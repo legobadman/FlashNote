@@ -153,6 +153,7 @@ copy C:\Qt\Qt-5.15.0\bin\Qt5SerialPortd.dll $(TargetDir)</Command>
   <ItemGroup>
     <ClCompile Include="FlashNote.cpp" />
     <ClCompile Include="NoteMainWindow.cpp" />
+    <ClCompile Include="qcc__icons.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +164,20 @@ mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
     </CustomBuild>
     <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\icons.qrc">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\rcc.exe" "%(FullPath)" -o "$(ProjectDir)\qcc__%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)\qcc__%(Filename).cpp</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="NoteMainWindow.ui">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\uic.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\ui_%(Filename).h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
