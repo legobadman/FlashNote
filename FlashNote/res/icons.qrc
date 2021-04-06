@@ -1,5 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>icons/flash.png</file>
+	<file>icons/flash2.png</file>
+	<file>icons/flash_old.png</file>
+	<file>icons/flash233.png</file>
 </qresource>
 </RCC>
