@@ -4,5 +4,8 @@
 #include <Windows.h>
 #include <QApplication>
 #include <QMainWindow>
+#include <QTreeView>
+#include <QtGui/QStandardItemModel>
+#include <QStyledItemDelegate>
 
 #endif
