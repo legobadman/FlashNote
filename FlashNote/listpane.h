@@ -9,6 +9,7 @@ public:
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
+	void resizeEvent(QResizeEvent* event) override;
 };
 
 #endif

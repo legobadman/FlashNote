@@ -27,14 +27,30 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 
 QSize LeftSideItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
+	return QSize(276, 36);
 	return QStyledItemDelegate::sizeHint(option, index);
 }
 
 void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
 {
 	QStyledItemDelegate::initStyleOption(option, index);
-	option->palette.setColor(QPalette::Window, QColor(42, 51, 60));
-	option->backgroundBrush.setColor(QColor(42, 51, 60));
+	option->palette.setColor(QPalette::All, QPalette::Text, QColor(213, 221, 227));
+	if (option->state & QStyle::State_Selected)
+	{
+		option->backgroundBrush.setColor(QColor(74, 93, 107));
+		option->backgroundBrush.setStyle(Qt::SolidPattern);
+	}
+	else if (option->state & QStyle::State_MouseOver)
+	{
+		option->backgroundBrush.setColor(QColor(53, 69, 83));
+		option->backgroundBrush.setStyle(Qt::SolidPattern);
+	}
+	else
+	{
+		option->backgroundBrush.setColor(QColor(42, 51, 60));
+		option->backgroundBrush.setStyle(Qt::SolidPattern);
+	}
+	option->font.setPointSize(12);
 }
 
 
@@ -62,19 +78,16 @@ void NoteMainWindow::init()
 		QIcon(":/icons/add_note.png"),
 		u8"新建笔记"
 	);
-	leftsidemodel->appendRow(pNewNoteItem);
 
 	QStandardItem* pAllNotesItem = new QStandardItem(
 		QIcon(":/icons/allnotes.png"),
 		u8"全部笔记"
 	);
-	leftsidemodel->appendRow(pAllNotesItem);
 
 	QStandardItem* pNoteBookItem = new QStandardItem(
 		QIcon(":/icons/notebooks.png"),
 		u8"笔记本"
 	);
-	leftsidemodel->appendRow(pNoteBookItem);
 
 	QStandardItem* pMaterialItem = new QStandardItem(
 		QIcon(":/icons/material.png"),
@@ -101,6 +114,9 @@ void NoteMainWindow::init()
 		u8"废纸篓"
 	);
 
+	leftsidemodel->appendRow(pNewNoteItem);
+	leftsidemodel->appendRow(pAllNotesItem);
+	leftsidemodel->appendRow(pNoteBookItem);
 	leftsidemodel->appendRow(pMaterialItem);
 	leftsidemodel->appendRow(pFragmentItem);
 	leftsidemodel->appendRow(pDiaryItem);

@@ -16,3 +16,8 @@ void NavigationPanel::paintEvent(QPaintEvent* event)
 {
 	QTreeView::paintEvent(event);
 }
+
+void NavigationPanel::resizeEvent(QResizeEvent* event)
+{
+	QTreeView::resizeEvent(event);
+}
