@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "NoteMainWindow.h"
+#include "MyStyle.h"
 
 int WINAPI WinMain(__in HINSTANCE hInstance,
 	__in_opt HINSTANCE hPrevInstance,
@@ -8,6 +9,8 @@ int WINAPI WinMain(__in HINSTANCE hInstance,
 {
 	QApplication::addLibraryPath("C:/Qt/Qt-5.15.0/plugins");
 	QApplication app(__argc, __argv);
+
+	QApplication::setStyle(new MyStyle);
 
 	NoteMainWindow mainWin(NULL);
 	mainWin.show();

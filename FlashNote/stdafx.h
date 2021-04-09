@@ -7,5 +7,6 @@
 #include <QTreeView>
 #include <QtGui/QStandardItemModel>
 #include <QStyledItemDelegate>
+#include <QHeaderView>
 
 #endif

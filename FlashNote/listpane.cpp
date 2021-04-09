@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "listpane.h"
+#include "moc_listpane.cpp"
 
 NavigationPanel::NavigationPanel(QWidget* parent)
 	: QTreeView(parent)
 {
-
+	header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	setAlternatingRowColors(true);
 }
 
 NavigationPanel::~NavigationPanel()

@@ -10,7 +10,7 @@ class LeftSideItemDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
 public:
-	LeftSideItemDelegate(QObject* parent);
+	LeftSideItemDelegate(QWidget* parent);
 	void setModelData(QWidget* editor,
 		QAbstractItemModel* model,
 		const QModelIndex& index) const;

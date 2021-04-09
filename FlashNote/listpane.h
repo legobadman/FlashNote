@@ -3,6 +3,7 @@
 
 class NavigationPanel : public QTreeView
 {
+	Q_OBJECT
 public:
 	NavigationPanel(QWidget* parent = nullptr);
 	~NavigationPanel();

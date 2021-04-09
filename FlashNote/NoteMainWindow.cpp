@@ -4,7 +4,7 @@
 #include "moc_NoteMainWindow.cpp"
 
 
-LeftSideItemDelegate::LeftSideItemDelegate(QObject* parent)
+LeftSideItemDelegate::LeftSideItemDelegate(QWidget* parent)
 	: QStyledItemDelegate(parent)
 {
 }
@@ -19,16 +19,13 @@ void LeftSideItemDelegate::setModelData(QWidget* editor,
 void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 	const QModelIndex& index) const
 {
-	//QStyleOptionViewItem opt = option;
-	//initStyleOption(&opt, index);
-
 	QStyledItemDelegate::paint(painter, option, index);
 }
 
 QSize LeftSideItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-	return QSize(276, 36);
-	return QStyledItemDelegate::sizeHint(option, index);
+	int w = ((QWidget*)parent())->width();
+	return QSize(w, 36);
 }
 
 void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
@@ -109,6 +106,11 @@ void NoteMainWindow::init()
 		u8"½ø¶È±í"
 	);
 
+	QStandardItem* pDraftItem = new QStandardItem(
+		QIcon(":/icons/draft.png"),
+		u8"²Ý¸å"
+		);
+
 	QStandardItem* pTrashItem = new QStandardItem(
 		QIcon(":/icons/trash.png"),
 		u8"·ÏÖ½Â¨"
@@ -121,6 +123,7 @@ void NoteMainWindow::init()
 	leftsidemodel->appendRow(pFragmentItem);
 	leftsidemodel->appendRow(pDiaryItem);
 	leftsidemodel->appendRow(pScheduleItem);
+	leftsidemodel->appendRow(pDraftItem);
 	leftsidemodel->appendRow(pTrashItem);
 
 	m_ui->treeView->setModel(leftsidemodel);
