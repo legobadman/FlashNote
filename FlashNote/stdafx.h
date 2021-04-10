@@ -5,8 +5,10 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QTreeView>
+#include <QTableView>
 #include <QtGui/QStandardItemModel>
 #include <QStyledItemDelegate>
 #include <QHeaderView>
+#include <QtGui/QPainter>
 
 #endif
