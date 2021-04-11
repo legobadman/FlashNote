@@ -10,5 +10,6 @@
 #include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QtGui/QPainter>
+#include <QtGui/QTextLayout>
 
 #endif

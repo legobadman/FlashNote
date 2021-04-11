@@ -42,6 +42,15 @@ void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
 	option->palette.setColor(QPalette::All, QPalette::Text, QColor(213, 221, 227));
 	option->backgroundBrush.setStyle(Qt::SolidPattern);
 
+	if (bNewNote)
+	{
+		option->decorationSize = QSize(28, 28);
+	}
+	else
+	{
+		option->decorationSize = QSize(16, 16);
+	}
+
 	if (option->state & QStyle::State_Selected)
 	{
 		option->backgroundBrush.setColor(selectedClr);
@@ -85,12 +94,12 @@ void NoteMainWindow::init()
 	m_ui = new Ui::NoteMainWindow();
 	m_ui->setupUi(this);
 
-	setWindowIcon(QIcon(":/icons/flash.png"));
+	setWindowIcon(QIcon(":/icons/bluewhite.png"));
 	
 	leftsidemodel = new	QStandardItemModel(m_ui->treeView);
 
 	QStandardItem* pNewNoteItem = new QStandardItem(
-		QIcon(":/icons/add_note.png"),
+		QIcon(":/icons/btn_addnote.png"),
 		u8"新建笔记"
 	);
 
@@ -116,13 +125,13 @@ void NoteMainWindow::init()
 	pMaterialItem->setEditable(false);
 
 	QStandardItem* pFragmentItem = new QStandardItem(
-		QIcon(":/icons/fragments.png"),
+		QIcon(":/icons/socialmediashare.png"),
 		u8"碎片信息"
 	);
 	pFragmentItem->setEditable(false);
 
 	QStandardItem* pDiaryItem = new QStandardItem(
-		QIcon(":/icons/diarys.png"),
+		QIcon(":/icons/myspace.png"),
 		u8"日记"
 	);
 	pDiaryItem->setEditable(false);

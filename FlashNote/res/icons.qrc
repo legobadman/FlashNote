@@ -4,5 +4,15 @@
 	<file>icons/flash2.png</file>
 	<file>icons/flash_old.png</file>
 	<file>icons/flash233.png</file>
+	<file>icons/bluewhite.png</file>
+	<file>icons/btn_addnote.png</file>
+	<file>icons/allnotes.png</file>
+	<file>icons/notebooks.png</file>
+	<file>icons/material.png</file>
+	<file>icons/myspace.png</file>
+	<file>icons/socialmediashare.png</file>
+	<file>icons/schedules.png</file>
+	<file>icons/draft.png</file>
+	<file>icons/trash.png</file>
 </qresource>
 </RCC>

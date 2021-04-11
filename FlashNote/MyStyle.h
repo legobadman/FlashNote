@@ -18,6 +18,9 @@ public:
 	int styleHint(StyleHint sh, const QStyleOption* opt = nullptr, const QWidget* w = nullptr,
 		QStyleHintReturn* shret = nullptr) const override;
 	void drawControl(ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget = nullptr) const override;
+
+private:
+	void viewItemDrawText(QPainter* p, const QStyleOptionViewItem* option, const QRect& rect) const;
 };
 
 #endif
