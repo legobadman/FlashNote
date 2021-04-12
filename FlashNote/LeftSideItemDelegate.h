@@ -3,7 +3,7 @@
 
 enum LEFT_SIDE_TYPE
 {
-	ITEM_NEWNOTE,
+	ITEM_NEWNOTE = 0,
 	ITEM_ALLNOTE,
 	ITEM_NOTEBOOK,
 	ITEM_MATERIAL,
@@ -12,6 +12,7 @@ enum LEFT_SIDE_TYPE
 	ITEM_SCHEDULE,
 	ITEM_DRAFT,
 	ITEM_TRASH,
+	ITEM_UNKNOWN,
 };
 
 class LeftSideItemDelegate : public QStyledItemDelegate
@@ -25,7 +26,6 @@ public:
 	void paint(QPainter* painter, const QStyleOptionViewItem& option,
 		const QModelIndex& index) const;
 	QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
-	void drawBackground(QStyleOptionViewItem& opt, QPainter* p, const QWidget* widget) const;
 
 protected:
 	void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;

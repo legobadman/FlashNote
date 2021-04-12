@@ -5,12 +5,10 @@
 
 MyStyle::MyStyle()
 {
-
 }
 
 MyStyle::~MyStyle()
 {
-
 }
 
 void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPainter* p,
@@ -19,44 +17,15 @@ void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPaint
 	if (qobject_cast<const NavigationPanel*>(widget))
 	{
 		const QStyleOptionViewItem* vopt = qstyleoption_cast<const QStyleOptionViewItem*>(opt);
-		if (!vopt)
+		if (pe == PE_PanelItemViewRow && vopt && !vopt->index.isValid())
 		{
-			return QProxyStyle::drawPrimitive(pe, opt, p, widget);
-		}
-		if (pe == PE_PanelItemViewRow)
-		{
-			if (vopt && !vopt->index.isValid())
-			{
-				QStyleOptionViewItem opt_clone(*vopt);
-				opt_clone.features.setFlag(QStyleOptionViewItem::Alternate);
+			QStyleOptionViewItem opt_clone(*vopt);
+			opt_clone.features.setFlag(QStyleOptionViewItem::Alternate);
 
-				QBrush brshBackground(QColor(42, 51, 60));
-				opt_clone.palette.setBrush(QPalette::All, QPalette::AlternateBase, brshBackground);
+			QBrush brshBackground(QColor(42, 51, 60));
+			opt_clone.palette.setBrush(QPalette::All, QPalette::AlternateBase, brshBackground);
 
-				return QProxyStyle::drawPrimitive(pe, &opt_clone, p, widget);
-			}
-		}
-		else if (pe == PE_PanelItemViewItem)
-		{
-			QStyleOptionViewItem option(*vopt);
-
-			bool newStyle = true;
-			if (const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(widget)) {
-				newStyle = !qobject_cast<const QTableView*>(widget);
-			}
-
-			if (newStyle && vopt) {
-				if (option.features & QStyleOptionViewItem::Alternate)
-					p->fillRect(option.rect, option.palette.alternateBase());
-
-				if (option.backgroundBrush.style() != Qt::NoBrush) {
-					const QPointF oldBrushOrigin = p->brushOrigin();
-					p->setBrushOrigin(option.rect.topLeft());
-					p->fillRect(option.rect, option.backgroundBrush);
-					p->setBrushOrigin(oldBrushOrigin);
-				}
-				return;
-			}
+			return QProxyStyle::drawPrimitive(pe, &opt_clone, p, widget);
 		}
 	}
 	return QProxyStyle::drawPrimitive(pe, opt, p, widget);
@@ -71,11 +40,6 @@ int MyStyle::styleHint(StyleHint sh, const QStyleOption* opt, const QWidget* w, 
 
 int MyStyle::pixelMetric(PixelMetric m, const QStyleOption* opt, const QWidget* widget) const
 {
-	switch (m)
-	{
-	case PM_FocusFrameHMargin:
-		return 2;
-	}
 	return QProxyStyle::pixelMetric(m, opt, widget);
 }
 
