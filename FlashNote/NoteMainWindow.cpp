@@ -1,82 +1,8 @@
 #include "stdafx.h"
 #include "ui_NoteMainWindow.h"
 #include "NoteMainWindow.h"
+#include "LeftSideItemDelegate.h"
 #include "moc_NoteMainWindow.cpp"
-
-
-LeftSideItemDelegate::LeftSideItemDelegate(QWidget* parent)
-	: QStyledItemDelegate(parent)
-{
-}
-
-void LeftSideItemDelegate::setModelData(QWidget* editor,
-	QAbstractItemModel* model,
-	const QModelIndex& index) const
-{
-	QStyledItemDelegate::setModelData(editor, model, index);
-}
-
-void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
-	const QModelIndex& index) const
-{
-	QStyledItemDelegate::paint(painter, option, index);
-}
-
-QSize LeftSideItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
-{
-	int w = ((QWidget*)parent())->width();
-	if (index.row() == 0)
-		return QSize(w, 60);
-	else
-		return QSize(w, 36);
-}
-
-void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
-{
-	QStyledItemDelegate::initStyleOption(option, index);
-	
-	bool bNewNote = index.row() == 0;
-	QColor backgroundClr(42, 51, 60);
-	QColor selectedClr(QColor(74, 93, 107));
-
-	option->palette.setColor(QPalette::All, QPalette::Text, QColor(213, 221, 227));
-	option->backgroundBrush.setStyle(Qt::SolidPattern);
-
-	if (bNewNote)
-	{
-		option->decorationSize = QSize(28, 28);
-	}
-	else
-	{
-		option->decorationSize = QSize(16, 16);
-	}
-
-	if (option->state & QStyle::State_Selected)
-	{
-		option->backgroundBrush.setColor(selectedClr);
-	}
-	else if (option->state & QStyle::State_MouseOver)
-	{
-		if (bNewNote)
-		{
-			option->backgroundBrush.setColor(backgroundClr);
-			option->palette.setColor(QPalette::All, QPalette::Text, QColor(255, 255, 255));
-		}
-		else
-		{
-			option->backgroundBrush.setColor(QColor(53, 69, 83));
-		}
-	}
-	else
-	{
-		option->backgroundBrush.setColor(backgroundClr);
-	}
-	if (bNewNote)
-		option->font.setPointSize(13);
-	else
-		option->font.setPointSize(12);
-}
-
 
 
 NoteMainWindow::NoteMainWindow(QWidget* parent)
@@ -102,57 +28,65 @@ void NoteMainWindow::init()
 		QIcon(":/icons/btn_addnote.png"),
 		u8"新建笔记"
 	);
-
 	pNewNoteItem->setSelectable(false);
 	pNewNoteItem->setEditable(false);
+	pNewNoteItem->setData(ITEM_NEWNOTE);
 
 	QStandardItem* pAllNotesItem = new QStandardItem(
 		QIcon(":/icons/allnotes.png"),
 		u8"全部笔记"
 	);
 	pAllNotesItem->setEditable(false);
+	pAllNotesItem->setData(ITEM_ALLNOTE);
 
 	QStandardItem* pNoteBookItem = new QStandardItem(
 		QIcon(":/icons/notebooks.png"),
 		u8"笔记本"
 	);
 	pNoteBookItem->setEditable(false);
+	pNoteBookItem->setData(ITEM_NOTEBOOK);
 
 	QStandardItem* pMaterialItem = new QStandardItem(
 		QIcon(":/icons/material.png"),
 		u8"全部素材"
 	);
 	pMaterialItem->setEditable(false);
+	pMaterialItem->setData(ITEM_MATERIAL);
 
 	QStandardItem* pFragmentItem = new QStandardItem(
 		QIcon(":/icons/socialmediashare.png"),
 		u8"碎片信息"
 	);
 	pFragmentItem->setEditable(false);
+	pFragmentItem->setData(ITEM_SOCIALMEDIA);
 
 	QStandardItem* pDiaryItem = new QStandardItem(
 		QIcon(":/icons/myspace.png"),
 		u8"日记"
 	);
 	pDiaryItem->setEditable(false);
+	pDiaryItem->setData(ITEM_DIARY);
 
 	QStandardItem* pScheduleItem = new QStandardItem(
 		QIcon(":/icons/schedules.png"),
 		u8"进度表"
 	);
 	pScheduleItem->setEditable(false);
+	pScheduleItem->setData(ITEM_SCHEDULE);
 
 	QStandardItem* pDraftItem = new QStandardItem(
 		QIcon(":/icons/draft.png"),
 		u8"草稿"
 		);
 	pDraftItem->setEditable(false);
+	pDraftItem->setData(ITEM_DRAFT);
 
 	QStandardItem* pTrashItem = new QStandardItem(
 		QIcon(":/icons/trash.png"),
 		u8"废纸篓"
 	);
 	pTrashItem->setEditable(false);
+	pTrashItem->setData(ITEM_TRASH);
 
 	leftsidemodel->appendRow(pNewNoteItem);
 	leftsidemodel->appendRow(pAllNotesItem);
@@ -169,5 +103,5 @@ void NoteMainWindow::init()
 
 	m_ui->splitter->setStretchFactor(1, 3);
 
-	this->showMaximized();
+	showMaximized();
 }

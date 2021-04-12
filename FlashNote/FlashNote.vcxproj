@@ -152,6 +152,7 @@ copy C:\Qt\Qt-5.15.0\bin\Qt5SerialPortd.dll $(TargetDir)</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FlashNote.cpp" />
+    <ClCompile Include="LeftSideItemDelegate.cpp" />
     <ClCompile Include="listpane.cpp" />
     <ClCompile Include="MyStyle.cpp" />
     <ClCompile Include="NoteMainWindow.cpp" />
@@ -176,6 +177,12 @@ mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
 mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
 "C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="LeftSideItemDelegate.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mkdir $(SolutionDir)\GeneratedFiles
+mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
+"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
     </CustomBuild>
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
