@@ -14,5 +14,17 @@
 	<file>icons/schedules.png</file>
 	<file>icons/draft.png</file>
 	<file>icons/trash.png</file>
+	<file>icons/16x16/Bold.png</file>
+	<file>icons/16x16/Italic.png</file>
+	<file>icons/16x16/Underline.png</file>
+	<file>icons/16x16/highlighted.png</file>
+	<file>icons/16x16/codeblock.png</file>
+ <file>icons/16x16/item_symbol.png</file>
+ <file>icons/16x16/item_id.png</file>
+ <file>icons/16x16/left_alignment.png</file>
+ <file>icons/16x16/attachment.png</file>
+ <file>icons/16x16/photo.png</file>
+ <file>icons/16x16/morecolor.png</file>
+ <file>icons/16x16/default_color.png</file>
 </qresource>
 </RCC>

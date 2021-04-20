@@ -95,7 +95,8 @@
        </attribute>
       </widget>
       <widget class="QStackedWidget" name="stackedWidget">
-       <widget class="QWidget" name="page"/>
+       <widget class="NoteEditWindow" name="editwindow">
+       </widget>
        <widget class="QWidget" name="page_2"/>
       </widget>
      </widget>
@@ -130,6 +131,11 @@
    <class>NavigationPanel</class>
    <extends>QTreeView</extends>
    <header>listpane.h</header>
+  </customwidget>
+  <customwidget>
+   <class>NoteEditWindow</class>
+   <extends>QWidget</extends>
+   <header>note_editwindow.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

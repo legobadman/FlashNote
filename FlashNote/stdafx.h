@@ -11,5 +11,10 @@
 #include <QHeaderView>
 #include <QtGui/QPainter>
 #include <QtGui/QTextLayout>
+#include <QComboBox>
+#include <QtGui/QPalette>
+#include <QStylePainter>
+#include <QtGui/QPainterPath>
+#include <QFontComboBox>
 
 #endif

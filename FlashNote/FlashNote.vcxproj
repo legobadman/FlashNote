@@ -89,7 +89,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Create</PrecompiledHeader>
-      <AdditionalIncludeDirectories>C:\Qt\Qt-5.15.0\include\QtWidgets;C:\Qt\Qt-5.15.0\include\QtCore;C:\Qt\Qt-5.15.0\include;$(SolutionDir)GeneratedFiles\$(Configuration);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\Qt-5.15.0\include\QtWidgets;C:\Qt\Qt-5.15.0\include\QtCore;C:\Qt\Qt-5.15.0\include;$(SolutionDir)GeneratedFiles\$(Configuration);$(SolutionDir)notecore;$(ProjectDir);$(ProjectDir)style;$(ProjectDir)comctrl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -151,15 +151,42 @@ copy C:\Qt\Qt-5.15.0\bin\Qt5SerialPortd.dll $(TargetDir)</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="colorgalleryview.cpp" />
+    <ClCompile Include="coloritemdelegate.cpp" />
+    <ClCompile Include="comctrl\menubutton.cpp" />
+    <ClCompile Include="comctrl\toolbutton.cpp" />
+    <ClCompile Include="DrawerFunc.cpp" />
     <ClCompile Include="FlashNote.cpp" />
+    <ClCompile Include="FontColorComboBox.cpp" />
+    <ClCompile Include="fontsize_combobox.cpp" />
+    <ClCompile Include="font_combobox.cpp" />
+    <ClCompile Include="FramelessLineEdit.cpp" />
     <ClCompile Include="LeftSideItemDelegate.cpp" />
     <ClCompile Include="listpane.cpp" />
-    <ClCompile Include="MyStyle.cpp" />
     <ClCompile Include="NoteMainWindow.cpp" />
+    <ClCompile Include="note_editwindow.cpp" />
     <ClCompile Include="qcc__icons.cpp" />
+    <ClCompile Include="SeperateLine.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="style\MyStyle.cpp" />
+    <ClCompile Include="style\ToolButtonStyle.cpp" />
+    <ClCompile Include="style\toolbuttonstyleoption.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="style\MyStyle.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="colorgalleryview.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="coloritemdelegate.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <ClInclude Include="style\ToolButtonStyle.h" />
+    <ClInclude Include="style\toolbuttonstyleoption.h" />
     <CustomBuild Include="NoteMainWindow.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mkdir $(SolutionDir)\GeneratedFiles
 mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
@@ -172,18 +199,48 @@ mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
 "C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
     </CustomBuild>
-    <CustomBuild Include="MyStyle.h">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mkdir $(SolutionDir)\GeneratedFiles
-mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
-"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
-    </CustomBuild>
     <CustomBuild Include="LeftSideItemDelegate.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mkdir $(SolutionDir)\GeneratedFiles
 mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
 "C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
     </CustomBuild>
+    <CustomBuild Include="note_editwindow.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mkdir $(SolutionDir)\GeneratedFiles
+mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
+"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="comctrl\menubutton.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="comctrl\toolbutton.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <ClInclude Include="DrawerFunc.h" />
+    <CustomBuild Include="FramelessLineEdit.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mkdir $(SolutionDir)\GeneratedFiles
+mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
+"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="fontsize_combobox.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">mkdir $(SolutionDir)\GeneratedFiles
+mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
+"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="font_combobox.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="FontColorComboBox.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <ClInclude Include="SeperateLine.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +252,13 @@ mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NoteMainWindow.ui">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\uic.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\ui_%(Filename).h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="note_editwindow.ui">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\uic.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\ui_%(Filename).h"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
