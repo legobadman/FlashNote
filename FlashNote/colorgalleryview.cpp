@@ -4,12 +4,14 @@
 #include "MyStyle.h"
 #include "moc_colorgalleryview.cpp"
 
-#define ITEM_SIZE 20
-#define ROW_GALLERY_VIEW 5
-#define COLUMN_GALLERY_VIEW 10
-#define VIEW_MARGIN 4
-#define VIEW_WIDTH MyStyle::dpiScaled(248)
-#define VIEW_HEIGHT MyStyle::dpiScaled(186)
+
+static const int sROW = 5;
+static const int sColumn = 10;
+static const int sTableItemMargin = 4;
+static const int sIconSize = 16;
+static const int sTableItemSize = 20;
+static const int sViewWidth = sColumn * sTableItemSize + (sColumn - 1) * sTableItemMargin;
+static const int sViewHeight = sROW * sTableItemSize + (sROW - 1) * sTableItemMargin;
 
 
 ColorGalleryView::ColorGalleryView(QWidget* parent)
@@ -25,13 +27,18 @@ ColorGalleryView::~ColorGalleryView()
 
 void ColorGalleryView::init()
 {
-	setFixedSize(MyStyle::dpiScaledSize(QSize(VIEW_WIDTH, VIEW_HEIGHT)));
+	setMouseTracking(true);
+	setFixedSize(QSize(sViewWidth, sViewHeight));
+	setFrameShape(QFrame::NoFrame);
 	initModel();
 }
 
 QRect ColorGalleryView::visualRect(const QModelIndex& index) const
 {
-	return QRect();
+	int r = index.row(), c = index.column();
+	QRect rc = QRect(c * (sTableItemSize + sTableItemMargin), r * (sTableItemSize + sTableItemMargin),
+		sTableItemSize, sTableItemSize);
+	return rc;
 }
 
 void ColorGalleryView::scrollTo(const QModelIndex& index, ScrollHint hint)
@@ -41,7 +48,11 @@ void ColorGalleryView::scrollTo(const QModelIndex& index, ScrollHint hint)
 
 QModelIndex ColorGalleryView::indexAt(const QPoint& point) const
 {
-	return QModelIndex();
+	float colProp = (float)point.x() / sViewWidth;
+	int col = colProp * sColumn;
+	float rowProp = (float)point.y() / sViewHeight;
+	int row = rowProp * sROW;
+	return model->index(row, col);
 }
 
 QModelIndex ColorGalleryView::moveCursor(CursorAction cursorAction,
@@ -74,31 +85,44 @@ QRegion ColorGalleryView::visualRegionForSelection(const QItemSelection& selecti
 	return QRegion();
 }
 
+bool ColorGalleryView::isHoverIndex(const QModelIndex& index)
+{
+	return index.row() == m_hoverIdx.row() && index.column() == m_hoverIdx.column();
+}
+
 void ColorGalleryView::initModel()
 {
-	model = new QStandardItemModel(ROW_GALLERY_VIEW, COLUMN_GALLERY_VIEW, this);
-
-	QStandardItem* pDefaultColor = new QStandardItem;
-	pDefaultColor->setIcon(QIcon(":/icons/16x16/default_color.png"));
-	pDefaultColor->setText(u8"默认颜色(D)");
-
-	model->setItem(0, 0, pDefaultColor);
-	for (int r = 1; r < ROW_GALLERY_VIEW + 1; r++)
+	model = new QStandardItemModel(sROW, sColumn, this);
+	for (int r = 0; r < sROW + 1; r++)
 	{
-		for (int c = 0; c < COLUMN_GALLERY_VIEW; c++)
+		for (int c = 0; c < sColumn; c++)
 		{
 			QStandardItem* pColorItem = new QStandardItem;
 			model->setItem(r, c, pColorItem);
 		}
 	}
-
-	QStandardItem* pMoreColor = new QStandardItem;
-	pMoreColor->setIcon(QIcon(":/icons/16x16/morecolor.png"));
-	pMoreColor->setText(u8"更多颜色(M)");
-	model->setItem(ROW_GALLERY_VIEW + 1, 0, pMoreColor);
-
 	setModel(model);
 	setItemDelegate(new ColorItemDelegate(this));
+}
+
+void ColorGalleryView::enterEvent(QEvent* e)
+{
+	update();
+}
+
+void ColorGalleryView::leaveEvent(QEvent* e)
+{
+	m_hoverIdx = QModelIndex();
+	update();
+}
+
+void ColorGalleryView::mouseMoveEvent(QMouseEvent* e)
+{
+	QPoint p = e->pos();
+	m_hoverIdx = indexAt(p);
+	int r = m_hoverIdx.row(), c = m_hoverIdx.column();
+	//update();
+	QAbstractItemView::mouseMoveEvent(e);
 }
 
 void ColorGalleryView::paintEvent(QPaintEvent* e)
@@ -106,40 +130,29 @@ void ColorGalleryView::paintEvent(QPaintEvent* e)
 	QPainter p(viewport());
 	QPainterPath path;
 
+	QRegion rg = e->region();
+
 	//draw the background
-	path.addRect(QRectF(0, 0, VIEW_WIDTH, VIEW_HEIGHT));
+	path.addRect(QRectF(0, 0, sViewWidth, sViewHeight));
 	p.fillPath(path, Qt::white);
 
-	//default color item
-	QModelIndex idx = model->index(0, 0);
-
-	QStyleOptionViewItem optionItem;
-	optionItem.state = QStyle::State_Enabled;
-	optionItem.rect = QRect(8, 8, 96, 25);
-	optionItem.type = QStyleOption::SO_ToolButton;
-	optionItem.decorationAlignment = Qt::AlignCenter;
-	optionItem.decorationPosition = QStyleOptionViewItem::Left;
-	optionItem.decorationSize = MyStyle::dpiScaledSize(QSize(16, 16));
-	optionItem.icon = idx.data(Qt::DecorationRole).value<QIcon>();
-	optionItem.text = idx.data(Qt::DisplayRole).toString();
-
-	itemDelegate(idx)->paint(&p, QStyleOptionViewItem(), idx);
-
 	int xoffset = 7, yoffset = 34;
-	for (int r = 0; r < ROW_GALLERY_VIEW; r++)
+	for (int r = 0; r < sROW; r++)
 	{
-		for (int c = 0; c < COLUMN_GALLERY_VIEW; c++)
+		for (int c = 0; c < sColumn; c++)
 		{
-			idx = model->index(r + 1, c);
-			QStyleOptionViewItem option;
-			itemDelegate(idx)->paint(&p, option, idx);
+			QModelIndex idx = model->index(r, c);
+			QRect rc = visualRect(idx);
+			if (rg.contains(rc))
+			{
+				QStyleOptionViewItem option;
+				itemDelegate(idx)->paint(&p, option, idx);
+			}
+			else
+			{
+				int j;
+				j = 0;
+			}
 		}
 	}
-
-	//more color item
-	idx = model->index(ROW_GALLERY_VIEW + 1, 0);
-	optionItem.rect = QRect(7, 156, 108, 25);
-	optionItem.icon = idx.data(Qt::DecorationRole).value<QIcon>();
-	optionItem.text = idx.data(Qt::DisplayRole).toString();
-	itemDelegate(idx)->paint(&p, QStyleOptionViewItem(), idx);
 }

@@ -12,6 +12,7 @@ public:
 	QRect visualRect(const QModelIndex& index) const override;
 	void scrollTo(const QModelIndex& index, ScrollHint hint = EnsureVisible) override;
 	QModelIndex indexAt(const QPoint& point) const override;
+	bool isHoverIndex(const QModelIndex& index);
 
 protected:
 	QModelIndex moveCursor(CursorAction cursorAction,
@@ -21,12 +22,14 @@ protected:
 	bool isIndexHidden(const QModelIndex& index) const override;
 	void setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command) override;
 	QRegion visualRegionForSelection(const QItemSelection& selection) const override;
-
+	void mouseMoveEvent(QMouseEvent* event) override;
 	void paintEvent(QPaintEvent* e) override;
+	void enterEvent(QEvent* e) override;
+	void leaveEvent(QEvent* e) override;
 
 private:
 	QStandardItemModel* model;
-
+	QModelIndex m_hoverIdx;
 };
 
 #endif

@@ -16,5 +16,6 @@
 #include <QStylePainter>
 #include <QtGui/QPainterPath>
 #include <QFontComboBox>
+#include <QPointer>
 
 #endif
