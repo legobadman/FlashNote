@@ -35,7 +35,15 @@
     <ClCompile Include="popupwidget.cpp">
       <Filter>comctrl</Filter>
     </ClCompile>
-    <ClCompile Include="alignmentcombobox.cpp" />
+    <ClCompile Include="richeditor\mrichtextedit.cpp">
+      <Filter>richeditor</Filter>
+    </ClCompile>
+    <ClCompile Include="richeditor\mtextedit.cpp">
+      <Filter>richeditor</Filter>
+    </ClCompile>
+    <ClCompile Include="richeditor\richtexteditor.cpp">
+      <Filter>richeditor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -47,7 +55,6 @@
     <ClInclude Include="style\toolbuttonstyleoption.h">
       <Filter>style</Filter>
     </ClInclude>
-    <ClInclude Include="alignmentcombobox.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NoteMainWindow.h" />
@@ -76,6 +83,18 @@
     <CustomBuild Include="popupwidget.h">
       <Filter>comctrl</Filter>
     </CustomBuild>
+    <CustomBuild Include="richeditor\mrichtextedit.ui">
+      <Filter>richeditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="richeditor\mrichtextedit.h">
+      <Filter>richeditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="richeditor\mtextedit.h">
+      <Filter>richeditor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="richeditor\richtexteditor.h">
+      <Filter>richeditor</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="style">
@@ -83,6 +102,9 @@
     </Filter>
     <Filter Include="comctrl">
       <UniqueIdentifier>{8a0359f6-7717-4212-93e5-f12bbba07a86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="richeditor">
+      <UniqueIdentifier>{5a6a1f13-ee7d-495e-9bc5-5ebebf6752aa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

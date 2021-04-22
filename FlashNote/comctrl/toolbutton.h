@@ -40,6 +40,7 @@ public slots:
 	void setChecked(bool bChecked);
 	void setDown(bool bDown);
 	void setButtonStyle(int style);
+	void setShortcut(QString);
 	virtual void updateIcon();
 
 signals:

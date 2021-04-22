@@ -151,7 +151,6 @@ copy C:\Qt\Qt-5.15.0\bin\Qt5SerialPortd.dll $(TargetDir)</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="alignmentcombobox.cpp" />
     <ClCompile Include="colorgallery.cpp" />
     <ClCompile Include="coloritemdelegate.cpp" />
     <ClCompile Include="colortableview.cpp" />
@@ -169,6 +168,9 @@ copy C:\Qt\Qt-5.15.0\bin\Qt5SerialPortd.dll $(TargetDir)</Command>
     <ClCompile Include="note_editwindow.cpp" />
     <ClCompile Include="popupwidget.cpp" />
     <ClCompile Include="qcc__icons.cpp" />
+    <ClCompile Include="richeditor\mrichtextedit.cpp" />
+    <ClCompile Include="richeditor\mtextedit.cpp" />
+    <ClCompile Include="richeditor\richtexteditor.cpp" />
     <ClCompile Include="SeperateLine.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="style\MyStyle.cpp" />
@@ -196,7 +198,18 @@ copy C:\Qt\Qt-5.15.0\bin\Qt5SerialPortd.dll $(TargetDir)</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
     </CustomBuild>
-    <ClInclude Include="alignmentcombobox.h" />
+    <CustomBuild Include="richeditor\mrichtextedit.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="richeditor\mtextedit.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="richeditor\richtexteditor.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
     <ClInclude Include="style\ToolButtonStyle.h" />
     <ClInclude Include="style\toolbuttonstyleoption.h" />
     <CustomBuild Include="NoteMainWindow.h">
@@ -271,6 +284,13 @@ mkdir $(SolutionDir)\GeneratedFiles\$(Configuration)
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="note_editwindow.ui">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\uic.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\ui_%(Filename).h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="richeditor\mrichtextedit.ui">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\uic.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\ui_%(Filename).h"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>

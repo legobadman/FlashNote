@@ -19,5 +19,7 @@
 #include <QPointer>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QDialog>
+#include <QTextEdit>
 
 #endif

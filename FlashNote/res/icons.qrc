@@ -1,6 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>icons/flash.png</file>
+ <file>icons/flash.png</file>
 	<file>icons/flash2.png</file>
 	<file>icons/flash_old.png</file>
 	<file>icons/flash233.png</file>
@@ -26,5 +26,6 @@
  <file>icons/16x16/photo.png</file>
  <file>icons/16x16/morecolor.png</file>
  <file>icons/16x16/default_color.png</file>
+ <file>icons/16x16/strikeout.png</file>
 </qresource>
 </RCC>

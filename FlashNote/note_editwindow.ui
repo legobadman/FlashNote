@@ -183,6 +183,10 @@
         </widget>
        </item>
        <item>
+        <widget class="ToolButton" name="strikeout" native="true">
+        </widget>
+       </item>
+       <item>
         <widget class="ToolButton" name="highlight" native="true">
          <property name="text" stdset="0">
           <string>PushButton</string>
@@ -264,7 +268,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTextEdit" name="textEdit"/>
+      <widget class="RichTextEditor" name="textEdit"/>
      </item>
     </layout>
    </item>
@@ -316,6 +320,11 @@
    <class>ColorGallery</class>
    <extends>QWidget</extends>
    <header>colorgallery.h</header>
+  </customwidget>
+  <customwidget>
+   <class>RichTextEditor</class>
+   <extends>QTextEdit</extends>
+   <header>richeditor/richtexteditor.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -111,6 +111,11 @@ void ToolButton::setChecked(bool bChecked)
 	update();
 }
 
+void ToolButton::setShortcut(QString text)
+{
+
+}
+
 void ToolButton::setDown(bool bDown)
 {
 	if (bDown == m_bDown)
@@ -153,6 +158,7 @@ void ToolButton::mouseReleaseEvent(QMouseEvent* e)
 	{
 		setChecked(!m_bChecked);
 	}
+	emit clicked();
 }
 
 void ToolButton::setCustomTip(QString tip)
