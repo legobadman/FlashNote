@@ -25,11 +25,6 @@ void MenuButton::popupChildWidget()
 void MenuButton::initStyleOption(StyleOptionToolButton* option) const
 {
 	ToolButton::initStyleOption(option);
-	if (option->rect.width() > 50)
-	{
-		int j;
-		j = 0;
-	}
 	option->features |= QStyleOptionToolButton::Menu;
 	option->triggerAble = true;
 }

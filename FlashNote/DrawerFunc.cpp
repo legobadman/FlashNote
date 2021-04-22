@@ -228,13 +228,14 @@ QColor DrawerFunc::getColor(DrawClassName className, DrawPropName propName)
 	}
 	case CLS_TEXT:
 	{
-		clr = QColor(255, 255, 255);
+		clr = QColor(0, 0, 0);
 		break;
 	}
 	case CLS_BORDER:
 	{
 		switch (propName)
 		{
+		case PROP_ACTIVE:
 		case PROP_DOWN:
 		case PROP_HOVER: clr = QColor(139, 202, 231); break;
 		default:
@@ -252,8 +253,9 @@ QColor DrawerFunc::getColor(DrawClassName className, DrawPropName propName)
 		//case PROP_DISABLE:clr = QColor(204, 204, 204); break;
 		case PROP_DOWN:	clr = QColor(201, 230, 244); break;
 		case PROP_HOVER:  clr = QColor(227,241,249); break;
-		//case PROP_ACTIVE:
-		default: clr = QColor(255, 0, 0); break;
+		case PROP_ACTIVE:clr = QColor(201, 230, 244); break;
+		default:
+			clr = QColor(255, 0, 0); break;
 		}
 		break;
 	}

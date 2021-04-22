@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "ColorGalleryView.h"
+#include "colortableview.h"
 #include "coloritemdelegate.h"
 #include "MyStyle.h"
 #include "moc_colorgalleryview.cpp"
@@ -10,22 +10,31 @@ static const int sColumn = 10;
 static const int sTableItemMargin = 4;
 static const int sIconSize = 16;
 static const int sTableItemSize = 20;
+static const int sBorderSize = 1;
 static const int sViewWidth = sColumn * sTableItemSize + (sColumn - 1) * sTableItemMargin;
 static const int sViewHeight = sROW * sTableItemSize + (sROW - 1) * sTableItemMargin;
 
+//Color Table
+static const char clrTable[sROW][sColumn][8] = {
+	{"#D6D6D6", "#5DDAFF", "#81B6FF", "#BA00FF", "#E500FF", "#F14F9A", "#FF7A74", "#FBCD5F", "#F5FF7D", "#96EE7D"},
+	{"#A8A8A8", "#1ECCFF", "#5898FF", "#9E00F3", "#D100FF", "#EB0073", "#FF4635", "#FFAF00", "#F3FF38", "#6BE748"},
+	{"#797979", "#1AADE0", "#3665EE", "#7600D8", "#A600C4", "#BC0058", "#FF0000", "#FA7A00", "#F7FF00", "#4DCE1D"},
+	{"#464646", "#1A90B9", "#2D4FC9", "#4F009A", "#8600A4", "#9C004C", "#E30000", "#DE5700", "#C6C500", "#41AD1C"},
+	{"#000000", "#147191", "#1C3387", "#41007D", "#6A0081", "#7B003D", "#AD0000", "#A74500", "#939600", "#328712"}
+};
 
-ColorGalleryView::ColorGalleryView(QWidget* parent)
+
+ColorTableView::ColorTableView(QWidget* parent)
 	: QAbstractItemView(parent)
 {
 	init();
 }
 
-ColorGalleryView::~ColorGalleryView()
+ColorTableView::~ColorTableView()
 {
-
 }
 
-void ColorGalleryView::init()
+void ColorTableView::init()
 {
 	setMouseTracking(true);
 	setFixedSize(QSize(sViewWidth, sViewHeight));
@@ -33,7 +42,7 @@ void ColorGalleryView::init()
 	initModel();
 }
 
-QRect ColorGalleryView::visualRect(const QModelIndex& index) const
+QRect ColorTableView::visualRect(const QModelIndex& index) const
 {
 	int r = index.row(), c = index.column();
 	QRect rc = QRect(c * (sTableItemSize + sTableItemMargin), r * (sTableItemSize + sTableItemMargin),
@@ -41,12 +50,11 @@ QRect ColorGalleryView::visualRect(const QModelIndex& index) const
 	return rc;
 }
 
-void ColorGalleryView::scrollTo(const QModelIndex& index, ScrollHint hint)
+void ColorTableView::scrollTo(const QModelIndex& index, ScrollHint hint)
 {
-
 }
 
-QModelIndex ColorGalleryView::indexAt(const QPoint& point) const
+QModelIndex ColorTableView::indexAt(const QPoint& point) const
 {
 	float colProp = (float)point.x() / sViewWidth;
 	int col = colProp * sColumn;
@@ -55,42 +63,42 @@ QModelIndex ColorGalleryView::indexAt(const QPoint& point) const
 	return model->index(row, col);
 }
 
-QModelIndex ColorGalleryView::moveCursor(CursorAction cursorAction,
+QModelIndex ColorTableView::moveCursor(CursorAction cursorAction,
 	Qt::KeyboardModifiers modifiers)
 {
 	return QModelIndex();
 }
 
-int ColorGalleryView::horizontalOffset() const
+int ColorTableView::horizontalOffset() const
 {
 	return 0;
 }
 
-int ColorGalleryView::verticalOffset() const
+int ColorTableView::verticalOffset() const
 {
 	return 0;
 }
 
-bool ColorGalleryView::isIndexHidden(const QModelIndex& index) const
+bool ColorTableView::isIndexHidden(const QModelIndex& index) const
 {
 	return false;
 }
 
-void ColorGalleryView::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command)
+void ColorTableView::setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command)
 {
 }
 
-QRegion ColorGalleryView::visualRegionForSelection(const QItemSelection& selection) const
+QRegion ColorTableView::visualRegionForSelection(const QItemSelection& selection) const
 {
 	return QRegion();
 }
 
-bool ColorGalleryView::isHoverIndex(const QModelIndex& index)
+bool ColorTableView::isHoverIndex(const QModelIndex& index) const
 {
-	return index.row() == m_hoverIdx.row() && index.column() == m_hoverIdx.column();
+	return index == m_hoverIdx;
 }
 
-void ColorGalleryView::initModel()
+void ColorTableView::initModel()
 {
 	model = new QStandardItemModel(sROW, sColumn, this);
 	for (int r = 0; r < sROW + 1; r++)
@@ -98,6 +106,8 @@ void ColorGalleryView::initModel()
 		for (int c = 0; c < sColumn; c++)
 		{
 			QStandardItem* pColorItem = new QStandardItem;
+			QString clrName(clrTable[r][c]);
+			pColorItem->setBackground(QBrush(QColor(clrName)));
 			model->setItem(r, c, pColorItem);
 		}
 	}
@@ -105,27 +115,24 @@ void ColorGalleryView::initModel()
 	setItemDelegate(new ColorItemDelegate(this));
 }
 
-void ColorGalleryView::enterEvent(QEvent* e)
+void ColorTableView::enterEvent(QEvent* e)
 {
 	update();
 }
 
-void ColorGalleryView::leaveEvent(QEvent* e)
+void ColorTableView::leaveEvent(QEvent* e)
 {
 	m_hoverIdx = QModelIndex();
 	update();
 }
 
-void ColorGalleryView::mouseMoveEvent(QMouseEvent* e)
+void ColorTableView::mouseMoveEvent(QMouseEvent* e)
 {
-	QPoint p = e->pos();
-	m_hoverIdx = indexAt(p);
-	int r = m_hoverIdx.row(), c = m_hoverIdx.column();
-	//update();
+	m_hoverIdx = indexAt(e->pos());
 	QAbstractItemView::mouseMoveEvent(e);
 }
 
-void ColorGalleryView::paintEvent(QPaintEvent* e)
+void ColorTableView::paintEvent(QPaintEvent* e)
 {
 	QPainter p(viewport());
 	QPainterPath path;
@@ -137,6 +144,7 @@ void ColorGalleryView::paintEvent(QPaintEvent* e)
 	p.fillPath(path, Qt::white);
 
 	int xoffset = 7, yoffset = 34;
+	int hit = 0, cached = 0;
 	for (int r = 0; r < sROW; r++)
 	{
 		for (int c = 0; c < sColumn; c++)
@@ -146,12 +154,12 @@ void ColorGalleryView::paintEvent(QPaintEvent* e)
 			if (rg.contains(rc))
 			{
 				QStyleOptionViewItem option;
-				itemDelegate(idx)->paint(&p, option, idx);
+				itemDelegate(idx)->paint(&p, QStyleOptionViewItem(), idx);
+				hit++;
 			}
 			else
 			{
-				int j;
-				j = 0;
+				cached++;
 			}
 		}
 	}

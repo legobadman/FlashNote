@@ -1,18 +1,18 @@
 #ifndef __STANDARD_COLOR_VIEW_H__
 #define __STANDARD_COLOR_VIEW_H__
 
-class ColorGalleryView : public QAbstractItemView
+class ColorTableView : public QAbstractItemView
 {
 	Q_OBJECT
 public:
-	ColorGalleryView(QWidget* parent = nullptr);
-	~ColorGalleryView();
+	ColorTableView(QWidget* parent = nullptr);
+	~ColorTableView();
 	void init();
 	void initModel();
 	QRect visualRect(const QModelIndex& index) const override;
 	void scrollTo(const QModelIndex& index, ScrollHint hint = EnsureVisible) override;
 	QModelIndex indexAt(const QPoint& point) const override;
-	bool isHoverIndex(const QModelIndex& index);
+	bool isHoverIndex(const QModelIndex& index) const;
 
 protected:
 	QModelIndex moveCursor(CursorAction cursorAction,

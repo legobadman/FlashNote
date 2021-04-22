@@ -20,9 +20,6 @@
       <number>3</number>
      </property>
      <item>
-      <widget class="ColorGalleryView" name="gallery"></widget>
-     </item>
-     <item>
       <widget class="FramelessLineEdit" name="editTitle">
        <property name="minimumSize">
         <size>
@@ -311,9 +308,14 @@
    <header>FontColorComboBox.h</header>
   </customwidget>
   <customwidget>
-   <class>ColorGalleryView</class>
+   <class>ColorTableView</class>
    <extends>QAbstractItemView</extends>
-   <header>colorgalleryview.h</header>
+   <header>colortableview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ColorGallery</class>
+   <extends>QWidget</extends>
+   <header>colorgallery.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

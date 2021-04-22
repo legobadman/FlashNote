@@ -630,11 +630,6 @@ void ToolButtonStyle::paintBackgrgNormal(QPainter* painter, const QWidget* widge
 void ToolButtonStyle::paintBackgrgOngmani(QPainter* painter, const QWidget* widget)
 {
 	QRect hoverRect = getHoverRect(widget);
-	if (hoverRect.width() != 43)
-	{
-		int j;
-		j = 0;
-	}
 	paintOngmaniBtnBackground(painter, hoverRect, m_option);
 }
 

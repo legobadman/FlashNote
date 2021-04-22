@@ -17,5 +17,7 @@
 #include <QtGui/QPainterPath>
 #include <QFontComboBox>
 #include <QPointer>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #endif

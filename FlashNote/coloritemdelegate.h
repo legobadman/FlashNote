@@ -1,7 +1,7 @@
 #ifndef __COLOR_ITEM_DELEGATE_H__
 #define __COLOR_ITEM_DELEGATE_H__
 
-#include "colorgalleryview.h"
+#include "colortableview.h"
 
 class ColorItemDelegate : public QStyledItemDelegate
 {
@@ -12,16 +12,12 @@ public:
 		const QModelIndex& index) const;
 	QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
-
 protected:
 	void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
 
 private:
-	void paintColorTable(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-
-private:
 	QColor m_color;
-	QPointer<ColorGalleryView> m_view;
+	QPointer<ColorTableView> m_view;
 };
 
 #endif

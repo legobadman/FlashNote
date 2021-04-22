@@ -10,6 +10,7 @@ ToolButton::ToolButton(QWidget* parent)
 	, m_bDown(false)
 	, m_bChecked(false)
 	, m_bPressed(false)
+	, m_bHideText(false)
 	, m_buttonStyle(ButtonIcon)
 {
 	setMouseTracking(true);
@@ -104,12 +105,18 @@ void ToolButton::showToolTip()
 
 void ToolButton::setChecked(bool bChecked)
 {
+	if (bChecked == m_bChecked)
+		return;
 	m_bChecked = bChecked;
+	update();
 }
 
 void ToolButton::setDown(bool bDown)
 {
+	if (bDown == m_bDown)
+		return;
 	m_bDown = bDown;
+	update();
 }
 
 void ToolButton::setPressed(bool bPressed)
@@ -142,6 +149,10 @@ void ToolButton::mousePressEvent(QMouseEvent* e)
 void ToolButton::mouseReleaseEvent(QMouseEvent* e)
 {
 	setPressed(false);
+	if (m_buttonStyle & ButtonCheckable)
+	{
+		setChecked(!m_bChecked);
+	}
 }
 
 void ToolButton::setCustomTip(QString tip)
@@ -166,7 +177,6 @@ void ToolButton::enterEvent(QEvent* e)
 
 void ToolButton::leaveEvent(QEvent* e)
 {
-	m_bPressed = false;
 	update();
 }
 

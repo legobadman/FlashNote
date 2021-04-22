@@ -15,6 +15,7 @@ public:
 		ButtonDownArrow = 0x0001 << 2,
 		ButtonRightArrow = 0x0001 << 3,
 		ButtonTextUnderIcon = 0x0001 << 4,
+		ButtonCheckable = 0x0001 << 5,
 		ButtonSingleLineText = 0x0001 << 10,			// 默认Rainbow显示两行文字空白。这个属性用于特殊情况：只想显示单行文字，并且不需要多余的一行空白。
 		ButtonNoButtonBg = 0x0001 << 11,			//不画背景
 	};
@@ -38,7 +39,6 @@ public slots:
 	void showToolTip();
 	void setChecked(bool bChecked);
 	void setDown(bool bDown);
-	void setPressed(bool bPressed);
 	void setButtonStyle(int style);
 	virtual void updateIcon();
 
@@ -58,6 +58,7 @@ protected:
 	virtual void initStyleOption(StyleOptionToolButton* option) const;
 
 	void setCustomTip(QString tip);
+	void setPressed(bool bPressed);
 	QString getCustomTip();
 
 protected:

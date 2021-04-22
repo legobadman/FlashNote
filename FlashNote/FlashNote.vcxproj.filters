@@ -30,7 +30,12 @@
       <Filter>style</Filter>
     </ClCompile>
     <ClCompile Include="coloritemdelegate.cpp" />
-    <ClCompile Include="colorgalleryview.cpp" />
+    <ClCompile Include="colortableview.cpp" />
+    <ClCompile Include="colorgallery.cpp" />
+    <ClCompile Include="popupwidget.cpp">
+      <Filter>comctrl</Filter>
+    </ClCompile>
+    <ClCompile Include="alignmentcombobox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -42,6 +47,7 @@
     <ClInclude Include="style\toolbuttonstyleoption.h">
       <Filter>style</Filter>
     </ClInclude>
+    <ClInclude Include="alignmentcombobox.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="NoteMainWindow.h" />
@@ -64,8 +70,12 @@
     <CustomBuild Include="style\MyStyle.h">
       <Filter>style</Filter>
     </CustomBuild>
-    <CustomBuild Include="colorgalleryview.h" />
     <CustomBuild Include="coloritemdelegate.h" />
+    <CustomBuild Include="colortableview.h" />
+    <CustomBuild Include="colorgallery.h" />
+    <CustomBuild Include="popupwidget.h">
+      <Filter>comctrl</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="style">
