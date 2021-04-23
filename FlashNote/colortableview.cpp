@@ -2,7 +2,7 @@
 #include "colortableview.h"
 #include "coloritemdelegate.h"
 #include "MyStyle.h"
-#include "moc_colorgalleryview.cpp"
+#include "moc_colortableview.cpp"
 
 
 static const int sROW = 5;
