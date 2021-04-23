@@ -11,7 +11,7 @@ public:
 	FontColorComboBox(QWidget* parent = nullptr);
 	~FontColorComboBox();
 	void initStyleOption(QStyleOptionComboBox* option) const;
-	void init_image();
+	void updateColor(const QColor& color);
 
 protected:
 	void paintEvent(QPaintEvent* event);
@@ -19,6 +19,10 @@ protected:
 
 protected slots:
 	void popupChildWidget();
+	void onFontColorItemClicked(const QColor& newColor);
+
+signals:
+	void colorChanged(const QColor& newColor);
 
 private:
 	QColor m_clr;

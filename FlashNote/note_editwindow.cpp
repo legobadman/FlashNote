@@ -84,6 +84,15 @@ void NoteEditWindow::initSlots()
 	//f_paragraph->addItems(m_paragraphItems);
 	//connect(f_paragraph, SIGNAL(activated(int)), this, SLOT(textStyle(int)));
 
+	connect(m_ui->fontsize_comboBox, SIGNAL(activated(QString)),
+		this, SLOT(textSize(QString)));
+	m_ui->fontsize_comboBox->setCurrentIndex(m_ui->fontsize_comboBox->findText(QString::number(QApplication::font()
+		.pointSize())));
+
+	connect(m_ui->font_comboBox, SIGNAL(activated(QString)), this, SLOT(onFontChanged(QString)));
+
+	connect(m_ui->fontcolor, SIGNAL(colorChanged(const QColor&)), this, SLOT(textFgColor(const QColor&)));
+
 	//m_ui->attachment->setShortcut(Qt::CTRL + Qt::Key_L);
 	connect(m_ui->attachment, SIGNAL(clicked(bool)), this, SLOT(textLink(bool)));
 
@@ -101,8 +110,6 @@ void NoteEditWindow::initSlots()
 
 	connect(m_ui->item_symbol, SIGNAL(clicked(bool)), this, SLOT(listBullet(bool)));
 	connect(m_ui->item_id, SIGNAL(clicked(bool)), this, SLOT(listOrdered(bool)));
-
-	//connect(f_fgcolor, SIGNAL(clicked()), this, SLOT(textFgColor()));
 }
 
 void NoteEditWindow::initCustomWidget()
@@ -257,6 +264,13 @@ void NoteEditWindow::textSize(const QString& p) {
 	}
 }
 
+void NoteEditWindow::onFontChanged(const QString& font)
+{
+	QTextCharFormat fmt;
+	fmt.setFont(QFont(font));
+	mergeFormatOnWordOrSelection(fmt);
+}
+
 void NoteEditWindow::textLink(bool checked) {
 	bool unlink = false;
 	QTextCharFormat fmt;
@@ -334,22 +348,19 @@ void NoteEditWindow::textStyle(int index) {
 	cursor.endEditBlock();
 }
 
-void NoteEditWindow::textFgColor() {
-	QColor col = QColorDialog::getColor(m_ui->textEdit->textColor(), this);
+void NoteEditWindow::textFgColor(const QColor& color)
+{
 	QTextCursor cursor = m_ui->textEdit->textCursor();
-	if (!cursor.hasSelection()) {
-		cursor.select(QTextCursor::WordUnderCursor);
-	}
 	QTextCharFormat fmt = cursor.charFormat();
-	if (col.isValid()) {
-		fmt.setForeground(col);
+	if (color.isValid()) {
+		fmt.setForeground(color);
 	}
 	else {
 		fmt.clearForeground();
 	}
 	cursor.setCharFormat(fmt);
 	m_ui->textEdit->setCurrentCharFormat(fmt);
-	fgColorChanged(col);
+	fgColorChanged(color);
 }
 
 void NoteEditWindow::textBgColor() {
@@ -443,31 +454,12 @@ void NoteEditWindow::slotCursorPositionChanged() {
 }
 
 void NoteEditWindow::fontChanged(const QFont& f) {
+	m_ui->font_comboBox->setCurrentIndex(m_ui->font_comboBox->findText(f.family()));
 	m_ui->fontsize_comboBox->setCurrentIndex(m_ui->fontsize_comboBox->findText(QString::number(f.pointSize())));
 	m_ui->bold->setChecked(f.bold());
 	m_ui->italic->setChecked(f.italic());
 	m_ui->underline->setChecked(f.underline());
 	m_ui->strikeout->setChecked(f.strikeOut());
-	//if (f.pointSize() == m_fontsize_h1) {
-	//	f_paragraph->setCurrentIndex(ParagraphHeading1);
-	//}
-	//else if (f.pointSize() == m_fontsize_h2) {
-	//	f_paragraph->setCurrentIndex(ParagraphHeading2);
-	//}
-	//else if (f.pointSize() == m_fontsize_h3) {
-	//	f_paragraph->setCurrentIndex(ParagraphHeading3);
-	//}
-	//else if (f.pointSize() == m_fontsize_h4) {
-	//	f_paragraph->setCurrentIndex(ParagraphHeading4);
-	//}
-	//else {
-	//	if (f.fixedPitch() && f.family() == "Monospace") {
-	//		f_paragraph->setCurrentIndex(ParagraphMonospace);
-	//	}
-	//	else {
-	//		f_paragraph->setCurrentIndex(ParagraphStandard);
-	//	}
-	//}
 	if (m_ui->textEdit->textCursor().currentList()) {
 		QTextListFormat lfmt = m_ui->textEdit->textCursor().currentList()->format();
 		if (lfmt.style() == QTextListFormat::ListDisc) {
@@ -513,8 +505,9 @@ void NoteEditWindow::bgColorChanged(const QColor& c) {
 
 void NoteEditWindow::slotCurrentCharFormatChanged(const QTextCharFormat& format) {
 	fontChanged(format.font());
-	bgColorChanged((format.background().isOpaque()) ? format.background().color() : QColor());
-	fgColorChanged((format.foreground().isOpaque()) ? format.foreground().color() : QColor());
+	//bgColorChanged((format.background().isOpaque()) ? format.background().color() : QColor());
+	QColor color = (format.foreground().isOpaque()) ? format.foreground().color() : QColor();
+	m_ui->fontcolor->updateColor(color);
 	m_ui->attachment->setChecked(format.isAnchor());
 }
 

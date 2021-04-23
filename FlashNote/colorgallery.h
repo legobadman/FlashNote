@@ -15,11 +15,20 @@ public:
 protected:
 	void closeEvent(QCloseEvent* event) override;
 	void hideEvent(QHideEvent* event) override;
+	QColor getCurrentColor(const QColor& color);
+
+signals:
+	void fontColorChanged(const QColor& newColor);
+
+public slots:
+	void onItemActivated(const QModelIndex& index);
+	void onDefaultColorClicked();
 
 private:
 	ColorTableView* m_clrTable;
 	ToolButton* m_btnDefaultClr;
 	ToolButton* m_btnMoreClr;
+	QColor m_color;
 };
 
 #endif

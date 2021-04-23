@@ -26,6 +26,7 @@ void ColorGallery::init()
 	m_btnDefaultClr->setButtonStyle(ToolButton::ButtonText | ToolButton::ButtonIcon);
 	m_btnDefaultClr->setIcon(QIcon(":/icons/16x16/default_color.png"));
 	m_btnDefaultClr->setIconSize(MyStyle::dpiScaledSize(QSize(16,16)));
+	
 	pHBoxLayout1->addWidget(m_btnDefaultClr);
 	pHBoxLayout1->addStretch();
 	pMainLayout->addLayout(pHBoxLayout1);
@@ -45,6 +46,9 @@ void ColorGallery::init()
 	pMainLayout->addLayout(pHBoxLayout2);
 	pMainLayout->addStretch();
 
+	connect(m_btnDefaultClr, SIGNAL(clicked()), this, SLOT(onDefaultColorClicked()));
+	connect(m_clrTable, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onItemActivated(const QModelIndex&)));
+
 	setLayout(pMainLayout);
 
 	setFixedSize(MyStyle::dpiScaledSize(QSize(248, 196)));
@@ -58,4 +62,23 @@ void ColorGallery::closeEvent(QCloseEvent* event)
 void ColorGallery::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
+}
+
+QColor ColorGallery::getCurrentColor(const QColor& color)
+{
+	return m_color;
+}
+
+void ColorGallery::onItemActivated(const QModelIndex& index)
+{
+	QBrush brush = index.data(Qt::BackgroundRole).value<QBrush>();
+	QColor clr = brush.color();
+	m_color = clr;
+	emit fontColorChanged(m_color);
+}
+
+void ColorGallery::onDefaultColorClicked()
+{
+	m_color = QColor(0, 0, 0);
+	emit fontColorChanged(m_color);
 }

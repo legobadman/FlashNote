@@ -41,9 +41,10 @@ protected slots:
 	void textStrikeout();
 	void textItalic();
 	void textSize(const QString& p);
+	void onFontChanged(const QString& font);
 	void textLink(bool checked);
 	void textStyle(int index);
-	void textFgColor();
+	void textFgColor(const QColor& color);
 	void textBgColor();
 	void listBullet(bool checked);
 	void listOrdered(bool checked);

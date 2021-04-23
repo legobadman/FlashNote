@@ -44,6 +44,8 @@ void FontColorComboBox::popupChildWidget()
 	PopupWidget* pPopup = new PopupWidget(this);
 	pPopup->setWindowFlag(Qt::Popup);
 	ColorGallery* pColorGallery = new ColorGallery(pPopup);
+	connect(pColorGallery, SIGNAL(fontColorChanged(const QColor&)), pPopup, SLOT(hide()));
+	connect(pColorGallery, SIGNAL(fontColorChanged(const QColor&)), this, SLOT(onFontColorItemClicked(const QColor&)));
 	pPopup->setContentWidget(pColorGallery);
 
 	QPoint pGlobal = mapToGlobal(QPoint(0, 0));
@@ -66,9 +68,24 @@ void FontColorComboBox::popupChildWidget()
 #endif
 }
 
+void FontColorComboBox::onFontColorItemClicked(const QColor& newColor)
+{
+	updateColor(newColor);
+	emit colorChanged(newColor);
+}
+
+void FontColorComboBox::updateColor(const QColor& color)
+{
+	if (color != m_clr)
+	{
+		m_clr = color;
+		update();
+	}
+}
+
 void FontColorComboBox::paintEvent(QPaintEvent* event)
 {
-	if (!m_bUpdated)
+	//if (!m_bUpdated)
 	{
 		updateIcon();
 	}
@@ -86,7 +103,7 @@ void FontColorComboBox::updateIcon()
 	p.setFont(font);
 
 	QPen pen;
-	pen.setColor(QColor(0, 0, 0));
+	pen.setColor(m_clr);
 	p.setPen(pen);
 	p.drawText(QRect(9,0,24,24), "a");
 

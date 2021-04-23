@@ -164,3 +164,11 @@ void ColorTableView::paintEvent(QPaintEvent* e)
 		}
 	}
 }
+
+//void ColorTableView::mouseReleaseEvent(QMouseEvent* event)
+//{
+//	const QModelIndex& index = indexAt(event->pos());
+//	QBrush brush = index.data(Qt::BackgroundRole).value<QBrush>();
+//	QColor clr = brush.color();
+//	emit(colorSelected(clr));
+//}

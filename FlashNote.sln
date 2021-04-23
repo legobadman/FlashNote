@@ -7,6 +7,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlashNote", "FlashNote\Flas
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "notecore", "notecore\notecore.vcxproj", "{02B4EC2A-49C0-4195-92B5-F11E22789848}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{C3A5D7FA-FE20-49D7-8AF8-9AAB9D8E8510}"
+	ProjectSection(SolutionItems) = preProject
+		natvis\qt.natstepfilter = natvis\qt.natstepfilter
+		natvis\Qt.natvis = natvis\Qt.natvis
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

@@ -22,10 +22,14 @@ protected:
 	bool isIndexHidden(const QModelIndex& index) const override;
 	void setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags command) override;
 	QRegion visualRegionForSelection(const QItemSelection& selection) const override;
+	//void mouseReleaseEvent(QMouseEvent* event) override;
 	void mouseMoveEvent(QMouseEvent* event) override;
 	void paintEvent(QPaintEvent* e) override;
 	void enterEvent(QEvent* e) override;
 	void leaveEvent(QEvent* e) override;
+
+signals:
+	void colorSelected(const QColor& color);
 
 private:
 	QStandardItemModel* model;
