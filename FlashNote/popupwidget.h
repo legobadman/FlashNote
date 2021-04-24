@@ -5,7 +5,7 @@ class PopupWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	PopupWidget(QWidget* parent);
+	PopupWidget(QWidget* parent = nullptr);
 	~PopupWidget();
 
 	void setContentWidget(QWidget* contentWidget);

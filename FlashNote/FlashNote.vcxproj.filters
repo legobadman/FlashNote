@@ -44,6 +44,7 @@
     <ClCompile Include="richeditor\richtexteditor.cpp">
       <Filter>richeditor</Filter>
     </ClCompile>
+    <ClCompile Include="alignmentcombobox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -95,6 +96,7 @@
     <CustomBuild Include="richeditor\richtexteditor.h">
       <Filter>richeditor</Filter>
     </CustomBuild>
+    <CustomBuild Include="alignmentcombobox.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="style">

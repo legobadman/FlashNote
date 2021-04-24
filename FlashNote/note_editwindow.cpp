@@ -92,6 +92,7 @@ void NoteEditWindow::initSlots()
 	connect(m_ui->font_comboBox, SIGNAL(activated(QString)), this, SLOT(onFontChanged(QString)));
 
 	connect(m_ui->fontcolor, SIGNAL(colorChanged(const QColor&)), this, SLOT(textFgColor(const QColor&)));
+	connect(m_ui->highlight, SIGNAL(clicked()), this, SLOT(textBgColor()));
 
 	//m_ui->attachment->setShortcut(Qt::CTRL + Qt::Key_L);
 	connect(m_ui->attachment, SIGNAL(clicked(bool)), this, SLOT(textLink(bool)));
@@ -108,8 +109,8 @@ void NoteEditWindow::initSlots()
 	//m_ui->item_symbol->setShortcut(Qt::CTRL + Qt::Key_Minus);
 	//m_ui->item_id->setShortcut(Qt::CTRL + Qt::Key_Equal);
 
-	connect(m_ui->item_symbol, SIGNAL(clicked(bool)), this, SLOT(listBullet(bool)));
-	connect(m_ui->item_id, SIGNAL(clicked(bool)), this, SLOT(listOrdered(bool)));
+	connect(m_ui->item_symbol, SIGNAL(clicked()), this, SLOT(listBullet()));
+	connect(m_ui->item_id, SIGNAL(clicked()), this, SLOT(listOrdered()));
 }
 
 void NoteEditWindow::initCustomWidget()
@@ -150,9 +151,6 @@ void NoteEditWindow::initCustomWidget()
 	m_ui->item_id->setIcon(QIcon(":/icons/16x16/item_id.png"));
 	m_ui->item_id->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->item_id->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
-	m_ui->alignment->setFixedSize(MyStyle::dpiScaledSize(QSize(45, 30)));
-	m_ui->alignment->setIcon(QIcon(":/icons/16x16/left_alignment.png"));
-	m_ui->alignment->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->attachment->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
 	m_ui->attachment->setIcon(QIcon(":/icons/16x16/attachment.png"));
 	m_ui->attachment->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
@@ -364,11 +362,8 @@ void NoteEditWindow::textFgColor(const QColor& color)
 }
 
 void NoteEditWindow::textBgColor() {
-	QColor col = QColorDialog::getColor(m_ui->textEdit->textBackgroundColor(), this);
+	QColor col = m_ui->highlight->isChecked() ? QColor("#FFFAA5") : QColor("#FFFFFF");
 	QTextCursor cursor = m_ui->textEdit->textCursor();
-	if (!cursor.hasSelection()) {
-		cursor.select(QTextCursor::WordUnderCursor);
-	}
 	QTextCharFormat fmt = cursor.charFormat();
 	if (col.isValid()) {
 		fmt.setBackground(col);
@@ -378,20 +373,21 @@ void NoteEditWindow::textBgColor() {
 	}
 	cursor.setCharFormat(fmt);
 	m_ui->textEdit->setCurrentCharFormat(fmt);
-	bgColorChanged(col);
 }
 
-void NoteEditWindow::listBullet(bool checked) {
-	if (checked) {
+void NoteEditWindow::listBullet()
+{
+	bool checked = m_ui->item_symbol->isChecked();
+	if (checked)
 		m_ui->item_id->setChecked(false);
-	}
 	list(checked, QTextListFormat::ListDisc);
 }
 
-void NoteEditWindow::listOrdered(bool checked) {
-	if (checked) {
+void NoteEditWindow::listOrdered()
+{
+	bool checked = m_ui->item_id->isChecked();
+	if (checked)
 		m_ui->item_symbol->setChecked(false);
-	}
 	list(checked, QTextListFormat::ListDecimal);
 }
 
@@ -417,9 +413,6 @@ void NoteEditWindow::list(bool checked, QTextListFormat::Style style) {
 
 void NoteEditWindow::mergeFormatOnWordOrSelection(const QTextCharFormat& format) {
 	QTextCursor cursor = m_ui->textEdit->textCursor();
-	//if (!cursor.hasSelection()) {
-	//    cursor.select(QTextCursor::WordUnderCursor);
-	//    }
 	cursor.mergeCharFormat(format);
 	m_ui->textEdit->mergeCurrentCharFormat(format);
 	m_ui->textEdit->setFocus(Qt::TabFocusReason);
@@ -427,27 +420,32 @@ void NoteEditWindow::mergeFormatOnWordOrSelection(const QTextCharFormat& format)
 
 void NoteEditWindow::slotCursorPositionChanged() {
 	QTextList* l = m_ui->textEdit->textCursor().currentList();
-	if (m_lastBlockList && (l == m_lastBlockList || (l != nullptr && m_lastBlockList != nullptr
-		&& l->format().style() == m_lastBlockList->format().style()))) {
-		return;
-	}
-	m_lastBlockList = l;
-	if (l) {
+	//if (m_lastBlockList && (l == m_lastBlockList || (l != nullptr && m_lastBlockList != nullptr
+	//	&& l->format().style() == m_lastBlockList->format().style()))) {
+	//	return;
+	//}
+	//m_lastBlockList = l;
+	if (l)
+	{
 		QTextListFormat lfmt = l->format();
-		if (lfmt.style() == QTextListFormat::ListDisc) {
+		if (lfmt.style() == QTextListFormat::ListDisc)
+		{
 			m_ui->item_symbol->setChecked(true);
 			m_ui->item_id->setChecked(false);
 		}
-		else if (lfmt.style() == QTextListFormat::ListDecimal) {
+		else if (lfmt.style() == QTextListFormat::ListDecimal)
+		{
 			m_ui->item_symbol->setChecked(false);
 			m_ui->item_id->setChecked(true);
 		}
-		else {
+		else
+		{
 			m_ui->item_symbol->setChecked(false);
 			m_ui->item_id->setChecked(false);
 		}
 	}
-	else {
+	else
+	{
 		m_ui->item_symbol->setChecked(false);
 		m_ui->item_id->setChecked(false);
 	}
@@ -489,7 +487,6 @@ void NoteEditWindow::fgColorChanged(const QColor& c) {
 	else {
 		pix.fill(QApplication::palette().windowText().color());
 	}
-	//f_fgcolor->setIcon(pix);
 }
 
 void NoteEditWindow::bgColorChanged(const QColor& c) {
@@ -500,14 +497,15 @@ void NoteEditWindow::bgColorChanged(const QColor& c) {
 	else {
 		pix.fill(QApplication::palette().window().color());
 	}
-	//f_bgcolor->setIcon(pix);
 }
 
 void NoteEditWindow::slotCurrentCharFormatChanged(const QTextCharFormat& format) {
 	fontChanged(format.font());
-	//bgColorChanged((format.background().isOpaque()) ? format.background().color() : QColor());
 	QColor color = (format.foreground().isOpaque()) ? format.foreground().color() : QColor();
+	QColor bgColor = format.background().color();
+	bool bHighlighted = format.background().isOpaque();
 	m_ui->fontcolor->updateColor(color);
+	m_ui->highlight->setChecked(bHighlighted);
 	m_ui->attachment->setChecked(format.isAnchor());
 }
 

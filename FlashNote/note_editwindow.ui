@@ -210,7 +210,8 @@
         <widget class="ToolButton" name="item_id" native="true"/>
        </item>
        <item>
-        <widget class="MenuButton" name="alignment" native="true"/>
+        <widget class="AlignmentComboBox" name="alignment2">
+        </widget>
        </item>
        <item>
         <widget class="SeperateVLine" name="vline2"/>
@@ -325,6 +326,11 @@
    <class>RichTextEditor</class>
    <extends>QTextEdit</extends>
    <header>richeditor/richtexteditor.h</header>
+  </customwidget>
+  <customwidget>
+   <class>AlignmentComboBox</class>
+   <extends>MenuButton</extends>
+   <header>alignmentcombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

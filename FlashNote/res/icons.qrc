@@ -22,6 +22,9 @@
  <file>icons/16x16/item_symbol.png</file>
  <file>icons/16x16/item_id.png</file>
  <file>icons/16x16/left_alignment.png</file>
+ <file>icons/16x16/center_alignment.png</file>
+ <file>icons/16x16/right_alignment.png</file>
+ <file>icons/16x16/twoside_alignment.png</file>
  <file>icons/16x16/attachment.png</file>
  <file>icons/16x16/photo.png</file>
  <file>icons/16x16/morecolor.png</file>

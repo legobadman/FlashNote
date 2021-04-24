@@ -151,6 +151,7 @@ copy C:\Qt\Qt-5.15.0\bin\Qt5SerialPortd.dll $(TargetDir)</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="alignmentcombobox.cpp" />
     <ClCompile Include="colorgallery.cpp" />
     <ClCompile Include="coloritemdelegate.cpp" />
     <ClCompile Include="colortableview.cpp" />
@@ -207,6 +208,10 @@ copy C:\Qt\Qt-5.15.0\bin\Qt5SerialPortd.dll $(TargetDir)</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
     </CustomBuild>
     <CustomBuild Include="richeditor\richtexteditor.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="alignmentcombobox.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Qt\Qt-5.15.0\bin\moc.exe" "%(FullPath)" -o "$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\GeneratedFiles\$(Configuration)\moc_%(Filename).cpp</Outputs>
     </CustomBuild>

@@ -8,6 +8,7 @@ PopupWidget::PopupWidget(QWidget* parent)
 	, m_pContentWidget(nullptr)
 {
 	setMouseTracking(true);
+    setWindowFlag(Qt::Popup);
 }
 
 PopupWidget::~PopupWidget()

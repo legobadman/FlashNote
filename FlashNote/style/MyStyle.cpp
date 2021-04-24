@@ -72,6 +72,16 @@ void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPaint
 	return QProxyStyle::drawPrimitive(pe, opt, p, widget);
 }
 
+void MyStyle::drawControl(ControlElement element, const QStyleOption* opt, QPainter* p, const QWidget* w) const
+{
+	switch (element)
+	{
+	case CE_ComboBoxLabel:
+		return;
+	}
+	return base::drawControl(element, opt, p, w);
+}
+
 int MyStyle::styleHint(StyleHint sh, const QStyleOption* opt, const QWidget* w, QStyleHintReturn* shret) const
 {
 	if (QStyle::SH_ItemView_PaintAlternatingRowColorsForEmptyArea == sh)

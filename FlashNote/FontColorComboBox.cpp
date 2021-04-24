@@ -42,7 +42,6 @@ void FontColorComboBox::popupChildWidget()
 {
 #ifndef USE_POPUP_FLAG
 	PopupWidget* pPopup = new PopupWidget(this);
-	pPopup->setWindowFlag(Qt::Popup);
 	ColorGallery* pColorGallery = new ColorGallery(pPopup);
 	connect(pColorGallery, SIGNAL(fontColorChanged(const QColor&)), pPopup, SLOT(hide()));
 	connect(pColorGallery, SIGNAL(fontColorChanged(const QColor&)), this, SLOT(onFontColorItemClicked(const QColor&)));

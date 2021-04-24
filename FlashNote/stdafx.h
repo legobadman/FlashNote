@@ -21,5 +21,6 @@
 #include <QVBoxLayout>
 #include <QDialog>
 #include <QTextEdit>
+#include <QListView>
 
 #endif

@@ -46,8 +46,8 @@ protected slots:
 	void textStyle(int index);
 	void textFgColor(const QColor& color);
 	void textBgColor();
-	void listBullet(bool checked);
-	void listOrdered(bool checked);
+	void listBullet();
+	void listOrdered();
 	void slotCurrentCharFormatChanged(const QTextCharFormat& format);
 	void slotCursorPositionChanged();
 	void slotClipboardDataChanged();
