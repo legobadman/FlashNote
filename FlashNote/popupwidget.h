@@ -20,6 +20,7 @@ signals:
 
 private:
 	QWidget* m_pContentWidget;
+	QVBoxLayout* m_layout;
 };
 
 #endif

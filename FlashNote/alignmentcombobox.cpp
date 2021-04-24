@@ -6,25 +6,26 @@
 #include "moc_alignmentcombobox.cpp"
 
 
-#ifdef USE_QCOMBOBOX
-AlignmentComboBox::AlignmentComboBox(QWidget* parent /* = nullptr */)
-    : QComboBox(parent)
-{
-    addItem(QIcon(":/icons/16x16/left_alignment.png"), u8"左对齐");
-    addItem(QIcon(":/icons/16x16/center_alignment.png"), u8"居中");
-    addItem(QIcon(":/icons/16x16/right_alignment.png"), u8"右对齐");
-    addItem(QIcon(":/icons/16x16/twoside_alignment.png"), u8"两端对齐");
-}
-
-AlignmentComboBox::~AlignmentComboBox()
+AlignItemDelegate::AlignItemDelegate(QWidget* parent)
+    : QStyledItemDelegate(parent)
 {
 }
 
-void AlignmentComboBox::paintEvent(QPaintEvent* e)
+void AlignItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    return QComboBox::paintEvent(e);
+    QStyledItemDelegate::paint(painter, option, index);
 }
-#endif
+
+QSize AlignItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    return MyStyle::dpiScaledSize(QSize(70, 30));
+}
+
+void AlignItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
+{
+    return QStyledItemDelegate::initStyleOption(option, index);
+}
+
 
 AlignmentComboBox::AlignmentComboBox(QWidget* parent /* = nullptr */)
     : MenuButton(parent)
@@ -59,9 +60,15 @@ void AlignmentComboBox::popup()
         m_pModel->appendRow(pCenterAlignment);
         m_pModel->appendRow(pRightAlignment);
         m_pModel->appendRow(pTwoSideAlignment);
-        m_pView->setModel(m_pModel);
 
+        m_pView->setModel(m_pModel);
+        m_pView->setContentsMargins(QMargins(9,9,9,9));
+        m_pView->setItemDelegate(new AlignItemDelegate(m_pView));
+        m_pView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        m_pView->setFixedSize(MyStyle::dpiScaledSize(QSize(98, 125)));
         m_popup->setContentWidget(m_pView);
+
+        connect(m_pView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onItemClicked(const QModelIndex&)));
     }
 
     QPoint pGlobal = mapToGlobal(QPoint(0, 0));
@@ -69,4 +76,9 @@ void AlignmentComboBox::popup()
     setDown(true);
     m_popup->exec(pGlobal.x(), pGlobal.y() + height() + margin, 98, 160);
     setDown(false);
+}
+
+void AlignmentComboBox::onItemClicked(const QModelIndex& index)
+{
+    emit alignmentChanged(index.row());
 }

@@ -1,21 +1,21 @@
 #ifndef __ALIGNMENT_COMBOBOX_H__
 #define __ALIGNMENT_COMBOBOX_H__
 
-//#define USE_QCOMBOBOX
+
 class PopupWidget;
 
-#ifdef USE_QCOMBOBOX
-class AlignmentComboBox : public QComboBox
+class AlignItemDelegate : public QStyledItemDelegate
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    AlignmentComboBox(QWidget* parent = nullptr);
-    ~AlignmentComboBox();
+	AlignItemDelegate(QWidget* parent);
+	void paint(QPainter* painter, const QStyleOptionViewItem& option,
+		const QModelIndex& index) const;
+	QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 protected:
-    void paintEvent(QPaintEvent* e) override;
+	void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
 };
-#else
 
 class AlignmentComboBox : public MenuButton
 {
@@ -29,14 +29,12 @@ signals:
 
 public slots:
     void popup();
+    void onItemClicked(const QModelIndex& index);
 
 private:
     PopupWidget* m_popup;
     QListView* m_pView;
     QStandardItemModel* m_pModel;
 };
-
-#endif
-
 
 #endif
