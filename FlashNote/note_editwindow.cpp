@@ -111,6 +111,7 @@ void NoteEditWindow::initSlots()
 
 	connect(m_ui->item_symbol, SIGNAL(clicked()), this, SLOT(listBullet()));
 	connect(m_ui->item_id, SIGNAL(clicked()), this, SLOT(listOrdered()));
+	connect(m_ui->photo, SIGNAL(clicked()), this, SLOT(insertImage()));
 }
 
 void NoteEditWindow::initCustomWidget()
@@ -559,15 +560,29 @@ void NoteEditWindow::setText(const QString& text) {
 	}
 }
 
-void NoteEditWindow::insertImage() {
-	QSettings s;
-	QString attdir = s.value("general/filedialog-path").toString();
-	QString file = QFileDialog::getOpenFileName(this,
-		tr("Select an image"),
-		attdir,
-		tr("JPEG (*.jpg);; GIF (*.gif);; PNG (*.png);; BMP (*.bmp);; All (*)"));
+void NoteEditWindow::insertImage()
+{
+	QString file = QFileDialog::getOpenFileName(this, tr("Select an image"),
+		".", tr("JPEG (*.jpg *jpeg)\n"
+			"GIF (*.gif)\n"
+			"PNG (*.png)\n"
+			"Bitmap Files (*.bmp)\n"));
+	QUrl Uri(QString("file://%1").arg(file));
 	QImage image = QImageReader(file).read();
 
-	m_ui->textEdit->dropImage(image, QFileInfo(file).suffix().toUpper().toLocal8Bit().data());
+	QTextDocument* textDocument = m_ui->textEdit->document();
+	textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
+	QTextCursor cursor = m_ui->textEdit->textCursor();
+	QTextImageFormat imageFormat;
 
+	//调整图片的宽度。
+	//TODO: resize的时候自动调宽
+	int w = m_ui->textEdit->width();
+	float ratio = (float)image.width() / image.height();
+	int h = w / ratio;
+
+	imageFormat.setWidth(w);
+	imageFormat.setHeight(h);
+	imageFormat.setName(Uri.toString());
+	cursor.insertImage(imageFormat);
 }

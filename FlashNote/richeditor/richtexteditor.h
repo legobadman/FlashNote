@@ -8,7 +8,8 @@ class RichTextEditor : public QTextEdit
 	Q_OBJECT
 public:
 	RichTextEditor(QWidget* parent = nullptr);
-	void dropImage(const QImage& image, const QString& format);
+	void dropImage(const QUrl& url, const QImage& image);
+	void dropTextFile(const QUrl& url);
 
 protected:
 	bool canInsertFromMimeData(const QMimeData* source) const;
