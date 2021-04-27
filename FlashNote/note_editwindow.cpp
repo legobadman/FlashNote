@@ -24,6 +24,7 @@
 NoteEditWindow::NoteEditWindow(QWidget* parent)
     : QWidget(parent)
     , m_pNote(NULL)
+	, m_bEnableBase64(true)
 {
     init();
     initContent();
@@ -565,17 +566,14 @@ void NoteEditWindow::setText(const QString& text) {
 void NoteEditWindow::checkDocument()
 {
 	QTextDocument* p = document();
-
-	QTextDocumentWriter writer("wtf", "odf");
-
-	writer.write(p);
-
-	//QString html = p->toHtml();
-	//QFile f("wtf.html");
-	//f.open(QIODevice::WriteOnly);
-	//f.write(html.toUtf8());
-	//f.close();
+    QString html = p->toHtml();
+    QFile f("wtf.html");
+    f.open(QIODevice::WriteOnly);
+    f.write(html.toUtf8());
+    f.close();
 }
+
+#define USE_BASE_64
 
 void NoteEditWindow::insertImage()
 {
@@ -590,13 +588,21 @@ void NoteEditWindow::insertImage()
 	QImage image = QImageReader(file).read();
 
 	QTextDocument* textDocument = m_ui->textEdit->document();
-	textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
 
-	//QByteArray byteArray;
-	//QBuffer buffer(&byteArray);
-	//image.save(&buffer, "PNG");
-	//QString url = QString("<img src=\"data:image/png;base64,") + byteArray.toBase64() + "\"/>";
-	//textDocument->addResource(QTextDocument::ImageResource, url, QVariant(image));
+	if (m_bEnableBase64)
+	{
+        QByteArray byteArray;
+        QBuffer buffer(&byteArray);
+        image.save(&buffer, "PNG");
+        Uri = QString("data:image/png;base64,") + byteArray.toBase64();
+        //Uri = QString("<img src=\"data:image/png;base64,") + byteArray.toBase64() + "\"/>";
+        textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
+	}
+	else
+	{
+		textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
+	}
+
 	QTextCursor cursor = m_ui->textEdit->textCursor();
 	QTextImageFormat imageFormat;
 

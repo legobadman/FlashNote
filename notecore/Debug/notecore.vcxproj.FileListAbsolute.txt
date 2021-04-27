@@ -1,2 +1,0 @@
-F:\FlashNote\Debug\notecore.pdb
-F:\FlashNote\notecore\Debug\notecore.pdb

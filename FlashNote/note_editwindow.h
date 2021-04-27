@@ -89,6 +89,7 @@ private:
 	};
 
 	QPointer<QTextList> m_lastBlockList;
+	bool m_bEnableBase64;
 };
 
 #endif
