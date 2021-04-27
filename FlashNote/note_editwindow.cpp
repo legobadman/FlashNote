@@ -4,6 +4,7 @@
 #include "moc_note_editwindow.cpp"
 #include "MyStyle.h"
 #include <QtGui/QClipboard>
+#include <QtGui/QTextDocumentWriter>
 #include <QMimeData>
 #include <QtGui/QFontDatabase>
 #include <QInputDialog>
@@ -112,6 +113,7 @@ void NoteEditWindow::initSlots()
 	connect(m_ui->item_symbol, SIGNAL(clicked()), this, SLOT(listBullet()));
 	connect(m_ui->item_id, SIGNAL(clicked()), this, SLOT(listOrdered()));
 	connect(m_ui->photo, SIGNAL(clicked()), this, SLOT(insertImage()));
+	connect(m_ui->attachment, SIGNAL(clicked()), this, SLOT(checkDocument()));
 }
 
 void NoteEditWindow::initCustomWidget()
@@ -560,6 +562,21 @@ void NoteEditWindow::setText(const QString& text) {
 	}
 }
 
+void NoteEditWindow::checkDocument()
+{
+	QTextDocument* p = document();
+
+	QTextDocumentWriter writer("wtf", "odf");
+
+	writer.write(p);
+
+	//QString html = p->toHtml();
+	//QFile f("wtf.html");
+	//f.open(QIODevice::WriteOnly);
+	//f.write(html.toUtf8());
+	//f.close();
+}
+
 void NoteEditWindow::insertImage()
 {
 	QString file = QFileDialog::getOpenFileName(this, tr("Select an image"),
@@ -567,11 +584,19 @@ void NoteEditWindow::insertImage()
 			"GIF (*.gif)\n"
 			"PNG (*.png)\n"
 			"Bitmap Files (*.bmp)\n"));
+	if (file.isEmpty())
+		return;
 	QUrl Uri(QString("file://%1").arg(file));
 	QImage image = QImageReader(file).read();
 
 	QTextDocument* textDocument = m_ui->textEdit->document();
 	textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
+
+	//QByteArray byteArray;
+	//QBuffer buffer(&byteArray);
+	//image.save(&buffer, "PNG");
+	//QString url = QString("<img src=\"data:image/png;base64,") + byteArray.toBase64() + "\"/>";
+	//textDocument->addResource(QTextDocument::ImageResource, url, QVariant(image));
 	QTextCursor cursor = m_ui->textEdit->textCursor();
 	QTextImageFormat imageFormat;
 

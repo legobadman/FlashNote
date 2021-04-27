@@ -30,6 +30,7 @@ public:
 public slots:
 	void setText(const QString& text);
 	void clearSource();
+	void checkDocument();
 
 protected slots:
 	void setPlainText(const QString& text) { m_ui->textEdit->setPlainText(text); }
