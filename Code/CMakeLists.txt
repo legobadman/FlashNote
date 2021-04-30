@@ -12,6 +12,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_ROOT}/bin)
 
 project(FlashNote)
 
+add_subdirectory(3rdparty)
 add_subdirectory(guimain)
 add_subdirectory(notecore)
 #add_subdirectory(3rdparty)
