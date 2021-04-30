@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.8.2)
 
-project(FlashNote)
-
 # Find includes in the build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -37,7 +35,7 @@ include_directories(
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 
 # Tell CMake to create the helloworld executable
-add_executable(FlashNote 
+add_executable(guimain 
     ./alignmentcombobox.cpp
     ./alignmentcombobox.h
     ./colorgallery.cpp
@@ -52,7 +50,7 @@ add_executable(FlashNote
     ./comctrl/toolbutton.h
     ./DrawerFunc.cpp
     ./DrawerFunc.h
-    ./FlashNote.cpp
+    ./guimain.cpp
     ./FontColorComboBox.cpp
     ./FontColorComboBox.h
     ./fontsize_combobox.cpp
@@ -93,7 +91,9 @@ add_executable(FlashNote
     ./style/toolbuttonstyleoption.h
 )
 
-target_precompile_headers(FlashNote PRIVATE ./stdafx.h)
+target_precompile_headers(guimain PRIVATE ./stdafx.h)
 
 # Add the Qt5 Widgets for linking
-target_link_libraries(FlashNote Qt5::Widgets)
+target_link_libraries(guimain Qt5::Widgets)
+
+set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")

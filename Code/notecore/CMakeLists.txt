@@ -1,4 +1,4 @@
-project(notecore)
+#project(notecore)
 
 ADD_LIBRARY(notecore STATIC
 	framework.h
@@ -6,4 +6,3 @@ ADD_LIBRARY(notecore STATIC
 	notebase.h
 	notecore.cpp
 	notecore.h)
-
