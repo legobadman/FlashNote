@@ -93,5 +93,7 @@ add_executable(FlashNote
     ./style/toolbuttonstyleoption.h
 )
 
+target_precompile_headers(FlashNote PRIVATE ./stdafx.h)
+
 # Add the Qt5 Widgets for linking
 target_link_libraries(FlashNote Qt5::Widgets)
