@@ -4,6 +4,8 @@ include_directories(
     ..
 )
 
+add_compile_definitions(thrift_EXPORTS)
+
 ADD_LIBRARY(thrift STATIC
 		#async/TAsyncBufferProcessor.h
 		async/TAsyncChannel.cpp
@@ -24,10 +26,10 @@ ADD_LIBRARY(thrift STATIC
 		#concurrency/BoostThreadFactory.h
 		#concurrency/Exception.h
 		#concurrency/FunctionRunner.h
-		#concurrency/Monitor.cpp
-		#concurrency/Monitor.h
-		#concurrency/Mutex.cpp
-		#concurrency/Mutex.h
+		concurrency/Monitor.cpp
+		concurrency/Monitor.h
+		concurrency/Mutex.cpp
+		concurrency/Mutex.h
 		#concurrency/PlatformThreadFactory.h
 		#concurrency/PosixThreadFactory.cpp
 		#concurrency/PosixThreadFactory.h
