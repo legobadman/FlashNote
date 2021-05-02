@@ -141,7 +141,9 @@
 //#define HAVE_NETDB_H 1
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
-//#define HAVE_NETINET_IN_H 1
+#ifdef __linux__
+#define HAVE_NETINET_IN_H 1
+#endif
 
 /* Define to 1 if you have the <openssl/rand.h> header file. */
 #define HAVE_OPENSSL_RAND_H 1

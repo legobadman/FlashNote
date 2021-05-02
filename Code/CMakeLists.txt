@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.2)
+cmake_minimum_required(VERSION 3.5.1)
 
 if (NOT DEFINED ${CMAKE_BUILD_TYPE})
 	SET(CMAKE_BUILD_TYPE Debug)
