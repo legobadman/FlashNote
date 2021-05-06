@@ -6,11 +6,14 @@
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
+#include <boost/shared_ptr.hpp>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
 using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
+
+using boost::shared_ptr;
 
 class HelloHandler : virtual public HelloIf {
  public:
@@ -27,11 +30,11 @@ class HelloHandler : virtual public HelloIf {
 
 int main(int argc, char **argv) {
   int port = 80;
-  ::std::shared_ptr<HelloHandler> handler(new HelloHandler());
-  ::std::shared_ptr<TProcessor> processor(new HelloProcessor(handler));
-  ::std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
-  ::std::shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-  ::std::shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+  shared_ptr<HelloHandler> handler(new HelloHandler());
+  shared_ptr<TProcessor> processor(new HelloProcessor(handler));
+  shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+  shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+  shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
   TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
   server.serve();

@@ -1,3 +1,5 @@
+typedef i32 Timestamp
+
 struct Note {
 	1:required string id;
 	2:required string title;
@@ -18,11 +20,11 @@ struct Notebook {
 	6:required string creater;
 }
 
-service UserServer {
+service UserInfo {
 	i32 GetUserId(1:required string username);
 }
 
-service NoteServer {
+service NoteInfo {
 	list<Notebook> GetNotebooks(1:required string userid);
 	string GetContent(1:required string noteid);
 }

@@ -4,11 +4,11 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-#include "NoteServer.h"
+#include "NoteInfo.h"
 
 
 
-uint32_t NoteServer_GetNotebooks_args::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t NoteInfo_GetNotebooks_args::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -51,9 +51,9 @@ uint32_t NoteServer_GetNotebooks_args::read(::apache::thrift::protocol::TProtoco
   return xfer;
 }
 
-uint32_t NoteServer_GetNotebooks_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t NoteInfo_GetNotebooks_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
-  xfer += oprot->writeStructBegin("NoteServer_GetNotebooks_args");
+  xfer += oprot->writeStructBegin("NoteInfo_GetNotebooks_args");
 
   xfer += oprot->writeFieldBegin("userid", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString(this->userid);
@@ -64,9 +64,9 @@ uint32_t NoteServer_GetNotebooks_args::write(::apache::thrift::protocol::TProtoc
   return xfer;
 }
 
-uint32_t NoteServer_GetNotebooks_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t NoteInfo_GetNotebooks_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
-  xfer += oprot->writeStructBegin("NoteServer_GetNotebooks_pargs");
+  xfer += oprot->writeStructBegin("NoteInfo_GetNotebooks_pargs");
 
   xfer += oprot->writeFieldBegin("userid", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString((*(this->userid)));
@@ -77,7 +77,7 @@ uint32_t NoteServer_GetNotebooks_pargs::write(::apache::thrift::protocol::TProto
   return xfer;
 }
 
-uint32_t NoteServer_GetNotebooks_result::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t NoteInfo_GetNotebooks_result::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -101,14 +101,14 @@ uint32_t NoteServer_GetNotebooks_result::read(::apache::thrift::protocol::TProto
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->success.clear();
-            uint32_t _size6;
-            ::apache::thrift::protocol::TType _etype9;
-            xfer += iprot->readListBegin(_etype9, _size6);
-            this->success.resize(_size6);
-            uint32_t _i10;
-            for (_i10 = 0; _i10 < _size6; ++_i10)
+            uint32_t _size12;
+            ::apache::thrift::protocol::TType _etype15;
+            xfer += iprot->readListBegin(_etype15, _size12);
+            this->success.resize(_size12);
+            uint32_t _i16;
+            for (_i16 = 0; _i16 < _size12; ++_i16)
             {
-              xfer += this->success[_i10].read(iprot);
+              xfer += this->success[_i16].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -129,20 +129,20 @@ uint32_t NoteServer_GetNotebooks_result::read(::apache::thrift::protocol::TProto
   return xfer;
 }
 
-uint32_t NoteServer_GetNotebooks_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t NoteInfo_GetNotebooks_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
 
   uint32_t xfer = 0;
 
-  xfer += oprot->writeStructBegin("NoteServer_GetNotebooks_result");
+  xfer += oprot->writeStructBegin("NoteInfo_GetNotebooks_result");
 
   if (this->__isset.success) {
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
-      std::vector<Notebook> ::const_iterator _iter11;
-      for (_iter11 = this->success.begin(); _iter11 != this->success.end(); ++_iter11)
+      std::vector<Notebook> ::const_iterator _iter17;
+      for (_iter17 = this->success.begin(); _iter17 != this->success.end(); ++_iter17)
       {
-        xfer += (*_iter11).write(oprot);
+        xfer += (*_iter17).write(oprot);
       }
       xfer += oprot->writeListEnd();
     }
@@ -153,7 +153,7 @@ uint32_t NoteServer_GetNotebooks_result::write(::apache::thrift::protocol::TProt
   return xfer;
 }
 
-uint32_t NoteServer_GetNotebooks_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t NoteInfo_GetNotebooks_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -177,14 +177,14 @@ uint32_t NoteServer_GetNotebooks_presult::read(::apache::thrift::protocol::TProt
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             (*(this->success)).clear();
-            uint32_t _size12;
-            ::apache::thrift::protocol::TType _etype15;
-            xfer += iprot->readListBegin(_etype15, _size12);
-            (*(this->success)).resize(_size12);
-            uint32_t _i16;
-            for (_i16 = 0; _i16 < _size12; ++_i16)
+            uint32_t _size18;
+            ::apache::thrift::protocol::TType _etype21;
+            xfer += iprot->readListBegin(_etype21, _size18);
+            (*(this->success)).resize(_size18);
+            uint32_t _i22;
+            for (_i22 = 0; _i22 < _size18; ++_i22)
             {
-              xfer += (*(this->success))[_i16].read(iprot);
+              xfer += (*(this->success))[_i22].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -205,7 +205,7 @@ uint32_t NoteServer_GetNotebooks_presult::read(::apache::thrift::protocol::TProt
   return xfer;
 }
 
-uint32_t NoteServer_GetContent_args::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t NoteInfo_GetContent_args::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -248,9 +248,9 @@ uint32_t NoteServer_GetContent_args::read(::apache::thrift::protocol::TProtocol*
   return xfer;
 }
 
-uint32_t NoteServer_GetContent_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t NoteInfo_GetContent_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
-  xfer += oprot->writeStructBegin("NoteServer_GetContent_args");
+  xfer += oprot->writeStructBegin("NoteInfo_GetContent_args");
 
   xfer += oprot->writeFieldBegin("noteid", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString(this->noteid);
@@ -261,9 +261,9 @@ uint32_t NoteServer_GetContent_args::write(::apache::thrift::protocol::TProtocol
   return xfer;
 }
 
-uint32_t NoteServer_GetContent_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t NoteInfo_GetContent_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
-  xfer += oprot->writeStructBegin("NoteServer_GetContent_pargs");
+  xfer += oprot->writeStructBegin("NoteInfo_GetContent_pargs");
 
   xfer += oprot->writeFieldBegin("noteid", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString((*(this->noteid)));
@@ -274,7 +274,7 @@ uint32_t NoteServer_GetContent_pargs::write(::apache::thrift::protocol::TProtoco
   return xfer;
 }
 
-uint32_t NoteServer_GetContent_result::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t NoteInfo_GetContent_result::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -314,11 +314,11 @@ uint32_t NoteServer_GetContent_result::read(::apache::thrift::protocol::TProtoco
   return xfer;
 }
 
-uint32_t NoteServer_GetContent_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t NoteInfo_GetContent_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
 
   uint32_t xfer = 0;
 
-  xfer += oprot->writeStructBegin("NoteServer_GetContent_result");
+  xfer += oprot->writeStructBegin("NoteInfo_GetContent_result");
 
   if (this->__isset.success) {
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_STRING, 0);
@@ -330,7 +330,7 @@ uint32_t NoteServer_GetContent_result::write(::apache::thrift::protocol::TProtoc
   return xfer;
 }
 
-uint32_t NoteServer_GetContent_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t NoteInfo_GetContent_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -370,18 +370,18 @@ uint32_t NoteServer_GetContent_presult::read(::apache::thrift::protocol::TProtoc
   return xfer;
 }
 
-void NoteServerClient::GetNotebooks(std::vector<Notebook> & _return, const std::string& userid)
+void NoteInfoClient::GetNotebooks(std::vector<Notebook> & _return, const std::string& userid)
 {
   send_GetNotebooks(userid);
   recv_GetNotebooks(_return);
 }
 
-void NoteServerClient::send_GetNotebooks(const std::string& userid)
+void NoteInfoClient::send_GetNotebooks(const std::string& userid)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("GetNotebooks", ::apache::thrift::protocol::T_CALL, cseqid);
 
-  NoteServer_GetNotebooks_pargs args;
+  NoteInfo_GetNotebooks_pargs args;
   args.userid = &userid;
   args.write(oprot_);
 
@@ -390,7 +390,7 @@ void NoteServerClient::send_GetNotebooks(const std::string& userid)
   oprot_->getTransport()->flush();
 }
 
-void NoteServerClient::recv_GetNotebooks(std::vector<Notebook> & _return)
+void NoteInfoClient::recv_GetNotebooks(std::vector<Notebook> & _return)
 {
 
   int32_t rseqid = 0;
@@ -415,7 +415,7 @@ void NoteServerClient::recv_GetNotebooks(std::vector<Notebook> & _return)
     iprot_->readMessageEnd();
     iprot_->getTransport()->readEnd();
   }
-  NoteServer_GetNotebooks_presult result;
+  NoteInfo_GetNotebooks_presult result;
   result.success = &_return;
   result.read(iprot_);
   iprot_->readMessageEnd();
@@ -428,18 +428,18 @@ void NoteServerClient::recv_GetNotebooks(std::vector<Notebook> & _return)
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "GetNotebooks failed: unknown result");
 }
 
-void NoteServerClient::GetContent(std::string& _return, const std::string& noteid)
+void NoteInfoClient::GetContent(std::string& _return, const std::string& noteid)
 {
   send_GetContent(noteid);
   recv_GetContent(_return);
 }
 
-void NoteServerClient::send_GetContent(const std::string& noteid)
+void NoteInfoClient::send_GetContent(const std::string& noteid)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("GetContent", ::apache::thrift::protocol::T_CALL, cseqid);
 
-  NoteServer_GetContent_pargs args;
+  NoteInfo_GetContent_pargs args;
   args.noteid = &noteid;
   args.write(oprot_);
 
@@ -448,7 +448,7 @@ void NoteServerClient::send_GetContent(const std::string& noteid)
   oprot_->getTransport()->flush();
 }
 
-void NoteServerClient::recv_GetContent(std::string& _return)
+void NoteInfoClient::recv_GetContent(std::string& _return)
 {
 
   int32_t rseqid = 0;
@@ -473,7 +473,7 @@ void NoteServerClient::recv_GetContent(std::string& _return)
     iprot_->readMessageEnd();
     iprot_->getTransport()->readEnd();
   }
-  NoteServer_GetContent_presult result;
+  NoteInfo_GetContent_presult result;
   result.success = &_return;
   result.read(iprot_);
   iprot_->readMessageEnd();
@@ -486,7 +486,7 @@ void NoteServerClient::recv_GetContent(std::string& _return)
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "GetContent failed: unknown result");
 }
 
-bool NoteServerProcessor::dispatchCall(::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, const std::string& fname, int32_t seqid, void* callContext) {
+bool NoteInfoProcessor::dispatchCall(::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, const std::string& fname, int32_t seqid, void* callContext) {
   ProcessMap::iterator pfn;
   pfn = processMap_.find(fname);
   if (pfn == processMap_.end()) {
@@ -505,34 +505,34 @@ bool NoteServerProcessor::dispatchCall(::apache::thrift::protocol::TProtocol* ip
   return true;
 }
 
-void NoteServerProcessor::process_GetNotebooks(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
+void NoteInfoProcessor::process_GetNotebooks(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
 {
   void* ctx = NULL;
   if (this->eventHandler_.get() != NULL) {
-    ctx = this->eventHandler_->getContext("NoteServer.GetNotebooks", callContext);
+    ctx = this->eventHandler_->getContext("NoteInfo.GetNotebooks", callContext);
   }
-  ::apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "NoteServer.GetNotebooks");
+  ::apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "NoteInfo.GetNotebooks");
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->preRead(ctx, "NoteServer.GetNotebooks");
+    this->eventHandler_->preRead(ctx, "NoteInfo.GetNotebooks");
   }
 
-  NoteServer_GetNotebooks_args args;
+  NoteInfo_GetNotebooks_args args;
   args.read(iprot);
   iprot->readMessageEnd();
   uint32_t bytes = iprot->getTransport()->readEnd();
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->postRead(ctx, "NoteServer.GetNotebooks", bytes);
+    this->eventHandler_->postRead(ctx, "NoteInfo.GetNotebooks", bytes);
   }
 
-  NoteServer_GetNotebooks_result result;
+  NoteInfo_GetNotebooks_result result;
   try {
     iface_->GetNotebooks(result.success, args.userid);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {
-      this->eventHandler_->handlerError(ctx, "NoteServer.GetNotebooks");
+      this->eventHandler_->handlerError(ctx, "NoteInfo.GetNotebooks");
     }
 
     ::apache::thrift::TApplicationException x(e.what());
@@ -545,7 +545,7 @@ void NoteServerProcessor::process_GetNotebooks(int32_t seqid, ::apache::thrift::
   }
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->preWrite(ctx, "NoteServer.GetNotebooks");
+    this->eventHandler_->preWrite(ctx, "NoteInfo.GetNotebooks");
   }
 
   oprot->writeMessageBegin("GetNotebooks", ::apache::thrift::protocol::T_REPLY, seqid);
@@ -555,38 +555,38 @@ void NoteServerProcessor::process_GetNotebooks(int32_t seqid, ::apache::thrift::
   oprot->getTransport()->flush();
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->postWrite(ctx, "NoteServer.GetNotebooks", bytes);
+    this->eventHandler_->postWrite(ctx, "NoteInfo.GetNotebooks", bytes);
   }
 }
 
-void NoteServerProcessor::process_GetContent(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
+void NoteInfoProcessor::process_GetContent(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
 {
   void* ctx = NULL;
   if (this->eventHandler_.get() != NULL) {
-    ctx = this->eventHandler_->getContext("NoteServer.GetContent", callContext);
+    ctx = this->eventHandler_->getContext("NoteInfo.GetContent", callContext);
   }
-  ::apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "NoteServer.GetContent");
+  ::apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "NoteInfo.GetContent");
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->preRead(ctx, "NoteServer.GetContent");
+    this->eventHandler_->preRead(ctx, "NoteInfo.GetContent");
   }
 
-  NoteServer_GetContent_args args;
+  NoteInfo_GetContent_args args;
   args.read(iprot);
   iprot->readMessageEnd();
   uint32_t bytes = iprot->getTransport()->readEnd();
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->postRead(ctx, "NoteServer.GetContent", bytes);
+    this->eventHandler_->postRead(ctx, "NoteInfo.GetContent", bytes);
   }
 
-  NoteServer_GetContent_result result;
+  NoteInfo_GetContent_result result;
   try {
     iface_->GetContent(result.success, args.noteid);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {
-      this->eventHandler_->handlerError(ctx, "NoteServer.GetContent");
+      this->eventHandler_->handlerError(ctx, "NoteInfo.GetContent");
     }
 
     ::apache::thrift::TApplicationException x(e.what());
@@ -599,7 +599,7 @@ void NoteServerProcessor::process_GetContent(int32_t seqid, ::apache::thrift::pr
   }
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->preWrite(ctx, "NoteServer.GetContent");
+    this->eventHandler_->preWrite(ctx, "NoteInfo.GetContent");
   }
 
   oprot->writeMessageBegin("GetContent", ::apache::thrift::protocol::T_REPLY, seqid);
@@ -609,14 +609,14 @@ void NoteServerProcessor::process_GetContent(int32_t seqid, ::apache::thrift::pr
   oprot->getTransport()->flush();
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->postWrite(ctx, "NoteServer.GetContent", bytes);
+    this->eventHandler_->postWrite(ctx, "NoteInfo.GetContent", bytes);
   }
 }
 
-::boost::shared_ptr< ::apache::thrift::TProcessor > NoteServerProcessorFactory::getProcessor(const ::apache::thrift::TConnectionInfo& connInfo) {
-  ::apache::thrift::ReleaseHandler< NoteServerIfFactory > cleanup(handlerFactory_);
-  ::boost::shared_ptr< NoteServerIf > handler(handlerFactory_->getHandler(connInfo), cleanup);
-  ::boost::shared_ptr< ::apache::thrift::TProcessor > processor(new NoteServerProcessor(handler));
+::boost::shared_ptr< ::apache::thrift::TProcessor > NoteInfoProcessorFactory::getProcessor(const ::apache::thrift::TConnectionInfo& connInfo) {
+  ::apache::thrift::ReleaseHandler< NoteInfoIfFactory > cleanup(handlerFactory_);
+  ::boost::shared_ptr< NoteInfoIf > handler(handlerFactory_->getHandler(connInfo), cleanup);
+  ::boost::shared_ptr< ::apache::thrift::TProcessor > processor(new NoteInfoProcessor(handler));
   return processor;
 }
 

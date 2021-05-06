@@ -4,11 +4,11 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-#include "UserServer.h"
+#include "UserInfo.h"
 
 
 
-uint32_t UserServer_GetUserId_args::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t UserInfo_GetUserId_args::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -51,9 +51,9 @@ uint32_t UserServer_GetUserId_args::read(::apache::thrift::protocol::TProtocol* 
   return xfer;
 }
 
-uint32_t UserServer_GetUserId_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t UserInfo_GetUserId_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
-  xfer += oprot->writeStructBegin("UserServer_GetUserId_args");
+  xfer += oprot->writeStructBegin("UserInfo_GetUserId_args");
 
   xfer += oprot->writeFieldBegin("username", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString(this->username);
@@ -64,9 +64,9 @@ uint32_t UserServer_GetUserId_args::write(::apache::thrift::protocol::TProtocol*
   return xfer;
 }
 
-uint32_t UserServer_GetUserId_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t UserInfo_GetUserId_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
-  xfer += oprot->writeStructBegin("UserServer_GetUserId_pargs");
+  xfer += oprot->writeStructBegin("UserInfo_GetUserId_pargs");
 
   xfer += oprot->writeFieldBegin("username", ::apache::thrift::protocol::T_STRING, 1);
   xfer += oprot->writeString((*(this->username)));
@@ -77,7 +77,7 @@ uint32_t UserServer_GetUserId_pargs::write(::apache::thrift::protocol::TProtocol
   return xfer;
 }
 
-uint32_t UserServer_GetUserId_result::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t UserInfo_GetUserId_result::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -117,11 +117,11 @@ uint32_t UserServer_GetUserId_result::read(::apache::thrift::protocol::TProtocol
   return xfer;
 }
 
-uint32_t UserServer_GetUserId_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t UserInfo_GetUserId_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
 
   uint32_t xfer = 0;
 
-  xfer += oprot->writeStructBegin("UserServer_GetUserId_result");
+  xfer += oprot->writeStructBegin("UserInfo_GetUserId_result");
 
   if (this->__isset.success) {
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I32, 0);
@@ -133,7 +133,7 @@ uint32_t UserServer_GetUserId_result::write(::apache::thrift::protocol::TProtoco
   return xfer;
 }
 
-uint32_t UserServer_GetUserId_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t UserInfo_GetUserId_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -173,18 +173,18 @@ uint32_t UserServer_GetUserId_presult::read(::apache::thrift::protocol::TProtoco
   return xfer;
 }
 
-int32_t UserServerClient::GetUserId(const std::string& username)
+int32_t UserInfoClient::GetUserId(const std::string& username)
 {
   send_GetUserId(username);
   return recv_GetUserId();
 }
 
-void UserServerClient::send_GetUserId(const std::string& username)
+void UserInfoClient::send_GetUserId(const std::string& username)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("GetUserId", ::apache::thrift::protocol::T_CALL, cseqid);
 
-  UserServer_GetUserId_pargs args;
+  UserInfo_GetUserId_pargs args;
   args.username = &username;
   args.write(oprot_);
 
@@ -193,7 +193,7 @@ void UserServerClient::send_GetUserId(const std::string& username)
   oprot_->getTransport()->flush();
 }
 
-int32_t UserServerClient::recv_GetUserId()
+int32_t UserInfoClient::recv_GetUserId()
 {
 
   int32_t rseqid = 0;
@@ -219,7 +219,7 @@ int32_t UserServerClient::recv_GetUserId()
     iprot_->getTransport()->readEnd();
   }
   int32_t _return;
-  UserServer_GetUserId_presult result;
+  UserInfo_GetUserId_presult result;
   result.success = &_return;
   result.read(iprot_);
   iprot_->readMessageEnd();
@@ -231,7 +231,7 @@ int32_t UserServerClient::recv_GetUserId()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "GetUserId failed: unknown result");
 }
 
-bool UserServerProcessor::dispatchCall(::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, const std::string& fname, int32_t seqid, void* callContext) {
+bool UserInfoProcessor::dispatchCall(::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, const std::string& fname, int32_t seqid, void* callContext) {
   ProcessMap::iterator pfn;
   pfn = processMap_.find(fname);
   if (pfn == processMap_.end()) {
@@ -250,34 +250,34 @@ bool UserServerProcessor::dispatchCall(::apache::thrift::protocol::TProtocol* ip
   return true;
 }
 
-void UserServerProcessor::process_GetUserId(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
+void UserInfoProcessor::process_GetUserId(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
 {
   void* ctx = NULL;
   if (this->eventHandler_.get() != NULL) {
-    ctx = this->eventHandler_->getContext("UserServer.GetUserId", callContext);
+    ctx = this->eventHandler_->getContext("UserInfo.GetUserId", callContext);
   }
-  ::apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "UserServer.GetUserId");
+  ::apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "UserInfo.GetUserId");
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->preRead(ctx, "UserServer.GetUserId");
+    this->eventHandler_->preRead(ctx, "UserInfo.GetUserId");
   }
 
-  UserServer_GetUserId_args args;
+  UserInfo_GetUserId_args args;
   args.read(iprot);
   iprot->readMessageEnd();
   uint32_t bytes = iprot->getTransport()->readEnd();
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->postRead(ctx, "UserServer.GetUserId", bytes);
+    this->eventHandler_->postRead(ctx, "UserInfo.GetUserId", bytes);
   }
 
-  UserServer_GetUserId_result result;
+  UserInfo_GetUserId_result result;
   try {
     result.success = iface_->GetUserId(args.username);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {
-      this->eventHandler_->handlerError(ctx, "UserServer.GetUserId");
+      this->eventHandler_->handlerError(ctx, "UserInfo.GetUserId");
     }
 
     ::apache::thrift::TApplicationException x(e.what());
@@ -290,7 +290,7 @@ void UserServerProcessor::process_GetUserId(int32_t seqid, ::apache::thrift::pro
   }
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->preWrite(ctx, "UserServer.GetUserId");
+    this->eventHandler_->preWrite(ctx, "UserInfo.GetUserId");
   }
 
   oprot->writeMessageBegin("GetUserId", ::apache::thrift::protocol::T_REPLY, seqid);
@@ -300,14 +300,14 @@ void UserServerProcessor::process_GetUserId(int32_t seqid, ::apache::thrift::pro
   oprot->getTransport()->flush();
 
   if (this->eventHandler_.get() != NULL) {
-    this->eventHandler_->postWrite(ctx, "UserServer.GetUserId", bytes);
+    this->eventHandler_->postWrite(ctx, "UserInfo.GetUserId", bytes);
   }
 }
 
-::boost::shared_ptr< ::apache::thrift::TProcessor > UserServerProcessorFactory::getProcessor(const ::apache::thrift::TConnectionInfo& connInfo) {
-  ::apache::thrift::ReleaseHandler< UserServerIfFactory > cleanup(handlerFactory_);
-  ::boost::shared_ptr< UserServerIf > handler(handlerFactory_->getHandler(connInfo), cleanup);
-  ::boost::shared_ptr< ::apache::thrift::TProcessor > processor(new UserServerProcessor(handler));
+::boost::shared_ptr< ::apache::thrift::TProcessor > UserInfoProcessorFactory::getProcessor(const ::apache::thrift::TConnectionInfo& connInfo) {
+  ::apache::thrift::ReleaseHandler< UserInfoIfFactory > cleanup(handlerFactory_);
+  ::boost::shared_ptr< UserInfoIf > handler(handlerFactory_->getHandler(connInfo), cleanup);
+  ::boost::shared_ptr< ::apache::thrift::TProcessor > processor(new UserInfoProcessor(handler));
   return processor;
 }
 

@@ -4,48 +4,48 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-#ifndef NoteServer_H
-#define NoteServer_H
+#ifndef NoteInfo_H
+#define NoteInfo_H
 
 #include <thrift/TDispatchProcessor.h>
 #include "notestructure_types.h"
 
 
 
-class NoteServerIf {
+class NoteInfoIf {
  public:
-  virtual ~NoteServerIf() {}
+  virtual ~NoteInfoIf() {}
   virtual void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid) = 0;
   virtual void GetContent(std::string& _return, const std::string& noteid) = 0;
 };
 
-class NoteServerIfFactory {
+class NoteInfoIfFactory {
  public:
-  typedef NoteServerIf Handler;
+  typedef NoteInfoIf Handler;
 
-  virtual ~NoteServerIfFactory() {}
+  virtual ~NoteInfoIfFactory() {}
 
-  virtual NoteServerIf* getHandler(const ::apache::thrift::TConnectionInfo& connInfo) = 0;
-  virtual void releaseHandler(NoteServerIf* /* handler */) = 0;
+  virtual NoteInfoIf* getHandler(const ::apache::thrift::TConnectionInfo& connInfo) = 0;
+  virtual void releaseHandler(NoteInfoIf* /* handler */) = 0;
 };
 
-class NoteServerIfSingletonFactory : virtual public NoteServerIfFactory {
+class NoteInfoIfSingletonFactory : virtual public NoteInfoIfFactory {
  public:
-  NoteServerIfSingletonFactory(const boost::shared_ptr<NoteServerIf>& iface) : iface_(iface) {}
-  virtual ~NoteServerIfSingletonFactory() {}
+  NoteInfoIfSingletonFactory(const boost::shared_ptr<NoteInfoIf>& iface) : iface_(iface) {}
+  virtual ~NoteInfoIfSingletonFactory() {}
 
-  virtual NoteServerIf* getHandler(const ::apache::thrift::TConnectionInfo&) {
+  virtual NoteInfoIf* getHandler(const ::apache::thrift::TConnectionInfo&) {
     return iface_.get();
   }
-  virtual void releaseHandler(NoteServerIf* /* handler */) {}
+  virtual void releaseHandler(NoteInfoIf* /* handler */) {}
 
  protected:
-  boost::shared_ptr<NoteServerIf> iface_;
+  boost::shared_ptr<NoteInfoIf> iface_;
 };
 
-class NoteServerNull : virtual public NoteServerIf {
+class NoteInfoNull : virtual public NoteInfoIf {
  public:
-  virtual ~NoteServerNull() {}
+  virtual ~NoteInfoNull() {}
   void GetNotebooks(std::vector<Notebook> & /* _return */, const std::string& /* userid */) {
     return;
   }
@@ -55,13 +55,13 @@ class NoteServerNull : virtual public NoteServerIf {
 };
 
 
-class NoteServer_GetNotebooks_args {
+class NoteInfo_GetNotebooks_args {
  public:
 
-  NoteServer_GetNotebooks_args() : userid() {
+  NoteInfo_GetNotebooks_args() : userid() {
   }
 
-  virtual ~NoteServer_GetNotebooks_args() throw() {}
+  virtual ~NoteInfo_GetNotebooks_args() throw() {}
 
   std::string userid;
 
@@ -69,17 +69,17 @@ class NoteServer_GetNotebooks_args {
     userid = val;
   }
 
-  bool operator == (const NoteServer_GetNotebooks_args & rhs) const
+  bool operator == (const NoteInfo_GetNotebooks_args & rhs) const
   {
     if (!(userid == rhs.userid))
       return false;
     return true;
   }
-  bool operator != (const NoteServer_GetNotebooks_args &rhs) const {
+  bool operator != (const NoteInfo_GetNotebooks_args &rhs) const {
     return !(*this == rhs);
   }
 
-  bool operator < (const NoteServer_GetNotebooks_args & ) const;
+  bool operator < (const NoteInfo_GetNotebooks_args & ) const;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
@@ -87,11 +87,11 @@ class NoteServer_GetNotebooks_args {
 };
 
 
-class NoteServer_GetNotebooks_pargs {
+class NoteInfo_GetNotebooks_pargs {
  public:
 
 
-  virtual ~NoteServer_GetNotebooks_pargs() throw() {}
+  virtual ~NoteInfo_GetNotebooks_pargs() throw() {}
 
   const std::string* userid;
 
@@ -99,71 +99,71 @@ class NoteServer_GetNotebooks_pargs {
 
 };
 
-typedef struct _NoteServer_GetNotebooks_result__isset {
-  _NoteServer_GetNotebooks_result__isset() : success(false) {}
+typedef struct _NoteInfo_GetNotebooks_result__isset {
+  _NoteInfo_GetNotebooks_result__isset() : success(false) {}
   bool success;
-} _NoteServer_GetNotebooks_result__isset;
+} _NoteInfo_GetNotebooks_result__isset;
 
-class NoteServer_GetNotebooks_result {
+class NoteInfo_GetNotebooks_result {
  public:
 
-  NoteServer_GetNotebooks_result() {
+  NoteInfo_GetNotebooks_result() {
   }
 
-  virtual ~NoteServer_GetNotebooks_result() throw() {}
+  virtual ~NoteInfo_GetNotebooks_result() throw() {}
 
   std::vector<Notebook>  success;
 
-  _NoteServer_GetNotebooks_result__isset __isset;
+  _NoteInfo_GetNotebooks_result__isset __isset;
 
   void __set_success(const std::vector<Notebook> & val) {
     success = val;
   }
 
-  bool operator == (const NoteServer_GetNotebooks_result & rhs) const
+  bool operator == (const NoteInfo_GetNotebooks_result & rhs) const
   {
     if (!(success == rhs.success))
       return false;
     return true;
   }
-  bool operator != (const NoteServer_GetNotebooks_result &rhs) const {
+  bool operator != (const NoteInfo_GetNotebooks_result &rhs) const {
     return !(*this == rhs);
   }
 
-  bool operator < (const NoteServer_GetNotebooks_result & ) const;
+  bool operator < (const NoteInfo_GetNotebooks_result & ) const;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
 };
 
-typedef struct _NoteServer_GetNotebooks_presult__isset {
-  _NoteServer_GetNotebooks_presult__isset() : success(false) {}
+typedef struct _NoteInfo_GetNotebooks_presult__isset {
+  _NoteInfo_GetNotebooks_presult__isset() : success(false) {}
   bool success;
-} _NoteServer_GetNotebooks_presult__isset;
+} _NoteInfo_GetNotebooks_presult__isset;
 
-class NoteServer_GetNotebooks_presult {
+class NoteInfo_GetNotebooks_presult {
  public:
 
 
-  virtual ~NoteServer_GetNotebooks_presult() throw() {}
+  virtual ~NoteInfo_GetNotebooks_presult() throw() {}
 
   std::vector<Notebook> * success;
 
-  _NoteServer_GetNotebooks_presult__isset __isset;
+  _NoteInfo_GetNotebooks_presult__isset __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
 };
 
 
-class NoteServer_GetContent_args {
+class NoteInfo_GetContent_args {
  public:
 
-  NoteServer_GetContent_args() : noteid() {
+  NoteInfo_GetContent_args() : noteid() {
   }
 
-  virtual ~NoteServer_GetContent_args() throw() {}
+  virtual ~NoteInfo_GetContent_args() throw() {}
 
   std::string noteid;
 
@@ -171,17 +171,17 @@ class NoteServer_GetContent_args {
     noteid = val;
   }
 
-  bool operator == (const NoteServer_GetContent_args & rhs) const
+  bool operator == (const NoteInfo_GetContent_args & rhs) const
   {
     if (!(noteid == rhs.noteid))
       return false;
     return true;
   }
-  bool operator != (const NoteServer_GetContent_args &rhs) const {
+  bool operator != (const NoteInfo_GetContent_args &rhs) const {
     return !(*this == rhs);
   }
 
-  bool operator < (const NoteServer_GetContent_args & ) const;
+  bool operator < (const NoteInfo_GetContent_args & ) const;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
@@ -189,11 +189,11 @@ class NoteServer_GetContent_args {
 };
 
 
-class NoteServer_GetContent_pargs {
+class NoteInfo_GetContent_pargs {
  public:
 
 
-  virtual ~NoteServer_GetContent_pargs() throw() {}
+  virtual ~NoteInfo_GetContent_pargs() throw() {}
 
   const std::string* noteid;
 
@@ -201,72 +201,72 @@ class NoteServer_GetContent_pargs {
 
 };
 
-typedef struct _NoteServer_GetContent_result__isset {
-  _NoteServer_GetContent_result__isset() : success(false) {}
+typedef struct _NoteInfo_GetContent_result__isset {
+  _NoteInfo_GetContent_result__isset() : success(false) {}
   bool success;
-} _NoteServer_GetContent_result__isset;
+} _NoteInfo_GetContent_result__isset;
 
-class NoteServer_GetContent_result {
+class NoteInfo_GetContent_result {
  public:
 
-  NoteServer_GetContent_result() : success() {
+  NoteInfo_GetContent_result() : success() {
   }
 
-  virtual ~NoteServer_GetContent_result() throw() {}
+  virtual ~NoteInfo_GetContent_result() throw() {}
 
   std::string success;
 
-  _NoteServer_GetContent_result__isset __isset;
+  _NoteInfo_GetContent_result__isset __isset;
 
   void __set_success(const std::string& val) {
     success = val;
   }
 
-  bool operator == (const NoteServer_GetContent_result & rhs) const
+  bool operator == (const NoteInfo_GetContent_result & rhs) const
   {
     if (!(success == rhs.success))
       return false;
     return true;
   }
-  bool operator != (const NoteServer_GetContent_result &rhs) const {
+  bool operator != (const NoteInfo_GetContent_result &rhs) const {
     return !(*this == rhs);
   }
 
-  bool operator < (const NoteServer_GetContent_result & ) const;
+  bool operator < (const NoteInfo_GetContent_result & ) const;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
 };
 
-typedef struct _NoteServer_GetContent_presult__isset {
-  _NoteServer_GetContent_presult__isset() : success(false) {}
+typedef struct _NoteInfo_GetContent_presult__isset {
+  _NoteInfo_GetContent_presult__isset() : success(false) {}
   bool success;
-} _NoteServer_GetContent_presult__isset;
+} _NoteInfo_GetContent_presult__isset;
 
-class NoteServer_GetContent_presult {
+class NoteInfo_GetContent_presult {
  public:
 
 
-  virtual ~NoteServer_GetContent_presult() throw() {}
+  virtual ~NoteInfo_GetContent_presult() throw() {}
 
   std::string* success;
 
-  _NoteServer_GetContent_presult__isset __isset;
+  _NoteInfo_GetContent_presult__isset __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
 };
 
-class NoteServerClient : virtual public NoteServerIf {
+class NoteInfoClient : virtual public NoteInfoIf {
  public:
-  NoteServerClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) :
+  NoteInfoClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) :
     piprot_(prot),
     poprot_(prot) {
     iprot_ = prot.get();
     oprot_ = prot.get();
   }
-  NoteServerClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> iprot, boost::shared_ptr< ::apache::thrift::protocol::TProtocol> oprot) :
+  NoteInfoClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> iprot, boost::shared_ptr< ::apache::thrift::protocol::TProtocol> oprot) :
     piprot_(iprot),
     poprot_(oprot) {
     iprot_ = iprot.get();
@@ -291,46 +291,46 @@ class NoteServerClient : virtual public NoteServerIf {
   ::apache::thrift::protocol::TProtocol* oprot_;
 };
 
-class NoteServerProcessor : public ::apache::thrift::TDispatchProcessor {
+class NoteInfoProcessor : public ::apache::thrift::TDispatchProcessor {
  protected:
-  boost::shared_ptr<NoteServerIf> iface_;
+  boost::shared_ptr<NoteInfoIf> iface_;
   virtual bool dispatchCall(::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, const std::string& fname, int32_t seqid, void* callContext);
  private:
-  typedef  void (NoteServerProcessor::*ProcessFunction)(int32_t, ::apache::thrift::protocol::TProtocol*, ::apache::thrift::protocol::TProtocol*, void*);
+  typedef  void (NoteInfoProcessor::*ProcessFunction)(int32_t, ::apache::thrift::protocol::TProtocol*, ::apache::thrift::protocol::TProtocol*, void*);
   typedef std::map<std::string, ProcessFunction> ProcessMap;
   ProcessMap processMap_;
   void process_GetNotebooks(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_GetContent(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
-  NoteServerProcessor(boost::shared_ptr<NoteServerIf> iface) :
+  NoteInfoProcessor(boost::shared_ptr<NoteInfoIf> iface) :
     iface_(iface) {
-    processMap_["GetNotebooks"] = &NoteServerProcessor::process_GetNotebooks;
-    processMap_["GetContent"] = &NoteServerProcessor::process_GetContent;
+    processMap_["GetNotebooks"] = &NoteInfoProcessor::process_GetNotebooks;
+    processMap_["GetContent"] = &NoteInfoProcessor::process_GetContent;
   }
 
-  virtual ~NoteServerProcessor() {}
+  virtual ~NoteInfoProcessor() {}
 };
 
-class NoteServerProcessorFactory : public ::apache::thrift::TProcessorFactory {
+class NoteInfoProcessorFactory : public ::apache::thrift::TProcessorFactory {
  public:
-  NoteServerProcessorFactory(const ::boost::shared_ptr< NoteServerIfFactory >& handlerFactory) :
+  NoteInfoProcessorFactory(const ::boost::shared_ptr< NoteInfoIfFactory >& handlerFactory) :
       handlerFactory_(handlerFactory) {}
 
   ::boost::shared_ptr< ::apache::thrift::TProcessor > getProcessor(const ::apache::thrift::TConnectionInfo& connInfo);
 
  protected:
-  ::boost::shared_ptr< NoteServerIfFactory > handlerFactory_;
+  ::boost::shared_ptr< NoteInfoIfFactory > handlerFactory_;
 };
 
-class NoteServerMultiface : virtual public NoteServerIf {
+class NoteInfoMultiface : virtual public NoteInfoIf {
  public:
-  NoteServerMultiface(std::vector<boost::shared_ptr<NoteServerIf> >& ifaces) : ifaces_(ifaces) {
+  NoteInfoMultiface(std::vector<boost::shared_ptr<NoteInfoIf> >& ifaces) : ifaces_(ifaces) {
   }
-  virtual ~NoteServerMultiface() {}
+  virtual ~NoteInfoMultiface() {}
  protected:
-  std::vector<boost::shared_ptr<NoteServerIf> > ifaces_;
-  NoteServerMultiface() {}
-  void add(boost::shared_ptr<NoteServerIf> iface) {
+  std::vector<boost::shared_ptr<NoteInfoIf> > ifaces_;
+  NoteInfoMultiface() {}
+  void add(boost::shared_ptr<NoteInfoIf> iface) {
     ifaces_.push_back(iface);
   }
  public:
