@@ -26,7 +26,7 @@ class HelloHandler : virtual public HelloIf {
 };
 
 int main(int argc, char **argv) {
-  int port = 9090;
+  int port = 80;
   ::std::shared_ptr<HelloHandler> handler(new HelloHandler());
   ::std::shared_ptr<TProcessor> processor(new HelloProcessor(handler));
   ::std::shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));

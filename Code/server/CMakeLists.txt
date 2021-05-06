@@ -6,5 +6,5 @@ SET( SERVER_FILES helloServer.cpp)
 SET( LIB_SOURCE  ./gen-cpp/Hello.cpp )
 
 ADD_EXECUTABLE(server ${SERVER_FILES} ${LIB_SOURCE} )
-TARGET_LINK_LIBRARIES(server thrift)
+TARGET_LINK_LIBRARIES(server -lthrift)
 
