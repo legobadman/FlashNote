@@ -20,82 +20,117 @@
 #ifndef _THRIFT_SERVER_TTHREADPOOLSERVER_H_
 #define _THRIFT_SERVER_TTHREADPOOLSERVER_H_ 1
 
-#include <atomic>
 #include <thrift/concurrency/ThreadManager.h>
-#include <thrift/server/TServerFramework.h>
+#include <thrift/server/TServer.h>
+#include <thrift/transport/TServerTransport.h>
 
-namespace apache {
-namespace thrift {
-namespace server {
+#include <boost/shared_ptr.hpp>
 
-/**
- * Manage clients using a thread pool.
- */
-class TThreadPoolServer : public TServerFramework {
-public:
+namespace apache { namespace thrift { namespace server {
+
+using apache::thrift::concurrency::ThreadManager;
+using apache::thrift::protocol::TProtocolFactory;
+using apache::thrift::transport::TServerTransport;
+using apache::thrift::transport::TTransportFactory;
+
+class TThreadPoolServer : public TServer {
+ public:
+  class Task;
+
+  template<typename ProcessorFactory>
   TThreadPoolServer(
-      const std::shared_ptr<apache::thrift::TProcessorFactory>& processorFactory,
-      const std::shared_ptr<apache::thrift::transport::TServerTransport>& serverTransport,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& transportFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& protocolFactory,
-      const std::shared_ptr<apache::thrift::concurrency::ThreadManager>& threadManager
-      = apache::thrift::concurrency::ThreadManager::newSimpleThreadManager());
+      const boost::shared_ptr<ProcessorFactory>& processorFactory,
+      const boost::shared_ptr<TServerTransport>& serverTransport,
+      const boost::shared_ptr<TTransportFactory>& transportFactory,
+      const boost::shared_ptr<TProtocolFactory>& protocolFactory,
+      const boost::shared_ptr<ThreadManager>& threadManager,
+      THRIFT_OVERLOAD_IF(ProcessorFactory, TProcessorFactory)) :
+    TServer(processorFactory, serverTransport, transportFactory,
+            protocolFactory),
+    threadManager_(threadManager),
+    stop_(false),
+    timeout_(0),
+    taskExpiration_(0) {}
 
+  template<typename Processor>
   TThreadPoolServer(
-      const std::shared_ptr<apache::thrift::TProcessor>& processor,
-      const std::shared_ptr<apache::thrift::transport::TServerTransport>& serverTransport,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& transportFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& protocolFactory,
-      const std::shared_ptr<apache::thrift::concurrency::ThreadManager>& threadManager
-      = apache::thrift::concurrency::ThreadManager::newSimpleThreadManager());
+      const boost::shared_ptr<Processor>& processor,
+      const boost::shared_ptr<TServerTransport>& serverTransport,
+      const boost::shared_ptr<TTransportFactory>& transportFactory,
+      const boost::shared_ptr<TProtocolFactory>& protocolFactory,
+      const boost::shared_ptr<ThreadManager>& threadManager,
+      THRIFT_OVERLOAD_IF(Processor, TProcessor)) :
+    TServer(processor, serverTransport, transportFactory, protocolFactory),
+    threadManager_(threadManager),
+    stop_(false),
+    timeout_(0),
+    taskExpiration_(0) {}
 
+  template<typename ProcessorFactory>
   TThreadPoolServer(
-      const std::shared_ptr<apache::thrift::TProcessorFactory>& processorFactory,
-      const std::shared_ptr<apache::thrift::transport::TServerTransport>& serverTransport,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& inputTransportFactory,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& outputTransportFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& inputProtocolFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& outputProtocolFactory,
-      const std::shared_ptr<apache::thrift::concurrency::ThreadManager>& threadManager
-      = apache::thrift::concurrency::ThreadManager::newSimpleThreadManager());
+      const boost::shared_ptr<ProcessorFactory>& processorFactory,
+      const boost::shared_ptr<TServerTransport>& serverTransport,
+      const boost::shared_ptr<TTransportFactory>& inputTransportFactory,
+      const boost::shared_ptr<TTransportFactory>& outputTransportFactory,
+      const boost::shared_ptr<TProtocolFactory>& inputProtocolFactory,
+      const boost::shared_ptr<TProtocolFactory>& outputProtocolFactory,
+      const boost::shared_ptr<ThreadManager>& threadManager,
+      THRIFT_OVERLOAD_IF(ProcessorFactory, TProcessorFactory)) :
+    TServer(processorFactory, serverTransport,
+            inputTransportFactory, outputTransportFactory,
+            inputProtocolFactory, outputProtocolFactory),
+    threadManager_(threadManager),
+    stop_(false),
+    timeout_(0),
+    taskExpiration_(0) {}
 
+  template<typename Processor>
   TThreadPoolServer(
-      const std::shared_ptr<apache::thrift::TProcessor>& processor,
-      const std::shared_ptr<apache::thrift::transport::TServerTransport>& serverTransport,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& inputTransportFactory,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& outputTransportFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& inputProtocolFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& outputProtocolFactory,
-      const std::shared_ptr<apache::thrift::concurrency::ThreadManager>& threadManager
-      = apache::thrift::concurrency::ThreadManager::newSimpleThreadManager());
+      const boost::shared_ptr<Processor>& processor,
+      const boost::shared_ptr<TServerTransport>& serverTransport,
+      const boost::shared_ptr<TTransportFactory>& inputTransportFactory,
+      const boost::shared_ptr<TTransportFactory>& outputTransportFactory,
+      const boost::shared_ptr<TProtocolFactory>& inputProtocolFactory,
+      const boost::shared_ptr<TProtocolFactory>& outputProtocolFactory,
+      const boost::shared_ptr<ThreadManager>& threadManager,
+      THRIFT_OVERLOAD_IF(Processor, TProcessor)) :
+    TServer(processor, serverTransport,
+            inputTransportFactory, outputTransportFactory,
+            inputProtocolFactory, outputProtocolFactory),
+    threadManager_(threadManager),
+    stop_(false),
+    timeout_(0),
+    taskExpiration_(0) {}
 
-  ~TThreadPoolServer() override;
+  virtual ~TThreadPoolServer();
 
-  /**
-   * Post-conditions (return guarantees):
-   *   There will be no clients connected.
-   */
-  void serve() override;
+  virtual void serve();
 
   virtual int64_t getTimeout() const;
+
   virtual void setTimeout(int64_t value);
 
+  virtual void stop() {
+    stop_ = true;
+    serverTransport_->interrupt();
+  }
+
   virtual int64_t getTaskExpiration() const;
+
   virtual void setTaskExpiration(int64_t value);
 
-  virtual std::shared_ptr<apache::thrift::concurrency::ThreadManager> getThreadManager() const;
+ protected:
 
-protected:
-  void onClientConnected(const std::shared_ptr<TConnectedClient>& pClient) override /* override */;
-  void onClientDisconnected(TConnectedClient* pClient) override /* override */;
+  boost::shared_ptr<ThreadManager> threadManager_;
 
-  std::shared_ptr<apache::thrift::concurrency::ThreadManager> threadManager_;
-  std::atomic<int64_t> timeout_;
-  std::atomic<int64_t> taskExpiration_;
+  volatile bool stop_;
+
+  volatile int64_t timeout_;
+
+  volatile int64_t taskExpiration_;
+
 };
 
-}
-}
-} // apache::thrift::server
+}}} // apache::thrift::server
 
 #endif // #ifndef _THRIFT_SERVER_TTHREADPOOLSERVER_H_

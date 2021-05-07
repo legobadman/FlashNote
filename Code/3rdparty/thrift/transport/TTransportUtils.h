@@ -29,9 +29,7 @@
 #include <thrift/transport/TBufferTransports.h>
 #include <thrift/transport/TFileTransport.h>
 
-namespace apache {
-namespace thrift {
-namespace transport {
+namespace apache { namespace thrift { namespace transport {
 
 /**
  * The null transport is a dummy transport that doesn't actually do anything.
@@ -41,17 +39,23 @@ namespace transport {
  *
  */
 class TNullTransport : public TVirtualTransport<TNullTransport> {
-public:
-  TNullTransport() = default;
+ public:
+  TNullTransport() {}
 
-  ~TNullTransport() override = default;
+  ~TNullTransport() {}
 
-  bool isOpen() const override { return true; }
+  bool isOpen() {
+    return true;
+  }
 
-  void open() override {}
+  void open() {}
 
-  void write(const uint8_t* /* buf */, uint32_t /* len */) { return; }
+  void write(const uint8_t* /* buf */, uint32_t /* len */) {
+    return;
+  }
+
 };
+
 
 /**
  * TPipedTransport. This transport allows piping of a request from one
@@ -62,91 +66,89 @@ public:
  *
  */
 class TPipedTransport : virtual public TTransport {
-public:
-  TPipedTransport(std::shared_ptr<TTransport> srcTrans, std::shared_ptr<TTransport> dstTrans,
-                 std::shared_ptr<TConfiguration> config = nullptr)
-    : TTransport(config),
-      srcTrans_(srcTrans),
-      dstTrans_(dstTrans),
-      rBufSize_(512),
-      rPos_(0),
-      rLen_(0),
-      wBufSize_(512),
-      wLen_(0) {
+ public:
+  TPipedTransport(boost::shared_ptr<TTransport> srcTrans,
+                  boost::shared_ptr<TTransport> dstTrans) :
+    srcTrans_(srcTrans),
+    dstTrans_(dstTrans),
+    rBufSize_(512), rPos_(0), rLen_(0),
+    wBufSize_(512), wLen_(0) {
 
     // default is to to pipe the request when readEnd() is called
     pipeOnRead_ = true;
     pipeOnWrite_ = false;
 
-    rBuf_ = (uint8_t*)std::malloc(sizeof(uint8_t) * rBufSize_);
-    if (rBuf_ == nullptr) {
+    rBuf_ = (uint8_t*) std::malloc(sizeof(uint8_t) * rBufSize_);
+    if (rBuf_ == NULL) {
       throw std::bad_alloc();
     }
-    wBuf_ = (uint8_t*)std::malloc(sizeof(uint8_t) * wBufSize_);
-    if (wBuf_ == nullptr) {
-      throw std::bad_alloc();
-    }
-  }
-
-  TPipedTransport(std::shared_ptr<TTransport> srcTrans,
-                  std::shared_ptr<TTransport> dstTrans,
-                  uint32_t sz,
-                  std::shared_ptr<TConfiguration> config = nullptr)
-    : TTransport(config),
-      srcTrans_(srcTrans),
-      dstTrans_(dstTrans),
-      rBufSize_(512),
-      rPos_(0),
-      rLen_(0),
-      wBufSize_(sz),
-      wLen_(0) {
-
-    rBuf_ = (uint8_t*)std::malloc(sizeof(uint8_t) * rBufSize_);
-    if (rBuf_ == nullptr) {
-      throw std::bad_alloc();
-    }
-    wBuf_ = (uint8_t*)std::malloc(sizeof(uint8_t) * wBufSize_);
-    if (wBuf_ == nullptr) {
+    wBuf_ = (uint8_t*) std::malloc(sizeof(uint8_t) * wBufSize_);
+    if (wBuf_ == NULL) {
       throw std::bad_alloc();
     }
   }
 
-  ~TPipedTransport() override {
+  TPipedTransport(boost::shared_ptr<TTransport> srcTrans,
+                  boost::shared_ptr<TTransport> dstTrans,
+                  uint32_t sz) :
+    srcTrans_(srcTrans),
+    dstTrans_(dstTrans),
+    rBufSize_(512), rPos_(0), rLen_(0),
+    wBufSize_(sz), wLen_(0) {
+
+    rBuf_ = (uint8_t*) std::malloc(sizeof(uint8_t) * rBufSize_);
+    if (rBuf_ == NULL) {
+      throw std::bad_alloc();
+    }
+    wBuf_ = (uint8_t*) std::malloc(sizeof(uint8_t) * wBufSize_);
+    if (wBuf_ == NULL) {
+      throw std::bad_alloc();
+    }
+  }
+
+  ~TPipedTransport() {
     std::free(rBuf_);
     std::free(wBuf_);
   }
 
-  bool isOpen() const override { return srcTrans_->isOpen(); }
+  bool isOpen() {
+    return srcTrans_->isOpen();
+  }
 
-  bool peek() override {
+  bool peek() {
     if (rPos_ >= rLen_) {
       // Double the size of the underlying buffer if it is full
       if (rLen_ == rBufSize_) {
-        rBufSize_ *= 2;
-        auto * tmpBuf = (uint8_t*)std::realloc(rBuf_, sizeof(uint8_t) * rBufSize_);
-	if (tmpBuf == nullptr) {
-	  throw std::bad_alloc();
-	}
-	rBuf_ = tmpBuf;
+        rBufSize_ *=2;
+        rBuf_ = (uint8_t *)std::realloc(rBuf_, sizeof(uint8_t) * rBufSize_);
       }
 
       // try to fill up the buffer
-      rLen_ += srcTrans_->read(rBuf_ + rPos_, rBufSize_ - rPos_);
+      rLen_ += srcTrans_->read(rBuf_+rPos_, rBufSize_ - rPos_);
     }
     return (rLen_ > rPos_);
   }
 
-  void open() override { srcTrans_->open(); }
 
-  void close() override { srcTrans_->close(); }
+  void open() {
+    srcTrans_->open();
+  }
 
-  void setPipeOnRead(bool pipeVal) { pipeOnRead_ = pipeVal; }
+  void close() {
+    srcTrans_->close();
+  }
 
-  void setPipeOnWrite(bool pipeVal) { pipeOnWrite_ = pipeVal; }
+  void setPipeOnRead(bool pipeVal) {
+    pipeOnRead_ = pipeVal;
+  }
+
+  void setPipeOnWrite(bool pipeVal) {
+    pipeOnWrite_ = pipeVal;
+  }
 
   uint32_t read(uint8_t* buf, uint32_t len);
 
-  uint32_t readEnd() override {
+  uint32_t readEnd() {
 
     if (pipeOnRead_) {
       dstTrans_->write(rBuf_, rPos_);
@@ -168,7 +170,7 @@ public:
 
   void write(const uint8_t* buf, uint32_t len);
 
-  uint32_t writeEnd() override {
+  uint32_t writeEnd() {
     if (pipeOnWrite_) {
       dstTrans_->write(wBuf_, wLen_);
       dstTrans_->flush();
@@ -176,21 +178,27 @@ public:
     return wLen_;
   }
 
-  void flush() override;
+  void flush();
 
-  std::shared_ptr<TTransport> getTargetTransport() { return dstTrans_; }
+  boost::shared_ptr<TTransport> getTargetTransport() {
+    return dstTrans_;
+  }
 
   /*
    * Override TTransport *_virt() functions to invoke our implementations.
    * We cannot use TVirtualTransport to provide these, since we need to inherit
    * virtually from TTransport.
    */
-  uint32_t read_virt(uint8_t* buf, uint32_t len) override { return this->read(buf, len); }
-  void write_virt(const uint8_t* buf, uint32_t len) override { this->write(buf, len); }
+  virtual uint32_t read_virt(uint8_t* buf, uint32_t len) {
+    return this->read(buf, len);
+  }
+  virtual void write_virt(const uint8_t* buf, uint32_t len) {
+    this->write(buf, len);
+  }
 
-protected:
-  std::shared_ptr<TTransport> srcTrans_;
-  std::shared_ptr<TTransport> dstTrans_;
+ protected:
+  boost::shared_ptr<TTransport> srcTrans_;
+  boost::shared_ptr<TTransport> dstTrans_;
 
   uint8_t* rBuf_;
   uint32_t rBufSize_;
@@ -205,35 +213,36 @@ protected:
   bool pipeOnWrite_;
 };
 
+
 /**
  * Wraps a transport into a pipedTransport instance.
  *
  */
 class TPipedTransportFactory : public TTransportFactory {
-public:
-  TPipedTransportFactory() = default;
-  TPipedTransportFactory(std::shared_ptr<TTransport> dstTrans) {
+ public:
+  TPipedTransportFactory() {}
+  TPipedTransportFactory(boost::shared_ptr<TTransport> dstTrans) {
     initializeTargetTransport(dstTrans);
   }
-  ~TPipedTransportFactory() override = default;
+  virtual ~TPipedTransportFactory() {}
 
   /**
    * Wraps the base transport into a piped transport.
    */
-  std::shared_ptr<TTransport> getTransport(std::shared_ptr<TTransport> srcTrans) override {
-    return std::shared_ptr<TTransport>(new TPipedTransport(srcTrans, dstTrans_));
+  virtual boost::shared_ptr<TTransport> getTransport(boost::shared_ptr<TTransport> srcTrans) {
+    return boost::shared_ptr<TTransport>(new TPipedTransport(srcTrans, dstTrans_));
   }
 
-  virtual void initializeTargetTransport(std::shared_ptr<TTransport> dstTrans) {
-    if (dstTrans_.get() == nullptr) {
+  virtual void initializeTargetTransport(boost::shared_ptr<TTransport> dstTrans) {
+    if (dstTrans_.get() == NULL) {
       dstTrans_ = dstTrans;
     } else {
       throw TException("Target transport already initialized");
     }
   }
 
-protected:
-  std::shared_ptr<TTransport> dstTrans_;
+ protected:
+  boost::shared_ptr<TTransport> dstTrans_;
 };
 
 /**
@@ -242,47 +251,52 @@ protected:
  * TTransport can still access the original transport.
  *
  */
-class TPipedFileReaderTransport : public TPipedTransport, public TFileReaderTransport {
-public:
-  TPipedFileReaderTransport(std::shared_ptr<TFileReaderTransport> srcTrans,
-                            std::shared_ptr<TTransport> dstTrans,
-                            std::shared_ptr<TConfiguration> config = nullptr);
+class TPipedFileReaderTransport : public TPipedTransport,
+                                  public TFileReaderTransport {
+ public:
+  TPipedFileReaderTransport(boost::shared_ptr<TFileReaderTransport> srcTrans, boost::shared_ptr<TTransport> dstTrans);
 
-  ~TPipedFileReaderTransport() override;
+  ~TPipedFileReaderTransport();
 
   // TTransport functions
-  bool isOpen() const override;
-  bool peek() override;
-  void open() override;
-  void close() override;
+  bool isOpen();
+  bool peek();
+  void open();
+  void close();
   uint32_t read(uint8_t* buf, uint32_t len);
   uint32_t readAll(uint8_t* buf, uint32_t len);
-  uint32_t readEnd() override;
+  uint32_t readEnd();
   void write(const uint8_t* buf, uint32_t len);
-  uint32_t writeEnd() override;
-  void flush() override;
+  uint32_t writeEnd();
+  void flush();
 
   // TFileReaderTransport functions
-  int32_t getReadTimeout() override;
-  void setReadTimeout(int32_t readTimeout) override;
-  uint32_t getNumChunks() override;
-  uint32_t getCurChunk() override;
-  void seekToChunk(int32_t chunk) override;
-  void seekToEnd() override;
+  int32_t getReadTimeout();
+  void setReadTimeout(int32_t readTimeout);
+  uint32_t getNumChunks();
+  uint32_t getCurChunk();
+  void seekToChunk(int32_t chunk);
+  void seekToEnd();
 
   /*
    * Override TTransport *_virt() functions to invoke our implementations.
    * We cannot use TVirtualTransport to provide these, since we need to inherit
    * virtually from TTransport.
    */
-  uint32_t read_virt(uint8_t* buf, uint32_t len) override { return this->read(buf, len); }
-  uint32_t readAll_virt(uint8_t* buf, uint32_t len) override { return this->readAll(buf, len); }
-  void write_virt(const uint8_t* buf, uint32_t len) override { this->write(buf, len); }
+  virtual uint32_t read_virt(uint8_t* buf, uint32_t len) {
+    return this->read(buf, len);
+  }
+  virtual uint32_t readAll_virt(uint8_t* buf, uint32_t len) {
+    return this->readAll(buf, len);
+  }
+  virtual void write_virt(const uint8_t* buf, uint32_t len) {
+    this->write(buf, len);
+  }
 
-protected:
+ protected:
   // shouldn't be used
   TPipedFileReaderTransport();
-  std::shared_ptr<TFileReaderTransport> srcTrans_;
+  boost::shared_ptr<TFileReaderTransport> srcTrans_;
 };
 
 /**
@@ -290,30 +304,27 @@ protected:
  *
  */
 class TPipedFileReaderTransportFactory : public TPipedTransportFactory {
-public:
-  TPipedFileReaderTransportFactory() = default;
-  TPipedFileReaderTransportFactory(std::shared_ptr<TTransport> dstTrans)
-    : TPipedTransportFactory(dstTrans) {}
-  ~TPipedFileReaderTransportFactory() override = default;
+ public:
+  TPipedFileReaderTransportFactory() {}
+  TPipedFileReaderTransportFactory(boost::shared_ptr<TTransport> dstTrans)
+    : TPipedTransportFactory(dstTrans)
+  {}
+  virtual ~TPipedFileReaderTransportFactory() {}
 
-  std::shared_ptr<TTransport> getTransport(std::shared_ptr<TTransport> srcTrans) override {
-    std::shared_ptr<TFileReaderTransport> pFileReaderTransport
-        = std::dynamic_pointer_cast<TFileReaderTransport>(srcTrans);
-    if (pFileReaderTransport.get() != nullptr) {
+  boost::shared_ptr<TTransport> getTransport(boost::shared_ptr<TTransport> srcTrans) {
+    boost::shared_ptr<TFileReaderTransport> pFileReaderTransport = boost::dynamic_pointer_cast<TFileReaderTransport>(srcTrans);
+    if (pFileReaderTransport.get() != NULL) {
       return getFileReaderTransport(pFileReaderTransport);
     } else {
-      return std::shared_ptr<TTransport>();
+      return boost::shared_ptr<TTransport>();
     }
   }
 
-  std::shared_ptr<TFileReaderTransport> getFileReaderTransport(
-      std::shared_ptr<TFileReaderTransport> srcTrans) {
-    return std::shared_ptr<TFileReaderTransport>(
-        new TPipedFileReaderTransport(srcTrans, dstTrans_));
+  boost::shared_ptr<TFileReaderTransport> getFileReaderTransport(boost::shared_ptr<TFileReaderTransport> srcTrans) {
+    return boost::shared_ptr<TFileReaderTransport>(new TPipedFileReaderTransport(srcTrans, dstTrans_));
   }
 };
-}
-}
-} // apache::thrift::transport
+
+}}} // apache::thrift::transport
 
 #endif // #ifndef _THRIFT_TRANSPORT_TTRANSPORTUTILS_H_

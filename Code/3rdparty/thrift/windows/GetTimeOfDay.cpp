@@ -21,75 +21,92 @@
 #include <thrift/thrift-config.h>
 
 // win32
-#if defined(__MINGW32__)
-  #include <sys/time.h>
-#endif
+#include <time.h>
 
-#if !defined(__MINGW32__)
-struct timezone {
-  int tz_minuteswest; /* minutes W of Greenwich */
-  int tz_dsttime;     /* type of dst correction */
-};
-#endif
-
-#if defined(__MINGW32__)
-int thrift_gettimeofday(struct timeval* tv, struct timezone* tz) {
-  return gettimeofday(tv,tz);
-}
+#if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
+#   define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
 #else
-#define WIN32_LEAN_AND_MEAN
-#include <Winsock2.h>
-#include <cstdint>
-#include <sstream>
-#include <thrift/transport/TTransportException.h>
-
-// This code started from a "FREE implementation" posted to Stack Overflow at:
-// https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows
-// added: assert
-// added: error handling
-// added: C++ style casts
-int thrift_gettimeofday(struct timeval * tp, struct timezone * tzp)
-{
-    // We don't fill it in so prove nobody is looking for the data
-    assert(tzp == nullptr);
-
-    // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
-    // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
-    // until 00:00:00 January 1, 1970 
-    static const uint64_t EPOCH = static_cast<uint64_t>(116444736000000000ULL);
-
-    SYSTEMTIME  system_time;
-    FILETIME    file_time;
-    uint64_t    time;
-
-    GetSystemTime( &system_time );
-    if (!SystemTimeToFileTime( &system_time, &file_time )) {
-      DWORD lastError = GetLastError();
-      std::stringstream ss;
-      ss << "SystemTimeToFileTime failed: 0x" << std::hex << lastError;
-      using apache::thrift::transport::TTransportException;
-      throw TTransportException(TTransportException::INTERNAL_ERROR, ss.str());
-    }
-    time =  static_cast<uint64_t>(file_time.dwLowDateTime )      ;
-    time += static_cast<uint64_t>(file_time.dwHighDateTime) << 32;
-
-    tp->tv_sec  = static_cast<long>((time - EPOCH) / 10000000L);
-    tp->tv_usec = static_cast<long>(system_time.wMilliseconds * 1000);
-    return 0;
-}
+#   define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 #endif
 
-int thrift_sleep(unsigned int seconds) {
+struct timezone
+{
+    int  tz_minuteswest; /* minutes W of Greenwich */
+    int  tz_dsttime;     /* type of dst correction */
+};
+
+int thrift_gettimeofday(struct timeval * tv, struct timezone * tz)
+{
+    FILETIME         ft;
+    unsigned __int64 tmpres(0);
+    static int       tzflag;
+
+    if (NULL != tv)
+    {
+        GetSystemTimeAsFileTime(&ft);
+
+        tmpres |= ft.dwHighDateTime;
+        tmpres <<= 32;
+        tmpres |= ft.dwLowDateTime;
+
+        /*converting file time to unix epoch*/
+        tmpres -= DELTA_EPOCH_IN_MICROSECS;
+        tmpres /= 10;  /*convert into microseconds*/
+        tv->tv_sec = (long)(tmpres / 1000000UL);
+        tv->tv_usec = (long)(tmpres % 1000000UL);
+    }
+
+    if (NULL != tz)
+    {
+        if (!tzflag)
+        {
+            _tzset();
+            tzflag++;
+        }
+
+        long time_zone(0);
+        errno_t err(_get_timezone(&time_zone));
+        if (err == NO_ERROR)
+        {
+            tz->tz_minuteswest = time_zone / 60;
+        }
+        else
+        {
+            return -1;
+        }
+
+        int day_light(0);
+        err = (_get_daylight(&day_light));
+        if (err == NO_ERROR)
+        {
+            tz->tz_dsttime = day_light;
+            return 0;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    return -1;
+}
+
+int thrift_sleep(unsigned int seconds)
+{
   ::Sleep(seconds * 1000);
   return 0;
 }
-int thrift_usleep(unsigned int microseconds) {
-  unsigned int milliseconds = (microseconds + 999) / 1000;
+int thrift_usleep(unsigned int microseconds)
+{
+  unsigned int milliseconds = (microseconds + 999)/ 1000;
   ::Sleep(milliseconds);
   return 0;
 }
 
-char* thrift_ctime_r(const time_t* _clock, char* _buf) {
-  strcpy(_buf, ctime(_clock));
-  return _buf;
+char *thrift_ctime_r(const time_t *_clock, char *_buf)
+{
+   strcpy(_buf, ctime(_clock));
+   return _buf;
 }
+
+

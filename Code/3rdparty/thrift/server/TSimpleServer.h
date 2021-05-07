@@ -20,58 +20,83 @@
 #ifndef _THRIFT_SERVER_TSIMPLESERVER_H_
 #define _THRIFT_SERVER_TSIMPLESERVER_H_ 1
 
-#include <thrift/server/TServerFramework.h>
+#include <thrift/server/TServer.h>
+#include <thrift/transport/TServerTransport.h>
 
-namespace apache {
-namespace thrift {
-namespace server {
+namespace apache { namespace thrift { namespace server {
 
 /**
  * This is the most basic simple server. It is single-threaded and runs a
  * continuous loop of accepting a single connection, processing requests on
- * that connection until it closes, and then repeating.
+ * that connection until it closes, and then repeating. It is a good example
+ * of how to extend the TServer interface.
+ *
  */
-class TSimpleServer : public TServerFramework {
-public:
+class TSimpleServer : public TServer {
+ public:
+  template<typename ProcessorFactory>
   TSimpleServer(
-      const std::shared_ptr<apache::thrift::TProcessorFactory>& processorFactory,
-      const std::shared_ptr<apache::thrift::transport::TServerTransport>& serverTransport,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& transportFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& protocolFactory);
+      const boost::shared_ptr<ProcessorFactory>& processorFactory,
+      const boost::shared_ptr<TServerTransport>& serverTransport,
+      const boost::shared_ptr<TTransportFactory>& transportFactory,
+      const boost::shared_ptr<TProtocolFactory>& protocolFactory,
+      THRIFT_OVERLOAD_IF(ProcessorFactory, TProcessorFactory)) :
+    TServer(processorFactory, serverTransport, transportFactory,
+            protocolFactory),
+    stop_(false) {}
 
+  template<typename Processor>
   TSimpleServer(
-      const std::shared_ptr<apache::thrift::TProcessor>& processor,
-      const std::shared_ptr<apache::thrift::transport::TServerTransport>& serverTransport,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& transportFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& protocolFactory);
+      const boost::shared_ptr<Processor>& processor,
+      const boost::shared_ptr<TServerTransport>& serverTransport,
+      const boost::shared_ptr<TTransportFactory>& transportFactory,
+      const boost::shared_ptr<TProtocolFactory>& protocolFactory,
+      THRIFT_OVERLOAD_IF(Processor, TProcessor)) :
+    TServer(processor, serverTransport, transportFactory, protocolFactory),
+    stop_(false) {}
 
+  template<typename ProcessorFactory>
   TSimpleServer(
-      const std::shared_ptr<apache::thrift::TProcessorFactory>& processorFactory,
-      const std::shared_ptr<apache::thrift::transport::TServerTransport>& serverTransport,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& inputTransportFactory,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& outputTransportFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& inputProtocolFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& outputProtocolFactory);
+      const boost::shared_ptr<ProcessorFactory>& processorFactory,
+      const boost::shared_ptr<TServerTransport>& serverTransport,
+      const boost::shared_ptr<TTransportFactory>& inputTransportFactory,
+      const boost::shared_ptr<TTransportFactory>& outputTransportFactory,
+      const boost::shared_ptr<TProtocolFactory>& inputProtocolFactory,
+      const boost::shared_ptr<TProtocolFactory>& outputProtocolFactory,
+      THRIFT_OVERLOAD_IF(ProcessorFactory, TProcessorFactory)) :
+    TServer(processorFactory, serverTransport,
+            inputTransportFactory, outputTransportFactory,
+            inputProtocolFactory, outputProtocolFactory),
+    stop_(false) {}
 
+  template<typename Processor>
   TSimpleServer(
-      const std::shared_ptr<apache::thrift::TProcessor>& processor,
-      const std::shared_ptr<apache::thrift::transport::TServerTransport>& serverTransport,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& inputTransportFactory,
-      const std::shared_ptr<apache::thrift::transport::TTransportFactory>& outputTransportFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& inputProtocolFactory,
-      const std::shared_ptr<apache::thrift::protocol::TProtocolFactory>& outputProtocolFactory);
+      const boost::shared_ptr<Processor>& processor,
+      const boost::shared_ptr<TServerTransport>& serverTransport,
+      const boost::shared_ptr<TTransportFactory>& inputTransportFactory,
+      const boost::shared_ptr<TTransportFactory>& outputTransportFactory,
+      const boost::shared_ptr<TProtocolFactory>& inputProtocolFactory,
+      const boost::shared_ptr<TProtocolFactory>& outputProtocolFactory,
+      THRIFT_OVERLOAD_IF(Processor, TProcessor)) :
+    TServer(processor, serverTransport,
+            inputTransportFactory, outputTransportFactory,
+            inputProtocolFactory, outputProtocolFactory),
+    stop_(false) {}
 
-  ~TSimpleServer() override;
+  ~TSimpleServer() {}
 
-protected:
-  void onClientConnected(const std::shared_ptr<TConnectedClient>& pClient) override /* override */;
-  void onClientDisconnected(TConnectedClient* pClient) override /* override */;
+  void serve();
 
-private:
-  void setConcurrentClientLimit(int64_t newLimit) override; // hide
+  void stop() {
+    stop_ = true;
+    serverTransport_->interrupt();
+  }
+
+ protected:
+  bool stop_;
+
 };
-}
-}
-} // apache::thrift::server
+
+}}} // apache::thrift::server
 
 #endif // #ifndef _THRIFT_SERVER_TSIMPLESERVER_H_

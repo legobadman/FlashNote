@@ -20,25 +20,24 @@
 #ifndef _THRIFT_TRANSPORT_TZLIBTRANSPORT_H_
 #define _THRIFT_TRANSPORT_TZLIBTRANSPORT_H_ 1
 
+#include <boost/lexical_cast.hpp>
 #include <thrift/transport/TTransport.h>
 #include <thrift/transport/TVirtualTransport.h>
-#include <thrift/TToString.h>
 #include <zlib.h>
 
 struct z_stream_s;
 
-namespace apache {
-namespace thrift {
-namespace transport {
+namespace apache { namespace thrift { namespace transport {
 
 class TZlibTransportException : public TTransportException {
-public:
-  TZlibTransportException(int status, const char* msg)
-    : TTransportException(TTransportException::INTERNAL_ERROR, errorMessage(status, msg)),
-      zlib_status_(status),
-      zlib_msg_(msg == nullptr ? "(null)" : msg) {}
+ public:
+  TZlibTransportException(int status, const char* msg) :
+    TTransportException(TTransportException::INTERNAL_ERROR,
+                        errorMessage(status, msg)),
+    zlib_status_(status),
+    zlib_msg_(msg == NULL ? "(null)" : msg) {}
 
-  ~TZlibTransportException() noexcept override = default;
+  virtual ~TZlibTransportException() throw() {}
 
   int getZlibStatus() { return zlib_status_; }
   std::string getZlibMessage() { return zlib_msg_; }
@@ -51,7 +50,7 @@ public:
       rv += "(no message)";
     }
     rv += " (status = ";
-    rv += to_string(status);
+    rv += boost::lexical_cast<std::string>(status);
     rv += ")";
     return rv;
   }
@@ -61,14 +60,15 @@ public:
 };
 
 /**
- * This transport uses zlib to compress on write and decompress on read
+ * This transport uses zlib to compress on write and decompress on read 
  *
  * TODO(dreiss): Don't do an extra copy of the compressed data if
  *               the underlying transport is TBuffered or TMemory.
  *
  */
 class TZlibTransport : public TVirtualTransport<TZlibTransport> {
-public:
+ public:
+ 
   /**
    * @param transport    The transport to read compressed data from
    *                     and write compressed data to.
@@ -78,36 +78,36 @@ public:
    * @param cwbuf_size   Compressed buffer size for writing.
    * @param comp_level   Compression level (0=none[fast], 6=default, 9=max[slow]).
    */
-  TZlibTransport(std::shared_ptr<TTransport> transport,
+  TZlibTransport(boost::shared_ptr<TTransport> transport,
                  int urbuf_size = DEFAULT_URBUF_SIZE,
                  int crbuf_size = DEFAULT_CRBUF_SIZE,
                  int uwbuf_size = DEFAULT_UWBUF_SIZE,
                  int cwbuf_size = DEFAULT_CWBUF_SIZE,
-                 int16_t comp_level = Z_DEFAULT_COMPRESSION,
-                 std::shared_ptr<TConfiguration> config = nullptr)
-    : TVirtualTransport(config),
-      transport_(transport),
-      urpos_(0),
-      uwpos_(0),
-      input_ended_(false),
-      output_finished_(false),
-      urbuf_size_(urbuf_size),
-      crbuf_size_(crbuf_size),
-      uwbuf_size_(uwbuf_size),
-      cwbuf_size_(cwbuf_size),
-      urbuf_(nullptr),
-      crbuf_(nullptr),
-      uwbuf_(nullptr),
-      cwbuf_(nullptr),
-      rstream_(nullptr),
-      wstream_(nullptr),
-      comp_level_(comp_level) {
+                 int16_t comp_level = Z_DEFAULT_COMPRESSION) :
+    transport_(transport),
+    urpos_(0),
+    uwpos_(0),
+    input_ended_(false),
+    output_finished_(false),
+    urbuf_size_(urbuf_size),
+    crbuf_size_(crbuf_size),
+    uwbuf_size_(uwbuf_size),
+    cwbuf_size_(cwbuf_size),
+    urbuf_(NULL),
+    crbuf_(NULL),
+    uwbuf_(NULL),
+    cwbuf_(NULL),
+    rstream_(NULL),
+    wstream_(NULL),
+    comp_level_(comp_level)
+  {
     if (uwbuf_size_ < MIN_DIRECT_DEFLATE_SIZE) {
       // Have to copy this into a local because of a linking issue.
       int minimum = MIN_DIRECT_DEFLATE_SIZE;
-      throw TTransportException(TTransportException::BAD_ARGS,
-                                "TZLibTransport: uncompressed write buffer must be at least"
-                                + to_string(minimum) + ".");
+      throw TTransportException(
+          TTransportException::BAD_ARGS,
+          "TZLibTransport: uncompressed write buffer must be at least"
+          + boost::lexical_cast<std::string>(minimum) + ".");
     }
 
     try {
@@ -138,20 +138,24 @@ public:
    * unflushed data.  You must explicitly call flush() or finish() to ensure
    * that data is actually written and flushed to the underlying transport.
    */
-  ~TZlibTransport() override;
+  ~TZlibTransport();
 
-  bool isOpen() const override;
-  bool peek() override;
+  bool isOpen();
+  bool peek();
 
-  void open() override { transport_->open(); }
+  void open() {
+    transport_->open();
+  }
 
-  void close() override { transport_->close(); }
+  void close() {
+    transport_->close();
+  }
 
   uint32_t read(uint8_t* buf, uint32_t len);
 
   void write(const uint8_t* buf, uint32_t len);
 
-  void flush() override;
+  void flush();
 
   /**
    * Finalize the zlib stream.
@@ -174,30 +178,29 @@ public:
    */
   void verifyChecksum();
 
-  /**
-   * TODO(someone_smart): Choose smart defaults.
-   */
+   /**
+    * TODO(someone_smart): Choose smart defaults.
+    */
   static const int DEFAULT_URBUF_SIZE = 128;
   static const int DEFAULT_CRBUF_SIZE = 1024;
   static const int DEFAULT_UWBUF_SIZE = 128;
   static const int DEFAULT_CWBUF_SIZE = 1024;
 
-  std::shared_ptr<TTransport> getUnderlyingTransport() const { return transport_; }
+ protected:
 
-protected:
   inline void checkZlibRv(int status, const char* msg);
   inline void checkZlibRvNothrow(int status, const char* msg);
-  inline int readAvail() const;
+  inline int readAvail();
   void flushToTransport(int flush);
   void flushToZlib(const uint8_t* buf, int len, int flush);
   bool readFromZlib();
 
-protected:
+ protected:
   // Writes smaller than this are buffered up.
   // Larger (or equal) writes are dumped straight to zlib.
   static const uint32_t MIN_DIRECT_DEFLATE_SIZE = 32;
 
-  std::shared_ptr<TTransport> transport_;
+  boost::shared_ptr<TTransport> transport_;
 
   int urpos_;
   int uwpos_;
@@ -223,29 +226,24 @@ protected:
   const int comp_level_;
 };
 
+
 /**
  * Wraps a transport into a zlibbed one.
  *
  */
 class TZlibTransportFactory : public TTransportFactory {
-public:
-  TZlibTransportFactory() = default;
+ public:
+  TZlibTransportFactory() {}
 
-  /**
-   * Wraps a transport factory into a zlibbed one.
-   */
-  TZlibTransportFactory(std::shared_ptr<TTransportFactory> transportFactory);
+  virtual ~TZlibTransportFactory() {}
 
-  ~TZlibTransportFactory() override = default;
-
-  std::shared_ptr<TTransport> getTransport(std::shared_ptr<TTransport> trans) override;
-
-protected:
-  std::shared_ptr<TTransportFactory> transportFactory_;
+  virtual boost::shared_ptr<TTransport> getTransport(
+                                         boost::shared_ptr<TTransport> trans) {
+    return boost::shared_ptr<TTransport>(new TZlibTransport(trans));
+  }
 };
 
-}
-}
-} // apache::thrift::transport
+
+}}} // apache::thrift::transport
 
 #endif // #ifndef _THRIFT_TRANSPORT_TZLIBTRANSPORT_H_

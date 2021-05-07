@@ -17,45 +17,31 @@
  * under the License.
  */
 
-#include <thrift/thrift_export.h>
 #include <thrift/transport/TSSLServerSocket.h>
 #include <thrift/transport/TSSLSocket.h>
 
-namespace apache {
-namespace thrift {
-namespace transport {
+namespace apache { namespace thrift { namespace transport {
+
+using namespace boost;
 
 /**
  * SSL server socket implementation.
  */
-TSSLServerSocket::TSSLServerSocket(int port, std::shared_ptr<TSSLSocketFactory> factory)
-  : TServerSocket(port), factory_(factory) {
-  factory_->server(true);
-}
-
-TSSLServerSocket::TSSLServerSocket(const std::string& address,
-                                   int port,
-                                   std::shared_ptr<TSSLSocketFactory> factory)
-  : TServerSocket(address, port), factory_(factory) {
-  factory_->server(true);
-}
-
 TSSLServerSocket::TSSLServerSocket(int port,
-                                   int sendTimeout,
-                                   int recvTimeout,
-                                   std::shared_ptr<TSSLSocketFactory> factory)
-  : TServerSocket(port, sendTimeout, recvTimeout), factory_(factory) {
+                                   shared_ptr<TSSLSocketFactory> factory):
+                                   TServerSocket(port), factory_(factory) {
   factory_->server(true);
 }
 
-std::shared_ptr<TSocket> TSSLServerSocket::createSocket(THRIFT_SOCKET client) {
-  if (interruptableChildren_) {
-      return factory_->createSocket(client, pChildInterruptSockReader_);
+TSSLServerSocket::TSSLServerSocket(int port, int sendTimeout, int recvTimeout,
+                                   shared_ptr<TSSLSocketFactory> factory):
+                                   TServerSocket(port, sendTimeout, recvTimeout),
+                                   factory_(factory) {
+  factory_->server(true);
+}
 
-  } else {
-      return factory_->createSocket(client);
-  }
+shared_ptr<TSocket> TSSLServerSocket::createSocket(int client) {
+  return factory_->createSocket(client);
 }
-}
-}
-}
+
+}}}

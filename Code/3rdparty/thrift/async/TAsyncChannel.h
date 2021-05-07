@@ -20,28 +20,21 @@
 #ifndef _THRIFT_ASYNC_TASYNCCHANNEL_H_
 #define _THRIFT_ASYNC_TASYNCCHANNEL_H_ 1
 
-#include <functional>
-#include <memory>
+#include <thrift/cxxfunctional.h>
 #include <thrift/Thrift.h>
 
-namespace apache {
-namespace thrift {
-namespace transport {
+namespace apache { namespace thrift { namespace transport {
 class TMemoryBuffer;
-}
-}
-}
+}}}
 
-namespace apache {
-namespace thrift {
-namespace async {
+namespace apache { namespace thrift { namespace async {
 using apache::thrift::transport::TMemoryBuffer;
 
 class TAsyncChannel {
-public:
-  typedef std::function<void()> VoidCallback;
+ public:
+  typedef apache::thrift::stdcxx::function<void()> VoidCallback;
 
-  virtual ~TAsyncChannel() = default;
+  virtual ~TAsyncChannel() {}
 
   // is the channel in a good state?
   virtual bool good() const = 0;
@@ -52,23 +45,22 @@ public:
    * Send a message over the channel.
    */
   virtual void sendMessage(const VoidCallback& cob,
-                           apache::thrift::transport::TMemoryBuffer* message) = 0;
+    apache::thrift::transport::TMemoryBuffer* message) = 0;
 
   /**
    * Receive a message from the channel.
    */
   virtual void recvMessage(const VoidCallback& cob,
-                           apache::thrift::transport::TMemoryBuffer* message) = 0;
+    apache::thrift::transport::TMemoryBuffer* message) = 0;
 
   /**
    * Send a message over the channel and receive a response.
    */
   virtual void sendAndRecvMessage(const VoidCallback& cob,
-                                  apache::thrift::transport::TMemoryBuffer* sendBuf,
-                                  apache::thrift::transport::TMemoryBuffer* recvBuf);
+    apache::thrift::transport::TMemoryBuffer* sendBuf,
+    apache::thrift::transport::TMemoryBuffer* recvBuf);
 };
-}
-}
-} // apache::thrift::async
+
+}}} // apache::thrift::async
 
 #endif // #ifndef _THRIFT_ASYNC_TASYNCCHANNEL_H_

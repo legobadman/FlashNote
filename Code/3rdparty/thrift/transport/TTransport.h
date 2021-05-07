@@ -21,27 +21,25 @@
 #define _THRIFT_TRANSPORT_TTRANSPORT_H_ 1
 
 #include <thrift/Thrift.h>
-#include <thrift/TConfiguration.h>
+#include <boost/shared_ptr.hpp>
 #include <thrift/transport/TTransportException.h>
-#include <memory>
 #include <string>
 
-namespace apache {
-namespace thrift {
-namespace transport {
+namespace apache { namespace thrift { namespace transport {
 
 /**
  * Helper template to hoist readAll implementation out of TTransport
  */
 template <class Transport_>
-uint32_t readAll(Transport_& trans, uint8_t* buf, uint32_t len) {
+uint32_t readAll(Transport_ &trans, uint8_t* buf, uint32_t len) {
   uint32_t have = 0;
   uint32_t get = 0;
 
   while (have < len) {
-    get = trans.read(buf + have, len - have);
+    get = trans.read(buf+have, len-have);
     if (get <= 0) {
-      throw TTransportException(TTransportException::END_OF_FILE, "No more data to read.");
+      throw TTransportException(TTransportException::END_OF_FILE,
+                                "No more data to read.");
     }
     have += get;
   }
@@ -49,31 +47,25 @@ uint32_t readAll(Transport_& trans, uint8_t* buf, uint32_t len) {
   return have;
 }
 
+
 /**
  * Generic interface for a method of transporting data. A TTransport may be
  * capable of either reading or writing, but not necessarily both.
  *
  */
 class TTransport {
-public:
-  TTransport(std::shared_ptr<TConfiguration> config = nullptr) { 
-    if(config == nullptr) {
-      configuration_ = std::shared_ptr<TConfiguration> (new TConfiguration());
-    } else {
-      configuration_ = config;
-    }
-    resetConsumedMessageSize(); 
-  }
-
+ public:
   /**
    * Virtual deconstructor.
    */
-  virtual ~TTransport() = default;
+  virtual ~TTransport() {}
 
   /**
    * Whether this transport is open.
    */
-  virtual bool isOpen() const { return false; }
+  virtual bool isOpen() {
+    return false;
+  }
 
   /**
    * Tests whether there is more data to read or if the remote side is
@@ -83,7 +75,9 @@ public:
    * This is used by a server to check if it should listen for another
    * request.
    */
-  virtual bool peek() { return isOpen(); }
+  virtual bool peek() {
+    return isOpen();
+  }
 
   /**
    * Opens the transport for communications.
@@ -115,7 +109,8 @@ public:
     return read_virt(buf, len);
   }
   virtual uint32_t read_virt(uint8_t* /* buf */, uint32_t /* len */) {
-    throw TTransportException(TTransportException::NOT_OPEN, "Base TTransport cannot read.");
+    throw TTransportException(TTransportException::NOT_OPEN,
+                              "Base TTransport cannot read.");
   }
 
   /**
@@ -163,7 +158,8 @@ public:
     write_virt(buf, len);
   }
   virtual void write_virt(const uint8_t* /* buf */, uint32_t /* len */) {
-    throw TTransportException(TTransportException::NOT_OPEN, "Base TTransport cannot write.");
+    throw TTransportException(TTransportException::NOT_OPEN,
+                              "Base TTransport cannot write.");
   }
 
   /**
@@ -201,7 +197,7 @@ public:
    * @oaram buf  A buffer where the data can be stored if needed.
    *             If borrow doesn't return buf, then the contents of
    *             buf after the call are undefined.  This parameter may be
-   *             nullptr to indicate that the caller is not supplying storage,
+   *             NULL to indicate that the caller is not supplying storage,
    *             but would like a pointer into an internal buffer, if
    *             available.
    * @param len  *len should initially contain the number of bytes to borrow.
@@ -219,7 +215,9 @@ public:
     T_VIRTUAL_CALL();
     return borrow_virt(buf, len);
   }
-  virtual const uint8_t* borrow_virt(uint8_t* /* buf */, uint32_t* /* len */) { return nullptr; }
+  virtual const uint8_t* borrow_virt(uint8_t* /* buf */, uint32_t* /* len */) {
+    return NULL;
+  }
 
   /**
    * Remove len bytes from the transport.  This should always follow a borrow
@@ -235,100 +233,15 @@ public:
     consume_virt(len);
   }
   virtual void consume_virt(uint32_t /* len */) {
-    throw TTransportException(TTransportException::NOT_OPEN, "Base TTransport cannot consume.");
+    throw TTransportException(TTransportException::NOT_OPEN,
+                              "Base TTransport cannot consume.");
   }
 
+ protected:
   /**
-   * Returns the origin of the transports call. The value depends on the
-   * transport used. An IP based transport for example will return the
-   * IP address of the client making the request.
-   * If the transport doesn't know the origin Unknown is returned.
-   *
-   * The returned value can be used in a log message for example
+   * Simple constructor.
    */
-  virtual const std::string getOrigin() const { return "Unknown"; }
-
-  std::shared_ptr<TConfiguration> getConfiguration() { return configuration_; }
-
-  void setConfiguration(std::shared_ptr<TConfiguration> config) { 
-    if (config != nullptr) configuration_ = config; 
-  }
-
-  /**
-   * Updates RemainingMessageSize to reflect then known real message size (e.g. framed transport).
-   * Will throw if we already consumed too many bytes or if the new size is larger than allowed.
-   *
-   * @param size  real message size
-   */
-  void updateKnownMessageSize(long int size)
-  {
-    long int consumed = knownMessageSize_ - remainingMessageSize_;
-    resetConsumedMessageSize(size);
-    countConsumedMessageBytes(consumed);
-  }
-
-  /**
-   * Throws if there are not enough bytes in the input stream to satisfy a read of numBytes bytes of data
-   *
-   * @param numBytes  numBytes bytes of data
-   */
-  void checkReadBytesAvailable(long int numBytes)
-  {
-    if (remainingMessageSize_ < numBytes)
-      throw TTransportException(TTransportException::END_OF_FILE, "MaxMessageSize reached");
-  }
-
-protected:
-  std::shared_ptr<TConfiguration> configuration_;
-  long int remainingMessageSize_;
-  long int knownMessageSize_;
-
-  inline long int getRemainingMessageSize() { return remainingMessageSize_; }
-  inline void setRemainingMessageSize(long int remainingMessageSize) { remainingMessageSize_ = remainingMessageSize; }
-  inline int getMaxMessageSize() { return configuration_->getMaxMessageSize(); }
-  inline long int getKnownMessageSize() { return knownMessageSize_; }
-  void setKnownMessageSize(long int knownMessageSize) { knownMessageSize_ = knownMessageSize; }
-
-  /**  
-   * Resets RemainingMessageSize to the configured maximum
-   * 
-   *  @param newSize  configured size
-   */
-  void resetConsumedMessageSize(long newSize = -1)
-  {
-    // full reset 
-    if (newSize < 0)
-    {
-        knownMessageSize_ = getMaxMessageSize();
-        remainingMessageSize_ = getMaxMessageSize();
-        return;
-    }
-
-    // update only: message size can shrink, but not grow
-    if (newSize > knownMessageSize_)
-        throw TTransportException(TTransportException::END_OF_FILE, "MaxMessageSize reached");
-
-    knownMessageSize_ = newSize;
-    remainingMessageSize_ = newSize;
-  }
-
-  /**
-   * Consumes numBytes from the RemainingMessageSize.
-   * 
-   *  @param numBytes  Consumes numBytes
-   */
-  void countConsumedMessageBytes(long int numBytes)
-  {
-    if (remainingMessageSize_ >= numBytes)
-    {
-      remainingMessageSize_ -= numBytes;
-    }
-    else
-    {
-      remainingMessageSize_ = 0;
-      throw TTransportException(TTransportException::END_OF_FILE, "MaxMessageSize reached");
-    }
-  }
+  TTransport() {}
 };
 
 /**
@@ -338,20 +251,20 @@ protected:
  *
  */
 class TTransportFactory {
-public:
-  TTransportFactory() = default;
+ public:
+  TTransportFactory() {}
 
-  virtual ~TTransportFactory() = default;
+  virtual ~TTransportFactory() {}
 
   /**
    * Default implementation does nothing, just returns the transport given.
    */
-  virtual std::shared_ptr<TTransport> getTransport(std::shared_ptr<TTransport> trans) {
+  virtual boost::shared_ptr<TTransport> getTransport(boost::shared_ptr<TTransport> trans) {
     return trans;
   }
+
 };
-}
-}
-} // apache::thrift::transport
+
+}}} // apache::thrift::transport
 
 #endif // #ifndef _THRIFT_TRANSPORT_TTRANSPORT_H_

@@ -23,42 +23,46 @@
 #include <QIODevice>
 
 #include <thrift/transport/TBufferTransports.h>
-#include <memory>
 
-namespace apache {
-namespace thrift {
+using boost::shared_ptr;
+  
+namespace apache { namespace thrift { namespace transport {
 
-using std::shared_ptr;
-
-namespace transport {
-
-TQIODeviceTransport::TQIODeviceTransport(shared_ptr<QIODevice> dev) : dev_(dev) {
+TQIODeviceTransport::TQIODeviceTransport(shared_ptr<QIODevice> dev)
+  : dev_(dev)
+{
 }
 
-TQIODeviceTransport::~TQIODeviceTransport() {
+TQIODeviceTransport::~TQIODeviceTransport()
+{
   dev_->close();
 }
 
-void TQIODeviceTransport::open() {
+void TQIODeviceTransport::open()
+{
   if (!isOpen()) {
     throw TTransportException(TTransportException::NOT_OPEN,
                               "open(): underlying QIODevice isn't open");
   }
 }
 
-bool TQIODeviceTransport::isOpen() const {
+bool TQIODeviceTransport::isOpen()
+{
   return dev_->isOpen();
 }
 
-bool TQIODeviceTransport::peek() {
+bool TQIODeviceTransport::peek()
+{
   return dev_->bytesAvailable() > 0;
 }
 
-void TQIODeviceTransport::close() {
+void TQIODeviceTransport::close()
+{
   dev_->close();
 }
 
-uint32_t TQIODeviceTransport::readAll(uint8_t* buf, uint32_t len) {
+uint32_t TQIODeviceTransport::readAll(uint8_t* buf, uint32_t len)
+{
   uint32_t requestLen = len;
   while (len) {
     uint32_t readSize;
@@ -82,7 +86,8 @@ uint32_t TQIODeviceTransport::readAll(uint8_t* buf, uint32_t len) {
   return requestLen;
 }
 
-uint32_t TQIODeviceTransport::read(uint8_t* buf, uint32_t len) {
+uint32_t TQIODeviceTransport::read(uint8_t* buf, uint32_t len)
+{
   uint32_t actualSize;
   qint64 readSize;
 
@@ -91,23 +96,25 @@ uint32_t TQIODeviceTransport::read(uint8_t* buf, uint32_t len) {
                               "read(): underlying QIODevice is not open");
   }
 
-  actualSize = (uint32_t)(std::min)((qint64)len, dev_->bytesAvailable());
-  readSize = dev_->read(reinterpret_cast<char*>(buf), actualSize);
+  actualSize = (uint32_t)std::min((qint64)len, dev_->bytesAvailable());
+  readSize = dev_->read(reinterpret_cast<char *>(buf), actualSize);
 
   if (readSize < 0) {
     QAbstractSocket* socket;
-    if ((socket = qobject_cast<QAbstractSocket*>(dev_.get()))) {
+    if ((socket = qobject_cast<QAbstractSocket* >(dev_.get()))) {
       throw TTransportException(TTransportException::UNKNOWN,
                                 "Failed to read() from QAbstractSocket",
                                 socket->error());
     }
-    throw TTransportException(TTransportException::UNKNOWN, "Failed to read from from QIODevice");
+    throw TTransportException(TTransportException::UNKNOWN,
+                              "Failed to read from from QIODevice");
   }
 
   return (uint32_t)readSize;
 }
 
-void TQIODeviceTransport::write(const uint8_t* buf, uint32_t len) {
+void TQIODeviceTransport::write(const uint8_t* buf, uint32_t len)
+{
   while (len) {
     uint32_t written = write_partial(buf, len);
     len -= written;
@@ -115,7 +122,8 @@ void TQIODeviceTransport::write(const uint8_t* buf, uint32_t len) {
   }
 }
 
-uint32_t TQIODeviceTransport::write_partial(const uint8_t* buf, uint32_t len) {
+uint32_t TQIODeviceTransport::write_partial(const uint8_t* buf, uint32_t len)
+{
   qint64 written;
 
   if (!dev_->isOpen()) {
@@ -128,8 +136,7 @@ uint32_t TQIODeviceTransport::write_partial(const uint8_t* buf, uint32_t len) {
     QAbstractSocket* socket;
     if ((socket = qobject_cast<QAbstractSocket*>(dev_.get()))) {
       throw TTransportException(TTransportException::UNKNOWN,
-                                "write_partial(): failed to write to QAbstractSocket",
-                                socket->error());
+                                "write_partial(): failed to write to QAbstractSocket", socket->error());
     }
 
     throw TTransportException(TTransportException::UNKNOWN,
@@ -139,7 +146,8 @@ uint32_t TQIODeviceTransport::write_partial(const uint8_t* buf, uint32_t len) {
   return (uint32_t)written;
 }
 
-void TQIODeviceTransport::flush() {
+void TQIODeviceTransport::flush()
+{
   if (!dev_->isOpen()) {
     throw TTransportException(TTransportException::NOT_OPEN,
                               "flush(): underlying QIODevice is not open");
@@ -154,16 +162,18 @@ void TQIODeviceTransport::flush() {
   }
 }
 
-uint8_t* TQIODeviceTransport::borrow(uint8_t* buf, uint32_t* len) {
-  (void)buf;
-  (void)len;
-  return nullptr;
+uint8_t* TQIODeviceTransport::borrow(uint8_t* buf, uint32_t* len)
+{
+  (void) buf;
+  (void) len;
+  return NULL;
 }
 
-void TQIODeviceTransport::consume(uint32_t len) {
-  (void)len;
+void TQIODeviceTransport::consume(uint32_t len)
+{
+  (void) len;
   throw TTransportException(TTransportException::UNKNOWN);
 }
-}
-}
-} // apache::thrift::transport
+
+}}} // apache::thrift::transport
+

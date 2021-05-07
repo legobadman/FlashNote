@@ -22,40 +22,29 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
-#include <thrift/config.h>
 #include <thrift/transport/THttpClient.h>
 #include <thrift/transport/TSocket.h>
 
-using std::string;
+namespace apache { namespace thrift { namespace transport {
 
-namespace apache {
-namespace thrift {
-namespace transport {
+using namespace std;
 
-THttpClient::THttpClient(std::shared_ptr<TTransport> transport,
-                         std::string host,
-                         std::string path,
-                         std::shared_ptr<TConfiguration> config)
-  : THttpTransport(transport, config),
-    host_(host), 
-    path_(path) {
+THttpClient::THttpClient(boost::shared_ptr<TTransport> transport, std::string host, std::string path) :
+  THttpTransport(transport), host_(host), path_(path) {
 }
 
-THttpClient::THttpClient(string host, int port, string path, 
-                         std::shared_ptr<TConfiguration> config)
-  : THttpTransport(std::shared_ptr<TTransport>(new TSocket(host, port)), config),
-    host_(host),
-    path_(path) {
+THttpClient::THttpClient(string host, int port, string path) :
+  THttpTransport(boost::shared_ptr<TTransport>(new TSocket(host, port))), host_(host), path_(path) {
 }
 
-THttpClient::~THttpClient() = default;
+THttpClient::~THttpClient() {}
 
 void THttpClient::parseHeader(char* header) {
   char* colon = strchr(header, ':');
-  if (colon == nullptr) {
+  if (colon == NULL) {
     return;
   }
-  char* value = colon + 1;
+  char* value = colon+1;
 
   if (boost::istarts_with(header, "Transfer-Encoding")) {
     if (boost::iends_with(value, "chunked")) {
@@ -71,16 +60,15 @@ bool THttpClient::parseStatusLine(char* status) {
   char* http = status;
 
   char* code = strchr(http, ' ');
-  if (code == nullptr) {
+  if (code == NULL) {
     throw TTransportException(string("Bad Status: ") + status);
   }
 
   *code = '\0';
-  while (*(code++) == ' ') {
-  };
+  while (*(code++) == ' ') {};
 
   char* msg = strchr(code, ' ');
-  if (msg == nullptr) {
+  if (msg == NULL) {
     throw TTransportException(string("Bad Status: ") + status);
   }
   *msg = '\0';
@@ -97,7 +85,6 @@ bool THttpClient::parseStatusLine(char* status) {
 }
 
 void THttpClient::flush() {
-  resetConsumedMessageSize();
   // Fetch the contents of the write buffer
   uint8_t* buf;
   uint32_t len;
@@ -105,13 +92,17 @@ void THttpClient::flush() {
 
   // Construct the HTTP header
   std::ostringstream h;
-  h << "POST " << path_ << " HTTP/1.1" << CRLF << "Host: " << host_ << CRLF
-    << "Content-Type: application/x-thrift" << CRLF << "Content-Length: " << len << CRLF
-    << "Accept: application/x-thrift" << CRLF << "User-Agent: Thrift/" << PACKAGE_VERSION
-    << " (C++/THttpClient)" << CRLF << CRLF;
+  h <<
+    "POST " << path_ << " HTTP/1.1" << CRLF <<
+    "Host: " << host_ << CRLF <<
+    "Content-Type: application/x-thrift" << CRLF <<
+    "Content-Length: " << len << CRLF <<
+    "Accept: application/x-thrift" << CRLF <<
+    "User-Agent: Thrift/" << VERSION << " (C++/THttpClient)" << CRLF <<
+    CRLF;
   string header = h.str();
 
-  if (header.size() > (std::numeric_limits<uint32_t>::max)())
+  if(header.size() > (std::numeric_limits<uint32_t>::max)())
     throw TTransportException("Header too big");
   // Write the header, then the data, then flush
   transport_->write((const uint8_t*)header.c_str(), static_cast<uint32_t>(header.size()));
@@ -123,9 +114,4 @@ void THttpClient::flush() {
   readHeaders_ = true;
 }
 
-void THttpClient::setPath(std::string path) {
-  path_ = path;
-}
-}
-}
-} // apache::thrift::transport
+}}} // apache::thrift::transport

@@ -23,47 +23,62 @@
 #include <thrift/protocol/TProtocol.h>
 #include <thrift/protocol/TVirtualProtocol.h>
 
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
-namespace apache {
-namespace thrift {
-namespace protocol {
+namespace apache { namespace thrift { namespace protocol {
 
 /**
  * The default binary protocol for thrift. Writes all data in a very basic
  * binary format, essentially just spitting out the raw bytes.
  *
  */
-template <class Transport_, class ByteOrder_ = TNetworkBigEndian>
-class TBinaryProtocolT : public TVirtualProtocol<TBinaryProtocolT<Transport_, ByteOrder_> > {
-public:
+template <class Transport_>
+class TBinaryProtocolT
+  : public TVirtualProtocol< TBinaryProtocolT<Transport_> > {
+ protected:
   static const int32_t VERSION_MASK = ((int32_t)0xffff0000);
   static const int32_t VERSION_1 = ((int32_t)0x80010000);
-  // VERSION_2 (0x80020000) was taken by TDenseProtocol (which has since been removed)
+  // VERSION_2 (0x80020000)  is taken by TDenseProtocol.
 
-  TBinaryProtocolT(std::shared_ptr<Transport_> trans)
-    : TVirtualProtocol<TBinaryProtocolT<Transport_, ByteOrder_> >(trans),
-      trans_(trans.get()),
-      string_limit_(0),
-      container_limit_(0),
-      strict_read_(false),
-      strict_write_(true) {}
+ public:
+  TBinaryProtocolT(boost::shared_ptr<Transport_> trans) :
+    TVirtualProtocol< TBinaryProtocolT<Transport_> >(trans),
+    trans_(trans.get()),
+    string_limit_(0),
+    container_limit_(0),
+    strict_read_(false),
+    strict_write_(true),
+    string_buf_(NULL),
+    string_buf_size_(0) {}
 
-  TBinaryProtocolT(std::shared_ptr<Transport_> trans,
+  TBinaryProtocolT(boost::shared_ptr<Transport_> trans,
                    int32_t string_limit,
                    int32_t container_limit,
                    bool strict_read,
-                   bool strict_write)
-    : TVirtualProtocol<TBinaryProtocolT<Transport_, ByteOrder_> >(trans),
-      trans_(trans.get()),
-      string_limit_(string_limit),
-      container_limit_(container_limit),
-      strict_read_(strict_read),
-      strict_write_(strict_write) {}
+                   bool strict_write) :
+    TVirtualProtocol< TBinaryProtocolT<Transport_> >(trans),
+    trans_(trans.get()),
+    string_limit_(string_limit),
+    container_limit_(container_limit),
+    strict_read_(strict_read),
+    strict_write_(strict_write),
+    string_buf_(NULL),
+    string_buf_size_(0) {}
 
-  void setStringSizeLimit(int32_t string_limit) { string_limit_ = string_limit; }
+  ~TBinaryProtocolT() {
+    if (string_buf_ != NULL) {
+      std::free(string_buf_);
+      string_buf_size_ = 0;
+    }
+  }
 
-  void setContainerSizeLimit(int32_t container_limit) { container_limit_ = container_limit; }
+  void setStringSizeLimit(int32_t string_limit) {
+    string_limit_ = string_limit;
+  }
+
+  void setContainerSizeLimit(int32_t container_limit) {
+    container_limit_ = container_limit;
+  }
 
   void setStrict(bool strict_read, bool strict_write) {
     strict_read_ = strict_read;
@@ -80,17 +95,22 @@ public:
 
   /*ol*/ uint32_t writeMessageEnd();
 
+
   inline uint32_t writeStructBegin(const char* name);
 
   inline uint32_t writeStructEnd();
 
-  inline uint32_t writeFieldBegin(const char* name, const TType fieldType, const int16_t fieldId);
+  inline uint32_t writeFieldBegin(const char* name,
+                                  const TType fieldType,
+                                  const int16_t fieldId);
 
   inline uint32_t writeFieldEnd();
 
   inline uint32_t writeFieldStop();
 
-  inline uint32_t writeMapBegin(const TType keyType, const TType valType, const uint32_t size);
+  inline uint32_t writeMapBegin(const TType keyType,
+                                const TType valType,
+                                const uint32_t size);
 
   inline uint32_t writeMapEnd();
 
@@ -123,7 +143,10 @@ public:
    * Reading functions
    */
 
-  /*ol*/ uint32_t readMessageBegin(std::string& name, TMessageType& messageType, int32_t& seqid);
+
+  /*ol*/ uint32_t readMessageBegin(std::string& name,
+                                   TMessageType& messageType,
+                                   int32_t& seqid);
 
   /*ol*/ uint32_t readMessageEnd();
 
@@ -131,11 +154,15 @@ public:
 
   inline uint32_t readStructEnd();
 
-  inline uint32_t readFieldBegin(std::string& name, TType& fieldType, int16_t& fieldId);
+  inline uint32_t readFieldBegin(std::string& name,
+                                 TType& fieldType,
+                                 int16_t& fieldId);
 
   inline uint32_t readFieldEnd();
 
-  inline uint32_t readMapBegin(TType& keyType, TType& valType, uint32_t& size);
+  inline uint32_t readMapBegin(TType& keyType,
+                               TType& valType,
+                               uint32_t& size);
 
   inline uint32_t readMapEnd();
 
@@ -149,7 +176,7 @@ public:
 
   inline uint32_t readBool(bool& value);
   // Provide the default readBool() implementation for std::vector<bool>
-  using TVirtualProtocol<TBinaryProtocolT<Transport_, ByteOrder_> >::readBool;
+  using TVirtualProtocol< TBinaryProtocolT<Transport_> >::readBool;
 
   inline uint32_t readByte(int8_t& byte);
 
@@ -161,31 +188,13 @@ public:
 
   inline uint32_t readDouble(double& dub);
 
-  template <typename StrType>
+  template<typename StrType>
   inline uint32_t readString(StrType& str);
 
   inline uint32_t readBinary(std::string& str);
 
-  int getMinSerializedSize(TType type);
-
-  void checkReadBytesAvailable(TSet& set)
-  {
-      trans_->checkReadBytesAvailable(set.size_ * getMinSerializedSize(set.elemType_));
-  }
-
-  void checkReadBytesAvailable(TList& list)
-  {
-      trans_->checkReadBytesAvailable(list.size_ * getMinSerializedSize(list.elemType_));
-  }
-
-  void checkReadBytesAvailable(TMap& map)
-  {
-      int elmSize = getMinSerializedSize(map.keyType_) + getMinSerializedSize(map.valueType_);
-      trans_->checkReadBytesAvailable(map.size_ * elmSize);
-  }
-
-protected:
-  template <typename StrType>
+ protected:
+  template<typename StrType>
   uint32_t readStringBody(StrType& str, int32_t sz);
 
   Transport_* trans_;
@@ -196,72 +205,77 @@ protected:
   // Enforce presence of version identifier
   bool strict_read_;
   bool strict_write_;
+
+  // Buffer for reading strings, save for the lifetime of the protocol to
+  // avoid memory churn allocating memory on every string read
+  uint8_t* string_buf_;
+  int32_t string_buf_size_;
+
 };
 
 typedef TBinaryProtocolT<TTransport> TBinaryProtocol;
-typedef TBinaryProtocolT<TTransport, TNetworkLittleEndian> TLEBinaryProtocol;
 
 /**
  * Constructs binary protocol handlers
  */
-template <class Transport_, class ByteOrder_ = TNetworkBigEndian>
+template <class Transport_>
 class TBinaryProtocolFactoryT : public TProtocolFactory {
-public:
-  TBinaryProtocolFactoryT()
-    : string_limit_(0), container_limit_(0), strict_read_(false), strict_write_(true) {}
+ public:
+  TBinaryProtocolFactoryT() :
+    string_limit_(0),
+    container_limit_(0),
+    strict_read_(false),
+    strict_write_(true) {}
 
-  TBinaryProtocolFactoryT(int32_t string_limit,
-                          int32_t container_limit,
-                          bool strict_read,
-                          bool strict_write)
-    : string_limit_(string_limit),
-      container_limit_(container_limit),
-      strict_read_(strict_read),
-      strict_write_(strict_write) {}
+  TBinaryProtocolFactoryT(int32_t string_limit, int32_t container_limit,
+                          bool strict_read, bool strict_write) :
+    string_limit_(string_limit),
+    container_limit_(container_limit),
+    strict_read_(strict_read),
+    strict_write_(strict_write) {}
 
-  ~TBinaryProtocolFactoryT() override = default;
+  virtual ~TBinaryProtocolFactoryT() {}
 
-  void setStringSizeLimit(int32_t string_limit) { string_limit_ = string_limit; }
+  void setStringSizeLimit(int32_t string_limit) {
+    string_limit_ = string_limit;
+  }
 
-  void setContainerSizeLimit(int32_t container_limit) { container_limit_ = container_limit; }
+  void setContainerSizeLimit(int32_t container_limit) {
+    container_limit_ = container_limit;
+  }
 
   void setStrict(bool strict_read, bool strict_write) {
     strict_read_ = strict_read;
     strict_write_ = strict_write;
   }
 
-  std::shared_ptr<TProtocol> getProtocol(std::shared_ptr<TTransport> trans) override {
-    std::shared_ptr<Transport_> specific_trans = std::dynamic_pointer_cast<Transport_>(trans);
+  boost::shared_ptr<TProtocol> getProtocol(boost::shared_ptr<TTransport> trans) {
+    boost::shared_ptr<Transport_> specific_trans =
+      boost::dynamic_pointer_cast<Transport_>(trans);
     TProtocol* prot;
     if (specific_trans) {
-      prot = new TBinaryProtocolT<Transport_, ByteOrder_>(specific_trans,
-                                                          string_limit_,
-                                                          container_limit_,
-                                                          strict_read_,
-                                                          strict_write_);
+      prot = new TBinaryProtocolT<Transport_>(specific_trans, string_limit_,
+                                              container_limit_, strict_read_,
+                                              strict_write_);
     } else {
-      prot = new TBinaryProtocolT<TTransport, ByteOrder_>(trans,
-                                                          string_limit_,
-                                                          container_limit_,
-                                                          strict_read_,
-                                                          strict_write_);
+      prot = new TBinaryProtocol(trans, string_limit_, container_limit_,
+                                 strict_read_, strict_write_);
     }
 
-    return std::shared_ptr<TProtocol>(prot);
+    return boost::shared_ptr<TProtocol>(prot);
   }
 
-private:
+ private:
   int32_t string_limit_;
   int32_t container_limit_;
   bool strict_read_;
   bool strict_write_;
+
 };
 
 typedef TBinaryProtocolFactoryT<TTransport> TBinaryProtocolFactory;
-typedef TBinaryProtocolFactoryT<TTransport, TNetworkLittleEndian> TLEBinaryProtocolFactory;
-}
-}
-} // apache::thrift::protocol
+
+}}} // apache::thrift::protocol
 
 #include <thrift/protocol/TBinaryProtocol.tcc>
 

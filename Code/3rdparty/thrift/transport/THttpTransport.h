@@ -23,9 +23,7 @@
 #include <thrift/transport/TBufferTransports.h>
 #include <thrift/transport/TVirtualTransport.h>
 
-namespace apache {
-namespace thrift {
-namespace transport {
+namespace apache { namespace thrift { namespace transport {
 
 /**
  * HTTP implementation of the thrift transport. This was irritating
@@ -35,34 +33,38 @@ namespace transport {
  * chunked transfer encoding, keepalive, etc. Tested against Apache.
  */
 class THttpTransport : public TVirtualTransport<THttpTransport> {
-public:
-  THttpTransport(std::shared_ptr<TTransport> transport, std::shared_ptr<TConfiguration> config = nullptr);
+ public:
+  THttpTransport(boost::shared_ptr<TTransport> transport);
 
-  ~THttpTransport() override;
+  virtual ~THttpTransport();
 
-  void open() override { transport_->open(); }
+  void open() {
+    transport_->open();
+  }
 
-  bool isOpen() const override { return transport_->isOpen(); }
+  bool isOpen() {
+    return transport_->isOpen();
+  }
 
-  bool peek() override { return transport_->peek(); }
+  bool peek() {
+    return transport_->peek();
+  }
 
-  void close() override { transport_->close(); }
+  void close() {
+    transport_->close();
+  }
 
   uint32_t read(uint8_t* buf, uint32_t len);
 
-  uint32_t readEnd() override;
+  uint32_t readEnd();
 
   void write(const uint8_t* buf, uint32_t len);
 
-  void flush() override {
-    resetConsumedMessageSize();
-  };
+  virtual void flush() = 0;
 
-  const std::string getOrigin() const override;
+ protected:
 
-protected:
-  std::shared_ptr<TTransport> transport_;
-  std::string origin_;
+  boost::shared_ptr<TTransport> transport_;
 
   TMemoryBuffer writeBuffer_;
   TMemoryBuffer readBuffer_;
@@ -99,8 +101,7 @@ protected:
   static const char* CRLF;
   static const int CRLF_LEN;
 };
-}
-}
-} // apache::thrift::transport
+
+}}} // apache::thrift::transport
 
 #endif // #ifndef _THRIFT_TRANSPORT_THTTPCLIENT_H_

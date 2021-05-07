@@ -22,9 +22,7 @@
 
 #include <thrift/protocol/TProtocol.h>
 
-namespace apache {
-namespace thrift {
-namespace protocol {
+namespace apache { namespace thrift { namespace protocol {
 
 using apache::thrift::transport::TTransport;
 
@@ -40,11 +38,13 @@ using apache::thrift::transport::TTransport;
  * instead.
  */
 class TProtocolDefaults : public TProtocol {
-public:
-  uint32_t readMessageBegin(std::string& name, TMessageType& messageType, int32_t& seqid) {
-    (void)name;
-    (void)messageType;
-    (void)seqid;
+ public:
+  uint32_t readMessageBegin(std::string& name,
+                            TMessageType& messageType,
+                            int32_t& seqid) {
+    (void) name;
+    (void) messageType;
+    (void) seqid;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
@@ -55,7 +55,7 @@ public:
   }
 
   uint32_t readStructBegin(std::string& name) {
-    (void)name;
+    (void) name;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
@@ -65,10 +65,12 @@ public:
                              "this protocol does not support reading (yet).");
   }
 
-  uint32_t readFieldBegin(std::string& name, TType& fieldType, int16_t& fieldId) {
-    (void)name;
-    (void)fieldType;
-    (void)fieldId;
+  uint32_t readFieldBegin(std::string& name,
+                          TType& fieldType,
+                          int16_t& fieldId) {
+    (void) name;
+    (void) fieldType;
+    (void) fieldId;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
@@ -79,9 +81,9 @@ public:
   }
 
   uint32_t readMapBegin(TType& keyType, TType& valType, uint32_t& size) {
-    (void)keyType;
-    (void)valType;
-    (void)size;
+    (void) keyType;
+    (void) valType;
+    (void) size;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
@@ -92,8 +94,8 @@ public:
   }
 
   uint32_t readListBegin(TType& elemType, uint32_t& size) {
-    (void)elemType;
-    (void)size;
+    (void) elemType;
+    (void) size;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
@@ -104,8 +106,8 @@ public:
   }
 
   uint32_t readSetBegin(TType& elemType, uint32_t& size) {
-    (void)elemType;
-    (void)size;
+    (void) elemType;
+    (void) size;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
@@ -116,55 +118,55 @@ public:
   }
 
   uint32_t readBool(bool& value) {
-    (void)value;
+    (void) value;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
 
   uint32_t readBool(std::vector<bool>::reference value) {
-    (void)value;
+    (void) value;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
 
   uint32_t readByte(int8_t& byte) {
-    (void)byte;
+    (void) byte;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
 
   uint32_t readI16(int16_t& i16) {
-    (void)i16;
+    (void) i16;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
 
   uint32_t readI32(int32_t& i32) {
-    (void)i32;
+    (void) i32;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
 
   uint32_t readI64(int64_t& i64) {
-    (void)i64;
+    (void) i64;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
 
   uint32_t readDouble(double& dub) {
-    (void)dub;
+    (void) dub;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
 
   uint32_t readString(std::string& str) {
-    (void)str;
+    (void) str;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
 
   uint32_t readBinary(std::string& str) {
-    (void)str;
+    (void) str;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support reading (yet).");
   }
@@ -172,9 +174,9 @@ public:
   uint32_t writeMessageBegin(const std::string& name,
                              const TMessageType messageType,
                              const int32_t seqid) {
-    (void)name;
-    (void)messageType;
-    (void)seqid;
+    (void) name;
+    (void) messageType;
+    (void) seqid;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
@@ -184,8 +186,9 @@ public:
                              "this protocol does not support writing (yet).");
   }
 
+
   uint32_t writeStructBegin(const char* name) {
-    (void)name;
+    (void) name;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
@@ -195,10 +198,12 @@ public:
                              "this protocol does not support writing (yet).");
   }
 
-  uint32_t writeFieldBegin(const char* name, const TType fieldType, const int16_t fieldId) {
-    (void)name;
-    (void)fieldType;
-    (void)fieldId;
+  uint32_t writeFieldBegin(const char* name,
+                           const TType fieldType,
+                           const int16_t fieldId) {
+    (void) name;
+    (void) fieldType;
+    (void) fieldId;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
@@ -213,10 +218,12 @@ public:
                              "this protocol does not support writing (yet).");
   }
 
-  uint32_t writeMapBegin(const TType keyType, const TType valType, const uint32_t size) {
-    (void)keyType;
-    (void)valType;
-    (void)size;
+  uint32_t writeMapBegin(const TType keyType,
+                         const TType valType,
+                         const uint32_t size) {
+    (void) keyType;
+    (void) valType;
+    (void) size;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
@@ -227,8 +234,8 @@ public:
   }
 
   uint32_t writeListBegin(const TType elemType, const uint32_t size) {
-    (void)elemType;
-    (void)size;
+    (void) elemType;
+    (void) size;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
@@ -239,8 +246,8 @@ public:
   }
 
   uint32_t writeSetBegin(const TType elemType, const uint32_t size) {
-    (void)elemType;
-    (void)size;
+    (void) elemType;
+    (void) size;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
@@ -251,145 +258,166 @@ public:
   }
 
   uint32_t writeBool(const bool value) {
-    (void)value;
+    (void) value;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
 
   uint32_t writeByte(const int8_t byte) {
-    (void)byte;
+    (void) byte;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
 
   uint32_t writeI16(const int16_t i16) {
-    (void)i16;
+    (void) i16;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
 
   uint32_t writeI32(const int32_t i32) {
-    (void)i32;
+    (void) i32;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
 
   uint32_t writeI64(const int64_t i64) {
-    (void)i64;
+    (void) i64;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
 
   uint32_t writeDouble(const double dub) {
-    (void)dub;
+    (void) dub;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
 
   uint32_t writeString(const std::string& str) {
-    (void)str;
+    (void) str;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
 
   uint32_t writeBinary(const std::string& str) {
-    (void)str;
+    (void) str;
     throw TProtocolException(TProtocolException::NOT_IMPLEMENTED,
                              "this protocol does not support writing (yet).");
   }
 
-  uint32_t skip(TType type) { return ::apache::thrift::protocol::skip(*this, type); }
+  uint32_t skip(TType type) {
+    return ::apache::thrift::protocol::skip(*this, type);
+  }
 
-protected:
-  TProtocolDefaults(std::shared_ptr<TTransport> ptrans) : TProtocol(ptrans) {}
+ protected:
+  TProtocolDefaults(boost::shared_ptr<TTransport> ptrans)
+    : TProtocol(ptrans)
+  {}
 };
 
 /**
  * Concrete TProtocol classes should inherit from TVirtualProtocol
  * so they don't have to manually override virtual methods.
  */
-template <class Protocol_, class Super_ = TProtocolDefaults>
+template <class Protocol_, class Super_=TProtocolDefaults>
 class TVirtualProtocol : public Super_ {
-public:
+ public:
   /**
    * Writing functions.
    */
 
-  uint32_t writeMessageBegin_virt(const std::string& name,
+  virtual uint32_t writeMessageBegin_virt(const std::string& name,
                                           const TMessageType messageType,
-                                          const int32_t seqid) override {
-    return static_cast<Protocol_*>(this)->writeMessageBegin(name, messageType, seqid);
+                                          const int32_t seqid) {
+    return static_cast<Protocol_*>(this)->writeMessageBegin(name, messageType,
+                                                            seqid);
   }
 
-  uint32_t writeMessageEnd_virt() override {
+  virtual uint32_t writeMessageEnd_virt() {
     return static_cast<Protocol_*>(this)->writeMessageEnd();
   }
 
-  uint32_t writeStructBegin_virt(const char* name) override {
+
+  virtual uint32_t writeStructBegin_virt(const char* name) {
     return static_cast<Protocol_*>(this)->writeStructBegin(name);
   }
 
-  uint32_t writeStructEnd_virt() override { return static_cast<Protocol_*>(this)->writeStructEnd(); }
-
-  uint32_t writeFieldBegin_virt(const char* name,
-                                        const TType fieldType,
-                                        const int16_t fieldId) override {
-    return static_cast<Protocol_*>(this)->writeFieldBegin(name, fieldType, fieldId);
+  virtual uint32_t writeStructEnd_virt() {
+    return static_cast<Protocol_*>(this)->writeStructEnd();
   }
 
-  uint32_t writeFieldEnd_virt() override { return static_cast<Protocol_*>(this)->writeFieldEnd(); }
+  virtual uint32_t writeFieldBegin_virt(const char* name,
+                                        const TType fieldType,
+                                        const int16_t fieldId) {
+    return static_cast<Protocol_*>(this)->writeFieldBegin(name, fieldType,
+                                                          fieldId);
+  }
 
-  uint32_t writeFieldStop_virt() override { return static_cast<Protocol_*>(this)->writeFieldStop(); }
+  virtual uint32_t writeFieldEnd_virt() {
+    return static_cast<Protocol_*>(this)->writeFieldEnd();
+  }
 
-  uint32_t writeMapBegin_virt(const TType keyType,
+  virtual uint32_t writeFieldStop_virt() {
+    return static_cast<Protocol_*>(this)->writeFieldStop();
+  }
+
+  virtual uint32_t writeMapBegin_virt(const TType keyType,
                                       const TType valType,
-                                      const uint32_t size) override {
+                                      const uint32_t size) {
     return static_cast<Protocol_*>(this)->writeMapBegin(keyType, valType, size);
   }
 
-  uint32_t writeMapEnd_virt() override { return static_cast<Protocol_*>(this)->writeMapEnd(); }
+  virtual uint32_t writeMapEnd_virt() {
+    return static_cast<Protocol_*>(this)->writeMapEnd();
+  }
 
-  uint32_t writeListBegin_virt(const TType elemType, const uint32_t size) override {
+  virtual uint32_t writeListBegin_virt(const TType elemType,
+                                       const uint32_t size) {
     return static_cast<Protocol_*>(this)->writeListBegin(elemType, size);
   }
 
-  uint32_t writeListEnd_virt() override { return static_cast<Protocol_*>(this)->writeListEnd(); }
+  virtual uint32_t writeListEnd_virt() {
+    return static_cast<Protocol_*>(this)->writeListEnd();
+  }
 
-  uint32_t writeSetBegin_virt(const TType elemType, const uint32_t size) override {
+  virtual uint32_t writeSetBegin_virt(const TType elemType,
+                                      const uint32_t size) {
     return static_cast<Protocol_*>(this)->writeSetBegin(elemType, size);
   }
 
-  uint32_t writeSetEnd_virt() override { return static_cast<Protocol_*>(this)->writeSetEnd(); }
+  virtual uint32_t writeSetEnd_virt() {
+    return static_cast<Protocol_*>(this)->writeSetEnd();
+  }
 
-  uint32_t writeBool_virt(const bool value) override {
+  virtual uint32_t writeBool_virt(const bool value) {
     return static_cast<Protocol_*>(this)->writeBool(value);
   }
 
-  uint32_t writeByte_virt(const int8_t byte) override {
+  virtual uint32_t writeByte_virt(const int8_t byte) {
     return static_cast<Protocol_*>(this)->writeByte(byte);
   }
 
-  uint32_t writeI16_virt(const int16_t i16) override {
+  virtual uint32_t writeI16_virt(const int16_t i16) {
     return static_cast<Protocol_*>(this)->writeI16(i16);
   }
 
-  uint32_t writeI32_virt(const int32_t i32) override {
+  virtual uint32_t writeI32_virt(const int32_t i32) {
     return static_cast<Protocol_*>(this)->writeI32(i32);
   }
 
-  uint32_t writeI64_virt(const int64_t i64) override {
+  virtual uint32_t writeI64_virt(const int64_t i64) {
     return static_cast<Protocol_*>(this)->writeI64(i64);
   }
 
-  uint32_t writeDouble_virt(const double dub) override {
+  virtual uint32_t writeDouble_virt(const double dub) {
     return static_cast<Protocol_*>(this)->writeDouble(dub);
   }
 
-  uint32_t writeString_virt(const std::string& str) override {
+  virtual uint32_t writeString_virt(const std::string& str) {
     return static_cast<Protocol_*>(this)->writeString(str);
   }
 
-  uint32_t writeBinary_virt(const std::string& str) override {
+  virtual uint32_t writeBinary_virt(const std::string& str) {
     return static_cast<Protocol_*>(this)->writeBinary(str);
   }
 
@@ -397,81 +425,103 @@ public:
    * Reading functions
    */
 
-  uint32_t readMessageBegin_virt(std::string& name,
+  virtual uint32_t readMessageBegin_virt(std::string& name,
                                          TMessageType& messageType,
-                                         int32_t& seqid) override {
-    return static_cast<Protocol_*>(this)->readMessageBegin(name, messageType, seqid);
+                                         int32_t& seqid) {
+    return static_cast<Protocol_*>(this)->readMessageBegin(name, messageType,
+                                                           seqid);
   }
 
-  uint32_t readMessageEnd_virt() override { return static_cast<Protocol_*>(this)->readMessageEnd(); }
+  virtual uint32_t readMessageEnd_virt() {
+    return static_cast<Protocol_*>(this)->readMessageEnd();
+  }
 
-  uint32_t readStructBegin_virt(std::string& name) override {
+  virtual uint32_t readStructBegin_virt(std::string& name) {
     return static_cast<Protocol_*>(this)->readStructBegin(name);
   }
 
-  uint32_t readStructEnd_virt() override { return static_cast<Protocol_*>(this)->readStructEnd(); }
-
-  uint32_t readFieldBegin_virt(std::string& name, TType& fieldType, int16_t& fieldId) override {
-    return static_cast<Protocol_*>(this)->readFieldBegin(name, fieldType, fieldId);
+  virtual uint32_t readStructEnd_virt() {
+    return static_cast<Protocol_*>(this)->readStructEnd();
   }
 
-  uint32_t readFieldEnd_virt() override { return static_cast<Protocol_*>(this)->readFieldEnd(); }
+  virtual uint32_t readFieldBegin_virt(std::string& name,
+                                       TType& fieldType,
+                                       int16_t& fieldId) {
+    return static_cast<Protocol_*>(this)->readFieldBegin(name, fieldType,
+                                                         fieldId);
+  }
 
-  uint32_t readMapBegin_virt(TType& keyType, TType& valType, uint32_t& size) override {
+  virtual uint32_t readFieldEnd_virt() {
+    return static_cast<Protocol_*>(this)->readFieldEnd();
+  }
+
+  virtual uint32_t readMapBegin_virt(TType& keyType,
+                                     TType& valType,
+                                     uint32_t& size) {
     return static_cast<Protocol_*>(this)->readMapBegin(keyType, valType, size);
   }
 
-  uint32_t readMapEnd_virt() override { return static_cast<Protocol_*>(this)->readMapEnd(); }
+  virtual uint32_t readMapEnd_virt() {
+    return static_cast<Protocol_*>(this)->readMapEnd();
+  }
 
-  uint32_t readListBegin_virt(TType& elemType, uint32_t& size) override {
+  virtual uint32_t readListBegin_virt(TType& elemType,
+                                      uint32_t& size) {
     return static_cast<Protocol_*>(this)->readListBegin(elemType, size);
   }
 
-  uint32_t readListEnd_virt() override { return static_cast<Protocol_*>(this)->readListEnd(); }
+  virtual uint32_t readListEnd_virt() {
+    return static_cast<Protocol_*>(this)->readListEnd();
+  }
 
-  uint32_t readSetBegin_virt(TType& elemType, uint32_t& size) override {
+  virtual uint32_t readSetBegin_virt(TType& elemType,
+                                     uint32_t& size) {
     return static_cast<Protocol_*>(this)->readSetBegin(elemType, size);
   }
 
-  uint32_t readSetEnd_virt() override { return static_cast<Protocol_*>(this)->readSetEnd(); }
+  virtual uint32_t readSetEnd_virt() {
+    return static_cast<Protocol_*>(this)->readSetEnd();
+  }
 
-  uint32_t readBool_virt(bool& value) override {
+  virtual uint32_t readBool_virt(bool& value) {
     return static_cast<Protocol_*>(this)->readBool(value);
   }
 
-  uint32_t readBool_virt(std::vector<bool>::reference value) override {
+  virtual uint32_t readBool_virt(std::vector<bool>::reference value) {
     return static_cast<Protocol_*>(this)->readBool(value);
   }
 
-  uint32_t readByte_virt(int8_t& byte) override {
+  virtual uint32_t readByte_virt(int8_t& byte) {
     return static_cast<Protocol_*>(this)->readByte(byte);
   }
 
-  uint32_t readI16_virt(int16_t& i16) override {
+  virtual uint32_t readI16_virt(int16_t& i16) {
     return static_cast<Protocol_*>(this)->readI16(i16);
   }
 
-  uint32_t readI32_virt(int32_t& i32) override {
+  virtual uint32_t readI32_virt(int32_t& i32) {
     return static_cast<Protocol_*>(this)->readI32(i32);
   }
 
-  uint32_t readI64_virt(int64_t& i64) override {
+  virtual uint32_t readI64_virt(int64_t& i64) {
     return static_cast<Protocol_*>(this)->readI64(i64);
   }
 
-  uint32_t readDouble_virt(double& dub) override {
+  virtual uint32_t readDouble_virt(double& dub) {
     return static_cast<Protocol_*>(this)->readDouble(dub);
   }
 
-  uint32_t readString_virt(std::string& str) override {
+  virtual uint32_t readString_virt(std::string& str) {
     return static_cast<Protocol_*>(this)->readString(str);
   }
 
-  uint32_t readBinary_virt(std::string& str) override {
+  virtual uint32_t readBinary_virt(std::string& str) {
     return static_cast<Protocol_*>(this)->readBinary(str);
   }
 
-  uint32_t skip_virt(TType type) override { return static_cast<Protocol_*>(this)->skip(type); }
+  virtual uint32_t skip_virt(TType type) {
+    return static_cast<Protocol_*>(this)->skip(type);
+  }
 
   /*
    * Provide a default skip() implementation that uses non-virtual read
@@ -484,7 +534,7 @@ public:
    * correct parent implementation, if desired.
    */
   uint32_t skip(TType type) {
-    auto* const prot = static_cast<Protocol_*>(this);
+    Protocol_* const prot = static_cast<Protocol_*>(this);
     return ::apache::thrift::protocol::skip(*prot, type);
   }
 
@@ -503,11 +553,12 @@ public:
   }
   using Super_::readBool; // so we don't hide readBool(bool&)
 
-protected:
-  TVirtualProtocol(std::shared_ptr<TTransport> ptrans) : Super_(ptrans) {}
+ protected:
+  TVirtualProtocol(boost::shared_ptr<TTransport> ptrans)
+    : Super_(ptrans)
+  {}
 };
-}
-}
-} // apache::thrift::protocol
+
+}}} // apache::thrift::protocol
 
 #endif // #define _THRIFT_PROTOCOL_TVIRTUALPROTOCOL_H_ 1

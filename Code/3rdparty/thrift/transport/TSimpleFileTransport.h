@@ -22,9 +22,7 @@
 
 #include <thrift/transport/TFDTransport.h>
 
-namespace apache {
-namespace thrift {
-namespace transport {
+namespace apache { namespace thrift { namespace transport {
 
 /**
  * Dead-simple wrapper around a file.
@@ -32,12 +30,12 @@ namespace transport {
  * Writeable files are opened with O_CREAT and O_APPEND
  */
 class TSimpleFileTransport : public TFDTransport {
-public:
-  TSimpleFileTransport(const std::string& path, bool read = true, bool write = false, 
-                                    std::shared_ptr<TConfiguration> config = nullptr);
+ public:
+  TSimpleFileTransport(const std::string& path,
+                       bool read =  true,
+                       bool write = false);
 };
-}
-}
-} // apache::thrift::transport
+
+}}} // apache::thrift::transport
 
 #endif //  _THRIFT_TRANSPORT_TSIMPLEFILETRANSPORT_H_

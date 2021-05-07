@@ -20,97 +20,74 @@
 #ifndef _THRIFT_TRANSPORT_TSERVERWINPIPES_H_
 #define _THRIFT_TRANSPORT_TSERVERWINPIPES_H_ 1
 
-#include <memory>
 #include <thrift/transport/TServerTransport.h>
+#include <boost/shared_ptr.hpp>
 #ifndef _WIN32
-#include <thrift/transport/TServerSocket.h>
-#endif
-#ifdef _WIN32
-#include <thrift/windows/Sync.h>
+#  include "TServerSocket.h"
 #endif
 
-#define TPIPE_SERVER_MAX_CONNS_DEFAULT PIPE_UNLIMITED_INSTANCES
+#define TPIPE_SERVER_MAX_CONNS_DEFAULT 10
 
-// Windows - set security to allow non-elevated apps
-// to access pipes created by elevated apps.
-// Full access to everyone
-const std::string DEFAULT_PIPE_SECURITY{"D:(A;;FA;;;WD)"};
-
-namespace apache {
-namespace thrift {
-namespace transport {
+namespace apache { namespace thrift { namespace transport {
 
 /**
  * Windows Pipes implementation of TServerTransport.
- * Don't destroy a TPipeServer at global scope, as that will cause a thread join
- * during DLLMain.  That also means that TServer's using TPipeServer shouldn't be at global
- * scope.
  */
 #ifdef _WIN32
-class TPipeServerImpl;
-class TPipe;
-
 class TPipeServer : public TServerTransport {
-public:
-  // Constructors
+ public:
+  //Constructors
   // Named Pipe -
-  TPipeServer(const std::string& pipename, uint32_t bufsize);
-  TPipeServer(const std::string& pipename, uint32_t bufsize, uint32_t maxconnections);
-  TPipeServer(const std::string& pipename,
-              uint32_t bufsize,
-              uint32_t maxconnections,
-              const std::string& securityDescriptor);
-  TPipeServer(const std::string& pipename);
+  TPipeServer(const std::string &pipename, uint32_t bufsize);
+  TPipeServer(const std::string &pipename, uint32_t bufsize, uint32_t maxconnections);
+  TPipeServer(const std::string &pipename);
   // Anonymous pipe -
   TPipeServer(int bufsize);
   TPipeServer();
 
-  // Destructor
-  virtual ~TPipeServer();
+  //Destructor
+  ~TPipeServer();
 
-  bool isOpen() const override;
+  //Standard transport callbacks
+  void interrupt();
+  void close();
+ protected:
+  boost::shared_ptr<TTransport> acceptImpl();
 
-  // Standard transport callbacks
-  void interrupt() override;
-  void close() override;
-  void listen() override;
+  bool TCreateNamedPipe();
+  bool TCreateAnonPipe();
+  void createWakeupEvent();
 
-  // Accessors
+ public:
+  //Accessors
   std::string getPipename();
-  void setPipename(const std::string& pipename);
-  int getBufferSize();
+  void setPipename(const std::string &pipename);
+  int  getBufferSize();
   void setBufferSize(int bufsize);
-  HANDLE getPipeHandle(); // Named Pipe R/W -or- Anonymous pipe Read handle
+  HANDLE getPipeHandle();  //Named Pipe R/W -or- Anonymous pipe Read handle
   HANDLE getWrtPipeHandle();
   HANDLE getClientRdPipeHandle();
   HANDLE getClientWrtPipeHandle();
   bool getAnonymous();
   void setAnonymous(bool anon);
-  void setMaxConnections(uint32_t maxconnections);
-  void setSecurityDescriptor(const std::string& securityDescriptor);
 
-  // this function is intended to be used in generic / template situations,
-  // so its name needs to be the same as TPipe's
-  HANDLE getNativeWaitHandle();
-
-protected:
-  virtual std::shared_ptr<TTransport> acceptImpl();
-
-private:
-  std::shared_ptr<TPipeServerImpl> impl_;
-
+ private:
   std::string pipename_;
-  std::string securityDescriptor_;
   uint32_t bufsize_;
+  HANDLE Pipe_;  //Named Pipe (R/W) or Anonymous Pipe (R)
   uint32_t maxconns_;
-  bool isAnonymous_;
+  HANDLE PipeW_; //Anonymous Pipe (W)
+  HANDLE ClientAnonRead, ClientAnonWrite; //Client side anonymous pipe handles
+  HANDLE wakeup;  // wake up event
+  //? Do we need duplicates to send to client?
+  bool isAnonymous;
+  bool stop_; // stop flag
 };
 #else //_WIN32
 //*NIX named pipe implementation uses domain socket
 typedef TServerSocket TPipeServer;
 #endif
-}
-}
-} // apache::thrift::transport
+
+}}} // apache::thrift::transport
 
 #endif // #ifndef _THRIFT_TRANSPORT_TSERVERWINPIPES_H_

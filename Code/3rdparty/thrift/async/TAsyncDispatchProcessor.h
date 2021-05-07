@@ -21,9 +21,7 @@
 
 #include <thrift/async/TAsyncProcessor.h>
 
-namespace apache {
-namespace thrift {
-namespace async {
+namespace apache { namespace thrift { namespace async {
 
 /**
  * TAsyncDispatchProcessor is a helper class to parse the message header then
@@ -33,16 +31,16 @@ namespace async {
  */
 template <class Protocol_>
 class TAsyncDispatchProcessorT : public TAsyncProcessor {
-public:
-  void process(std::function<void(bool success)> _return,
-                       std::shared_ptr<protocol::TProtocol> in,
-                       std::shared_ptr<protocol::TProtocol> out) override {
+ public:
+  virtual void process(apache::thrift::stdcxx::function<void(bool success)> _return,
+                       boost::shared_ptr<protocol::TProtocol> in,
+                       boost::shared_ptr<protocol::TProtocol> out) {
     protocol::TProtocol* inRaw = in.get();
     protocol::TProtocol* outRaw = out.get();
 
     // Try to dynamic cast to the template protocol type
-    auto* specificIn = dynamic_cast<Protocol_*>(inRaw);
-    auto* specificOut = dynamic_cast<Protocol_*>(outRaw);
+    Protocol_* specificIn = dynamic_cast<Protocol_*>(inRaw);
+    Protocol_* specificOut = dynamic_cast<Protocol_*>(outRaw);
     if (specificIn && specificOut) {
       return processFast(_return, specificIn, specificOut);
     }
@@ -62,7 +60,8 @@ public:
     // (The old generated processor code used to try to skip a T_STRUCT and
     // continue.  However, that seems unsafe.)
     if (mtype != protocol::T_CALL && mtype != protocol::T_ONEWAY) {
-      GlobalOutput.printf("received invalid message type %d from client", mtype);
+      GlobalOutput.printf("received invalid message type %d from client",
+                          mtype);
       _return(false);
       return;
     }
@@ -70,16 +69,16 @@ public:
     return this->dispatchCall(_return, inRaw, outRaw, fname, seqid);
   }
 
-  void processFast(std::function<void(bool success)> _return,
-                   Protocol_* in,
-                   Protocol_* out) {
+  void processFast(apache::thrift::stdcxx::function<void(bool success)> _return,
+                   Protocol_* in, Protocol_* out) {
     std::string fname;
     protocol::TMessageType mtype;
     int32_t seqid;
     in->readMessageBegin(fname, mtype, seqid);
 
     if (mtype != protocol::T_CALL && mtype != protocol::T_ONEWAY) {
-      GlobalOutput.printf("received invalid message type %d from client", mtype);
+      GlobalOutput.printf("received invalid message type %d from client",
+                          mtype);
       _return(false);
       return;
     }
@@ -87,15 +86,13 @@ public:
     return this->dispatchCallTemplated(_return, in, out, fname, seqid);
   }
 
-  virtual void dispatchCall(std::function<void(bool ok)> _return,
+  virtual void dispatchCall(apache::thrift::stdcxx::function<void(bool ok)> _return,
                             apache::thrift::protocol::TProtocol* in,
                             apache::thrift::protocol::TProtocol* out,
-                            const std::string& fname,
-                            int32_t seqid) = 0;
+                            const std::string& fname, int32_t seqid) = 0;
 
-  virtual void dispatchCallTemplated(std::function<void(bool ok)> _return,
-                                     Protocol_* in,
-                                     Protocol_* out,
+  virtual void dispatchCallTemplated(apache::thrift::stdcxx::function<void(bool ok)> _return,
+                                     Protocol_* in, Protocol_* out,
                                      const std::string& fname,
                                      int32_t seqid) = 0;
 };
@@ -105,10 +102,10 @@ public:
  * that doesn't bother trying to perform a dynamic_cast.
  */
 class TAsyncDispatchProcessor : public TAsyncProcessor {
-public:
-  void process(std::function<void(bool success)> _return,
-                       std::shared_ptr<protocol::TProtocol> in,
-                       std::shared_ptr<protocol::TProtocol> out) override {
+ public:
+  virtual void process(apache::thrift::stdcxx::function<void(bool success)> _return,
+                       boost::shared_ptr<protocol::TProtocol> in,
+                       boost::shared_ptr<protocol::TProtocol> out) {
     protocol::TProtocol* inRaw = in.get();
     protocol::TProtocol* outRaw = out.get();
 
@@ -123,7 +120,8 @@ public:
     // (The old generated processor code used to try to skip a T_STRUCT and
     // continue.  However, that seems unsafe.)
     if (mtype != protocol::T_CALL && mtype != protocol::T_ONEWAY) {
-      GlobalOutput.printf("received invalid message type %d from client", mtype);
+      GlobalOutput.printf("received invalid message type %d from client",
+                          mtype);
       _return(false);
       return;
     }
@@ -131,21 +129,21 @@ public:
     return dispatchCall(_return, inRaw, outRaw, fname, seqid);
   }
 
-  virtual void dispatchCall(std::function<void(bool ok)> _return,
+  virtual void dispatchCall(apache::thrift::stdcxx::function<void(bool ok)> _return,
                             apache::thrift::protocol::TProtocol* in,
                             apache::thrift::protocol::TProtocol* out,
-                            const std::string& fname,
-                            int32_t seqid) = 0;
+                            const std::string& fname, int32_t seqid) = 0;
 };
 
 // Specialize TAsyncDispatchProcessorT for TProtocol and TDummyProtocol just to
 // use the generic TDispatchProcessor.
 template <>
-class TAsyncDispatchProcessorT<protocol::TDummyProtocol> : public TAsyncDispatchProcessor {};
+class TAsyncDispatchProcessorT<protocol::TDummyProtocol> :
+  public TAsyncDispatchProcessor {};
 template <>
-class TAsyncDispatchProcessorT<protocol::TProtocol> : public TAsyncDispatchProcessor {};
-}
-}
-} // apache::thrift::async
+class TAsyncDispatchProcessorT<protocol::TProtocol> :
+  public TAsyncDispatchProcessor {};
+
+}}} // apache::thrift::async
 
 #endif // _THRIFT_ASYNC_TASYNCDISPATCHPROCESSOR_H_

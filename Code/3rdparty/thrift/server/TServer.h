@@ -25,11 +25,9 @@
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/concurrency/Thread.h>
 
-#include <memory>
+#include <boost/shared_ptr.hpp>
 
-namespace apache {
-namespace thrift {
-namespace server {
+namespace apache { namespace thrift { namespace server {
 
 using apache::thrift::TProcessor;
 using apache::thrift::protocol::TBinaryProtocolFactory;
@@ -47,8 +45,9 @@ using apache::thrift::transport::TTransportFactory;
  * instance's state).
  */
 class TServerEventHandler {
-public:
-  virtual ~TServerEventHandler() = default;
+ public:
+
+  virtual ~TServerEventHandler() {}
 
   /**
    * Called before the server begins.
@@ -58,11 +57,11 @@ public:
   /**
    * Called when a new client has connected and is about to being processing.
    */
-  virtual void* createContext(std::shared_ptr<TProtocol> input,
-                              std::shared_ptr<TProtocol> output) {
+  virtual void* createContext(boost::shared_ptr<TProtocol> input,
+                              boost::shared_ptr<TProtocol> output) {
     (void)input;
     (void)output;
-    return nullptr;
+    return NULL;
   }
 
   /**
@@ -70,8 +69,8 @@ public:
    * context.
    */
   virtual void deleteContext(void* serverContext,
-                             std::shared_ptr<TProtocol> input,
-                             std::shared_ptr<TProtocol> output) {
+                             boost::shared_ptr<TProtocol>input,
+                             boost::shared_ptr<TProtocol>output) {
     (void)serverContext;
     (void)input;
     (void)output;
@@ -80,16 +79,19 @@ public:
   /**
    * Called when a client is about to call the processor.
    */
-  virtual void processContext(void* serverContext, std::shared_ptr<TTransport> transport) {
+  virtual void processContext(void* serverContext,
+                              boost::shared_ptr<TTransport> transport) {
     (void)serverContext;
     (void)transport;
-  }
+}
 
-protected:
+ protected:
+
   /**
    * Prevent direct instantiation.
    */
-  TServerEventHandler() = default;
+  TServerEventHandler() {}
+
 };
 
 /**
@@ -97,115 +99,155 @@ protected:
  *
  */
 class TServer : public concurrency::Runnable {
-public:
-  ~TServer() override = default;
+ public:
+
+  virtual ~TServer() {}
 
   virtual void serve() = 0;
 
   virtual void stop() {}
 
   // Allows running the server as a Runnable thread
-  void run() override { serve(); }
+  virtual void run() {
+    serve();
+  }
 
-  std::shared_ptr<TProcessorFactory> getProcessorFactory() { return processorFactory_; }
+  boost::shared_ptr<TProcessorFactory> getProcessorFactory() {
+    return processorFactory_;
+  }
 
-  std::shared_ptr<TServerTransport> getServerTransport() { return serverTransport_; }
+  boost::shared_ptr<TServerTransport> getServerTransport() {
+    return serverTransport_;
+  }
 
-  std::shared_ptr<TTransportFactory> getInputTransportFactory() { return inputTransportFactory_; }
+  boost::shared_ptr<TTransportFactory> getInputTransportFactory() {
+    return inputTransportFactory_;
+  }
 
-  std::shared_ptr<TTransportFactory> getOutputTransportFactory() {
+  boost::shared_ptr<TTransportFactory> getOutputTransportFactory() {
     return outputTransportFactory_;
   }
 
-  std::shared_ptr<TProtocolFactory> getInputProtocolFactory() { return inputProtocolFactory_; }
+  boost::shared_ptr<TProtocolFactory> getInputProtocolFactory() {
+    return inputProtocolFactory_;
+  }
 
-  std::shared_ptr<TProtocolFactory> getOutputProtocolFactory() { return outputProtocolFactory_; }
+  boost::shared_ptr<TProtocolFactory> getOutputProtocolFactory() {
+    return outputProtocolFactory_;
+  }
 
-  std::shared_ptr<TServerEventHandler> getEventHandler() { return eventHandler_; }
+  boost::shared_ptr<TServerEventHandler> getEventHandler() {
+    return eventHandler_;
+  }
 
 protected:
-  TServer(const std::shared_ptr<TProcessorFactory>& processorFactory)
-    : processorFactory_(processorFactory) {
-    setInputTransportFactory(std::shared_ptr<TTransportFactory>(new TTransportFactory()));
-    setOutputTransportFactory(std::shared_ptr<TTransportFactory>(new TTransportFactory()));
-    setInputProtocolFactory(std::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
-    setOutputProtocolFactory(std::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
+  template<typename ProcessorFactory>
+  TServer(const boost::shared_ptr<ProcessorFactory>& processorFactory,
+          THRIFT_OVERLOAD_IF(ProcessorFactory, TProcessorFactory)):
+    processorFactory_(processorFactory) {
+    setInputTransportFactory(boost::shared_ptr<TTransportFactory>(
+          new TTransportFactory()));
+    setOutputTransportFactory(boost::shared_ptr<TTransportFactory>(
+          new TTransportFactory()));
+    setInputProtocolFactory(boost::shared_ptr<TProtocolFactory>(
+          new TBinaryProtocolFactory()));
+    setOutputProtocolFactory(boost::shared_ptr<TProtocolFactory>(
+          new TBinaryProtocolFactory()));
   }
 
-  TServer(const std::shared_ptr<TProcessor>& processor)
-    : processorFactory_(new TSingletonProcessorFactory(processor)) {
-    setInputTransportFactory(std::shared_ptr<TTransportFactory>(new TTransportFactory()));
-    setOutputTransportFactory(std::shared_ptr<TTransportFactory>(new TTransportFactory()));
-    setInputProtocolFactory(std::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
-    setOutputProtocolFactory(std::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
+  template<typename Processor>
+  TServer(const boost::shared_ptr<Processor>& processor,
+          THRIFT_OVERLOAD_IF(Processor, TProcessor)):
+    processorFactory_(new TSingletonProcessorFactory(processor)) {
+    setInputTransportFactory(boost::shared_ptr<TTransportFactory>(new TTransportFactory()));
+    setOutputTransportFactory(boost::shared_ptr<TTransportFactory>(new TTransportFactory()));
+    setInputProtocolFactory(boost::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
+    setOutputProtocolFactory(boost::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
   }
 
-  TServer(const std::shared_ptr<TProcessorFactory>& processorFactory,
-          const std::shared_ptr<TServerTransport>& serverTransport)
-    : processorFactory_(processorFactory), serverTransport_(serverTransport) {
-    setInputTransportFactory(std::shared_ptr<TTransportFactory>(new TTransportFactory()));
-    setOutputTransportFactory(std::shared_ptr<TTransportFactory>(new TTransportFactory()));
-    setInputProtocolFactory(std::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
-    setOutputProtocolFactory(std::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
+  template<typename ProcessorFactory>
+  TServer(const boost::shared_ptr<ProcessorFactory>& processorFactory,
+          const boost::shared_ptr<TServerTransport>& serverTransport,
+          THRIFT_OVERLOAD_IF(ProcessorFactory, TProcessorFactory)):
+    processorFactory_(processorFactory),
+    serverTransport_(serverTransport) {
+    setInputTransportFactory(boost::shared_ptr<TTransportFactory>(
+          new TTransportFactory()));
+    setOutputTransportFactory(boost::shared_ptr<TTransportFactory>(
+          new TTransportFactory()));
+    setInputProtocolFactory(boost::shared_ptr<TProtocolFactory>(
+          new TBinaryProtocolFactory()));
+    setOutputProtocolFactory(boost::shared_ptr<TProtocolFactory>(
+          new TBinaryProtocolFactory()));
   }
 
-  TServer(const std::shared_ptr<TProcessor>& processor,
-          const std::shared_ptr<TServerTransport>& serverTransport)
-    : processorFactory_(new TSingletonProcessorFactory(processor)),
-      serverTransport_(serverTransport) {
-    setInputTransportFactory(std::shared_ptr<TTransportFactory>(new TTransportFactory()));
-    setOutputTransportFactory(std::shared_ptr<TTransportFactory>(new TTransportFactory()));
-    setInputProtocolFactory(std::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
-    setOutputProtocolFactory(std::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
+  template<typename Processor>
+  TServer(const boost::shared_ptr<Processor>& processor,
+          const boost::shared_ptr<TServerTransport>& serverTransport,
+          THRIFT_OVERLOAD_IF(Processor, TProcessor)):
+    processorFactory_(new TSingletonProcessorFactory(processor)),
+    serverTransport_(serverTransport) {
+    setInputTransportFactory(boost::shared_ptr<TTransportFactory>(new TTransportFactory()));
+    setOutputTransportFactory(boost::shared_ptr<TTransportFactory>(new TTransportFactory()));
+    setInputProtocolFactory(boost::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
+    setOutputProtocolFactory(boost::shared_ptr<TProtocolFactory>(new TBinaryProtocolFactory()));
   }
 
-  TServer(const std::shared_ptr<TProcessorFactory>& processorFactory,
-          const std::shared_ptr<TServerTransport>& serverTransport,
-          const std::shared_ptr<TTransportFactory>& transportFactory,
-          const std::shared_ptr<TProtocolFactory>& protocolFactory)
-    : processorFactory_(processorFactory),
-      serverTransport_(serverTransport),
-      inputTransportFactory_(transportFactory),
-      outputTransportFactory_(transportFactory),
-      inputProtocolFactory_(protocolFactory),
-      outputProtocolFactory_(protocolFactory) {}
+  template<typename ProcessorFactory>
+  TServer(const boost::shared_ptr<ProcessorFactory>& processorFactory,
+          const boost::shared_ptr<TServerTransport>& serverTransport,
+          const boost::shared_ptr<TTransportFactory>& transportFactory,
+          const boost::shared_ptr<TProtocolFactory>& protocolFactory,
+          THRIFT_OVERLOAD_IF(ProcessorFactory, TProcessorFactory)):
+    processorFactory_(processorFactory),
+    serverTransport_(serverTransport),
+    inputTransportFactory_(transportFactory),
+    outputTransportFactory_(transportFactory),
+    inputProtocolFactory_(protocolFactory),
+    outputProtocolFactory_(protocolFactory) {}
 
-  TServer(const std::shared_ptr<TProcessor>& processor,
-          const std::shared_ptr<TServerTransport>& serverTransport,
-          const std::shared_ptr<TTransportFactory>& transportFactory,
-          const std::shared_ptr<TProtocolFactory>& protocolFactory)
-    : processorFactory_(new TSingletonProcessorFactory(processor)),
-      serverTransport_(serverTransport),
-      inputTransportFactory_(transportFactory),
-      outputTransportFactory_(transportFactory),
-      inputProtocolFactory_(protocolFactory),
-      outputProtocolFactory_(protocolFactory) {}
+  template<typename Processor>
+  TServer(const boost::shared_ptr<Processor>& processor,
+          const boost::shared_ptr<TServerTransport>& serverTransport,
+          const boost::shared_ptr<TTransportFactory>& transportFactory,
+          const boost::shared_ptr<TProtocolFactory>& protocolFactory,
+          THRIFT_OVERLOAD_IF(Processor, TProcessor)):
+    processorFactory_(new TSingletonProcessorFactory(processor)),
+    serverTransport_(serverTransport),
+    inputTransportFactory_(transportFactory),
+    outputTransportFactory_(transportFactory),
+    inputProtocolFactory_(protocolFactory),
+    outputProtocolFactory_(protocolFactory) {}
 
-  TServer(const std::shared_ptr<TProcessorFactory>& processorFactory,
-          const std::shared_ptr<TServerTransport>& serverTransport,
-          const std::shared_ptr<TTransportFactory>& inputTransportFactory,
-          const std::shared_ptr<TTransportFactory>& outputTransportFactory,
-          const std::shared_ptr<TProtocolFactory>& inputProtocolFactory,
-          const std::shared_ptr<TProtocolFactory>& outputProtocolFactory)
-    : processorFactory_(processorFactory),
-      serverTransport_(serverTransport),
-      inputTransportFactory_(inputTransportFactory),
-      outputTransportFactory_(outputTransportFactory),
-      inputProtocolFactory_(inputProtocolFactory),
-      outputProtocolFactory_(outputProtocolFactory) {}
+  template<typename ProcessorFactory>
+  TServer(const boost::shared_ptr<ProcessorFactory>& processorFactory,
+          const boost::shared_ptr<TServerTransport>& serverTransport,
+          const boost::shared_ptr<TTransportFactory>& inputTransportFactory,
+          const boost::shared_ptr<TTransportFactory>& outputTransportFactory,
+          const boost::shared_ptr<TProtocolFactory>& inputProtocolFactory,
+          const boost::shared_ptr<TProtocolFactory>& outputProtocolFactory,
+          THRIFT_OVERLOAD_IF(ProcessorFactory, TProcessorFactory)):
+    processorFactory_(processorFactory),
+    serverTransport_(serverTransport),
+    inputTransportFactory_(inputTransportFactory),
+    outputTransportFactory_(outputTransportFactory),
+    inputProtocolFactory_(inputProtocolFactory),
+    outputProtocolFactory_(outputProtocolFactory) {}
 
-  TServer(const std::shared_ptr<TProcessor>& processor,
-          const std::shared_ptr<TServerTransport>& serverTransport,
-          const std::shared_ptr<TTransportFactory>& inputTransportFactory,
-          const std::shared_ptr<TTransportFactory>& outputTransportFactory,
-          const std::shared_ptr<TProtocolFactory>& inputProtocolFactory,
-          const std::shared_ptr<TProtocolFactory>& outputProtocolFactory)
-    : processorFactory_(new TSingletonProcessorFactory(processor)),
-      serverTransport_(serverTransport),
-      inputTransportFactory_(inputTransportFactory),
-      outputTransportFactory_(outputTransportFactory),
-      inputProtocolFactory_(inputProtocolFactory),
-      outputProtocolFactory_(outputProtocolFactory) {}
+  template<typename Processor>
+  TServer(const boost::shared_ptr<Processor>& processor,
+          const boost::shared_ptr<TServerTransport>& serverTransport,
+          const boost::shared_ptr<TTransportFactory>& inputTransportFactory,
+          const boost::shared_ptr<TTransportFactory>& outputTransportFactory,
+          const boost::shared_ptr<TProtocolFactory>& inputProtocolFactory,
+          const boost::shared_ptr<TProtocolFactory>& outputProtocolFactory,
+          THRIFT_OVERLOAD_IF(Processor, TProcessor)):
+    processorFactory_(new TSingletonProcessorFactory(processor)),
+    serverTransport_(serverTransport),
+    inputTransportFactory_(inputTransportFactory),
+    outputTransportFactory_(outputTransportFactory),
+    inputProtocolFactory_(inputProtocolFactory),
+    outputProtocolFactory_(outputProtocolFactory) {}
 
   /**
    * Get a TProcessor to handle calls on a particular connection.
@@ -214,9 +256,10 @@ protected:
    * call).  This allows the TProcessorFactory to return a different processor
    * for each connection if it desires.
    */
-  std::shared_ptr<TProcessor> getProcessor(std::shared_ptr<TProtocol> inputProtocol,
-                                             std::shared_ptr<TProtocol> outputProtocol,
-                                             std::shared_ptr<TTransport> transport) {
+  boost::shared_ptr<TProcessor> getProcessor(
+      boost::shared_ptr<TProtocol> inputProtocol,
+      boost::shared_ptr<TProtocol> outputProtocol,
+      boost::shared_ptr<TTransport> transport) {
     TConnectionInfo connInfo;
     connInfo.input = inputProtocol;
     connInfo.output = outputProtocol;
@@ -225,37 +268,38 @@ protected:
   }
 
   // Class variables
-  std::shared_ptr<TProcessorFactory> processorFactory_;
-  std::shared_ptr<TServerTransport> serverTransport_;
+  boost::shared_ptr<TProcessorFactory> processorFactory_;
+  boost::shared_ptr<TServerTransport> serverTransport_;
 
-  std::shared_ptr<TTransportFactory> inputTransportFactory_;
-  std::shared_ptr<TTransportFactory> outputTransportFactory_;
+  boost::shared_ptr<TTransportFactory> inputTransportFactory_;
+  boost::shared_ptr<TTransportFactory> outputTransportFactory_;
 
-  std::shared_ptr<TProtocolFactory> inputProtocolFactory_;
-  std::shared_ptr<TProtocolFactory> outputProtocolFactory_;
+  boost::shared_ptr<TProtocolFactory> inputProtocolFactory_;
+  boost::shared_ptr<TProtocolFactory> outputProtocolFactory_;
 
-  std::shared_ptr<TServerEventHandler> eventHandler_;
+  boost::shared_ptr<TServerEventHandler> eventHandler_;
 
 public:
-  void setInputTransportFactory(std::shared_ptr<TTransportFactory> inputTransportFactory) {
+  void setInputTransportFactory(boost::shared_ptr<TTransportFactory> inputTransportFactory) {
     inputTransportFactory_ = inputTransportFactory;
   }
 
-  void setOutputTransportFactory(std::shared_ptr<TTransportFactory> outputTransportFactory) {
+  void setOutputTransportFactory(boost::shared_ptr<TTransportFactory> outputTransportFactory) {
     outputTransportFactory_ = outputTransportFactory;
   }
 
-  void setInputProtocolFactory(std::shared_ptr<TProtocolFactory> inputProtocolFactory) {
+  void setInputProtocolFactory(boost::shared_ptr<TProtocolFactory> inputProtocolFactory) {
     inputProtocolFactory_ = inputProtocolFactory;
   }
 
-  void setOutputProtocolFactory(std::shared_ptr<TProtocolFactory> outputProtocolFactory) {
+  void setOutputProtocolFactory(boost::shared_ptr<TProtocolFactory> outputProtocolFactory) {
     outputProtocolFactory_ = outputProtocolFactory;
   }
 
-  void setServerEventHandler(std::shared_ptr<TServerEventHandler> eventHandler) {
+  void setServerEventHandler(boost::shared_ptr<TServerEventHandler> eventHandler) {
     eventHandler_ = eventHandler;
   }
+
 };
 
 /**
@@ -263,11 +307,9 @@ public:
  * for the current process and all of its children.
  * By default, tries to increase it to as much as 2^24.
  */
-#ifdef HAVE_SYS_RESOURCE_H
-int increase_max_fds(int max_fds = (1 << 24));
-#endif
-}
-}
-} // apache::thrift::server
+ int increase_max_fds(int max_fds=(1<<24));
+
+
+}}} // apache::thrift::server
 
 #endif // #ifndef _THRIFT_SERVER_TSERVER_H_

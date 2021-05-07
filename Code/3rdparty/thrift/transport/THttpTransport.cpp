@@ -17,52 +17,45 @@
  * under the License.
  */
 
-#include <sstream>
-
 #include <thrift/transport/THttpTransport.h>
 
-using std::string;
+namespace apache { namespace thrift { namespace transport {
 
-namespace apache {
-namespace thrift {
-namespace transport {
+using namespace std;
 
 // Yeah, yeah, hacky to put these here, I know.
 const char* THttpTransport::CRLF = "\r\n";
 const int THttpTransport::CRLF_LEN = 2;
 
-THttpTransport::THttpTransport(std::shared_ptr<TTransport> transport, std::shared_ptr<TConfiguration> config)
-  : TVirtualTransport(config),
-    transport_(transport),
-    origin_(""),
-    readHeaders_(true),
-    chunked_(false),
-    chunkedDone_(false),
-    chunkSize_(0),
-    contentLength_(0),
-    httpBuf_(nullptr),
-    httpPos_(0),
-    httpBufLen_(0),
-    httpBufSize_(1024) {
+THttpTransport::THttpTransport(boost::shared_ptr<TTransport> transport) :
+  transport_(transport),
+  readHeaders_(true),
+  chunked_(false),
+  chunkedDone_(false),
+  chunkSize_(0),
+  contentLength_(0),
+  httpBuf_(NULL),
+  httpPos_(0),
+  httpBufLen_(0),
+  httpBufSize_(1024) {
   init();
 }
 
 void THttpTransport::init() {
-  httpBuf_ = (char*)std::malloc(httpBufSize_ + 1);
-  if (httpBuf_ == nullptr) {
+  httpBuf_ = (char*)std::malloc(httpBufSize_+1);
+  if (httpBuf_ == NULL) {
     throw std::bad_alloc();
   }
   httpBuf_[httpBufLen_] = '\0';
 }
 
 THttpTransport::~THttpTransport() {
-  if (httpBuf_ != nullptr) {
+  if (httpBuf_ != NULL) {
     std::free(httpBuf_);
   }
 }
 
 uint32_t THttpTransport::read(uint8_t* buf, uint32_t len) {
-  checkReadBytesAvailable(len);
   if (readBuffer_.available_read() == 0) {
     readBuffer_.resetBuffer();
     uint32_t got = readMoreData();
@@ -86,10 +79,8 @@ uint32_t THttpTransport::readEnd() {
 uint32_t THttpTransport::readMoreData() {
   uint32_t size;
 
-  if (httpPos_ == httpBufLen_) {
-    // Get more data!
-    refill();
-  }
+  // Get more data!
+  refill();
 
   if (readHeaders_) {
     readHeaders();
@@ -99,9 +90,8 @@ uint32_t THttpTransport::readMoreData() {
     size = readChunked();
   } else {
     size = readContent(contentLength_);
-    readHeaders_ = true;
   }
-
+  readHeaders_ = true;
   return size;
 }
 
@@ -134,7 +124,7 @@ void THttpTransport::readChunkedFooters() {
 
 uint32_t THttpTransport::parseChunkSize(char* line) {
   char* semi = strchr(line, ';');
-  if (semi != nullptr) {
+  if (semi != NULL) {
     *semi = '\0';
   }
   uint32_t size = 0;
@@ -159,7 +149,7 @@ uint32_t THttpTransport::readContent(uint32_t size) {
     if (need < give) {
       give = need;
     }
-    readBuffer_.write((uint8_t*)(httpBuf_ + httpPos_), give);
+    readBuffer_.write((uint8_t*)(httpBuf_+httpPos_), give);
     httpPos_ += give;
     need -= give;
   }
@@ -168,30 +158,31 @@ uint32_t THttpTransport::readContent(uint32_t size) {
 
 char* THttpTransport::readLine() {
   while (true) {
-    char* eol = nullptr;
+    char* eol = NULL;
 
-    eol = strstr(httpBuf_ + httpPos_, CRLF);
+    eol = strstr(httpBuf_+httpPos_, CRLF);
 
     // No CRLF yet?
-    if (eol == nullptr) {
+    if (eol == NULL) {
       // Shift whatever we have now to front and refill
       shift();
       refill();
     } else {
       // Return pointer to next line
       *eol = '\0';
-      char* line = httpBuf_ + httpPos_;
-      httpPos_ = static_cast<uint32_t>((eol - httpBuf_) + CRLF_LEN);
+      char* line = httpBuf_+httpPos_;
+      httpPos_ = static_cast<uint32_t>((eol-httpBuf_) + CRLF_LEN);
       return line;
     }
   }
+
 }
 
 void THttpTransport::shift() {
   if (httpBufLen_ > httpPos_) {
     // Shift down remaining data and read more
     uint32_t length = httpBufLen_ - httpPos_;
-    memmove(httpBuf_, httpBuf_ + httpPos_, length);
+    memmove(httpBuf_, httpBuf_+httpPos_, length);
     httpBufLen_ = length;
   } else {
     httpBufLen_ = 0;
@@ -204,20 +195,19 @@ void THttpTransport::refill() {
   uint32_t avail = httpBufSize_ - httpBufLen_;
   if (avail <= (httpBufSize_ / 4)) {
     httpBufSize_ *= 2;
-    char* tmpBuf = (char*)std::realloc(httpBuf_, httpBufSize_ + 1);
-    if (tmpBuf == nullptr) {
+    httpBuf_ = (char*)std::realloc(httpBuf_, httpBufSize_+1);
+    if (httpBuf_ == NULL) {
       throw std::bad_alloc();
     }
-    httpBuf_ = tmpBuf;
   }
 
   // Read more data
-  uint32_t got = transport_->read((uint8_t*)(httpBuf_ + httpBufLen_), httpBufSize_ - httpBufLen_);
+  uint32_t got = transport_->read((uint8_t*)(httpBuf_+httpBufLen_), httpBufSize_-httpBufLen_);
   httpBufLen_ += got;
   httpBuf_[httpBufLen_] = '\0';
 
   if (got == 0) {
-    throw TTransportException(TTransportException::END_OF_FILE, "Could not refill buffer");
+    throw TTransportException("Could not refill buffer");
   }
 }
 
@@ -259,14 +249,4 @@ void THttpTransport::write(const uint8_t* buf, uint32_t len) {
   writeBuffer_.write(buf, len);
 }
 
-const std::string THttpTransport::getOrigin() const {
-  std::ostringstream oss;
-  if (!origin_.empty()) {
-    oss << origin_ << ", ";
-  }
-  oss << transport_->getOrigin();
-  return oss.str();
-}
-}
-}
-}
+}}}

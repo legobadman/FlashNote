@@ -19,18 +19,15 @@
 
 #include <thrift/concurrency/TimerManager.h>
 #include <thrift/concurrency/Exception.h>
+#include <thrift/concurrency/Util.h>
 
 #include <assert.h>
 #include <iostream>
-#include <memory>
 #include <set>
 
-namespace apache {
-namespace thrift {
-namespace concurrency {
+namespace apache { namespace thrift { namespace concurrency {
 
-using std::shared_ptr;
-using std::weak_ptr;
+using boost::shared_ptr;
 
 /**
  * TimerManager class
@@ -39,36 +36,41 @@ using std::weak_ptr;
  */
 class TimerManager::Task : public Runnable {
 
-public:
-  enum STATE { WAITING, EXECUTING, CANCELLED, COMPLETE };
+ public:
+  enum STATE {
+    WAITING,
+    EXECUTING,
+    CANCELLED,
+    COMPLETE
+  };
 
-  Task(shared_ptr<Runnable> runnable) : runnable_(runnable), state_(WAITING) {}
+  Task(shared_ptr<Runnable> runnable) :
+    runnable_(runnable),
+    state_(WAITING) {}
 
-  ~Task() override = default;
+  ~Task() {
+  }
 
-  void run() override {
+  void run() {
     if (state_ == EXECUTING) {
       runnable_->run();
       state_ = COMPLETE;
     }
   }
 
-  bool operator==(const shared_ptr<Runnable> & runnable) const { return runnable_ == runnable; }
-
-  task_iterator it_;
-
-private:
+ private:
   shared_ptr<Runnable> runnable_;
   friend class TimerManager::Dispatcher;
   STATE state_;
 };
 
-class TimerManager::Dispatcher : public Runnable {
+class TimerManager::Dispatcher: public Runnable {
 
-public:
-  Dispatcher(TimerManager* manager) : manager_(manager) {}
+ public:
+  Dispatcher(TimerManager* manager) :
+    manager_(manager) {}
 
-  ~Dispatcher() override = default;
+  ~Dispatcher() {}
 
   /**
    * Dispatcher entry point
@@ -76,7 +78,7 @@ public:
    * As long as dispatcher thread is running, pull tasks off the task taskMap_
    * and execute.
    */
-  void run() override {
+  void run() {
     {
       Synchronized s(manager_->monitor_);
       if (manager_->state_ == TimerManager::STARTING) {
@@ -90,29 +92,24 @@ public:
       {
         Synchronized s(manager_->monitor_);
         task_iterator expiredTaskEnd;
-        auto now = std::chrono::steady_clock::now();
-        while (manager_->state_ == TimerManager::STARTED
-               && (expiredTaskEnd = manager_->taskMap_.upper_bound(now))
-                  == manager_->taskMap_.begin()) {
-          std::chrono::milliseconds timeout(0);
+        int64_t now = Util::currentTime();
+        while (manager_->state_ == TimerManager::STARTED &&
+               (expiredTaskEnd = manager_->taskMap_.upper_bound(now)) == manager_->taskMap_.begin()) {
+          int64_t timeout = 0LL;
           if (!manager_->taskMap_.empty()) {
-            timeout = std::chrono::duration_cast<std::chrono::milliseconds>(manager_->taskMap_.begin()->first - now);
-            //because the unit of steady_clock is smaller than millisecond,timeout may be 0.
-            if (timeout.count() == 0) {
-              timeout = std::chrono::milliseconds(1);
-            }
-            manager_->monitor_.waitForTimeRelative(timeout);
-          } else {
-            manager_->monitor_.waitForTimeRelative(0);
+            timeout = manager_->taskMap_.begin()->first - now;
           }
-          now = std::chrono::steady_clock::now();
+          assert((timeout != 0 && manager_->taskCount_ > 0) || (timeout == 0 && manager_->taskCount_ == 0));
+          try {
+            manager_->monitor_.wait(timeout);
+          } catch (TimedOutException &) {}
+          now = Util::currentTime();
         }
 
         if (manager_->state_ == TimerManager::STARTED) {
-          for (auto ix = manager_->taskMap_.begin(); ix != expiredTaskEnd; ix++) {
+          for (task_iterator ix = manager_->taskMap_.begin(); ix != expiredTaskEnd; ix++) {
             shared_ptr<TimerManager::Task> task = ix->second;
             expiredTasks.insert(task);
-            task->it_ = manager_->taskMap_.end();
             if (task->state_ == TimerManager::Task::WAITING) {
               task->state_ = TimerManager::Task::EXECUTING;
             }
@@ -122,8 +119,8 @@ public:
         }
       }
 
-      for (const auto & expiredTask : expiredTasks) {
-        expiredTask->run();
+      for (std::set<shared_ptr<Task> >::iterator ix =  expiredTasks.begin(); ix != expiredTasks.end(); ix++) {
+        (*ix)->run();
       }
 
     } while (manager_->state_ == TimerManager::STARTED);
@@ -132,26 +129,26 @@ public:
       Synchronized s(manager_->monitor_);
       if (manager_->state_ == TimerManager::STOPPING) {
         manager_->state_ = TimerManager::STOPPED;
-        manager_->monitor_.notifyAll();
+        manager_->monitor_.notify();
       }
     }
     return;
   }
 
-private:
+ private:
   TimerManager* manager_;
   friend class TimerManager;
 };
 
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable : 4355) // 'this' used in base member initializer list
+#pragma warning(disable: 4355) // 'this' used in base member initializer list
 #endif
 
-TimerManager::TimerManager()
-  : taskCount_(0),
-    state_(TimerManager::UNINITIALIZED),
-    dispatcher_(std::make_shared<Dispatcher>(this)) {
+TimerManager::TimerManager() :
+  taskCount_(0),
+  state_(TimerManager::UNINITIALIZED),
+  dispatcher_(shared_ptr<Dispatcher>(new Dispatcher(this))) {
 }
 
 #if defined(_MSC_VER)
@@ -166,8 +163,9 @@ TimerManager::~TimerManager() {
   if (state_ != STOPPED) {
     try {
       stop();
-    } catch (...) {
-      // We're really hosed.
+    } catch(...) {
+      throw;
+      // uhoh
     }
   }
 }
@@ -205,7 +203,7 @@ void TimerManager::stop() {
     Synchronized s(monitor_);
     if (state_ == TimerManager::UNINITIALIZED) {
       state_ = TimerManager::STOPPED;
-    } else if (state_ != STOPPING && state_ != STOPPED) {
+    } else if (state_ != STOPPING &&  state_ != STOPPED) {
       doStop = true;
       state_ = STOPPING;
       monitor_.notifyAll();
@@ -220,7 +218,7 @@ void TimerManager::stop() {
     taskMap_.clear();
 
     // Remove dispatcher's reference to us.
-    dispatcher_->manager_ = nullptr;
+    dispatcher_->manager_ = NULL;
   }
 }
 
@@ -229,7 +227,7 @@ shared_ptr<const ThreadFactory> TimerManager::threadFactory() const {
   return threadFactory_;
 }
 
-void TimerManager::threadFactory(shared_ptr<const ThreadFactory> value) {
+void TimerManager::threadFactory(shared_ptr<const ThreadFactory>  value) {
   Synchronized s(monitor_);
   threadFactory_ = value;
 }
@@ -238,84 +236,70 @@ size_t TimerManager::taskCount() const {
   return taskCount_;
 }
 
-TimerManager::Timer TimerManager::add(shared_ptr<Runnable> task, const std::chrono::milliseconds &timeout) {
-  return add(task, std::chrono::steady_clock::now() + timeout);
+void TimerManager::add(shared_ptr<Runnable> task, int64_t timeout) {
+  int64_t now = Util::currentTime();
+  timeout += now;
+
+  {
+    Synchronized s(monitor_);
+    if (state_ != TimerManager::STARTED) {
+      throw IllegalStateException();
+    }
+
+    // If the task map is empty, we will kick the dispatcher for sure. Otherwise, we kick him
+    // if the expiration time is shorter than the current value. Need to test before we insert,
+    // because the new task might insert at the front.
+    bool notifyRequired = (taskCount_ == 0) ? true : timeout < taskMap_.begin()->first;
+
+    taskCount_++;
+    taskMap_.insert(std::pair<int64_t, shared_ptr<Task> >(timeout, shared_ptr<Task>(new Task(task))));
+
+    // If the task map was empty, or if we have an expiration that is earlier
+    // than any previously seen, kick the dispatcher so it can update its
+    // timeout
+    if (notifyRequired) {
+      monitor_.notify();
+    }
+  }
 }
 
-TimerManager::Timer TimerManager::add(shared_ptr<Runnable> task,
-    const std::chrono::time_point<std::chrono::steady_clock>& abstime) {
-  auto now = std::chrono::steady_clock::now();
+void TimerManager::add(shared_ptr<Runnable> task, const struct THRIFT_TIMESPEC& value) {
 
-  if (abstime < now) {
-    throw InvalidArgumentException();
-  }
-  Synchronized s(monitor_);
-  if (state_ != TimerManager::STARTED) {
-    throw IllegalStateException();
-  }
+  int64_t expiration;
+  Util::toMilliseconds(expiration, value);
 
-  // If the task map is empty, we will kick the dispatcher for sure. Otherwise, we kick him
-  // if the expiration time is shorter than the current value. Need to test before we insert,
-  // because the new task might insert at the front.
-  bool notifyRequired = (taskCount_ == 0) ? true : abstime < taskMap_.begin()->first;
+  int64_t now = Util::currentTime();
 
-  shared_ptr<Task> timer(new Task(task));
-  taskCount_++;
-  timer->it_ = taskMap_.emplace(abstime, timer);
-
-  // If the task map was empty, or if we have an expiration that is earlier
-  // than any previously seen, kick the dispatcher so it can update its
-  // timeout
-  if (notifyRequired) {
-    monitor_.notify();
+  if (expiration < now) {
+    throw  InvalidArgumentException();
   }
 
-  return timer;
+  add(task, expiration - now);
+}
+
+void TimerManager::add(shared_ptr<Runnable> task, const struct timeval& value) {
+
+  int64_t expiration;
+  Util::toMilliseconds(expiration, value);
+
+  int64_t now = Util::currentTime();
+
+  if (expiration < now) {
+    throw  InvalidArgumentException();
+  }
+
+  add(task, expiration - now);
 }
 
 void TimerManager::remove(shared_ptr<Runnable> task) {
+  (void) task;
   Synchronized s(monitor_);
   if (state_ != TimerManager::STARTED) {
     throw IllegalStateException();
   }
-  bool found = false;
-  for (auto ix = taskMap_.begin(); ix != taskMap_.end();) {
-    if (*ix->second == task) {
-      found = true;
-      taskCount_--;
-      taskMap_.erase(ix++);
-    } else {
-      ++ix;
-    }
-  }
-  if (!found) {
-    throw NoSuchTaskException();
-  }
 }
 
-void TimerManager::remove(Timer handle) {
-  Synchronized s(monitor_);
-  if (state_ != TimerManager::STARTED) {
-    throw IllegalStateException();
-  }
+TimerManager::STATE TimerManager::state() const { return state_; }
 
-  shared_ptr<Task> task = handle.lock();
-  if (!task) {
-    throw NoSuchTaskException();
-  }
+}}} // apache::thrift::concurrency
 
-  if (task->it_ == taskMap_.end()) {
-    // Task is being executed
-    throw UncancellableTaskException();
-  }
-
-  taskMap_.erase(task->it_);
-  taskCount_--;
-}
-
-TimerManager::STATE TimerManager::state() const {
-  return state_;
-}
-}
-}
-} // apache::thrift::concurrency
