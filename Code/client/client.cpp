@@ -22,11 +22,11 @@ using boost::shared_ptr;
 
 //#define HELLO
 #define USER_INFO
-//#define NODE_INFO
+#define NODE_INFO
 
-int main(int argc, char** argv) {
-
-	shared_ptr<TTransport> socket(new TSocket("120.78.150.174", 80));
+int main(int argc, char** argv)
+{
+	shared_ptr<TTransport> socket(new TSocket("120.78.150.174", 81));
 	shared_ptr<TTransport> transport(new TBufferedTransport(socket));
 	shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
 	
@@ -44,8 +44,19 @@ int main(int argc, char** argv) {
 	int32_t wtf = client.GetUserId("luzh");
 	std::cout << wtf;
 #endif
+
+#ifdef NODE_INFO
+	shared_ptr<TTransport> socket2(new TSocket("120.78.150.174", 82));
+	shared_ptr<TTransport> transport2(new TBufferedTransport(socket2));
+	shared_ptr<TProtocol> protocol2(new TBinaryProtocol(transport2));
+
+	NoteInfoClient client2(protocol2);
+	transport2->open();
+	client2.GetContent(std::string(""), "");
+#endif
 	
 	transport->close();
+	transport2->close();
 
 	return 0;
 }

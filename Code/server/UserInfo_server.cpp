@@ -28,7 +28,7 @@ class UserInfoHandler : virtual public UserInfoIf {
 };
 
 int main(int argc, char **argv) {
-  int port = 9090;
+  int port = 81;
   shared_ptr<UserInfoHandler> handler(new UserInfoHandler());
   shared_ptr<TProcessor> processor(new UserInfoProcessor(handler));
   shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));

@@ -33,7 +33,7 @@ class NoteInfoHandler : virtual public NoteInfoIf {
 };
 
 int main(int argc, char **argv) {
-  int port = 9090;
+  int port = 82;
   shared_ptr<NoteInfoHandler> handler(new NoteInfoHandler());
   shared_ptr<TProcessor> processor(new NoteInfoProcessor(handler));
   shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
