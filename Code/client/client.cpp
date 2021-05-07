@@ -17,7 +17,7 @@ using namespace apache::thrift::transport;
 
 int main(int argc, char** argv) {
 
-	shared_ptr<TTransport> socket(new TSocket("localhost", 9090));
+	shared_ptr<TTransport> socket(new TSocket("120.78.150.174", 80));
 	shared_ptr<TTransport> transport(new TBufferedTransport(socket));
 	shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
 	HelloClient client(protocol);

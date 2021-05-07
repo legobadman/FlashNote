@@ -16,6 +16,7 @@ if (WIN32)
 	add_subdirectory(guimain)
 	add_subdirectory(notecore)
 	add_subdirectory(client)
+	add_subdirectory(3rdparty)
 
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT guimain)
 	set_property(TARGET guimain PROPERTY VS_NO_SOLUTION_DEPLOY OFF)
