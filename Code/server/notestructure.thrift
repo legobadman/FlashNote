@@ -21,7 +21,7 @@ struct Notebook {
 }
 
 service UserInfo {
-	i32 GetUserId(1:required string username);
+	string GetUserId(1:required string username);
 }
 
 service NoteInfo {

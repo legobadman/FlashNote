@@ -20,7 +20,7 @@ class UserInfoHandler : virtual public UserInfoIf {
     // Your initialization goes here
   }
 
-  int32_t GetUserId(const std::string& username) {
+  void GetUserId(std::string& _return, const std::string& username) {
     // Your implementation goes here
     printf("GetUserId\n");
   }

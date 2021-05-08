@@ -98,8 +98,8 @@ uint32_t UserInfo_GetUserId_result::read(::apache::thrift::protocol::TProtocol* 
     switch (fid)
     {
       case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->success);
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->success);
           this->__isset.success = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -124,8 +124,8 @@ uint32_t UserInfo_GetUserId_result::write(::apache::thrift::protocol::TProtocol*
   xfer += oprot->writeStructBegin("UserInfo_GetUserId_result");
 
   if (this->__isset.success) {
-    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I32, 0);
-    xfer += oprot->writeI32(this->success);
+    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_STRING, 0);
+    xfer += oprot->writeString(this->success);
     xfer += oprot->writeFieldEnd();
   }
   xfer += oprot->writeFieldStop();
@@ -154,8 +154,8 @@ uint32_t UserInfo_GetUserId_presult::read(::apache::thrift::protocol::TProtocol*
     switch (fid)
     {
       case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32((*(this->success)));
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString((*(this->success)));
           this->__isset.success = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -173,10 +173,10 @@ uint32_t UserInfo_GetUserId_presult::read(::apache::thrift::protocol::TProtocol*
   return xfer;
 }
 
-int32_t UserInfoClient::GetUserId(const std::string& username)
+void UserInfoClient::GetUserId(std::string& _return, const std::string& username)
 {
   send_GetUserId(username);
-  return recv_GetUserId();
+  recv_GetUserId(_return);
 }
 
 void UserInfoClient::send_GetUserId(const std::string& username)
@@ -193,7 +193,7 @@ void UserInfoClient::send_GetUserId(const std::string& username)
   oprot_->getTransport()->flush();
 }
 
-int32_t UserInfoClient::recv_GetUserId()
+void UserInfoClient::recv_GetUserId(std::string& _return)
 {
 
   int32_t rseqid = 0;
@@ -218,7 +218,6 @@ int32_t UserInfoClient::recv_GetUserId()
     iprot_->readMessageEnd();
     iprot_->getTransport()->readEnd();
   }
-  int32_t _return;
   UserInfo_GetUserId_presult result;
   result.success = &_return;
   result.read(iprot_);
@@ -226,7 +225,8 @@ int32_t UserInfoClient::recv_GetUserId()
   iprot_->getTransport()->readEnd();
 
   if (result.__isset.success) {
-    return _return;
+    // _return pointer has now been filled
+    return;
   }
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "GetUserId failed: unknown result");
 }
@@ -273,7 +273,7 @@ void UserInfoProcessor::process_GetUserId(int32_t seqid, ::apache::thrift::proto
 
   UserInfo_GetUserId_result result;
   try {
-    result.success = iface_->GetUserId(args.username);
+    iface_->GetUserId(result.success, args.username);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {

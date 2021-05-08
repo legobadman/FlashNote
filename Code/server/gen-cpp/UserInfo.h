@@ -15,7 +15,7 @@
 class UserInfoIf {
  public:
   virtual ~UserInfoIf() {}
-  virtual int32_t GetUserId(const std::string& username) = 0;
+  virtual void GetUserId(std::string& _return, const std::string& username) = 0;
 };
 
 class UserInfoIfFactory {
@@ -45,9 +45,8 @@ class UserInfoIfSingletonFactory : virtual public UserInfoIfFactory {
 class UserInfoNull : virtual public UserInfoIf {
  public:
   virtual ~UserInfoNull() {}
-  int32_t GetUserId(const std::string& /* username */) {
-    int32_t _return = 0;
-    return _return;
+  void GetUserId(std::string& /* _return */, const std::string& /* username */) {
+    return;
   }
 };
 
@@ -104,16 +103,16 @@ typedef struct _UserInfo_GetUserId_result__isset {
 class UserInfo_GetUserId_result {
  public:
 
-  UserInfo_GetUserId_result() : success(0) {
+  UserInfo_GetUserId_result() : success() {
   }
 
   virtual ~UserInfo_GetUserId_result() throw() {}
 
-  int32_t success;
+  std::string success;
 
   _UserInfo_GetUserId_result__isset __isset;
 
-  void __set_success(const int32_t val) {
+  void __set_success(const std::string& val) {
     success = val;
   }
 
@@ -145,7 +144,7 @@ class UserInfo_GetUserId_presult {
 
   virtual ~UserInfo_GetUserId_presult() throw() {}
 
-  int32_t* success;
+  std::string* success;
 
   _UserInfo_GetUserId_presult__isset __isset;
 
@@ -173,9 +172,9 @@ class UserInfoClient : virtual public UserInfoIf {
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  int32_t GetUserId(const std::string& username);
+  void GetUserId(std::string& _return, const std::string& username);
   void send_GetUserId(const std::string& username);
-  int32_t recv_GetUserId();
+  void recv_GetUserId(std::string& _return);
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -224,13 +223,14 @@ class UserInfoMultiface : virtual public UserInfoIf {
     ifaces_.push_back(iface);
   }
  public:
-  int32_t GetUserId(const std::string& username) {
+  void GetUserId(std::string& _return, const std::string& username) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->GetUserId(username);
+      ifaces_[i]->GetUserId(_return, username);
     }
-    return ifaces_[i]->GetUserId(username);
+    ifaces_[i]->GetUserId(_return, username);
+    return;
   }
 
 };
