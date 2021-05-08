@@ -109,8 +109,8 @@ void swap(Note &a, Note &b);
 class Notebook {
  public:
 
-  static const char* ascii_fingerprint; // = "6C5D5049A7225822B29295CED8837E24";
-  static const uint8_t binary_fingerprint[16]; // = {0x6C,0x5D,0x50,0x49,0xA7,0x22,0x58,0x22,0xB2,0x92,0x95,0xCE,0xD8,0x83,0x7E,0x24};
+  static const char* ascii_fingerprint; // = "A8EB55D24FF0BC49BE2B139C14BD7ECC";
+  static const uint8_t binary_fingerprint[16]; // = {0xA8,0xEB,0x55,0xD2,0x4F,0xF0,0xBC,0x49,0xBE,0x2B,0x13,0x9C,0x14,0xBD,0x7E,0xCC};
 
   Notebook() : id(), name(), create_time(0), modify_time(0), creater() {
   }
@@ -123,6 +123,7 @@ class Notebook {
   Timestamp create_time;
   Timestamp modify_time;
   std::string creater;
+  std::vector<std::string>  owners;
 
   void __set_id(const std::string& val) {
     id = val;
@@ -148,6 +149,10 @@ class Notebook {
     creater = val;
   }
 
+  void __set_owners(const std::vector<std::string> & val) {
+    owners = val;
+  }
+
   bool operator == (const Notebook & rhs) const
   {
     if (!(id == rhs.id))
@@ -161,6 +166,8 @@ class Notebook {
     if (!(modify_time == rhs.modify_time))
       return false;
     if (!(creater == rhs.creater))
+      return false;
+    if (!(owners == rhs.owners))
       return false;
     return true;
   }

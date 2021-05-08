@@ -18,6 +18,7 @@ struct Notebook {
 	4:required Timestamp create_time;
 	5:required Timestamp modify_time;
 	6:required string creater;
+	7:required list<string> owners;
 }
 
 service UserInfo {
