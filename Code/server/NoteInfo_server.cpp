@@ -32,6 +32,7 @@ class NoteInfoHandler : virtual public NoteInfoIf {
   void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid) {
     // Your implementation goes here
     auto collection = conn["flashnote"]["notebooks"];
+    auto note_coll = conn["flashnote"]["notes"];
     mongocxx::cursor cursor = collection.find(document{}
         << "creater"
         << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} }
@@ -40,18 +41,41 @@ class NoteInfoHandler : virtual public NoteInfoIf {
     for (auto doc : cursor)
     {
         bsoncxx::document::view view = doc;
-        std::string Name = doc["name"].get_utf8().value.to_string(); 
-        std::string bookid = doc["_id"].get_oid().value.to_string();
-        std::string creater = doc["creater"].get_oid().value.to_string();
-        bsoncxx::types::b_date create_time = doc["create_time"].get_date();
-        bsoncxx::types::b_date modify_time = doc["modify_time"].get_date();
 
-	Notebook notebook;
-        notebook.id = bookid;
-        notebook.create_time = create_time.to_int64();
-        notebook.modify_time = modify_time.to_int64();
-        notebook.creater = creater;
-        notebook.name = Name;
+        Notebook notebook;
+        notebook.id = doc["_id"].get_oid().value.to_string();
+        notebook.name = doc["name"].get_utf8().value.to_string();
+        notebook.create_time = doc["create_time"].get_date().to_int64();
+        notebook.modify_time = doc["modify_time"].get_date().to_int64();
+        notebook.creater = doc["creater"].get_oid().value.to_string();
+
+        bsoncxx::array::view av = doc["notes"].get_array().value;
+        for (auto iter = av.begin(); iter != av.end(); iter++)
+        {
+            bsoncxx::array::element elem(*iter);
+            std::string noteid = elem.get_oid().value.to_string();
+            std::cout << "note id = " << noteid << std::endl;
+
+	    bsoncxx::stdx::optional<bsoncxx::document::value> note_result =
+			note_coll.find_one(document{}
+				<< "_id"
+				<< bsoncxx::oid{ bsoncxx::stdx::string_view{noteid} }
+			        << finalize);
+            if (note_result)
+            {
+                bsoncxx::document::view note_view = note_result->view();
+
+                Note note;
+                note.title = note_view["title"].get_utf8().value.to_string();
+                note.text_abbre = note_view["content"].get_utf8().value.to_string();
+                note.id = noteid;
+                note.create_time = note_view["create_time"].get_date().to_int64();
+                note.modify_time = note_view["modify_time"].get_date().to_int64();
+
+                notebook.notes.push_back(note);
+            }
+        }
+        _return.push_back(notebook);
     }
     printf("GetNotebooks\n");
   }
