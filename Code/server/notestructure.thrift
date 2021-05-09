@@ -1,4 +1,4 @@
-typedef i32 Timestamp
+typedef i64 Timestamp
 
 struct Note {
 	1:required string id;

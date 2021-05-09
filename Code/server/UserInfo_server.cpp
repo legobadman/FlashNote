@@ -40,6 +40,15 @@ class UserInfoHandler : virtual public UserInfoIf
 
     if (maybe_result)
     {
+      bsoncxx::document::view view = maybe_result->view();
+      bsoncxx::document::element element = view["_id"];
+      bsoncxx::type type = element.type(); 
+      if (type == bsoncxx::type::k_oid)
+      {
+        _return = element.get_oid().value.to_string();
+      }
+      std::string wtf = bsoncxx::to_string(type);
+      std::cout << wtf << std::endl;
       std::cout << bsoncxx::to_json(*maybe_result) << std::endl;
     }
     printf("GetUserId\n");

@@ -10,8 +10,8 @@
 
 
 
-const char* Note::ascii_fingerprint = "44D59A597378E5B243F6FA53B3ACA428";
-const uint8_t Note::binary_fingerprint[16] = {0x44,0xD5,0x9A,0x59,0x73,0x78,0xE5,0xB2,0x43,0xF6,0xFA,0x53,0xB3,0xAC,0xA4,0x28};
+const char* Note::ascii_fingerprint = "F37A6A5626A4C188CBD18204A08A1B7C";
+const uint8_t Note::binary_fingerprint[16] = {0xF3,0x7A,0x6A,0x56,0x26,0xA4,0xC1,0x88,0xCB,0xD1,0x82,0x04,0xA0,0x8A,0x1B,0x7C};
 
 uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
 
@@ -102,16 +102,16 @@ uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
         }
         break;
       case 7:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->create_time);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->create_time);
           isset_create_time = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
       case 8:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->modify_time);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->modify_time);
           isset_modify_time = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -181,12 +181,12 @@ uint32_t Note::write(::apache::thrift::protocol::TProtocol* oprot) const {
   }
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("create_time", ::apache::thrift::protocol::T_I32, 7);
-  xfer += oprot->writeI32(this->create_time);
+  xfer += oprot->writeFieldBegin("create_time", ::apache::thrift::protocol::T_I64, 7);
+  xfer += oprot->writeI64(this->create_time);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("modify_time", ::apache::thrift::protocol::T_I32, 8);
-  xfer += oprot->writeI32(this->modify_time);
+  xfer += oprot->writeFieldBegin("modify_time", ::apache::thrift::protocol::T_I64, 8);
+  xfer += oprot->writeI64(this->modify_time);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -206,8 +206,8 @@ void swap(Note &a, Note &b) {
   swap(a.modify_time, b.modify_time);
 }
 
-const char* Notebook::ascii_fingerprint = "A8EB55D24FF0BC49BE2B139C14BD7ECC";
-const uint8_t Notebook::binary_fingerprint[16] = {0xA8,0xEB,0x55,0xD2,0x4F,0xF0,0xBC,0x49,0xBE,0x2B,0x13,0x9C,0x14,0xBD,0x7E,0xCC};
+const char* Notebook::ascii_fingerprint = "B094AAFC6CD67AB534096E80EAB7D14C";
+const uint8_t Notebook::binary_fingerprint[16] = {0xB0,0x94,0xAA,0xFC,0x6C,0xD6,0x7A,0xB5,0x34,0x09,0x6E,0x80,0xEA,0xB7,0xD1,0x4C};
 
 uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
 
@@ -273,16 +273,16 @@ uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
         }
         break;
       case 4:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->create_time);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->create_time);
           isset_create_time = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
       case 5:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->modify_time);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->modify_time);
           isset_modify_time = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -366,12 +366,12 @@ uint32_t Notebook::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeString(this->name);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("create_time", ::apache::thrift::protocol::T_I32, 4);
-  xfer += oprot->writeI32(this->create_time);
+  xfer += oprot->writeFieldBegin("create_time", ::apache::thrift::protocol::T_I64, 4);
+  xfer += oprot->writeI64(this->create_time);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("modify_time", ::apache::thrift::protocol::T_I32, 5);
-  xfer += oprot->writeI32(this->modify_time);
+  xfer += oprot->writeFieldBegin("modify_time", ::apache::thrift::protocol::T_I64, 5);
+  xfer += oprot->writeI64(this->modify_time);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldBegin("creater", ::apache::thrift::protocol::T_STRING, 6);

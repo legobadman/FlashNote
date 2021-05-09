@@ -2,17 +2,26 @@
 // You should copy it to another filename to avoid overwriting it.
 
 #include "gen-cpp/NoteInfo.h"
+#include <iostream>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
 using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
-
+using bsoncxx::builder::stream::finalize;
+using bsoncxx::builder::stream::document;
 using boost::shared_ptr;
+
+mongocxx::instance inst{};
+mongocxx::client conn{ mongocxx::uri{} };
 
 class NoteInfoHandler : virtual public NoteInfoIf {
  public:
@@ -22,11 +31,34 @@ class NoteInfoHandler : virtual public NoteInfoIf {
 
   void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid) {
     // Your implementation goes here
+    auto collection = conn["flashnote"]["notebooks"];
+    mongocxx::cursor cursor = collection.find(document{}
+        << "creater"
+        << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} }
+        << finalize
+    );
+    for (auto doc : cursor)
+    {
+        bsoncxx::document::view view = doc;
+        std::string Name = doc["name"].get_utf8().value.to_string(); 
+        std::string bookid = doc["_id"].get_oid().value.to_string();
+        std::string creater = doc["creater"].get_oid().value.to_string();
+        bsoncxx::types::b_date create_time = doc["create_time"].get_date();
+        bsoncxx::types::b_date modify_time = doc["modify_time"].get_date();
+
+	Notebook notebook;
+        notebook.id = bookid;
+        notebook.create_time = create_time.to_int64();
+        notebook.modify_time = modify_time.to_int64();
+        notebook.creater = creater;
+        notebook.name = Name;
+    }
     printf("GetNotebooks\n");
   }
 
   void GetContent(std::string& _return, const std::string& noteid) {
     // Your implementation goes here
+    
     printf("GetContent\n");
   }
 
