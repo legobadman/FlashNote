@@ -23,81 +23,82 @@ using boost::shared_ptr;
 mongocxx::instance inst{};
 mongocxx::client conn{ mongocxx::uri{} };
 
-class NoteInfoHandler : virtual public NoteInfoIf {
- public:
-  NoteInfoHandler() {
-    // Your initialization goes here
-  }
+class NoteInfoHandler : virtual public NoteInfoIf
+{
+public:
+	NoteInfoHandler() {
+		// Your initialization goes here
+	}
 
-  void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid) {
-    // Your implementation goes here
-    auto collection = conn["flashnote"]["notebooks"];
-    auto note_coll = conn["flashnote"]["notes"];
-    mongocxx::cursor cursor = collection.find(document{}
-        << "creater"
-        << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} }
-        << finalize
-    );
-    for (auto doc : cursor)
-    {
-        bsoncxx::document::view view = doc;
+	void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid)
+	{
+		// Your implementation goes here
+		auto collection = conn["flashnote"]["notebooks"];
+		auto note_coll = conn["flashnote"]["notes"];
+		mongocxx::cursor cursor = collection.find(document{}
+			<< "creater"
+			<< bsoncxx::oid{ bsoncxx::stdx::string_view{userid} }
+			<< finalize
+		);
+        for (auto doc : cursor)
+		{
+			bsoncxx::document::view view = doc;
 
-        Notebook notebook;
-        notebook.id = doc["_id"].get_oid().value.to_string();
-        notebook.name = doc["name"].get_utf8().value.to_string();
-        notebook.create_time = doc["create_time"].get_date().to_int64();
-        notebook.modify_time = doc["modify_time"].get_date().to_int64();
-        notebook.creater = doc["creater"].get_oid().value.to_string();
+			Notebook notebook;
+			notebook.id = doc["_id"].get_oid().value.to_string();
+			notebook.name = doc["name"].get_utf8().value.to_string();
+			notebook.create_time = doc["create_time"].get_date().to_int64();
+			notebook.modify_time = doc["modify_time"].get_date().to_int64();
+			notebook.creater = doc["creater"].get_oid().value.to_string();
 
-        bsoncxx::array::view av = doc["notes"].get_array().value;
-        for (auto iter = av.begin(); iter != av.end(); iter++)
-        {
-            bsoncxx::array::element elem(*iter);
-            std::string noteid = elem.get_oid().value.to_string();
-            std::cout << "note id = " << noteid << std::endl;
+			bsoncxx::array::view av = doc["notes"].get_array().value;
+			for (auto iter = av.begin(); iter != av.end(); iter++)
+			{
+				bsoncxx::array::element elem(*iter);
+				std::string noteid = elem.get_oid().value.to_string();
+				std::cout << "note id = " << noteid << std::endl;
 
-	    bsoncxx::stdx::optional<bsoncxx::document::value> note_result =
-			note_coll.find_one(document{}
-				<< "_id"
-				<< bsoncxx::oid{ bsoncxx::stdx::string_view{noteid} }
-			        << finalize);
-            if (note_result)
-            {
-                bsoncxx::document::view note_view = note_result->view();
+				bsoncxx::stdx::optional<bsoncxx::document::value> note_result = 
+					note_coll.find_one(document{}
+						<< "_id"
+						<< bsoncxx::oid{ bsoncxx::stdx::string_view{noteid} }
+						<< finalize);
+				if (note_result)
+				{
+					bsoncxx::document::view note_view = note_result->view();
 
-                Note note;
-                note.title = note_view["title"].get_utf8().value.to_string();
-                note.text_abbre = note_view["content"].get_utf8().value.to_string();
-                note.id = noteid;
-                note.create_time = note_view["create_time"].get_date().to_int64();
-                note.modify_time = note_view["modify_time"].get_date().to_int64();
+					Note note;
+					note.title = note_view["title"].get_utf8().value.to_string();
+					note.text_abbre = note_view["content"].get_utf8().value.to_string();
+					note.id = noteid;
+					note.create_time = note_view["create_time"].get_date().to_int64();
+					note.modify_time = note_view["modify_time"].get_date().to_int64();
 
-                notebook.notes.push_back(note);
-            }
-        }
-        _return.push_back(notebook);
-    }
-    printf("GetNotebooks\n");
-  }
+					notebook.notes.push_back(note);
+				}
+			}
+			_return.push_back(notebook);
+		}
+		printf("GetNotebooks\n");
+	}
 
-  void GetContent(std::string& _return, const std::string& noteid) {
-    // Your implementation goes here
-    
-    printf("GetContent\n");
-  }
-
+	void GetContent(std::string& _return, const std::string& noteid)
+	{
+		printf("GetContent\n");
+	}
 };
 
-int main(int argc, char **argv) {
-  int port = 82;
-  shared_ptr<NoteInfoHandler> handler(new NoteInfoHandler());
-  shared_ptr<TProcessor> processor(new NoteInfoProcessor(handler));
-  shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
-  shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
-  shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
+int main(int argc, char **argv)
+{
+	int port = 82;
+	shared_ptr<NoteInfoHandler> handler(new NoteInfoHandler());
+	shared_ptr<TProcessor> processor(new NoteInfoProcessor(handler));
+	shared_ptr<TServerTransport> serverTransport(new TServerSocket(port));
+	shared_ptr<TTransportFactory> transportFactory(new TBufferedTransportFactory());
+	shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());
 
-  TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
-  server.serve();
-  return 0;
+	TSimpleServer server(processor, serverTransport, transportFactory, protocolFactory);
+	server.serve();
+	return 0;
 }
 
