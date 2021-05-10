@@ -18,6 +18,8 @@ using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
 using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::document;
+using bsoncxx::builder::stream::open_document;
+using bsoncxx::builder::stream::close_document;
 using boost::shared_ptr;
 
 mongocxx::instance inst{};
@@ -30,63 +32,140 @@ public:
 		// Your initialization goes here
 	}
 
-	void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid)
+	void GetNotebooks(std::vector<Notebook>& _return, const std::string& userid)
 	{
 		// Your implementation goes here
-		auto collection = conn["flashnote"]["notebooks"];
+		mongocxx::collection users = conn["flashnote"]["user"];
+		auto notebooks = conn["flashnote"]["notebooks"];
 		auto note_coll = conn["flashnote"]["notes"];
-		mongocxx::cursor cursor = collection.find(document{}
-			<< "creater"
-			<< bsoncxx::oid{ bsoncxx::stdx::string_view{userid} }
-			<< finalize
-		);
-        for (auto doc : cursor)
+		
+		bsoncxx::stdx::optional<bsoncxx::document::value> user_result =
+			users.find_one(document{} << "_id" << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} } << finalize);
+		if (user_result)
 		{
-			bsoncxx::document::view view = doc;
-
-			Notebook notebook;
-			notebook.id = doc["_id"].get_oid().value.to_string();
-			notebook.name = doc["name"].get_utf8().value.to_string();
-			notebook.create_time = doc["create_time"].get_date().to_int64();
-			notebook.modify_time = doc["modify_time"].get_date().to_int64();
-			notebook.creater_id = doc["creater"].get_oid().value.to_string();
-
-			bsoncxx::array::view av = doc["notes"].get_array().value;
+			bsoncxx::document::view userview = user_result->view();
+			auto booksview = userview.find("notebooks");
+			if (booksview == userview.end())
+			{
+				return;
+			}
+			bsoncxx::array::view av = booksview->get_array().value;
 			for (auto iter = av.begin(); iter != av.end(); iter++)
 			{
 				bsoncxx::array::element elem(*iter);
-				std::string noteid = elem.get_oid().value.to_string();
-				std::cout << "note id = " << noteid << std::endl;
+				std::string bookid = elem.get_oid().value.to_string();
 
-				bsoncxx::stdx::optional<bsoncxx::document::value> note_result = 
-					note_coll.find_one(document{}
-						<< "_id"
-						<< bsoncxx::oid{ bsoncxx::stdx::string_view{noteid} }
-						<< finalize);
-				if (note_result)
+				bsoncxx::stdx::optional<bsoncxx::document::value> book_result =
+					notebooks.find_one(document{} << "_id" << bsoncxx::oid{ bsoncxx::stdx::string_view{bookid} } << finalize); 
+				if (book_result)
 				{
-					bsoncxx::document::view note_view = note_result->view();
+					bsoncxx::document::view bookview = book_result->view();
+					
+					Notebook notebook;
+					notebook.id = bookview["_id"].get_oid().value.to_string();
+					notebook.name = bookview["name"].get_utf8().value.to_string();
+					notebook.create_time = bookview["create_time"].get_date().to_int64();
+					notebook.modify_time = bookview["modify_time"].get_date().to_int64();
+					notebook.creater_id = bookview["creater"].get_oid().value.to_string();
 
-					Note note;
-					note.title = note_view["title"].get_utf8().value.to_string();
-					note.text_abbre = note_view["content"].get_utf8().value.to_string();
-					note.id = noteid;
-					note.create_time = note_view["create_time"].get_date().to_int64();
-					note.modify_time = note_view["modify_time"].get_date().to_int64();
-					//TODO: creater_id
+					bsoncxx::array::view av = bookview["notes"].get_array().value;
+					for (auto iter = av.begin(); iter != av.end(); iter++)
+					{
+						bsoncxx::array::element elem(*iter);
+						std::string noteid = elem.get_oid().value.to_string();
 
-					notebook.notes.push_back(note);
+						bsoncxx::stdx::optional<bsoncxx::document::value> note_result = 
+							note_coll.find_one(document{}
+								<< "_id"
+								<< bsoncxx::oid{ bsoncxx::stdx::string_view{noteid} }
+								<< finalize);
+						if (note_result)
+						{
+							bsoncxx::document::view note_view = note_result->view();
+
+							Note note;
+							note.title = note_view["title"].get_utf8().value.to_string();
+							note.text_abbre = note_view["content"].get_utf8().value.to_string();
+							note.id = noteid;
+							note.create_time = note_view["create_time"].get_date().to_int64();
+							note.modify_time = note_view["modify_time"].get_date().to_int64();
+							//TODO: creater_id
+
+							notebook.notes.push_back(note);
+						}
+					}
+					_return.push_back(notebook);
+				}
+				else
+				{
+					//bookid已经失效了。
+					std::cout << "bookid = " << bookid << "is invalid" << std::endl;
 				}
 			}
-			_return.push_back(notebook);
+		}
+		else
+		{
+			std::cout << "no user" << std::endl;
 		}
 		printf("GetNotebooks\n");
 	}
 
-	void NewNotebook(std::string& _return, const std::string& userid, const std::string& name)
+	void NewNotebook(std::string& newbookid, const std::string& userid, const std::string& name)
 	{
-		// Your implementation goes here
-		printf("NewNotebook\n");
+		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
+		mongocxx::collection users = conn["flashnote"]["user"];
+
+		// 要先检查userid的合法性
+		bsoncxx::stdx::optional<bsoncxx::document::value> maybe_result =
+			users.find_one(document{} << "_id" << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} } << finalize);
+		if (!maybe_result)
+		{
+			std::cout << "invalid user id: " << userid << std::endl;
+			return;
+		}
+
+		// 检查用户是否已有同名的notebook。
+		std::vector<Notebook> books;
+		GetNotebooks(books, userid);
+		for (int i = 0; i < books.size(); i++)
+		{
+			if (books[i].name == name)
+			{
+				std::cout << "already has a same book" << std::endl;
+				return;
+			}
+		}
+
+		bsoncxx::types::b_oid oId;
+		oId.value = bsoncxx::oid(userid.c_str(), 12);
+
+		// 2.先创建一个notebook
+		const bsoncxx::document::value& notebook = bsoncxx::builder::basic::make_document(
+			bsoncxx::builder::basic::kvp("create_time", bsoncxx::types::b_date{ std::chrono::system_clock::now() }),
+			bsoncxx::builder::basic::kvp("modify_time", bsoncxx::types::b_date{ std::chrono::system_clock::now() }),
+			bsoncxx::builder::basic::kvp("name", name),
+			bsoncxx::builder::basic::kvp("creater", oId),
+			bsoncxx::builder::basic::kvp("owners", [=](bsoncxx::builder::basic::sub_array subarr){
+					subarr.append(userid);
+				}),
+			bsoncxx::builder::basic::kvp("notes", bsoncxx::types::b_array()));				
+
+		auto retVal = notebooks.insert_one(notebook.view());
+		if (retVal)
+		{
+			std::cout << "notebook has been inserted into the db" << std::endl;
+			bsoncxx::oid oid = retVal->inserted_id().get_oid().value;
+			newbookid = oid.to_string();
+
+			// 3.将notebook加入用户列表。
+			auto update_result = users.update_one(document{} << "_id" << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} } << finalize,
+					document{} << "$addToSet" << open_document <<
+				   	"notebooks" << bsoncxx::oid{ bsoncxx::stdx::string_view{newbookid} } << close_document << finalize);
+			if (update_result)
+			{
+				std::cout << "notebook has been appended to the user" << std::endl;
+			}
+		}
 	}
 
 	bool DeleteNotebook(const std::string& userid, const std::string& bookid)
