@@ -16,7 +16,15 @@ class NoteInfoIf {
  public:
   virtual ~NoteInfoIf() {}
   virtual void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid) = 0;
+  virtual void NewNotebook(std::string& _return, const std::string& userid, const std::string& name) = 0;
+  virtual bool DeleteNotebook(const std::string& userid, const std::string& bookid) = 0;
+  virtual void NewNote(std::string& _return, const std::string& bookid, const std::string& title) = 0;
+  virtual bool UpdateNote(const std::string& noteid, const std::string& title, const std::string& note) = 0;
   virtual void GetContent(std::string& _return, const std::string& noteid) = 0;
+  virtual bool MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid) = 0;
+  virtual bool TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid) = 0;
+  virtual bool RecoverNote(const std::string& userid, const std::string& noteid) = 0;
+  virtual bool DeleteNote(const std::string& noteid) = 0;
 };
 
 class NoteInfoIfFactory {
@@ -49,8 +57,38 @@ class NoteInfoNull : virtual public NoteInfoIf {
   void GetNotebooks(std::vector<Notebook> & /* _return */, const std::string& /* userid */) {
     return;
   }
+  void NewNotebook(std::string& /* _return */, const std::string& /* userid */, const std::string& /* name */) {
+    return;
+  }
+  bool DeleteNotebook(const std::string& /* userid */, const std::string& /* bookid */) {
+    bool _return = false;
+    return _return;
+  }
+  void NewNote(std::string& /* _return */, const std::string& /* bookid */, const std::string& /* title */) {
+    return;
+  }
+  bool UpdateNote(const std::string& /* noteid */, const std::string& /* title */, const std::string& /* note */) {
+    bool _return = false;
+    return _return;
+  }
   void GetContent(std::string& /* _return */, const std::string& /* noteid */) {
     return;
+  }
+  bool MoveNote(const std::string& /* noteid */, const std::string& /* src_bookid */, const std::string& /* dest_bookid */) {
+    bool _return = false;
+    return _return;
+  }
+  bool TrashNote(const std::string& /* userid */, const std::string& /* bookid */, const std::string& /* noteid */) {
+    bool _return = false;
+    return _return;
+  }
+  bool RecoverNote(const std::string& /* userid */, const std::string& /* noteid */) {
+    bool _return = false;
+    return _return;
+  }
+  bool DeleteNote(const std::string& /* noteid */) {
+    bool _return = false;
+    return _return;
   }
 };
 
@@ -151,6 +189,454 @@ class NoteInfo_GetNotebooks_presult {
   std::vector<Notebook> * success;
 
   _NoteInfo_GetNotebooks_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class NoteInfo_NewNotebook_args {
+ public:
+
+  NoteInfo_NewNotebook_args() : userid(), name() {
+  }
+
+  virtual ~NoteInfo_NewNotebook_args() throw() {}
+
+  std::string userid;
+  std::string name;
+
+  void __set_userid(const std::string& val) {
+    userid = val;
+  }
+
+  void __set_name(const std::string& val) {
+    name = val;
+  }
+
+  bool operator == (const NoteInfo_NewNotebook_args & rhs) const
+  {
+    if (!(userid == rhs.userid))
+      return false;
+    if (!(name == rhs.name))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_NewNotebook_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_NewNotebook_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_NewNotebook_pargs {
+ public:
+
+
+  virtual ~NoteInfo_NewNotebook_pargs() throw() {}
+
+  const std::string* userid;
+  const std::string* name;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_NewNotebook_result__isset {
+  _NoteInfo_NewNotebook_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_NewNotebook_result__isset;
+
+class NoteInfo_NewNotebook_result {
+ public:
+
+  NoteInfo_NewNotebook_result() : success() {
+  }
+
+  virtual ~NoteInfo_NewNotebook_result() throw() {}
+
+  std::string success;
+
+  _NoteInfo_NewNotebook_result__isset __isset;
+
+  void __set_success(const std::string& val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_NewNotebook_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_NewNotebook_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_NewNotebook_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_NewNotebook_presult__isset {
+  _NoteInfo_NewNotebook_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_NewNotebook_presult__isset;
+
+class NoteInfo_NewNotebook_presult {
+ public:
+
+
+  virtual ~NoteInfo_NewNotebook_presult() throw() {}
+
+  std::string* success;
+
+  _NoteInfo_NewNotebook_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class NoteInfo_DeleteNotebook_args {
+ public:
+
+  NoteInfo_DeleteNotebook_args() : userid(), bookid() {
+  }
+
+  virtual ~NoteInfo_DeleteNotebook_args() throw() {}
+
+  std::string userid;
+  std::string bookid;
+
+  void __set_userid(const std::string& val) {
+    userid = val;
+  }
+
+  void __set_bookid(const std::string& val) {
+    bookid = val;
+  }
+
+  bool operator == (const NoteInfo_DeleteNotebook_args & rhs) const
+  {
+    if (!(userid == rhs.userid))
+      return false;
+    if (!(bookid == rhs.bookid))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_DeleteNotebook_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_DeleteNotebook_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_DeleteNotebook_pargs {
+ public:
+
+
+  virtual ~NoteInfo_DeleteNotebook_pargs() throw() {}
+
+  const std::string* userid;
+  const std::string* bookid;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_DeleteNotebook_result__isset {
+  _NoteInfo_DeleteNotebook_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_DeleteNotebook_result__isset;
+
+class NoteInfo_DeleteNotebook_result {
+ public:
+
+  NoteInfo_DeleteNotebook_result() : success(0) {
+  }
+
+  virtual ~NoteInfo_DeleteNotebook_result() throw() {}
+
+  bool success;
+
+  _NoteInfo_DeleteNotebook_result__isset __isset;
+
+  void __set_success(const bool val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_DeleteNotebook_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_DeleteNotebook_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_DeleteNotebook_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_DeleteNotebook_presult__isset {
+  _NoteInfo_DeleteNotebook_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_DeleteNotebook_presult__isset;
+
+class NoteInfo_DeleteNotebook_presult {
+ public:
+
+
+  virtual ~NoteInfo_DeleteNotebook_presult() throw() {}
+
+  bool* success;
+
+  _NoteInfo_DeleteNotebook_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class NoteInfo_NewNote_args {
+ public:
+
+  NoteInfo_NewNote_args() : bookid(), title() {
+  }
+
+  virtual ~NoteInfo_NewNote_args() throw() {}
+
+  std::string bookid;
+  std::string title;
+
+  void __set_bookid(const std::string& val) {
+    bookid = val;
+  }
+
+  void __set_title(const std::string& val) {
+    title = val;
+  }
+
+  bool operator == (const NoteInfo_NewNote_args & rhs) const
+  {
+    if (!(bookid == rhs.bookid))
+      return false;
+    if (!(title == rhs.title))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_NewNote_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_NewNote_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_NewNote_pargs {
+ public:
+
+
+  virtual ~NoteInfo_NewNote_pargs() throw() {}
+
+  const std::string* bookid;
+  const std::string* title;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_NewNote_result__isset {
+  _NoteInfo_NewNote_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_NewNote_result__isset;
+
+class NoteInfo_NewNote_result {
+ public:
+
+  NoteInfo_NewNote_result() : success() {
+  }
+
+  virtual ~NoteInfo_NewNote_result() throw() {}
+
+  std::string success;
+
+  _NoteInfo_NewNote_result__isset __isset;
+
+  void __set_success(const std::string& val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_NewNote_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_NewNote_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_NewNote_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_NewNote_presult__isset {
+  _NoteInfo_NewNote_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_NewNote_presult__isset;
+
+class NoteInfo_NewNote_presult {
+ public:
+
+
+  virtual ~NoteInfo_NewNote_presult() throw() {}
+
+  std::string* success;
+
+  _NoteInfo_NewNote_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class NoteInfo_UpdateNote_args {
+ public:
+
+  NoteInfo_UpdateNote_args() : noteid(), title(), note() {
+  }
+
+  virtual ~NoteInfo_UpdateNote_args() throw() {}
+
+  std::string noteid;
+  std::string title;
+  std::string note;
+
+  void __set_noteid(const std::string& val) {
+    noteid = val;
+  }
+
+  void __set_title(const std::string& val) {
+    title = val;
+  }
+
+  void __set_note(const std::string& val) {
+    note = val;
+  }
+
+  bool operator == (const NoteInfo_UpdateNote_args & rhs) const
+  {
+    if (!(noteid == rhs.noteid))
+      return false;
+    if (!(title == rhs.title))
+      return false;
+    if (!(note == rhs.note))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_UpdateNote_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_UpdateNote_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_UpdateNote_pargs {
+ public:
+
+
+  virtual ~NoteInfo_UpdateNote_pargs() throw() {}
+
+  const std::string* noteid;
+  const std::string* title;
+  const std::string* note;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_UpdateNote_result__isset {
+  _NoteInfo_UpdateNote_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_UpdateNote_result__isset;
+
+class NoteInfo_UpdateNote_result {
+ public:
+
+  NoteInfo_UpdateNote_result() : success(0) {
+  }
+
+  virtual ~NoteInfo_UpdateNote_result() throw() {}
+
+  bool success;
+
+  _NoteInfo_UpdateNote_result__isset __isset;
+
+  void __set_success(const bool val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_UpdateNote_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_UpdateNote_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_UpdateNote_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_UpdateNote_presult__isset {
+  _NoteInfo_UpdateNote_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_UpdateNote_presult__isset;
+
+class NoteInfo_UpdateNote_presult {
+ public:
+
+
+  virtual ~NoteInfo_UpdateNote_presult() throw() {}
+
+  bool* success;
+
+  _NoteInfo_UpdateNote_presult__isset __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
@@ -258,6 +744,454 @@ class NoteInfo_GetContent_presult {
 
 };
 
+
+class NoteInfo_MoveNote_args {
+ public:
+
+  NoteInfo_MoveNote_args() : noteid(), src_bookid(), dest_bookid() {
+  }
+
+  virtual ~NoteInfo_MoveNote_args() throw() {}
+
+  std::string noteid;
+  std::string src_bookid;
+  std::string dest_bookid;
+
+  void __set_noteid(const std::string& val) {
+    noteid = val;
+  }
+
+  void __set_src_bookid(const std::string& val) {
+    src_bookid = val;
+  }
+
+  void __set_dest_bookid(const std::string& val) {
+    dest_bookid = val;
+  }
+
+  bool operator == (const NoteInfo_MoveNote_args & rhs) const
+  {
+    if (!(noteid == rhs.noteid))
+      return false;
+    if (!(src_bookid == rhs.src_bookid))
+      return false;
+    if (!(dest_bookid == rhs.dest_bookid))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_MoveNote_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_MoveNote_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_MoveNote_pargs {
+ public:
+
+
+  virtual ~NoteInfo_MoveNote_pargs() throw() {}
+
+  const std::string* noteid;
+  const std::string* src_bookid;
+  const std::string* dest_bookid;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_MoveNote_result__isset {
+  _NoteInfo_MoveNote_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_MoveNote_result__isset;
+
+class NoteInfo_MoveNote_result {
+ public:
+
+  NoteInfo_MoveNote_result() : success(0) {
+  }
+
+  virtual ~NoteInfo_MoveNote_result() throw() {}
+
+  bool success;
+
+  _NoteInfo_MoveNote_result__isset __isset;
+
+  void __set_success(const bool val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_MoveNote_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_MoveNote_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_MoveNote_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_MoveNote_presult__isset {
+  _NoteInfo_MoveNote_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_MoveNote_presult__isset;
+
+class NoteInfo_MoveNote_presult {
+ public:
+
+
+  virtual ~NoteInfo_MoveNote_presult() throw() {}
+
+  bool* success;
+
+  _NoteInfo_MoveNote_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class NoteInfo_TrashNote_args {
+ public:
+
+  NoteInfo_TrashNote_args() : userid(), bookid(), noteid() {
+  }
+
+  virtual ~NoteInfo_TrashNote_args() throw() {}
+
+  std::string userid;
+  std::string bookid;
+  std::string noteid;
+
+  void __set_userid(const std::string& val) {
+    userid = val;
+  }
+
+  void __set_bookid(const std::string& val) {
+    bookid = val;
+  }
+
+  void __set_noteid(const std::string& val) {
+    noteid = val;
+  }
+
+  bool operator == (const NoteInfo_TrashNote_args & rhs) const
+  {
+    if (!(userid == rhs.userid))
+      return false;
+    if (!(bookid == rhs.bookid))
+      return false;
+    if (!(noteid == rhs.noteid))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_TrashNote_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_TrashNote_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_TrashNote_pargs {
+ public:
+
+
+  virtual ~NoteInfo_TrashNote_pargs() throw() {}
+
+  const std::string* userid;
+  const std::string* bookid;
+  const std::string* noteid;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_TrashNote_result__isset {
+  _NoteInfo_TrashNote_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_TrashNote_result__isset;
+
+class NoteInfo_TrashNote_result {
+ public:
+
+  NoteInfo_TrashNote_result() : success(0) {
+  }
+
+  virtual ~NoteInfo_TrashNote_result() throw() {}
+
+  bool success;
+
+  _NoteInfo_TrashNote_result__isset __isset;
+
+  void __set_success(const bool val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_TrashNote_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_TrashNote_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_TrashNote_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_TrashNote_presult__isset {
+  _NoteInfo_TrashNote_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_TrashNote_presult__isset;
+
+class NoteInfo_TrashNote_presult {
+ public:
+
+
+  virtual ~NoteInfo_TrashNote_presult() throw() {}
+
+  bool* success;
+
+  _NoteInfo_TrashNote_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class NoteInfo_RecoverNote_args {
+ public:
+
+  NoteInfo_RecoverNote_args() : userid(), noteid() {
+  }
+
+  virtual ~NoteInfo_RecoverNote_args() throw() {}
+
+  std::string userid;
+  std::string noteid;
+
+  void __set_userid(const std::string& val) {
+    userid = val;
+  }
+
+  void __set_noteid(const std::string& val) {
+    noteid = val;
+  }
+
+  bool operator == (const NoteInfo_RecoverNote_args & rhs) const
+  {
+    if (!(userid == rhs.userid))
+      return false;
+    if (!(noteid == rhs.noteid))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_RecoverNote_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_RecoverNote_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_RecoverNote_pargs {
+ public:
+
+
+  virtual ~NoteInfo_RecoverNote_pargs() throw() {}
+
+  const std::string* userid;
+  const std::string* noteid;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_RecoverNote_result__isset {
+  _NoteInfo_RecoverNote_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_RecoverNote_result__isset;
+
+class NoteInfo_RecoverNote_result {
+ public:
+
+  NoteInfo_RecoverNote_result() : success(0) {
+  }
+
+  virtual ~NoteInfo_RecoverNote_result() throw() {}
+
+  bool success;
+
+  _NoteInfo_RecoverNote_result__isset __isset;
+
+  void __set_success(const bool val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_RecoverNote_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_RecoverNote_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_RecoverNote_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_RecoverNote_presult__isset {
+  _NoteInfo_RecoverNote_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_RecoverNote_presult__isset;
+
+class NoteInfo_RecoverNote_presult {
+ public:
+
+
+  virtual ~NoteInfo_RecoverNote_presult() throw() {}
+
+  bool* success;
+
+  _NoteInfo_RecoverNote_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class NoteInfo_DeleteNote_args {
+ public:
+
+  NoteInfo_DeleteNote_args() : noteid() {
+  }
+
+  virtual ~NoteInfo_DeleteNote_args() throw() {}
+
+  std::string noteid;
+
+  void __set_noteid(const std::string& val) {
+    noteid = val;
+  }
+
+  bool operator == (const NoteInfo_DeleteNote_args & rhs) const
+  {
+    if (!(noteid == rhs.noteid))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_DeleteNote_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_DeleteNote_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_DeleteNote_pargs {
+ public:
+
+
+  virtual ~NoteInfo_DeleteNote_pargs() throw() {}
+
+  const std::string* noteid;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_DeleteNote_result__isset {
+  _NoteInfo_DeleteNote_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_DeleteNote_result__isset;
+
+class NoteInfo_DeleteNote_result {
+ public:
+
+  NoteInfo_DeleteNote_result() : success(0) {
+  }
+
+  virtual ~NoteInfo_DeleteNote_result() throw() {}
+
+  bool success;
+
+  _NoteInfo_DeleteNote_result__isset __isset;
+
+  void __set_success(const bool val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_DeleteNote_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_DeleteNote_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_DeleteNote_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_DeleteNote_presult__isset {
+  _NoteInfo_DeleteNote_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_DeleteNote_presult__isset;
+
+class NoteInfo_DeleteNote_presult {
+ public:
+
+
+  virtual ~NoteInfo_DeleteNote_presult() throw() {}
+
+  bool* success;
+
+  _NoteInfo_DeleteNote_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
 class NoteInfoClient : virtual public NoteInfoIf {
  public:
   NoteInfoClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) :
@@ -281,9 +1215,33 @@ class NoteInfoClient : virtual public NoteInfoIf {
   void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid);
   void send_GetNotebooks(const std::string& userid);
   void recv_GetNotebooks(std::vector<Notebook> & _return);
+  void NewNotebook(std::string& _return, const std::string& userid, const std::string& name);
+  void send_NewNotebook(const std::string& userid, const std::string& name);
+  void recv_NewNotebook(std::string& _return);
+  bool DeleteNotebook(const std::string& userid, const std::string& bookid);
+  void send_DeleteNotebook(const std::string& userid, const std::string& bookid);
+  bool recv_DeleteNotebook();
+  void NewNote(std::string& _return, const std::string& bookid, const std::string& title);
+  void send_NewNote(const std::string& bookid, const std::string& title);
+  void recv_NewNote(std::string& _return);
+  bool UpdateNote(const std::string& noteid, const std::string& title, const std::string& note);
+  void send_UpdateNote(const std::string& noteid, const std::string& title, const std::string& note);
+  bool recv_UpdateNote();
   void GetContent(std::string& _return, const std::string& noteid);
   void send_GetContent(const std::string& noteid);
   void recv_GetContent(std::string& _return);
+  bool MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid);
+  void send_MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid);
+  bool recv_MoveNote();
+  bool TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid);
+  void send_TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid);
+  bool recv_TrashNote();
+  bool RecoverNote(const std::string& userid, const std::string& noteid);
+  void send_RecoverNote(const std::string& userid, const std::string& noteid);
+  bool recv_RecoverNote();
+  bool DeleteNote(const std::string& noteid);
+  void send_DeleteNote(const std::string& noteid);
+  bool recv_DeleteNote();
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -300,12 +1258,28 @@ class NoteInfoProcessor : public ::apache::thrift::TDispatchProcessor {
   typedef std::map<std::string, ProcessFunction> ProcessMap;
   ProcessMap processMap_;
   void process_GetNotebooks(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_NewNotebook(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_DeleteNotebook(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_NewNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_UpdateNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_GetContent(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_MoveNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_TrashNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_RecoverNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_DeleteNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   NoteInfoProcessor(boost::shared_ptr<NoteInfoIf> iface) :
     iface_(iface) {
     processMap_["GetNotebooks"] = &NoteInfoProcessor::process_GetNotebooks;
+    processMap_["NewNotebook"] = &NoteInfoProcessor::process_NewNotebook;
+    processMap_["DeleteNotebook"] = &NoteInfoProcessor::process_DeleteNotebook;
+    processMap_["NewNote"] = &NoteInfoProcessor::process_NewNote;
+    processMap_["UpdateNote"] = &NoteInfoProcessor::process_UpdateNote;
     processMap_["GetContent"] = &NoteInfoProcessor::process_GetContent;
+    processMap_["MoveNote"] = &NoteInfoProcessor::process_MoveNote;
+    processMap_["TrashNote"] = &NoteInfoProcessor::process_TrashNote;
+    processMap_["RecoverNote"] = &NoteInfoProcessor::process_RecoverNote;
+    processMap_["DeleteNote"] = &NoteInfoProcessor::process_DeleteNote;
   }
 
   virtual ~NoteInfoProcessor() {}
@@ -344,6 +1318,44 @@ class NoteInfoMultiface : virtual public NoteInfoIf {
     return;
   }
 
+  void NewNotebook(std::string& _return, const std::string& userid, const std::string& name) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->NewNotebook(_return, userid, name);
+    }
+    ifaces_[i]->NewNotebook(_return, userid, name);
+    return;
+  }
+
+  bool DeleteNotebook(const std::string& userid, const std::string& bookid) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->DeleteNotebook(userid, bookid);
+    }
+    return ifaces_[i]->DeleteNotebook(userid, bookid);
+  }
+
+  void NewNote(std::string& _return, const std::string& bookid, const std::string& title) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->NewNote(_return, bookid, title);
+    }
+    ifaces_[i]->NewNote(_return, bookid, title);
+    return;
+  }
+
+  bool UpdateNote(const std::string& noteid, const std::string& title, const std::string& note) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->UpdateNote(noteid, title, note);
+    }
+    return ifaces_[i]->UpdateNote(noteid, title, note);
+  }
+
   void GetContent(std::string& _return, const std::string& noteid) {
     size_t sz = ifaces_.size();
     size_t i = 0;
@@ -352,6 +1364,42 @@ class NoteInfoMultiface : virtual public NoteInfoIf {
     }
     ifaces_[i]->GetContent(_return, noteid);
     return;
+  }
+
+  bool MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->MoveNote(noteid, src_bookid, dest_bookid);
+    }
+    return ifaces_[i]->MoveNote(noteid, src_bookid, dest_bookid);
+  }
+
+  bool TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->TrashNote(userid, bookid, noteid);
+    }
+    return ifaces_[i]->TrashNote(userid, bookid, noteid);
+  }
+
+  bool RecoverNote(const std::string& userid, const std::string& noteid) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->RecoverNote(userid, noteid);
+    }
+    return ifaces_[i]->RecoverNote(userid, noteid);
+  }
+
+  bool DeleteNote(const std::string& noteid) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->DeleteNote(noteid);
+    }
+    return ifaces_[i]->DeleteNote(noteid);
   }
 
 };

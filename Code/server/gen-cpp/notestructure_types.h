@@ -23,10 +23,10 @@ typedef int64_t Timestamp;
 class Note {
  public:
 
-  static const char* ascii_fingerprint; // = "F37A6A5626A4C188CBD18204A08A1B7C";
-  static const uint8_t binary_fingerprint[16]; // = {0xF3,0x7A,0x6A,0x56,0x26,0xA4,0xC1,0x88,0xCB,0xD1,0x82,0x04,0xA0,0x8A,0x1B,0x7C};
+  static const char* ascii_fingerprint; // = "0FE07E98F8DCAA5C4CAAD9CDCED5F067";
+  static const uint8_t binary_fingerprint[16]; // = {0x0F,0xE0,0x7E,0x98,0xF8,0xDC,0xAA,0x5C,0x4C,0xAA,0xD9,0xCD,0xCE,0xD5,0xF0,0x67};
 
-  Note() : id(), title(), text_abbre(), notebook_id(), creater_id(), create_time(0), modify_time(0) {
+  Note() : id(), title(), text_abbre(), creater_id(), create_time(0), modify_time(0), share(0) {
   }
 
   virtual ~Note() throw() {}
@@ -34,11 +34,10 @@ class Note {
   std::string id;
   std::string title;
   std::string text_abbre;
-  std::string notebook_id;
   std::string creater_id;
-  std::vector<std::string>  owners;
   Timestamp create_time;
   Timestamp modify_time;
+  bool share;
 
   void __set_id(const std::string& val) {
     id = val;
@@ -52,16 +51,8 @@ class Note {
     text_abbre = val;
   }
 
-  void __set_notebook_id(const std::string& val) {
-    notebook_id = val;
-  }
-
   void __set_creater_id(const std::string& val) {
     creater_id = val;
-  }
-
-  void __set_owners(const std::vector<std::string> & val) {
-    owners = val;
   }
 
   void __set_create_time(const Timestamp val) {
@@ -72,6 +63,10 @@ class Note {
     modify_time = val;
   }
 
+  void __set_share(const bool val) {
+    share = val;
+  }
+
   bool operator == (const Note & rhs) const
   {
     if (!(id == rhs.id))
@@ -80,15 +75,13 @@ class Note {
       return false;
     if (!(text_abbre == rhs.text_abbre))
       return false;
-    if (!(notebook_id == rhs.notebook_id))
-      return false;
     if (!(creater_id == rhs.creater_id))
-      return false;
-    if (!(owners == rhs.owners))
       return false;
     if (!(create_time == rhs.create_time))
       return false;
     if (!(modify_time == rhs.modify_time))
+      return false;
+    if (!(share == rhs.share))
       return false;
     return true;
   }
@@ -109,10 +102,10 @@ void swap(Note &a, Note &b);
 class Notebook {
  public:
 
-  static const char* ascii_fingerprint; // = "B094AAFC6CD67AB534096E80EAB7D14C";
-  static const uint8_t binary_fingerprint[16]; // = {0xB0,0x94,0xAA,0xFC,0x6C,0xD6,0x7A,0xB5,0x34,0x09,0x6E,0x80,0xEA,0xB7,0xD1,0x4C};
+  static const char* ascii_fingerprint; // = "422405715F4FD702966E81371B63B490";
+  static const uint8_t binary_fingerprint[16]; // = {0x42,0x24,0x05,0x71,0x5F,0x4F,0xD7,0x02,0x96,0x6E,0x81,0x37,0x1B,0x63,0xB4,0x90};
 
-  Notebook() : id(), name(), create_time(0), modify_time(0), creater() {
+  Notebook() : id(), name(), create_time(0), modify_time(0), creater_id(), share(0) {
   }
 
   virtual ~Notebook() throw() {}
@@ -122,8 +115,8 @@ class Notebook {
   std::string name;
   Timestamp create_time;
   Timestamp modify_time;
-  std::string creater;
-  std::vector<std::string>  owners;
+  std::string creater_id;
+  bool share;
 
   void __set_id(const std::string& val) {
     id = val;
@@ -145,12 +138,12 @@ class Notebook {
     modify_time = val;
   }
 
-  void __set_creater(const std::string& val) {
-    creater = val;
+  void __set_creater_id(const std::string& val) {
+    creater_id = val;
   }
 
-  void __set_owners(const std::vector<std::string> & val) {
-    owners = val;
+  void __set_share(const bool val) {
+    share = val;
   }
 
   bool operator == (const Notebook & rhs) const
@@ -165,9 +158,9 @@ class Notebook {
       return false;
     if (!(modify_time == rhs.modify_time))
       return false;
-    if (!(creater == rhs.creater))
+    if (!(creater_id == rhs.creater_id))
       return false;
-    if (!(owners == rhs.owners))
+    if (!(share == rhs.share))
       return false;
     return true;
   }

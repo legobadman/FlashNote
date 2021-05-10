@@ -25,9 +25,49 @@ class NoteInfoHandler : virtual public NoteInfoIf {
     printf("GetNotebooks\n");
   }
 
+  void NewNotebook(std::string& _return, const std::string& userid, const std::string& name) {
+    // Your implementation goes here
+    printf("NewNotebook\n");
+  }
+
+  bool DeleteNotebook(const std::string& userid, const std::string& bookid) {
+    // Your implementation goes here
+    printf("DeleteNotebook\n");
+  }
+
+  void NewNote(std::string& _return, const std::string& bookid, const std::string& title) {
+    // Your implementation goes here
+    printf("NewNote\n");
+  }
+
+  bool UpdateNote(const std::string& noteid, const std::string& title, const std::string& note) {
+    // Your implementation goes here
+    printf("UpdateNote\n");
+  }
+
   void GetContent(std::string& _return, const std::string& noteid) {
     // Your implementation goes here
     printf("GetContent\n");
+  }
+
+  bool MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid) {
+    // Your implementation goes here
+    printf("MoveNote\n");
+  }
+
+  bool TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid) {
+    // Your implementation goes here
+    printf("TrashNote\n");
+  }
+
+  bool RecoverNote(const std::string& userid, const std::string& noteid) {
+    // Your implementation goes here
+    printf("RecoverNote\n");
+  }
+
+  bool DeleteNote(const std::string& noteid) {
+    // Your implementation goes here
+    printf("DeleteNote\n");
   }
 
 };

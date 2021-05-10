@@ -10,8 +10,8 @@
 
 
 
-const char* Note::ascii_fingerprint = "F37A6A5626A4C188CBD18204A08A1B7C";
-const uint8_t Note::binary_fingerprint[16] = {0xF3,0x7A,0x6A,0x56,0x26,0xA4,0xC1,0x88,0xCB,0xD1,0x82,0x04,0xA0,0x8A,0x1B,0x7C};
+const char* Note::ascii_fingerprint = "0FE07E98F8DCAA5C4CAAD9CDCED5F067";
+const uint8_t Note::binary_fingerprint[16] = {0x0F,0xE0,0x7E,0x98,0xF8,0xDC,0xAA,0x5C,0x4C,0xAA,0xD9,0xCD,0xCE,0xD5,0xF0,0x67};
 
 uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
 
@@ -27,11 +27,10 @@ uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
   bool isset_id = false;
   bool isset_title = false;
   bool isset_text_abbre = false;
-  bool isset_notebook_id = false;
   bool isset_creater_id = false;
-  bool isset_owners = false;
   bool isset_create_time = false;
   bool isset_modify_time = false;
+  bool isset_share = false;
 
   while (true)
   {
@@ -67,41 +66,13 @@ uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
         break;
       case 4:
         if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->notebook_id);
-          isset_notebook_id = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 5:
-        if (ftype == ::apache::thrift::protocol::T_STRING) {
           xfer += iprot->readString(this->creater_id);
           isset_creater_id = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
-      case 6:
-        if (ftype == ::apache::thrift::protocol::T_LIST) {
-          {
-            this->owners.clear();
-            uint32_t _size0;
-            ::apache::thrift::protocol::TType _etype3;
-            xfer += iprot->readListBegin(_etype3, _size0);
-            this->owners.resize(_size0);
-            uint32_t _i4;
-            for (_i4 = 0; _i4 < _size0; ++_i4)
-            {
-              xfer += iprot->readString(this->owners[_i4]);
-            }
-            xfer += iprot->readListEnd();
-          }
-          isset_owners = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      case 7:
+      case 5:
         if (ftype == ::apache::thrift::protocol::T_I64) {
           xfer += iprot->readI64(this->create_time);
           isset_create_time = true;
@@ -109,10 +80,18 @@ uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
-      case 8:
+      case 6:
         if (ftype == ::apache::thrift::protocol::T_I64) {
           xfer += iprot->readI64(this->modify_time);
           isset_modify_time = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 7:
+        if (ftype == ::apache::thrift::protocol::T_BOOL) {
+          xfer += iprot->readBool(this->share);
+          isset_share = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -132,15 +111,13 @@ uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_text_abbre)
     throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_notebook_id)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_creater_id)
-    throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_owners)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_create_time)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_modify_time)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_share)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -161,32 +138,20 @@ uint32_t Note::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeString(this->text_abbre);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("notebook_id", ::apache::thrift::protocol::T_STRING, 4);
-  xfer += oprot->writeString(this->notebook_id);
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("creater_id", ::apache::thrift::protocol::T_STRING, 5);
+  xfer += oprot->writeFieldBegin("creater_id", ::apache::thrift::protocol::T_STRING, 4);
   xfer += oprot->writeString(this->creater_id);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("owners", ::apache::thrift::protocol::T_LIST, 6);
-  {
-    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->owners.size()));
-    std::vector<std::string> ::const_iterator _iter5;
-    for (_iter5 = this->owners.begin(); _iter5 != this->owners.end(); ++_iter5)
-    {
-      xfer += oprot->writeString((*_iter5));
-    }
-    xfer += oprot->writeListEnd();
-  }
-  xfer += oprot->writeFieldEnd();
-
-  xfer += oprot->writeFieldBegin("create_time", ::apache::thrift::protocol::T_I64, 7);
+  xfer += oprot->writeFieldBegin("create_time", ::apache::thrift::protocol::T_I64, 5);
   xfer += oprot->writeI64(this->create_time);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("modify_time", ::apache::thrift::protocol::T_I64, 8);
+  xfer += oprot->writeFieldBegin("modify_time", ::apache::thrift::protocol::T_I64, 6);
   xfer += oprot->writeI64(this->modify_time);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("share", ::apache::thrift::protocol::T_BOOL, 7);
+  xfer += oprot->writeBool(this->share);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -199,15 +164,14 @@ void swap(Note &a, Note &b) {
   swap(a.id, b.id);
   swap(a.title, b.title);
   swap(a.text_abbre, b.text_abbre);
-  swap(a.notebook_id, b.notebook_id);
   swap(a.creater_id, b.creater_id);
-  swap(a.owners, b.owners);
   swap(a.create_time, b.create_time);
   swap(a.modify_time, b.modify_time);
+  swap(a.share, b.share);
 }
 
-const char* Notebook::ascii_fingerprint = "B094AAFC6CD67AB534096E80EAB7D14C";
-const uint8_t Notebook::binary_fingerprint[16] = {0xB0,0x94,0xAA,0xFC,0x6C,0xD6,0x7A,0xB5,0x34,0x09,0x6E,0x80,0xEA,0xB7,0xD1,0x4C};
+const char* Notebook::ascii_fingerprint = "422405715F4FD702966E81371B63B490";
+const uint8_t Notebook::binary_fingerprint[16] = {0x42,0x24,0x05,0x71,0x5F,0x4F,0xD7,0x02,0x96,0x6E,0x81,0x37,0x1B,0x63,0xB4,0x90};
 
 uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
 
@@ -225,8 +189,8 @@ uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
   bool isset_name = false;
   bool isset_create_time = false;
   bool isset_modify_time = false;
-  bool isset_creater = false;
-  bool isset_owners = false;
+  bool isset_creater_id = false;
+  bool isset_share = false;
 
   while (true)
   {
@@ -248,14 +212,14 @@ uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->notes.clear();
-            uint32_t _size6;
-            ::apache::thrift::protocol::TType _etype9;
-            xfer += iprot->readListBegin(_etype9, _size6);
-            this->notes.resize(_size6);
-            uint32_t _i10;
-            for (_i10 = 0; _i10 < _size6; ++_i10)
+            uint32_t _size0;
+            ::apache::thrift::protocol::TType _etype3;
+            xfer += iprot->readListBegin(_etype3, _size0);
+            this->notes.resize(_size0);
+            uint32_t _i4;
+            for (_i4 = 0; _i4 < _size0; ++_i4)
             {
-              xfer += this->notes[_i10].read(iprot);
+              xfer += this->notes[_i4].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -290,28 +254,16 @@ uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
         break;
       case 6:
         if (ftype == ::apache::thrift::protocol::T_STRING) {
-          xfer += iprot->readString(this->creater);
-          isset_creater = true;
+          xfer += iprot->readString(this->creater_id);
+          isset_creater_id = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
       case 7:
-        if (ftype == ::apache::thrift::protocol::T_LIST) {
-          {
-            this->owners.clear();
-            uint32_t _size11;
-            ::apache::thrift::protocol::TType _etype14;
-            xfer += iprot->readListBegin(_etype14, _size11);
-            this->owners.resize(_size11);
-            uint32_t _i15;
-            for (_i15 = 0; _i15 < _size11; ++_i15)
-            {
-              xfer += iprot->readString(this->owners[_i15]);
-            }
-            xfer += iprot->readListEnd();
-          }
-          isset_owners = true;
+        if (ftype == ::apache::thrift::protocol::T_BOOL) {
+          xfer += iprot->readBool(this->share);
+          isset_share = true;
         } else {
           xfer += iprot->skip(ftype);
         }
@@ -335,9 +287,9 @@ uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_modify_time)
     throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_creater)
+  if (!isset_creater_id)
     throw TProtocolException(TProtocolException::INVALID_DATA);
-  if (!isset_owners)
+  if (!isset_share)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -353,10 +305,10 @@ uint32_t Notebook::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeFieldBegin("notes", ::apache::thrift::protocol::T_LIST, 2);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->notes.size()));
-    std::vector<Note> ::const_iterator _iter16;
-    for (_iter16 = this->notes.begin(); _iter16 != this->notes.end(); ++_iter16)
+    std::vector<Note> ::const_iterator _iter5;
+    for (_iter5 = this->notes.begin(); _iter5 != this->notes.end(); ++_iter5)
     {
-      xfer += (*_iter16).write(oprot);
+      xfer += (*_iter5).write(oprot);
     }
     xfer += oprot->writeListEnd();
   }
@@ -374,20 +326,12 @@ uint32_t Notebook::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeI64(this->modify_time);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("creater", ::apache::thrift::protocol::T_STRING, 6);
-  xfer += oprot->writeString(this->creater);
+  xfer += oprot->writeFieldBegin("creater_id", ::apache::thrift::protocol::T_STRING, 6);
+  xfer += oprot->writeString(this->creater_id);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("owners", ::apache::thrift::protocol::T_LIST, 7);
-  {
-    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRING, static_cast<uint32_t>(this->owners.size()));
-    std::vector<std::string> ::const_iterator _iter17;
-    for (_iter17 = this->owners.begin(); _iter17 != this->owners.end(); ++_iter17)
-    {
-      xfer += oprot->writeString((*_iter17));
-    }
-    xfer += oprot->writeListEnd();
-  }
+  xfer += oprot->writeFieldBegin("share", ::apache::thrift::protocol::T_BOOL, 7);
+  xfer += oprot->writeBool(this->share);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -402,8 +346,8 @@ void swap(Notebook &a, Notebook &b) {
   swap(a.name, b.name);
   swap(a.create_time, b.create_time);
   swap(a.modify_time, b.modify_time);
-  swap(a.creater, b.creater);
-  swap(a.owners, b.owners);
+  swap(a.creater_id, b.creater_id);
+  swap(a.share, b.share);
 }
 
 
