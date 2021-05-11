@@ -373,6 +373,7 @@ public:
 		else
 		{
 			std::cout << "Notebook (id=" << bookid << ") has no note with id = " << noteid << std::endl;
+			return false;
 		}
 
 		//2. 生成Trash记录
@@ -387,12 +388,13 @@ public:
 		if (retVal)
 		{
 			std::cout << "note(id=" << noteid << ") has been inserted into trash" << std::endl;
+			return true;
 		}
 		else
 		{
 			std::cout << "trash record insert failed" << std::endl;
+			return false;
 		}
-		printf("TrashNote\n");
 	}
 
 	bool RecoverNote(const std::string& userid, const std::string& noteid)
@@ -507,7 +509,7 @@ public:
 		if (sz == 0)
 		{
 			//从notes删除该笔记
-			delete_result = trash_conn.delete_one(document{} << "note_id"
+			delete_result = notes.delete_one(document{} << "_id"
 				<< TO_BSON_OID(noteid) << finalize);
 			if (!delete_result)
 			{
