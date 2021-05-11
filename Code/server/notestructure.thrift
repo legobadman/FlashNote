@@ -65,6 +65,6 @@ service NoteInfo {
 	// 将userid的废纸篓中的noteid笔记恢复。
 	bool RecoverNote(1:required string userid, 2:required string noteid);
 
-	// 将noteid的笔记彻底销毁，但不需要立即移除包含该noteid的笔记本。（可以惰性销毁）
-	bool DeleteNote(1:required string noteid);
+	// 将某用户废纸篓下的noteid的笔记彻底销毁。
+	bool DeleteNote(1:required string userid, 2:required string noteid);
 }

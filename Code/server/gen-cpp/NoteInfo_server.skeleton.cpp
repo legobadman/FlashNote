@@ -65,7 +65,7 @@ class NoteInfoHandler : virtual public NoteInfoIf {
     printf("RecoverNote\n");
   }
 
-  bool DeleteNote(const std::string& noteid) {
+  bool DeleteNote(const std::string& userid, const std::string& noteid) {
     // Your implementation goes here
     printf("DeleteNote\n");
   }

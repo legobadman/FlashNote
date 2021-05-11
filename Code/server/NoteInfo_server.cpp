@@ -16,6 +16,7 @@ using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
 using namespace ::apache::thrift::transport;
 using namespace ::apache::thrift::server;
+using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::document;
 using bsoncxx::builder::stream::open_document;
@@ -24,6 +25,9 @@ using boost::shared_ptr;
 
 mongocxx::instance inst{};
 mongocxx::client conn{ mongocxx::uri{} };
+
+#define TO_BSON_OID(strid) bsoncxx::oid{ bsoncxx::stdx::string_view{strid} }
+#define BSON_NOW() bsoncxx::types::b_date{ std::chrono::system_clock::now() }
 
 class NoteInfoHandler : virtual public NoteInfoIf
 {
@@ -34,13 +38,12 @@ public:
 
 	void GetNotebooks(std::vector<Notebook>& _return, const std::string& userid)
 	{
-		// Your implementation goes here
 		mongocxx::collection users = conn["flashnote"]["user"];
 		auto notebooks = conn["flashnote"]["notebooks"];
 		auto note_coll = conn["flashnote"]["notes"];
 		
 		bsoncxx::stdx::optional<bsoncxx::document::value> user_result =
-			users.find_one(document{} << "_id" << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} } << finalize);
+			users.find_one(document{} << "_id" << TO_BSON_OID(userid) << finalize);
 		if (user_result)
 		{
 			bsoncxx::document::view userview = user_result->view();
@@ -56,7 +59,7 @@ public:
 				std::string bookid = elem.get_oid().value.to_string();
 
 				bsoncxx::stdx::optional<bsoncxx::document::value> book_result =
-					notebooks.find_one(document{} << "_id" << bsoncxx::oid{ bsoncxx::stdx::string_view{bookid} } << finalize); 
+					notebooks.find_one(document{} << "_id" << TO_BSON_OID(bookid) << finalize); 
 				if (book_result)
 				{
 					bsoncxx::document::view bookview = book_result->view();
@@ -77,7 +80,7 @@ public:
 						bsoncxx::stdx::optional<bsoncxx::document::value> note_result = 
 							note_coll.find_one(document{}
 								<< "_id"
-								<< bsoncxx::oid{ bsoncxx::stdx::string_view{noteid} }
+								<< TO_BSON_OID(noteid)
 								<< finalize);
 						if (note_result)
 						{
@@ -117,7 +120,7 @@ public:
 
 		// 要先检查userid的合法性
 		bsoncxx::stdx::optional<bsoncxx::document::value> maybe_result =
-			users.find_one(document{} << "_id" << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} } << finalize);
+			users.find_one(document{} << "_id" << TO_BSON_OID(userid) << finalize);
 		if (!maybe_result)
 		{
 			std::cout << "invalid user id: " << userid << std::endl;
@@ -136,17 +139,14 @@ public:
 			}
 		}
 
-		bsoncxx::types::b_oid oId;
-		oId.value = bsoncxx::oid(userid.c_str(), 12);
-
 		// 2.先创建一个notebook
 		const bsoncxx::document::value& notebook = bsoncxx::builder::basic::make_document(
 			bsoncxx::builder::basic::kvp("create_time", bsoncxx::types::b_date{ std::chrono::system_clock::now() }),
 			bsoncxx::builder::basic::kvp("modify_time", bsoncxx::types::b_date{ std::chrono::system_clock::now() }),
 			bsoncxx::builder::basic::kvp("name", name),
-			bsoncxx::builder::basic::kvp("creater", oId),
+			bsoncxx::builder::basic::kvp("creater", TO_BSON_OID(userid)),
 			bsoncxx::builder::basic::kvp("owners", [=](bsoncxx::builder::basic::sub_array subarr){
-					subarr.append(userid);
+					subarr.append(TO_BSON_OID(userid));
 				}),
 			bsoncxx::builder::basic::kvp("notes", bsoncxx::types::b_array()));				
 
@@ -158,9 +158,9 @@ public:
 			newbookid = oid.to_string();
 
 			// 3.将notebook加入用户列表。
-			auto update_result = users.update_one(document{} << "_id" << bsoncxx::oid{ bsoncxx::stdx::string_view{userid} } << finalize,
+			auto update_result = users.update_one(document{} << "_id" << TO_BSON_OID(userid) << finalize,
 					document{} << "$addToSet" << open_document <<
-				   	"notebooks" << bsoncxx::oid{ bsoncxx::stdx::string_view{newbookid} } << close_document << finalize);
+				   	"notebooks" << TO_BSON_OID(newbookid) << close_document << finalize);
 			if (update_result)
 			{
 				std::cout << "notebook has been appended to the user" << std::endl;
@@ -170,49 +170,389 @@ public:
 
 	bool DeleteNotebook(const std::string& userid, const std::string& bookid)
 	{
-		// Your implementation goes here
+		// 取出bookid所指定的book的owners，观察是否只有userid，若是，可视为
+		// 非共享book，然后检索user，从notebooks中删除bookid。
+		// 然后将bookid下所有note，移入Trash
+		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
+		mongocxx::collection notes = conn["flashnote"]["notes"];
+		mongocxx::collection users = conn["flashnote"]["user"];
+
+		//合法性检查
+		auto user_result = users.find_one(document{} << "_id" << TO_BSON_OID(userid) << finalize);
+		if (!user_result)
+		{
+			std::cout << "no user with user-id = " << userid << std::endl;
+			return false;
+		}
+
+		auto book_result = notebooks.find_one(document{} << "_id" << TO_BSON_OID(bookid) << finalize);
+		if (!book_result)
+		{
+			std::cout << "no user with user-id = " << userid << std::endl;
+			return false;
+		}
+
+		//notebook删除userid的owner
+		auto update_result = notebooks.update_one(
+			document{} << "_id" << TO_BSON_OID(bookid) << finalize,
+			document{} << "$pull" << open_document <<
+			"owners" << TO_BSON_OID(userid) << close_document << finalize);
+		if (!update_result)
+		{
+			std::cout << "notebook (id=" << bookid << ") has no owner called " <<
+				userid << std::endl;
+			return false;
+		}
+
+		//user移除该notebook
+		update_result = users.update_one(
+			document{} << "_id" << TO_BSON_OID(userid) << finalize,
+			document{} << "$pull" << open_document <<
+			"notebooks" << TO_BSON_OID(bookid) << close_document << finalize);
+		if (!update_result)
+		{
+			std::cout << "user (id=" << userid << ") has no notebook called " <<
+				bookid << std::endl;
+			return false;
+		}
+
+		//再取一次notebook，观察是否还有其他owner
+		book_result = notebooks.find_one(document{} << "_id" << TO_BSON_OID(bookid) << finalize);
+		bsoncxx::document::view bookview = book_result->view();
+		auto owners_view = bookview.find("owners");
+		if (owners_view == bookview.end())
+		{
+			std::cout << "no owners key in notebook(id = " << bookid << std::endl;
+			return false;
+		}
+
+		bsoncxx::array::view av = bookview["owners"].get_array().value;
+		int sz = std::distance(av.begin(), av.end());
+		if (sz == 0)
+		{
+			//只有一个owner且被删除的笔记本，就不视为共享笔记本
+			//此时需要trash掉所有的note。
+			auto notes_view = bookview.find("notes");
+			bsoncxx::array::view av = notes_view->get_array().value;
+			for (auto iter = av.begin(); iter != av.end(); iter++)
+			{
+				bsoncxx::array::element elem(*iter);
+				std::string noteid = elem.get_oid().value.to_string();
+				bool bRet = TrashNote(userid, bookid, noteid);
+				if (!bRet)
+				{
+					std::cout << "note (id=" << noteid << ") trash failed" <<
+						std::endl;
+				}
+			}
+		}
 		printf("DeleteNotebook\n");
 	}
 
-	void NewNote(std::string& _return, const std::string& bookid, const std::string& title)
+	void NewNote(std::string& newnoteid, const std::string& userid, const std::string& bookid, const std::string& title)
 	{
-		// Your implementation goes here
-		printf("NewNote\n");
+		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
+		mongocxx::collection notes = conn["flashnote"]["notes"];
+		mongocxx::collection users = conn["flashnote"]["user"];
+
+		//合法性检查
+		auto user_result = users.find_one(document{} << "_id" << TO_BSON_OID(userid) << finalize);
+		if (!user_result)
+		{
+			std::cout << "no user with user-id = " << userid << std::endl;
+			return;
+		}
+
+		auto book_result = notebooks.find_one(document{} << "_id" << TO_BSON_OID(bookid) << finalize);
+		if (!book_result)
+		{
+			std::cout << "no user with user-id = " << userid << std::endl;
+			return;
+		}
+
+		const bsoncxx::document::value& note = bsoncxx::builder::basic::make_document(
+			kvp("creater", TO_BSON_OID(userid)),
+			kvp("owners", [=](bsoncxx::builder::basic::sub_array subarr) {
+				subarr.append(TO_BSON_OID(userid));
+				}),
+			kvp("create_time", BSON_NOW()),
+			kvp("modify_time", BSON_NOW()),
+			kvp("title", title),
+			kvp("content", ""));
+
+		auto retVal = notes.insert_one(note.view());
+		if (retVal)
+		{
+			bsoncxx::oid oid = retVal->inserted_id().get_oid().value;
+			newnoteid = oid.to_string();
+			std::cout << "new note has been inserted into notes" << std::endl;
+
+			auto update_result = notebooks.update_one(
+				document{} << "_id" << TO_BSON_OID(bookid) << finalize,
+				document{} << "$addToSet" << open_document <<
+				"notes" << TO_BSON_OID(newnoteid) << close_document << finalize
+			);
+			if (update_result)
+			{
+				std::cout << newnoteid << " has been inserted into notebook." << std::endl;
+			}
+			else
+			{
+				std::cout << "note cannot insert into the notebook" << std::endl;
+				newnoteid = "";
+			}
+		}
+		else
+		{
+			std::cout << "NewNote insert_one failed" << std::endl;
+		}
 	}
 
-	bool UpdateNote(const std::string& noteid, const std::string& title, const std::string& note)
+	bool UpdateNote(const std::string& noteid, const std::string& title, const std::string& content)
 	{
-		// Your implementation goes here
-		printf("UpdateNote\n");
+		mongocxx::collection notes = conn["flashnote"]["notes"];
+		auto note_result = notes.find_one(document{} << "_id" << TO_BSON_OID(noteid) << finalize);
+		if (!note_result)
+		{
+			std::cout << "no note with note-id = " << noteid << std::endl;
+			return false;
+		}
+
+		auto update_result = notes.update_one(
+			document{} << "_id" << TO_BSON_OID(noteid) << finalize,
+			document{} << "$set" << open_document <<
+			"title" << title << 
+			"content" << content <<
+			close_document << finalize);
+		if (update_result)
+		{
+			std::cout << "note id = " << noteid << " has been updated" << std::endl;
+			return true;
+		}
+		else
+		{
+			std::cout << "note id = " << noteid << " updated failed" << std::endl;
+		}
+		return false;
 	}
 
-	void GetContent(std::string& _return, const std::string& noteid)
+	void GetContent(std::string& content, const std::string& noteid)
 	{
+		mongocxx::collection notes = conn["flashnote"]["notes"];
+		auto note_result = notes.find_one(document{} << "_id" << TO_BSON_OID(noteid) << finalize);
+		if (!note_result)
+		{
+			std::cout << "no note with note-id = " << noteid << std::endl;
+			return;
+		}
+		bsoncxx::document::view noteview = note_result->view();
+		content = noteview["content"].get_utf8().value.to_string();
 		printf("GetContent\n");
 	}
 
 	bool MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid)
 	{
-		// Your implementation goes here
-		printf("MoveNote\n");
+		// TODO
 	}
 
 	bool TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid)
 	{
-		// Your implementation goes here
+		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
+		mongocxx::collection users = conn["flashnote"]["user"];
+		mongocxx::collection trash_conn = conn["flashnote"]["trash"];
+
+		//1. notebooks先去掉noteid
+		auto update_result = notebooks.update_one(
+			document{} << "_id" << TO_BSON_OID(bookid) << finalize,
+			document{} << "$pull" << open_document <<
+			"notes" << TO_BSON_OID(noteid) << close_document << finalize);
+		if (update_result)
+		{
+			std::cout << bookid << "has been removed by notebook collection" << std::endl;
+		}
+		else
+		{
+			std::cout << "Notebook (id=" << bookid << ") has no note with id = " << noteid << std::endl;
+		}
+
+		//2. 生成Trash记录
+		const bsoncxx::document::value& trash = bsoncxx::builder::basic::make_document(
+			kvp("trash_time", bsoncxx::types::b_date{ std::chrono::system_clock::now() }),
+			kvp("user_id", TO_BSON_OID(userid)),
+			kvp("srcbook_id", TO_BSON_OID(bookid)),
+			kvp("note_id", TO_BSON_OID(noteid))
+			);
+
+		auto retVal = trash_conn.insert_one(trash.view());
+		if (retVal)
+		{
+			std::cout << "note(id=" << noteid << ") has been inserted into trash" << std::endl;
+		}
+		else
+		{
+			std::cout << "trash record insert failed" << std::endl;
+		}
 		printf("TrashNote\n");
 	}
 
 	bool RecoverNote(const std::string& userid, const std::string& noteid)
 	{
-		// Your implementation goes here
-		printf("RecoverNote\n");
+		mongocxx::collection users = conn["flashnote"]["user"];
+		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
+		mongocxx::collection notes = conn["flashnote"]["notes"];
+		mongocxx::collection trash_conn = conn["flashnote"]["trash"];
+
+		auto note_result = notes.find_one(document{} << "_id" << TO_BSON_OID(noteid) << finalize);
+		if (!note_result)
+		{
+			std::cout << "no note with note-id = " << noteid << std::endl;
+			return false;
+		}
+
+		auto user_result = users.find_one(document{} << "_id" << TO_BSON_OID(userid) << finalize);
+		if (!user_result)
+		{
+			std::cout << "no user with user-id = " << userid << std::endl;
+			return false;
+		}
+
+		auto trash_record = trash_conn.find_one(
+			document{}
+			<< "user_id" << TO_BSON_OID(userid)
+			<< "note_id" << TO_BSON_OID(noteid)
+			<< finalize
+		);
+		if (!trash_record)
+		{
+			std::cout << "error: There is no trash record " << std::endl;
+			return false;
+		}
+
+		bsoncxx::document::view trashview = trash_record->view();
+		bsoncxx::types::b_oid trashid = trashview["_id"].get_oid();
+		bsoncxx::types::b_oid bookOid = trashview["srcbook_id"].get_oid();
+		//检查bookOid的合法性
+		auto book_result = notebooks.find_one(document{} << "_id" << bookOid.value << finalize);
+		if (book_result)
+		{
+			//从trash中移除该记录。
+			auto delete_result = trash_conn.delete_one(document{} << "_id" << trashid.value << finalize);
+			if (!delete_result)
+			{
+				std::cout << "Transh id = " << trashid.value.to_string() << std::endl;
+				return false;
+			}
+			std::cout << "Trash record has been removed" << std::endl;
+			//将该note重新添加到notebook
+			return AddNoteToBook(bookOid.value.to_string(), noteid);
+		}
+		else
+		{
+			std::cout << "The book (id=" << bookOid.value.to_string()
+				<< "in trash is not valid" << std::endl;
+		}
+		return false;
 	}
 
-	bool DeleteNote(const std::string& noteid)
+	bool DeleteNote(const std::string& userid, const std::string& noteid)
 	{
 		// Your implementation goes here
+		// 从废纸篓彻底删除此笔记，类似删除笔记本，需要观察持有者的个数。
+		std::cout << "Hello?" << std::endl;
+		
+		mongocxx::collection notes = conn["flashnote"]["notes"];
+		mongocxx::collection trash_conn = conn["flashnote"]["trash"];
+
+		auto note_result = notes.find_one(document{} << "_id" << TO_BSON_OID(noteid) << finalize);
+		if (!note_result)
+		{
+			std::cout << "no note with note-id = " << noteid << std::endl;
+			return false;
+		}
+
+		//note owners移除当前用户
+		auto update_result = notes.update_one(
+			document{} << "_id" << TO_BSON_OID(noteid) << finalize,
+			document{} << "$pull" << open_document <<
+			"owners" << TO_BSON_OID(userid) << close_document << finalize);
+		if (!update_result)
+		{
+			std::cout << "note (id=" << noteid << ") has no owner called " << userid << std::endl;
+			return false;
+		}
+
+		//先从用户trash删除该记录。
+		auto delete_result = trash_conn.delete_one(
+			document{} << "user_id" << TO_BSON_OID(userid) <<
+				"note_id" << TO_BSON_OID(noteid) << finalize);
+		if (!delete_result)
+		{
+			std::cout << "note(id = " << noteid << ") not in trash" << std::endl;
+			return false;
+		}
+
+		//观察是否还有其他owners
+		note_result = notes.find_one(document{} << "_id" << TO_BSON_OID(noteid) << finalize);
+		bsoncxx::document::view note_view = note_result->view();
+
+		auto owners_view = note_view.find("owners");
+		if (owners_view == note_view.end())
+		{
+			std::cout << "no owners key in note(id = " << noteid << std::endl;
+			return false;
+		}
+
+		bsoncxx::array::view av = note_view["owners"].get_array().value;
+		int sz = std::distance(av.begin(), av.end());
+		if (sz == 0)
+		{
+			//从notes删除该笔记
+			delete_result = trash_conn.delete_one(document{} << "note_id"
+				<< TO_BSON_OID(noteid) << finalize);
+			if (!delete_result)
+			{
+				std::cout << "Delete failed from notes (id = " << noteid << ")" << std::endl;
+			}
+		}
 		printf("DeleteNote\n");
+	}
+
+private:
+	bool AddNoteToBook(const std::string& bookid, const std::string& noteid)
+	{
+		//不能外部调用，因为笔记不能在同一用户不同笔记本共享。
+		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
+		mongocxx::collection notes = conn["flashnote"]["notes"];
+
+		auto note_result = notes.find_one(document{} << "_id" << TO_BSON_OID(noteid) << finalize);
+		if (!note_result)
+		{
+			std::cout << "no note with note-id = " << noteid << std::endl;
+			return false;
+		}
+
+		auto book_result = notebooks.find_one(document{} << "_id" << TO_BSON_OID(bookid) << finalize);
+		if (!book_result)
+		{
+			std::cout << "no notebook with id = " << bookid << std::endl;
+			return false;
+		}
+
+		auto update_result = notebooks.update_one(
+			document{} << "_id" << TO_BSON_OID(bookid) << finalize,
+			document{} << "$addToSet" << open_document <<
+			"notes" << TO_BSON_OID(noteid) << close_document << finalize
+		);
+		if (update_result)
+		{
+			std::cout << noteid << " has been inserted into notebook." << std::endl;
+			return true;
+		}
+		else
+		{
+			std::cout << noteid << " has not been inserted into notebook." << std::endl;
+			return false;
+		}
 	}
 };
 

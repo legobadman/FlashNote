@@ -24,7 +24,7 @@ class NoteInfoIf {
   virtual bool MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid) = 0;
   virtual bool TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid) = 0;
   virtual bool RecoverNote(const std::string& userid, const std::string& noteid) = 0;
-  virtual bool DeleteNote(const std::string& noteid) = 0;
+  virtual bool DeleteNote(const std::string& userid, const std::string& noteid) = 0;
 };
 
 class NoteInfoIfFactory {
@@ -86,7 +86,7 @@ class NoteInfoNull : virtual public NoteInfoIf {
     bool _return = false;
     return _return;
   }
-  bool DeleteNote(const std::string& /* noteid */) {
+  bool DeleteNote(const std::string& /* userid */, const std::string& /* noteid */) {
     bool _return = false;
     return _return;
   }
@@ -1102,12 +1102,17 @@ class NoteInfo_RecoverNote_presult {
 class NoteInfo_DeleteNote_args {
  public:
 
-  NoteInfo_DeleteNote_args() : noteid() {
+  NoteInfo_DeleteNote_args() : userid(), noteid() {
   }
 
   virtual ~NoteInfo_DeleteNote_args() throw() {}
 
+  std::string userid;
   std::string noteid;
+
+  void __set_userid(const std::string& val) {
+    userid = val;
+  }
 
   void __set_noteid(const std::string& val) {
     noteid = val;
@@ -1115,6 +1120,8 @@ class NoteInfo_DeleteNote_args {
 
   bool operator == (const NoteInfo_DeleteNote_args & rhs) const
   {
+    if (!(userid == rhs.userid))
+      return false;
     if (!(noteid == rhs.noteid))
       return false;
     return true;
@@ -1137,6 +1144,7 @@ class NoteInfo_DeleteNote_pargs {
 
   virtual ~NoteInfo_DeleteNote_pargs() throw() {}
 
+  const std::string* userid;
   const std::string* noteid;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
@@ -1247,8 +1255,8 @@ class NoteInfoClient : virtual public NoteInfoIf {
   bool RecoverNote(const std::string& userid, const std::string& noteid);
   void send_RecoverNote(const std::string& userid, const std::string& noteid);
   bool recv_RecoverNote();
-  bool DeleteNote(const std::string& noteid);
-  void send_DeleteNote(const std::string& noteid);
+  bool DeleteNote(const std::string& userid, const std::string& noteid);
+  void send_DeleteNote(const std::string& userid, const std::string& noteid);
   bool recv_DeleteNote();
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
@@ -1401,13 +1409,13 @@ class NoteInfoMultiface : virtual public NoteInfoIf {
     return ifaces_[i]->RecoverNote(userid, noteid);
   }
 
-  bool DeleteNote(const std::string& noteid) {
+  bool DeleteNote(const std::string& userid, const std::string& noteid) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->DeleteNote(noteid);
+      ifaces_[i]->DeleteNote(userid, noteid);
     }
-    return ifaces_[i]->DeleteNote(noteid);
+    return ifaces_[i]->DeleteNote(userid, noteid);
   }
 
 };

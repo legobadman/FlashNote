@@ -1745,6 +1745,7 @@ uint32_t NoteInfo_DeleteNote_args::read(::apache::thrift::protocol::TProtocol* i
 
   using ::apache::thrift::protocol::TProtocolException;
 
+  bool isset_userid = false;
   bool isset_noteid = false;
 
   while (true)
@@ -1756,6 +1757,14 @@ uint32_t NoteInfo_DeleteNote_args::read(::apache::thrift::protocol::TProtocol* i
     switch (fid)
     {
       case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->userid);
+          isset_userid = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
         if (ftype == ::apache::thrift::protocol::T_STRING) {
           xfer += iprot->readString(this->noteid);
           isset_noteid = true;
@@ -1772,6 +1781,8 @@ uint32_t NoteInfo_DeleteNote_args::read(::apache::thrift::protocol::TProtocol* i
 
   xfer += iprot->readStructEnd();
 
+  if (!isset_userid)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_noteid)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
@@ -1781,7 +1792,11 @@ uint32_t NoteInfo_DeleteNote_args::write(::apache::thrift::protocol::TProtocol* 
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("NoteInfo_DeleteNote_args");
 
-  xfer += oprot->writeFieldBegin("noteid", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeFieldBegin("userid", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->userid);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("noteid", ::apache::thrift::protocol::T_STRING, 2);
   xfer += oprot->writeString(this->noteid);
   xfer += oprot->writeFieldEnd();
 
@@ -1794,7 +1809,11 @@ uint32_t NoteInfo_DeleteNote_pargs::write(::apache::thrift::protocol::TProtocol*
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("NoteInfo_DeleteNote_pargs");
 
-  xfer += oprot->writeFieldBegin("noteid", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeFieldBegin("userid", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString((*(this->userid)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("noteid", ::apache::thrift::protocol::T_STRING, 2);
   xfer += oprot->writeString((*(this->noteid)));
   xfer += oprot->writeFieldEnd();
 
@@ -2432,18 +2451,19 @@ bool NoteInfoClient::recv_RecoverNote()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "RecoverNote failed: unknown result");
 }
 
-bool NoteInfoClient::DeleteNote(const std::string& noteid)
+bool NoteInfoClient::DeleteNote(const std::string& userid, const std::string& noteid)
 {
-  send_DeleteNote(noteid);
+  send_DeleteNote(userid, noteid);
   return recv_DeleteNote();
 }
 
-void NoteInfoClient::send_DeleteNote(const std::string& noteid)
+void NoteInfoClient::send_DeleteNote(const std::string& userid, const std::string& noteid)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("DeleteNote", ::apache::thrift::protocol::T_CALL, cseqid);
 
   NoteInfo_DeleteNote_pargs args;
+  args.userid = &userid;
   args.noteid = &noteid;
   args.write(oprot_);
 
@@ -3018,7 +3038,7 @@ void NoteInfoProcessor::process_DeleteNote(int32_t seqid, ::apache::thrift::prot
 
   NoteInfo_DeleteNote_result result;
   try {
-    result.success = iface_->DeleteNote(args.noteid);
+    result.success = iface_->DeleteNote(args.userid, args.noteid);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {
