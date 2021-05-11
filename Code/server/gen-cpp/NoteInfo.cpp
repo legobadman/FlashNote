@@ -584,6 +584,7 @@ uint32_t NoteInfo_NewNote_args::read(::apache::thrift::protocol::TProtocol* ipro
 
   using ::apache::thrift::protocol::TProtocolException;
 
+  bool isset_userid = false;
   bool isset_bookid = false;
   bool isset_title = false;
 
@@ -597,13 +598,21 @@ uint32_t NoteInfo_NewNote_args::read(::apache::thrift::protocol::TProtocol* ipro
     {
       case 1:
         if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->userid);
+          isset_userid = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
           xfer += iprot->readString(this->bookid);
           isset_bookid = true;
         } else {
           xfer += iprot->skip(ftype);
         }
         break;
-      case 2:
+      case 3:
         if (ftype == ::apache::thrift::protocol::T_STRING) {
           xfer += iprot->readString(this->title);
           isset_title = true;
@@ -620,6 +629,8 @@ uint32_t NoteInfo_NewNote_args::read(::apache::thrift::protocol::TProtocol* ipro
 
   xfer += iprot->readStructEnd();
 
+  if (!isset_userid)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_bookid)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_title)
@@ -631,11 +642,15 @@ uint32_t NoteInfo_NewNote_args::write(::apache::thrift::protocol::TProtocol* opr
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("NoteInfo_NewNote_args");
 
-  xfer += oprot->writeFieldBegin("bookid", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeFieldBegin("userid", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->userid);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("bookid", ::apache::thrift::protocol::T_STRING, 2);
   xfer += oprot->writeString(this->bookid);
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("title", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeFieldBegin("title", ::apache::thrift::protocol::T_STRING, 3);
   xfer += oprot->writeString(this->title);
   xfer += oprot->writeFieldEnd();
 
@@ -648,11 +663,15 @@ uint32_t NoteInfo_NewNote_pargs::write(::apache::thrift::protocol::TProtocol* op
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("NoteInfo_NewNote_pargs");
 
-  xfer += oprot->writeFieldBegin("bookid", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeFieldBegin("userid", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString((*(this->userid)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("bookid", ::apache::thrift::protocol::T_STRING, 2);
   xfer += oprot->writeString((*(this->bookid)));
   xfer += oprot->writeFieldEnd();
 
-  xfer += oprot->writeFieldBegin("title", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeFieldBegin("title", ::apache::thrift::protocol::T_STRING, 3);
   xfer += oprot->writeString((*(this->title)));
   xfer += oprot->writeFieldEnd();
 
@@ -2056,18 +2075,19 @@ bool NoteInfoClient::recv_DeleteNotebook()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "DeleteNotebook failed: unknown result");
 }
 
-void NoteInfoClient::NewNote(std::string& _return, const std::string& bookid, const std::string& title)
+void NoteInfoClient::NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title)
 {
-  send_NewNote(bookid, title);
+  send_NewNote(userid, bookid, title);
   recv_NewNote(_return);
 }
 
-void NoteInfoClient::send_NewNote(const std::string& bookid, const std::string& title)
+void NoteInfoClient::send_NewNote(const std::string& userid, const std::string& bookid, const std::string& title)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("NewNote", ::apache::thrift::protocol::T_CALL, cseqid);
 
   NoteInfo_NewNote_pargs args;
+  args.userid = &userid;
   args.bookid = &bookid;
   args.title = &title;
   args.write(oprot_);
@@ -2674,7 +2694,7 @@ void NoteInfoProcessor::process_NewNote(int32_t seqid, ::apache::thrift::protoco
 
   NoteInfo_NewNote_result result;
   try {
-    iface_->NewNote(result.success, args.bookid, args.title);
+    iface_->NewNote(result.success, args.userid, args.bookid, args.title);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {

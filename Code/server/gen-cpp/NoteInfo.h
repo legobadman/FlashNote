@@ -18,7 +18,7 @@ class NoteInfoIf {
   virtual void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid) = 0;
   virtual void NewNotebook(std::string& _return, const std::string& userid, const std::string& name) = 0;
   virtual bool DeleteNotebook(const std::string& userid, const std::string& bookid) = 0;
-  virtual void NewNote(std::string& _return, const std::string& bookid, const std::string& title) = 0;
+  virtual void NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title) = 0;
   virtual bool UpdateNote(const std::string& noteid, const std::string& title, const std::string& note) = 0;
   virtual void GetContent(std::string& _return, const std::string& noteid) = 0;
   virtual bool MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid) = 0;
@@ -64,7 +64,7 @@ class NoteInfoNull : virtual public NoteInfoIf {
     bool _return = false;
     return _return;
   }
-  void NewNote(std::string& /* _return */, const std::string& /* bookid */, const std::string& /* title */) {
+  void NewNote(std::string& /* _return */, const std::string& /* userid */, const std::string& /* bookid */, const std::string& /* title */) {
     return;
   }
   bool UpdateNote(const std::string& /* noteid */, const std::string& /* title */, const std::string& /* note */) {
@@ -418,13 +418,18 @@ class NoteInfo_DeleteNotebook_presult {
 class NoteInfo_NewNote_args {
  public:
 
-  NoteInfo_NewNote_args() : bookid(), title() {
+  NoteInfo_NewNote_args() : userid(), bookid(), title() {
   }
 
   virtual ~NoteInfo_NewNote_args() throw() {}
 
+  std::string userid;
   std::string bookid;
   std::string title;
+
+  void __set_userid(const std::string& val) {
+    userid = val;
+  }
 
   void __set_bookid(const std::string& val) {
     bookid = val;
@@ -436,6 +441,8 @@ class NoteInfo_NewNote_args {
 
   bool operator == (const NoteInfo_NewNote_args & rhs) const
   {
+    if (!(userid == rhs.userid))
+      return false;
     if (!(bookid == rhs.bookid))
       return false;
     if (!(title == rhs.title))
@@ -460,6 +467,7 @@ class NoteInfo_NewNote_pargs {
 
   virtual ~NoteInfo_NewNote_pargs() throw() {}
 
+  const std::string* userid;
   const std::string* bookid;
   const std::string* title;
 
@@ -1221,8 +1229,8 @@ class NoteInfoClient : virtual public NoteInfoIf {
   bool DeleteNotebook(const std::string& userid, const std::string& bookid);
   void send_DeleteNotebook(const std::string& userid, const std::string& bookid);
   bool recv_DeleteNotebook();
-  void NewNote(std::string& _return, const std::string& bookid, const std::string& title);
-  void send_NewNote(const std::string& bookid, const std::string& title);
+  void NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title);
+  void send_NewNote(const std::string& userid, const std::string& bookid, const std::string& title);
   void recv_NewNote(std::string& _return);
   bool UpdateNote(const std::string& noteid, const std::string& title, const std::string& note);
   void send_UpdateNote(const std::string& noteid, const std::string& title, const std::string& note);
@@ -1337,13 +1345,13 @@ class NoteInfoMultiface : virtual public NoteInfoIf {
     return ifaces_[i]->DeleteNotebook(userid, bookid);
   }
 
-  void NewNote(std::string& _return, const std::string& bookid, const std::string& title) {
+  void NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title) {
     size_t sz = ifaces_.size();
     size_t i = 0;
     for (; i < (sz - 1); ++i) {
-      ifaces_[i]->NewNote(_return, bookid, title);
+      ifaces_[i]->NewNote(_return, userid, bookid, title);
     }
-    ifaces_[i]->NewNote(_return, bookid, title);
+    ifaces_[i]->NewNote(_return, userid, bookid, title);
     return;
   }
 
