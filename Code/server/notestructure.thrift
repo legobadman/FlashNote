@@ -38,7 +38,7 @@ service NoteInfo {
 	/*创建笔记
 	 指定bookid，创建标题为title的（非共享）笔记。
 	 */
-	string NewNote(1:required string bookid, 2:required string title);		//返回note-id
+	string NewNote(1:required string userid, 2:required string bookid, 3:required string title);		//返回note-id
 	
 	/* 更新笔记内容 */
 	bool UpdateNote(1:required string noteid, 2:required string title, 3:required string note);	//更新笔记内容。
@@ -51,6 +51,14 @@ service NoteInfo {
 
 	/* 将note移入垃圾桶
 	  仅对userid用户下bookid笔记本下的笔记noteid，移入属于userid的废纸篓，不影响该noteid在其他用户下的安放。
+	  Trash的内部构造如下：
+	  [
+	    {"_id":<trash-id-by-mongodb>, "note_id":<note-id>, "user_id":<user-id>,
+			"oringal_book_id":<book-id>, "trash_time":<date>} 
+
+		...
+	  ]
+	 
 	 */
 	bool TrashNote(1:required string userid, 2:required string bookid, 3:required string noteid);
 
