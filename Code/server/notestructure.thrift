@@ -43,7 +43,9 @@ service NoteInfo {
 	/* 更新笔记内容 */
 	bool UpdateNote(1:required string noteid, 2:required string title, 3:required string note);	//更新笔记内容。
 
-	/* 从服务端获取给定note的全部内容 */
+	/* 从服务端获取给定note的全部内容 
+	   Title是否也可以纳入。
+	 */
 	string GetContent(1:required string noteid);
 
 	/* 将笔记从src_bookid指定的book，移动到dest_bookid指定的book。*/
@@ -63,6 +65,7 @@ service NoteInfo {
 	bool TrashNote(1:required string userid, 2:required string bookid, 3:required string noteid);
 
 	// 将userid的废纸篓中的noteid笔记恢复。
+	//Q: 如果工作簿已经删除，那么Recover如何定义？
 	bool RecoverNote(1:required string userid, 2:required string noteid);
 
 	// 将某用户废纸篓下的noteid的笔记彻底销毁。
