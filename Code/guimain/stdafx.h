@@ -22,5 +22,7 @@
 #include <QDialog>
 #include <QTextEdit>
 #include <QListView>
+#include <QtWidgets/QMdiArea>
+#include <QSystemTrayIcon>
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef __LEFTSIDE_ITEM_DELEGATE_H__
 #define __LEFTSIDE_ITEM_DELEGATE_H__
 
-enum LEFT_SIDE_TYPE
+enum class LEFT_SIDE_TYPE
 {
 	ITEM_NEWNOTE = 0,
 	ITEM_ALLNOTE,
@@ -14,6 +14,8 @@ enum LEFT_SIDE_TYPE
 	ITEM_TRASH,
 	ITEM_UNKNOWN,
 };
+
+Q_DECLARE_METATYPE(LEFT_SIDE_TYPE)
 
 class LeftSideItemDelegate : public QStyledItemDelegate
 {

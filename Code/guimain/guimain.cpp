@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "NoteMainWindow.h"
+#include "notetrayicon.h"
 #include "MyStyle.h"
 #include "richeditor/mrichtextedit.h"
 
@@ -33,6 +34,11 @@ int WINAPI WinMain(__in HINSTANCE hInstance,
 
 	NoteMainWindow mainWin(NULL);
 	mainWin.show();
+
+	NoteTrayIcon systemTrayIcon;
+	systemTrayIcon.setMainWindow(&mainWin);
+	systemTrayIcon.show();
+
 	app.exec();
 	return 0;
 #endif

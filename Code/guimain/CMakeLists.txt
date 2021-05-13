@@ -69,6 +69,8 @@ add_executable(guimain
     ./note_editwindow.cpp
     ./note_editwindow.h
     ./note_editwindow.ui
+    ./notetrayicon.cpp
+    ./notetrayicon.h
     ./popupwidget.cpp
     ./popupwidget.h
     ./res/icons.qrc

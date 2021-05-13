@@ -101,16 +101,12 @@ static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int max
 void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 	const QModelIndex& index) const
 {
-	//return QStyledItemDelegate::paint(painter, option, index);
 	Q_ASSERT(index.isValid());
 
 	QStyleOptionViewItem opt = option;
 	initStyleOption(&opt, index);
 
-	int roleData = index.data(Qt::UserRole + 1).toInt();
-	LEFT_SIDE_TYPE type = LEFT_SIDE_TYPE::ITEM_UNKNOWN;
-	if (roleData >= ITEM_NEWNOTE && roleData < ITEM_UNKNOWN)
-		type = (LEFT_SIDE_TYPE)roleData;
+	LEFT_SIDE_TYPE type = index.data(Qt::UserRole + 1).value<LEFT_SIDE_TYPE>();
 
 	const QWidget* widget = option.widget;
 
@@ -126,7 +122,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	const int icon_center_xoffset = 30;
 
 	int iconSize = opt.decorationSize.height();
-	int textMargin = (type == ITEM_NEWNOTE) ? 8 : 5;
+	int textMargin = (type == LEFT_SIDE_TYPE::ITEM_NEWNOTE) ? 8 : 5;
 	QTextLayout textLayout2(opt.text, opt.font);
 	const int maxLineWidth = 8388607; //≤Œ’’QCommonStylePrivate::viewItemSize
 	QSizeF szText = viewItemTextLayout(textLayout2, maxLineWidth);
