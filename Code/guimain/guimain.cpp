@@ -1,11 +1,17 @@
 ﻿#include "stdafx.h"
 #include "NoteMainWindow.h"
+#include "notewinservice.h"
 #include "notetrayicon.h"
 #include "MyStyle.h"
 #include "richeditor/mrichtextedit.h"
 
 //#define TEXT_RICH_EDITOR
+//#define TEST_WIDGET_WINDOW_PARENT
 
+#ifdef TEST_WIDGET_WINDOW_PARENT
+#include "qtexamples/MltpDlgs1.h"
+#include "qtexamples/MltpDlgs2.h"
+#endif
 
 int WINAPI WinMain(__in HINSTANCE hInstance,
 	__in_opt HINSTANCE hPrevInstance,
@@ -26,18 +32,21 @@ int WINAPI WinMain(__in HINSTANCE hInstance,
 
 	return app.exec();
 
+#elif defined(TEST_WIDGET_WINDOW_PARENT)
+	QApplication a(__argc, __argv);
+	MltpDlgs1 w;
+	w.setMinimumSize(300, 100);
+	w.show();
+	return a.exec();
+
 #else
 	QApplication::addLibraryPath("C:/Qt/Qt-5.15.0/plugins");
 	QApplication app(__argc, __argv);
 
 	QApplication::setStyle(new MyStyle);
 
-	NoteMainWindow mainWin(NULL);
-	mainWin.show();
-
-	NoteTrayIcon systemTrayIcon;
-	systemTrayIcon.setMainWindow(&mainWin);
-	systemTrayIcon.show();
+	NoteWinService service(NULL);
+	service.startup();
 
 	app.exec();
 	return 0;

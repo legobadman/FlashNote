@@ -71,6 +71,8 @@ add_executable(guimain
     ./note_editwindow.ui
     ./notetrayicon.cpp
     ./notetrayicon.h
+    ./notewinservice.cpp
+    ./notewinservice.h
     ./popupwidget.cpp
     ./popupwidget.h
     ./res/icons.qrc
@@ -91,6 +93,12 @@ add_executable(guimain
     ./style/ToolButtonStyle.h
     ./style/toolbuttonstyleoption.cpp
     ./style/toolbuttonstyleoption.h
+
+    #qt ‘—È¥˙¬Î
+    ./qtexamples/MltpDlgs1.cpp
+    ./qtexamples/MltpDlgs1.h
+    ./qtexamples/MltpDlgs2.cpp
+    ./qtexamples/MltpDlgs2.h
 )
 
 target_precompile_headers(guimain PRIVATE ./stdafx.h)

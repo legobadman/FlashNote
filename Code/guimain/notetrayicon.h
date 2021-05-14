@@ -9,14 +9,20 @@ class NoteTrayIcon : public QSystemTrayIcon
 public:
 	NoteTrayIcon(QObject* parent = nullptr);
 	~NoteTrayIcon();
-
 	void setMainWindow(NoteMainWindow* pWin);
+
+signals:
+	void contextActivated();
+	void triggerActivated();
+	void quickTriggerd();
 
 public slots:
 	void onActivated(QSystemTrayIcon::ActivationReason reason);
+	void onQuickTriggered();
 
 private:
 	NoteMainWindow* m_pWin;
+	QApplication* m_pApp;
 };
 
 #endif

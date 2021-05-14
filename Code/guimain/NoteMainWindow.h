@@ -13,15 +13,21 @@ public:
 	NoteMainWindow(QWidget* parent);
 	~NoteMainWindow();
 	void init();
+	void showNavigationPane(bool show);
+	void setApplication(QApplication* pApp);
 
 public slots:
 	void onLeftTreeClicked(const QModelIndex& index);
+
+signals:
+	void newnote();
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
 
 private:
 	Ui::NoteMainWindow* m_ui;
+	QApplication* m_pApp;
 };
 
 #endif

@@ -7,7 +7,7 @@
 
 
 NoteMainWindow::NoteMainWindow(QWidget* parent)
-	: QMainWindow(parent)
+	: QMainWindow(parent, Qt::Window)
 {
 	init();
 }
@@ -27,8 +27,6 @@ void NoteMainWindow::init()
 
 	connect(m_ui->treeView, SIGNAL(clicked(const QModelIndex&)),
 		this, SLOT(onLeftTreeClicked(const QModelIndex&)));
-
-	showMaximized();
 }
 
 void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
@@ -36,8 +34,7 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	LEFT_SIDE_TYPE type = index.data(Qt::UserRole + 1).value<LEFT_SIDE_TYPE>();
 	if (type == LEFT_SIDE_TYPE::ITEM_NEWNOTE)
 	{
-		NoteEditWindow* pEditWin = new NoteEditWindow;
-		pEditWin->show();
+		emit newnote();
 	}
 	else if (type == LEFT_SIDE_TYPE::ITEM_NOTEBOOK)
 	{
@@ -45,10 +42,22 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	}
 }
 
+void NoteMainWindow::showNavigationPane(bool show)
+{
+	if (show)
+		m_ui->treeView->show();
+	else
+		m_ui->treeView->hide();
+}
+
+void NoteMainWindow::setApplication(QApplication* pApp)
+{
+	m_pApp = pApp;
+}
+
 void NoteMainWindow::closeEvent(QCloseEvent* event)
 {
+	//TODO: 外部需要回收窗口
 	event->ignore();
 	hide();
 }
-
-
