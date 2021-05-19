@@ -18,19 +18,25 @@ public:
 	void init();
 	void initCustomWidget();
 	void initContent();
+	void initWidget(INotebook* pNotebook, INote* pNote);
 	INote* GetNote();
-	bool isTitleEmpty() const;
 
 	QString toPlainText() const { return m_ui->textEdit->toPlainText(); }
 	QString toHtml() const;
 	QTextDocument* document() { return m_ui->textEdit->document(); }
 	QTextCursor textCursor() const { return m_ui->textEdit->textCursor(); }
 	void setTextCursor(const QTextCursor& cursor) { m_ui->textEdit->setTextCursor(cursor); }
+	void setBookName(const QString& name);
 
 public slots:
 	void setText(const QString& text);
 	void clearSource();
 	void checkDocument();
+	void onTitleChanged();
+	void onTextChanged();
+	void updateTitle();
+	void saveNote();
+	void switchtobook(int bookidx);
 
 protected slots:
 	void setPlainText(const QString& text) { m_ui->textEdit->setPlainText(text); }
@@ -71,7 +77,8 @@ private:
 
 private:
 	Ui::NoteEditWindow* m_ui;
-	INote* m_pNote;
+	com_sptr<INote> m_pNote;
+	com_sptr<INotebook> m_pNotebook;
 
 	QStringList m_paragraphItems;
 	int m_fontsize_h1;
@@ -89,6 +96,7 @@ private:
 	};
 
 	QPointer<QTextList> m_lastBlockList;
+	std::wstring m_bookid;
 	bool m_bEnableBase64;
 };
 

@@ -4,6 +4,9 @@
 #include "notetrayicon.h"
 #include "MyStyle.h"
 #include "richeditor/mrichtextedit.h"
+#include "note_types.h"
+
+INoteApplication* coreApp = NULL;
 
 //#define TEXT_RICH_EDITOR
 //#define TEST_WIDGET_WINDOW_PARENT
@@ -45,8 +48,9 @@ int WINAPI WinMain(__in HINSTANCE hInstance,
 
 	QApplication::setStyle(new MyStyle);
 
-	NoteWinService service(NULL);
-	service.startup();
+	CreateApplication(&coreApp);
+
+	NoteWinService::GetInstance().startup();
 
 	app.exec();
 	return 0;

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "LeftSideItemDelegate.h"
 #include "moc_LeftSideItemDelegate.cpp"
+#include "MyStyle.h"
 
 
 LeftSideItemDelegate::LeftSideItemDelegate(QWidget* parent)
@@ -18,31 +19,26 @@ void LeftSideItemDelegate::setModelData(QWidget* editor,
 QSize LeftSideItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	int w = ((QWidget*)parent())->width();
-	if (index.row() == 0)
-		return QSize(w, 60);
-	else
-		return QSize(w, 36);
+	ITEM_WIDGET_TYPE widgetType = index.data(ItemWidgetTypeRole).value<ITEM_WIDGET_TYPE>();
+	if (widgetType == ITEM_WIDGET_TYPE::ITEM_TOPLEVEL)
+		return MyStyle::dpiScaledSize(QSize(w, 36));
+	else if (widgetType == ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL)
+		return MyStyle::dpiScaledSize(QSize(w, 24));
 }
 
 void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
 {
 	QStyledItemDelegate::initStyleOption(option, index);
 
-	bool bNewNote = index.row() == 0;
+	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
 	QColor backgroundClr(42, 51, 60);
 	QColor selectedClr(QColor(74, 93, 107));
 
 	option->palette.setColor(QPalette::All, QPalette::Text, QColor(213, 221, 227));
 	option->backgroundBrush.setStyle(Qt::SolidPattern);
 	option->showDecorationSelected = false;
-	if (bNewNote)
-	{
-		option->decorationSize = QSize(28, 28);
-	}
-	else
-	{
-		option->decorationSize = QSize(16, 16);
-	}
+
+	option->decorationSize = QSize(16, 16);
 
 	if (option->state & QStyle::State_Selected)
 	{
@@ -50,24 +46,13 @@ void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
 	}
 	else if (option->state & QStyle::State_MouseOver)
 	{
-		if (bNewNote)
-		{
-			option->backgroundBrush.setColor(backgroundClr);
-			option->palette.setColor(QPalette::All, QPalette::Text, QColor(255, 255, 255));
-		}
-		else
-		{
-			option->backgroundBrush.setColor(QColor(53, 69, 83));
-		}
+		option->backgroundBrush.setColor(QColor(53, 69, 83));
 	}
 	else
 	{
 		option->backgroundBrush.setColor(backgroundClr);
 	}
-	if (bNewNote)
-		option->font.setPointSize(13);
-	else
-		option->font.setPointSize(12);
+	option->font.setPointSize(12);
 }
 
 static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight = -1, int* lastVisibleLine = nullptr)
@@ -106,7 +91,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	QStyleOptionViewItem opt = option;
 	initStyleOption(&opt, index);
 
-	LEFT_SIDE_TYPE type = index.data(Qt::UserRole + 1).value<LEFT_SIDE_TYPE>();
+	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
 
 	const QWidget* widget = option.widget;
 
@@ -122,7 +107,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	const int icon_center_xoffset = 30;
 
 	int iconSize = opt.decorationSize.height();
-	int textMargin = (type == LEFT_SIDE_TYPE::ITEM_NEWNOTE) ? 8 : 5;
+	int textMargin = 5;
 	QTextLayout textLayout2(opt.text, opt.font);
 	const int maxLineWidth = 8388607; //≤Œ’’QCommonStylePrivate::viewItemSize
 	QSizeF szText = viewItemTextLayout(textLayout2, maxLineWidth);

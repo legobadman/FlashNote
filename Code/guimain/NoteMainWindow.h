@@ -6,6 +6,8 @@ namespace Ui
 	class NoteMainWindow;
 }
 
+#include "LeftSideItemDelegate.h"
+
 class NoteMainWindow : public QMainWindow
 {
 	Q_OBJECT
@@ -13,21 +15,25 @@ public:
 	NoteMainWindow(QWidget* parent);
 	~NoteMainWindow();
 	void init();
-	void showNavigationPane(bool show);
-	void setApplication(QApplication* pApp);
+	void initSelected();
 
 public slots:
 	void onLeftTreeClicked(const QModelIndex& index);
-
-signals:
-	void newnote();
+	void onNoteItemClicked(const QModelIndex& index);
+	void onNewNote();
+	void showNotesInfo(int idxNotebook, int idxNote);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
 
 private:
+	int getActiveBookIndex();
+	int getActiveNoteInBook(int bookidx);
+	void onShowNote(int idxBook, INote* pNote);
+
+private:
 	Ui::NoteMainWindow* m_ui;
-	QApplication* m_pApp;
+	com_sptr<INotebook> m_pNotebook;
 };
 
 #endif

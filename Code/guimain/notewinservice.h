@@ -4,27 +4,32 @@
 #include <QObject>
 
 #include "NoteMainWindow.h"
+#include "newnotewindow.h"
 #include "notetrayicon.h"
 
-typedef NoteMainWindow NewNoteWindow;
-
-class NoteWinService : public QWidget
+class NoteWinService : public QObject
 {
 	Q_OBJECT
 public:
-	NoteWinService(QWidget* parent);
+	static NoteWinService& GetInstance();
 	~NoteWinService();
 	void startup();
+	INoteApplication* coreApplication();
+	void initUI();
+	void initCoreFromRPC();
 
 public slots:
-	void onNewNote();
 	void onQuickApp();
 	void onTrigger();
 
 private:
-	QVector<QSharedPointer<NewNoteWindow>> m_subWindows;
+	NoteWinService();
+	NoteWinService(const NoteWinService&) {}
+
+private:
 	QSharedPointer<NoteMainWindow> m_mainWindow;
 	NoteTrayIcon m_trayIcon;
+	com_sptr<INoteApplication> m_spApp;
 };
 
 #endif

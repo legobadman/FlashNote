@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "note_editwindow.h"
+#include "rpcservice.h"
+#include "note_types.h"
+#include "guihelper.h"
 #include "moc_note_editwindow.cpp"
 #include "MyStyle.h"
 #include <QtGui/QClipboard>
@@ -23,7 +26,6 @@
 
 NoteEditWindow::NoteEditWindow(QWidget* parent)
     : QWidget(parent)
-    , m_pNote(NULL)
 	, m_bEnableBase64(true)
 {
     init();
@@ -39,12 +41,28 @@ INote* NoteEditWindow::GetNote()
     return m_pNote;
 }
 
-bool NoteEditWindow::isTitleEmpty() const
+void NoteEditWindow::initWidget(INotebook* pNotebook, INote* pNote)
 {
-    if (!m_pNote)
-        return true;
-    else
-        return m_pNote->GetTitle().empty();
+	m_pNotebook = pNotebook;
+	m_pNote = pNote;
+
+	QString bookName = AppHelper::GetNotebookName(m_pNotebook);
+	m_ui->bookmenu->blockSignals(true);
+	m_ui->bookmenu->setText(bookName);
+	m_ui->bookmenu->blockSignals(false);
+
+	QString title = AppHelper::GetNoteTitle(m_pNote);
+	QString content = AppHelper::GetNoteContent(m_pNote);
+
+	m_ui->editTitle->blockSignals(true);
+	m_ui->editTitle->setText(title);
+	m_ui->editTitle->blockSignals(false);
+
+	m_ui->textEdit->blockSignals(true);
+	m_ui->textEdit->setText(content);
+	m_ui->textEdit->blockSignals(false);
+	
+	update();
 }
 
 void NoteEditWindow::init()
@@ -61,13 +79,23 @@ void NoteEditWindow::init()
 	initSlots();
 }
 
+void NoteEditWindow::setBookName(const QString& name)
+{
+	m_ui->bookmenu->setText(name);
+	update();
+}
+
 void NoteEditWindow::initSlots()
 {
 	m_lastBlockList = nullptr;
+
+	connect(m_ui->editTitle, SIGNAL(textChanged(const QString&)), this, SLOT(onTitleChanged()));
+
 	connect(m_ui->textEdit, SIGNAL(currentCharFormatChanged(QTextCharFormat)),
 		this, SLOT(slotCurrentCharFormatChanged(QTextCharFormat)));
 	connect(m_ui->textEdit, SIGNAL(cursorPositionChanged()),
 		this, SLOT(slotCursorPositionChanged()));
+	connect(m_ui->textEdit, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
 
 	m_fontsize_h1 = 18;
 	m_fontsize_h2 = 16;
@@ -121,6 +149,8 @@ void NoteEditWindow::initCustomWidget()
 {
 	m_ui->font_comboBox->setFixedSize(MyStyle::dpiScaledSize(QSize(150, 28)));
 	m_ui->fontsize_comboBox->setFixedSize(MyStyle::dpiScaledSize(QSize(50, 28)));
+
+	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(50, 22)));
 
 	m_ui->bold->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
 	m_ui->bold->setIcon(QIcon(":/icons/16x16/Bold.png"));
@@ -530,15 +560,76 @@ QString NoteEditWindow::toHtml() const {
 	return s;
 }
 
-void NoteEditWindow::increaseIndentation() {
+void NoteEditWindow::updateTitle()
+{
+	std::wstring title = m_ui->editTitle->text().toStdWString();
+	BSTR bstrContent = SysAllocString(title.c_str());
+	m_pNote->SetTitle(bstrContent);
+
+	RPCService::GetInstance().SynchronizeNote(m_pNotebook, m_pNote);
+}
+
+void NoteEditWindow::saveNote()
+{
+	Q_ASSERT(m_pNote);
+	QTextDocument* p = document();
+	QString title = m_ui->editTitle->text();
+	QString html = p->toHtml();
+	QString plainText = p->toPlainText();
+
+	BSTR bstrTitle = SysAllocString(title.toStdWString().c_str());
+	m_pNote->SetTitle(bstrTitle);
+	BSTR bstrContent = SysAllocString(html.toStdWString().c_str());
+	m_pNote->SetContent(bstrContent);
+	BSTR bstrPlainText = SysAllocString(plainText.toStdWString().c_str());
+	m_pNote->SetPlainText(bstrPlainText);
+
+	RPCService::GetInstance().SynchronizeNote(m_pNotebook, m_pNote);
+}
+
+void NoteEditWindow::switchtobook(int bookidx)
+{
+	VARIANT newindex;
+	V_VT(&newindex) = VT_I4;
+	V_I4(&newindex) = bookidx;
+	com_sptr<INotebook> spNewbook;
+	HRESULT hr = coreApp->GetNotebook(newindex, &spNewbook);
+	if (FAILED(hr) || !spNewbook)
+	{
+		Q_ASSERT(FALSE);
+	}
+
+	hr = m_pNotebook->RemoveNote(m_pNote);
+	if (FAILED(hr))
+		Q_ASSERT(FALSE);
+	hr = spNewbook->AddNote(m_pNote);
+	if (FAILED(hr))
+		Q_ASSERT(FALSE);
+	m_pNotebook = spNewbook;
+}
+
+void NoteEditWindow::onTitleChanged()
+{
+	QTimer::singleShot(2000, this, SLOT(saveNote()));
+}
+
+void NoteEditWindow::onTextChanged()
+{
+	QTimer::singleShot(2000, this, SLOT(saveNote()));
+}
+
+void NoteEditWindow::increaseIndentation()
+{
 	indent(+1);
 }
 
-void NoteEditWindow::decreaseIndentation() {
+void NoteEditWindow::decreaseIndentation()
+{
 	indent(-1);
 }
 
-void NoteEditWindow::indent(int delta) {
+void NoteEditWindow::indent(int delta)
+{
 	QTextCursor cursor = m_ui->textEdit->textCursor();
 	cursor.beginEditBlock();
 	QTextBlockFormat bfmt = cursor.blockFormat();
@@ -550,7 +641,8 @@ void NoteEditWindow::indent(int delta) {
 	cursor.endEditBlock();
 }
 
-void NoteEditWindow::setText(const QString& text) {
+void NoteEditWindow::setText(const QString& text)
+{
 	if (text.isEmpty()) {
 		setPlainText(text);
 		return;

@@ -1,21 +1,48 @@
 #include "stdafx.h"
 #include "notewinservice.h"
+#include "note_types.h"
+#include "rpcservice.h"
+#include "guihelper.h"
 
-NoteWinService::NoteWinService(QWidget* parent)
-	: QWidget(parent)
+
+NoteWinService::NoteWinService()
+	: QObject(NULL)
+{
+	m_spApp = coreApp;
+	initCoreFromRPC();
+	initUI();
+}
+
+NoteWinService::~NoteWinService()
+{
+}
+
+void NoteWinService::initUI()
 {
 	NoteMainWindow* pwtf = new NoteMainWindow(NULL);
 	m_mainWindow = QSharedPointer<NoteMainWindow>(pwtf);
-	connect(m_mainWindow.data(), SIGNAL(newnote()), 
-		this, SLOT(onNewNote()));
+	connect(m_mainWindow.data(), SIGNAL(newnote(int)),
+		this, SLOT(onNewNote(int)));
 	connect(&m_trayIcon, SIGNAL(triggerActivated()),
 		this, SLOT(onTrigger()));
 	connect(&m_trayIcon, SIGNAL(quickTriggerd()),
 		this, SLOT(onQuickApp()));
 }
 
-NoteWinService::~NoteWinService()
+NoteWinService& NoteWinService::GetInstance()
 {
+	static NoteWinService inst;
+	return inst;
+}
+
+INoteApplication* NoteWinService::coreApplication()
+{
+	return m_spApp;
+}
+
+void NoteWinService::initCoreFromRPC()
+{
+	RPCService::GetInstance().InitcoreFromRPC(m_spApp);
 }
 
 void NoteWinService::startup()
@@ -32,15 +59,4 @@ void NoteWinService::onQuickApp()
 void NoteWinService::onTrigger()
 {
 	m_mainWindow->show();
-}
-
-void NoteWinService::onNewNote()
-{
-	NoteMainWindow* pNewNoteWindow = new NoteMainWindow(NULL);
-
-	pNewNoteWindow->showNavigationPane(false);
-	pNewNoteWindow->setWindowTitle(u8"ÐÂ½¨±Ê¼Ç");
-	pNewNoteWindow->showMaximized();
-
-	m_subWindows.append(QSharedPointer<NoteMainWindow>(pNewNoteWindow));
 }

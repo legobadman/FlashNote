@@ -1,5 +1,9 @@
 #project(notecore)
 
+include_directories(
+    ../facility
+	)
+
 ADD_LIBRARY(notecore STATIC
 	framework.h
 	notebase.cpp

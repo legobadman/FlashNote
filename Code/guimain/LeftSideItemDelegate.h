@@ -1,10 +1,9 @@
 #ifndef __LEFTSIDE_ITEM_DELEGATE_H__
 #define __LEFTSIDE_ITEM_DELEGATE_H__
 
-enum class LEFT_SIDE_TYPE
+enum class ITEM_CONTENT_TYPE
 {
-	ITEM_NEWNOTE = 0,
-	ITEM_ALLNOTE,
+	ITEM_ALLNOTE = 0,
 	ITEM_NOTEBOOK,
 	ITEM_MATERIAL,
 	ITEM_SOCIALMEDIA,
@@ -12,10 +11,24 @@ enum class LEFT_SIDE_TYPE
 	ITEM_SCHEDULE,
 	ITEM_DRAFT,
 	ITEM_TRASH,
+	ITEM_NOTEBOOKITEM,
 	ITEM_UNKNOWN,
 };
+Q_DECLARE_METATYPE(ITEM_CONTENT_TYPE)
 
-Q_DECLARE_METATYPE(LEFT_SIDE_TYPE)
+enum class ITEM_WIDGET_TYPE
+{
+	ITEM_TOPLEVEL,	//左边最顶层项
+	ITEM_CHILDLEVEL, //展开的子项
+};
+Q_DECLARE_METATYPE(ITEM_WIDGET_TYPE)
+
+enum LEFT_SIDE_ROLE
+{
+	ItemWidgetTypeRole = Qt::UserRole + 1,
+	ItemContentTypeRole,
+	ItemUnkInterfaceRole,
+};
 
 class LeftSideItemDelegate : public QStyledItemDelegate
 {

@@ -48,6 +48,29 @@
       </widget>
      </item>
      <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_233">
+       <property name="spacing">
+        <number>3</number>
+       </property>
+       <item>
+        <widget class="MenuButton"  name="bookmenu" native="true"/>		   
+	   </item>
+       <item>
+        <spacer name="horizontalSpacer233">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+	 </item>		
+     <item>
       <widget class="QFrame" name="frame">
        <property name="minimumSize">
         <size>

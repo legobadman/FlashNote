@@ -22,7 +22,11 @@
 #include <QDialog>
 #include <QTextEdit>
 #include <QListView>
+#include <QTimer>
 #include <QtWidgets/QMdiArea>
 #include <QSystemTrayIcon>
+#include "com_sptr.h"
+#include "notecore.h"
+#include "note_types.h"
 
 #endif

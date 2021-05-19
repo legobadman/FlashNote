@@ -29,15 +29,27 @@ include_directories(
     ./style/
     ./richeditor/
     ./style/
-    ../notecore)
+    ../notecore
+    ../facility
+    ../server/gen-cpp
+    ../rpcservice
+    ../include
+    ../3rdparty
+	../3rdparty/boost_1_55_0
+    )
 
 # Find the QtWidgets library
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
+
+link_directories(../3rdparty/boost_1_55_0/stage/lib)
 
 # Tell CMake to create the helloworld executable
 add_executable(guimain 
     ./alignmentcombobox.cpp
     ./alignmentcombobox.h
+    ./booklistview.cpp
+    ./booklistview.h
+    ./booklistview.ui
     ./colorgallery.cpp
     ./colorgallery.h
     ./coloritemdelegate.cpp
@@ -51,6 +63,8 @@ add_executable(guimain
     ./DrawerFunc.cpp
     ./DrawerFunc.h
     ./guimain.cpp
+    ./guihelper.cpp
+    ./guihelper.h
     ./FontColorComboBox.cpp
     ./FontColorComboBox.h
     ./fontsize_combobox.cpp
@@ -63,6 +77,9 @@ add_executable(guimain
     ./LeftSideItemDelegate.h
     ./listpane.cpp
     ./listpane.h
+    ./newnotewindow.cpp
+    ./newnotewindow.h
+    ./newnotewindow.ui
     ./NoteMainWindow.cpp
     ./NoteMainWindow.h
     ./NoteMainWindow.ui
@@ -99,11 +116,17 @@ add_executable(guimain
     ./qtexamples/MltpDlgs1.h
     ./qtexamples/MltpDlgs2.cpp
     ./qtexamples/MltpDlgs2.h
+
+    #thrift生成的类型
+	#../server/gen-cpp/UserInfo.cpp
+	#../server/gen-cpp/NoteInfo.cpp
+	#../server/gen-cpp/notestructure_constants.cpp
+	#../server/gen-cpp/notestructure_types.cpp
 )
 
 target_precompile_headers(guimain PRIVATE ./stdafx.h)
 
 # Add the Qt5 Widgets for linking
-target_link_libraries(guimain Qt5::Widgets)
+target_link_libraries(guimain notecore Qt5::Widgets rpcservice)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")

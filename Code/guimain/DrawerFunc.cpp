@@ -23,7 +23,7 @@ QColor DrawerFunc::getColorFromWidget(const QWidget* w, QStyle::State state, QSt
 		if (propName == "foreground")
 		{
 			const NoteEditWindow* pWin = qobject_cast<const NoteEditWindow*>(w->parent());
-			if (pWin && pWin->isTitleEmpty())
+			if (pWin)
 			{
 
 			}

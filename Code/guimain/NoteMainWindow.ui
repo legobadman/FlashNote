@@ -44,7 +44,7 @@
       <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
-      <widget class="NavigationPanel" name="treeView">
+      <widget class="NavigationPanel" name="listpane">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -69,31 +69,9 @@
          <height>0</height>
         </size>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="showDropIndicator" stdset="0">
-        <bool>false</bool>
-       </property>
-       <property name="indentation">
-        <number>0</number>
-       </property>
-       <attribute name="headerVisible">
-        <bool>false</bool>
-       </attribute>
-       <attribute name="headerCascadingSectionResizes">
-        <bool>true</bool>
-       </attribute>
-       <attribute name="headerDefaultSectionSize">
-        <number>555</number>
-       </attribute>
-       <attribute name="headerStretchLastSection">
-        <bool>false</bool>
-       </attribute>
       </widget>
+      <widget class="BookListView" name="booklist">
+	  </widget>
       <widget class="QStackedWidget" name="stackedWidget">
        <widget class="NoteEditWindow" name="editwindow">
        </widget>
@@ -129,13 +107,18 @@
  <customwidgets>
   <customwidget>
    <class>NavigationPanel</class>
-   <extends>QTreeView</extends>
+   <extends>QWidget</extends>
    <header>listpane.h</header>
   </customwidget>
   <customwidget>
    <class>NoteEditWindow</class>
    <extends>QWidget</extends>
    <header>note_editwindow.h</header>
+  </customwidget>
+  <customwidget>
+   <class>BookListView</class>
+   <extends>QWidget</extends>
+   <header>booklistview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

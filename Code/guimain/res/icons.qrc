@@ -19,16 +19,19 @@
 	<file>icons/16x16/Underline.png</file>
 	<file>icons/16x16/highlighted.png</file>
 	<file>icons/16x16/codeblock.png</file>
- <file>icons/16x16/item_symbol.png</file>
- <file>icons/16x16/item_id.png</file>
- <file>icons/16x16/left_alignment.png</file>
- <file>icons/16x16/center_alignment.png</file>
- <file>icons/16x16/right_alignment.png</file>
- <file>icons/16x16/twoside_alignment.png</file>
- <file>icons/16x16/attachment.png</file>
- <file>icons/16x16/photo.png</file>
- <file>icons/16x16/morecolor.png</file>
- <file>icons/16x16/default_color.png</file>
- <file>icons/16x16/strikeout.png</file>
+	<file>icons/16x16/item_symbol.png</file>
+	<file>icons/16x16/item_id.png</file>
+	<file>icons/16x16/left_alignment.png</file>
+	<file>icons/16x16/center_alignment.png</file>
+	<file>icons/16x16/right_alignment.png</file>
+	<file>icons/16x16/twoside_alignment.png</file>
+	<file>icons/16x16/attachment.png</file>
+	<file>icons/16x16/photo.png</file>
+	<file>icons/16x16/morecolor.png</file>
+	<file>icons/16x16/default_color.png</file>
+	<file>icons/16x16/strikeout.png</file>
+	<file>icons/24x24/more.png</file>
+	<file>icons/24x24/sort_options.png</file>
+	<file>icons/24x24/listview.png</file>
 </qresource>
 </RCC>

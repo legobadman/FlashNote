@@ -55,7 +55,7 @@ void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPaint
 	{
 		return drawMyLineEdit(pe, opt, p, widget);
 	}
-	if (qobject_cast<const NavigationPanel*>(widget))
+	if (qobject_cast<const NoteItemTreeView*>(widget))
 	{
 		const QStyleOptionViewItem* vopt = qstyleoption_cast<const QStyleOptionViewItem*>(opt);
 		if (pe == PE_PanelItemViewRow && vopt && !vopt->index.isValid())
