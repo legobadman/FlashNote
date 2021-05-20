@@ -138,6 +138,21 @@ NoteItemTreeView::NoteItemTreeView(QWidget* parent)
 {
 }
 
+void NoteItemTreeView::mousePressEvent(QMouseEvent* e)
+{
+	QPoint pos = e->pos();
+	const QModelIndex& index = indexAt(pos);
+	if (pos.x() < 30 && this->itemsExpandable())
+	{
+		setExpanded(index, !isExpanded(index));
+	}
+	else
+	{
+		QTreeView::mousePressEvent(e);
+	}
+}
+
+
 NavigationPanel::NavigationPanel(QWidget* parent)
 	: QWidget(parent)
 	, leftsidemodel(NULL)
@@ -260,7 +275,7 @@ void NavigationPanel::initModel()
 	leftsidemodel->appendRow(pTrashItem);
 
 	m_treeview->setModel(leftsidemodel);
-	m_treeview->setItemDelegate(new LeftSideItemDelegate(this));
+	m_treeview->setItemDelegate(new LeftSideItemDelegate(m_treeview));
 }
 
 void NavigationPanel::initNotebookItem()

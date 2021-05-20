@@ -86,6 +86,8 @@ add_executable(guimain
     ./note_editwindow.cpp
     ./note_editwindow.h
     ./note_editwindow.ui
+    ./noteseditview.cpp
+    ./noteseditview.h
     ./notetrayicon.cpp
     ./notetrayicon.h
     ./notewinservice.cpp

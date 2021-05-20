@@ -70,12 +70,9 @@
         </size>
        </property>
       </widget>
-      <widget class="BookListView" name="booklist">
-	  </widget>
-      <widget class="QStackedWidget" name="stackedWidget">
-       <widget class="NoteEditWindow" name="editwindow">
-       </widget>
-       <widget class="QWidget" name="page_2"/>
+      <widget class="QStackedWidget" name="stackedWidget2">
+       <widget class="NotesEditView" name="notesview"/>
+       <widget class="QWidget" name="booksview"/>
       </widget>
      </widget>
     </item>
@@ -119,6 +116,11 @@
    <class>BookListView</class>
    <extends>QWidget</extends>
    <header>booklistview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>NotesEditView</class>
+   <extends>QSplitter</extends>
+   <header>noteseditview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

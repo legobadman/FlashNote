@@ -15,13 +15,11 @@ public:
 	NoteMainWindow(QWidget* parent);
 	~NoteMainWindow();
 	void init();
-	void initSelected();
 
 public slots:
 	void onLeftTreeClicked(const QModelIndex& index);
-	void onNoteItemClicked(const QModelIndex& index);
 	void onNewNote();
-	void showNotesInfo(int idxNotebook, int idxNote);
+	void initNotesView(int idxNotebook, int idxNote);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
@@ -29,7 +27,6 @@ protected:
 private:
 	int getActiveBookIndex();
 	int getActiveNoteInBook(int bookidx);
-	void onShowNote(int idxBook, INote* pNote);
 
 private:
 	Ui::NoteMainWindow* m_ui;

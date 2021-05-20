@@ -34,6 +34,9 @@ class NoteItemTreeView : public QTreeView
 	Q_OBJECT
 public:
 	NoteItemTreeView(QWidget* parent = nullptr);
+
+protected:
+	void mousePressEvent(QMouseEvent* e) override;
 };
 
 class NavigationPanel : public QWidget

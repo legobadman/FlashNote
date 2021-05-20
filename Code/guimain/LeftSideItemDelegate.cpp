@@ -83,6 +83,86 @@ static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int max
 	return QSizeF(widthUsed, height);
 }
 
+void LeftSideItemDelegate::drawExpandArrow(QPainter* painter, const QStyleOptionViewItem& option) const
+{
+	QTreeView* treeview = (QTreeView*)parent();
+	const QModelIndex& index = option.index;
+
+	bool bExpanded = treeview->isExpanded(index);
+	QPoint basePt = option.rect.topLeft();
+
+	qreal leftmargin = 10, height = 36, bottommargin = 13, leg = 8, base_side = 10;
+
+	QPainterPath path;
+	if (bExpanded)
+	{
+		/*
+			------------------------------------
+
+		  ←	leftmargin →  ⊿            leg
+						  🠕
+					 bottommargin
+						  ↓
+			------------------------------------
+		*/
+		bottommargin = 12;
+
+		QPoint lb, rb, rt;
+		lb.setX(leftmargin);
+		lb.setY(height - bottommargin);
+		lb += basePt;
+
+		rb.setX(leftmargin + leg);
+		rb.setY(height - bottommargin);
+		rb += basePt;
+
+		rt.setX(leftmargin + leg);
+		rt.setY(height - bottommargin - leg);
+		rt += basePt;
+
+		path.moveTo(lb);
+		path.lineTo(rb);
+		path.lineTo(rt);
+		path.lineTo(lb);
+
+		painter->setPen(Qt::NoPen);
+		painter->fillPath(path, QBrush(QColor(212, 220, 226)));
+
+	}
+	else
+	{
+		/*
+			------------------------------------
+			←	leftmargin →  ▷         base_side:(左边的“底边”), height;
+							  🠕
+						 bottommargin
+							  ↓
+			------------------------------------
+		*/
+		QPointF lt, lb, rp;
+
+		lb.setX(leftmargin);
+		lb.setY(height - bottommargin);
+		lb += basePt;
+
+		lt.setX(leftmargin);
+		lt.setY(height - bottommargin - base_side);
+		lt += basePt;
+
+		qreal yyy = (lb.y() + lt.y());
+		rp.setY(yyy / 2.0);
+		rp.setX(leftmargin + 5.0);	//height
+
+		path.moveTo(lb);
+		path.lineTo(rp);
+		path.lineTo(lt);
+		path.lineTo(lb);
+
+		painter->setPen(QPen(QColor(212, 220, 226)));
+		painter->drawPath(path);
+	}
+}
+
 void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option,
 	const QModelIndex& index) const
 {
@@ -93,9 +173,12 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 
 	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
 
-	const QWidget* widget = option.widget;
+	QTreeView* treeview = (QTreeView*)parent();
 
 	painter->save();
+
+	const QWidget* widget = option.widget;
+
 	painter->setClipRect(opt.rect);
 
 	const QAbstractItemView* view = qobject_cast<const QAbstractItemView*>(widget);
@@ -104,12 +187,12 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	palette.setColor(QPalette::All, QPalette::HighlightedText, palette.color(QPalette::Active, QPalette::Text));
 	opt.palette = palette;
 
-	const int icon_center_xoffset = 30;
+	const int icon_center_xoffset = 32;
 
 	int iconSize = opt.decorationSize.height();
 	int textMargin = 5;
 	QTextLayout textLayout2(opt.text, opt.font);
-	const int maxLineWidth = 8388607; //����QCommonStylePrivate::viewItemSize
+	const int maxLineWidth = 8388607; //参照QCommonStylePrivate::viewItemSize
 	QSizeF szText = viewItemTextLayout(textLayout2, maxLineWidth);
 
 	int icon_xoffset = icon_center_xoffset - iconSize / 2;
@@ -127,6 +210,14 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 		painter->setBrushOrigin(opt.rect.topLeft());
 		painter->fillRect(opt.rect, opt.backgroundBrush);
 		painter->setBrushOrigin(oldBrushOrigin);
+	}
+
+	//TODO: 展开项在收缩时也能呈现被选中的状态。
+
+	//展开收缩箭头。
+	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
+	{
+		drawExpandArrow(painter, opt);
 	}
 
 	// draw the icon

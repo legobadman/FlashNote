@@ -42,11 +42,17 @@ BookListView::~BookListView()
 {
 }
 
-void BookListView::initNotebook(INotebook* pNotebook, int idxNote)
+void BookListView::updateNotebook(INotebook* pNotebook, int idxNote)
 {
 	static const int nContentLimit = 74;
 
 	m_spNotebook = pNotebook;
+
+	QString bookName = AppHelper::GetNotebookName(pNotebook);
+	m_ui->lblNotebook->setText(bookName);
+	m_ui->lblNumberNotes->setText(QString(u8"%1Ìõ±Ê¼Ç").arg(
+		QString::number(m_spNotebook->GetCount())));
+
 	m_idxNote = idxNote;
 
 	m_model = new QStandardItemModel(this);

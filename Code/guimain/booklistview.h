@@ -10,11 +10,11 @@ class BookListView : public QWidget
 {
 	Q_OBJECT
 public:
-	BookListView(QWidget* parent);
+	BookListView(QWidget* parent = nullptr);
 	~BookListView();
 
 	void init();
-	void initNotebook(INotebook* pNotebook, int idxNote);
+	void updateNotebook(INotebook* pNotebook, int idxNote);
 
 signals:
 	void noteitemclicked(const QModelIndex&);

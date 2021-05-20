@@ -30,6 +30,12 @@ enum LEFT_SIDE_ROLE
 	ItemUnkInterfaceRole,
 };
 
+enum CONTENT_MAIN_VIEW
+{
+	NOTES_VIEW,
+	NOTEBOOKS_VIEW
+};
+
 class LeftSideItemDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
@@ -44,6 +50,9 @@ public:
 
 protected:
 	void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
+
+private:
+	void drawExpandArrow(QPainter* painter, const QStyleOptionViewItem& option) const;
 };
 
 #endif

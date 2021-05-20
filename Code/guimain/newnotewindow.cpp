@@ -26,7 +26,7 @@ void NewNoteWindow::init(int bookid)
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebook(bookid, &spNotebook);
 	HRESULT hr = CreateNote(NORMAL_NOTE, &m_pNote);
-	m_ui->editwindow->initWidget(spNotebook, m_pNote);
+	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote);
 }
 
 void NewNoteWindow::closeEvent(QCloseEvent* event)
