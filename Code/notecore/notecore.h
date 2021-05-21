@@ -42,6 +42,7 @@ interface INotebook : public IUnknown
 	virtual HRESULT Item(VARIANT Index, INote** ppNote) = 0;
 	virtual HRESULT AddNote(INote* pNote) = 0;
 	virtual HRESULT RemoveNote(INote* pNote) = 0;
+	virtual int GetNoteIdx(INote* pNote) = 0;
 };
 
 //暂时不区分Notebook的类型，可能不同类型的note组成一个book
@@ -52,6 +53,7 @@ interface INoteApplication : public IUnknown
 	virtual HRESULT AddNotebook(INotebook* pNotebook) = 0;
 	virtual HRESULT GetUserId(OUT BSTR* pbstrId) const = 0;
 	virtual HRESULT SetUserId(IN BSTR bstrId) = 0;
+	virtual int GetNoteBookIdx(INotebook* pNotebook) = 0;
 };
 
 HRESULT CreateNote(NOTE_TYPE type, INote** ppNote);

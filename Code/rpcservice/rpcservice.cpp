@@ -45,6 +45,25 @@ RPCService::RPCService()
 	thrift_transport->open();
 }
 
+bool RPCService::SynchronizeNotebook(INotebook* pNotebook)
+{
+	BSTR bstrId, bstrName;
+	std::wstring bookid = AppHelper::GetNotebookId(pNotebook).toStdWString();
+	std::wstring bookName = AppHelper::GetNotebookName(pNotebook).toStdWString();
+	if (bookid.empty())
+	{
+		bookid = NewNotebook(bookName);
+		if (bookid.empty())
+			return false;
+
+		pNotebook->SetId(SysAllocString(bookid.c_str()));
+		coreApp->AddNotebook(pNotebook);
+	}
+
+	//其他更新待续
+	return true;
+}
+
 void RPCService::SynchronizeNote(INotebook* pNotebook, INote* pNote)
 {
 	BSTR bstrId, bstrTitle, bstrContent;
@@ -77,6 +96,13 @@ std::wstring RPCService::NewNote(std::wstring bookid, std::wstring title)
 	std::string newnoteid;
 	m_pClient->NewNote(newnoteid, _userid, converter.to_bytes(bookid), converter.to_bytes(title));
 	return converter.from_bytes(newnoteid);
+}
+
+std::wstring RPCService::NewNotebook(std::wstring name)
+{
+	std::string bookid;
+	m_pClient->NewNotebook(bookid, _userid, converter.to_bytes(name));
+	return converter.from_bytes(bookid);
 }
 
 void RPCService::RemoveNote(int bookid, INote* pNote)

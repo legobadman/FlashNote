@@ -240,6 +240,16 @@ HRESULT NotebookBase::RemoveNote(INote* pNote)
 	return E_FAIL;
 }
 
+int NotebookBase::GetNoteIdx(INote* pNote)
+{
+	for (int i = 0; i < m_vecNotes.size(); i++)
+	{
+		if (m_vecNotes[i] == pNote)
+			return i;
+	}
+	return -1;
+}
+
 HRESULT NotebookBase::QueryInterface(
 	/* [in] */ REFIID riid,
 	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
@@ -325,6 +335,16 @@ HRESULT NoteApplication::SetUserId(IN BSTR bstrId)
 {
 	m_id.Attach(bstrId);
 	return S_OK;
+}
+
+int NoteApplication::GetNoteBookIdx(INotebook* pNote)
+{
+	for (int i = 0; i < m_vecBooks.size(); i++)
+	{
+		if (m_vecBooks[i] == pNote)
+			return i;
+	}
+	return -1;
 }
 
 HRESULT NoteApplication::QueryInterface(

@@ -59,6 +59,7 @@ public:
 	HRESULT Item(VARIANT Index, INote** ppNote);
 	HRESULT AddNote(INote* pNote);
 	HRESULT RemoveNote(INote* pNote);
+	int GetNoteIdx(INote* pNote);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -86,6 +87,7 @@ public:
 	int GetCount() const;
 	HRESULT GetUserId(OUT BSTR* pbstrId) const;
 	HRESULT SetUserId(IN BSTR bstrId);
+	int GetNoteBookIdx(INotebook* pNote);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(

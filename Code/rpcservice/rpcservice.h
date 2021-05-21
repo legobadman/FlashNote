@@ -19,8 +19,10 @@ public:
 	void getnotebooks(std::vector<NOTEBOOK>& vecBooks);
 	void InitcoreFromRPC(INoteApplication* pApp);
 	void SynchronizeNote(INotebook* pNotebook, INote* pNote);
+	bool SynchronizeNotebook(INotebook* pNotebook);
 	void RemoveNote(int bookid, INote* pNote);
 	std::wstring NewNote(std::wstring bookid, std::wstring title);
+	std::wstring NewNotebook(std::wstring name);
 
 private:
 	RPCService();

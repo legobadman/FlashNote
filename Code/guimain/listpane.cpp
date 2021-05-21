@@ -5,6 +5,7 @@
 #include "note_types.h"
 #include "notewinservice.h"
 #include "MyStyle.h"
+#include "guihelper.h"
 #include "moc_listpane.cpp"
 
 
@@ -135,7 +136,9 @@ void NewNoteItem::leaveEvent(QEvent* e)
 
 NoteItemTreeView::NoteItemTreeView(QWidget* parent)
 	: QTreeView(parent)
+	, m_hoverObj(MOUSE_IN_OTHER)
 {
+	setMouseTracking(true);
 }
 
 void NoteItemTreeView::mousePressEvent(QMouseEvent* e)
@@ -148,7 +151,53 @@ void NoteItemTreeView::mousePressEvent(QMouseEvent* e)
 	}
 	else
 	{
+		
+	}
+
+	updateHoverState(e->pos());
+	if (m_hoverObj == MOUSE_IN_EXPAND || m_hoverObj == MOUSE_IN_ADD)
+	{
+		emit clickObj(index, m_hoverObj);
+	}
+	else
+	{
 		QTreeView::mousePressEvent(e);
+	}
+}
+
+void NoteItemTreeView::mouseMoveEvent(QMouseEvent* e)
+{
+	updateHoverState(e->pos());
+	QTreeView::mouseMoveEvent(e);
+}
+
+void NoteItemTreeView::updateHoverState(QPoint pos)
+{
+	int width = this->width();
+	const QModelIndex& index = indexAt(pos);
+	static int xrange_expand = 30;
+	static int xrange_addbtn = 35;
+
+	if (pos.x() < xrange_expand && model()->hasChildren(index))
+	{
+		if (m_hoverObj != MOUSE_IN_EXPAND)
+		{
+			m_hoverObj = MOUSE_IN_EXPAND;
+			update(index);
+		}
+	}
+	else if (pos.x() > width - xrange_addbtn)
+	{
+		if (m_hoverObj != MOUSE_IN_ADD)
+		{
+			m_hoverObj = MOUSE_IN_ADD;
+			update(index);
+		}
+	}
+	else if (m_hoverObj != MOUSE_IN_OTHER)
+	{
+		m_hoverObj = MOUSE_IN_OTHER;
+		update(index);
 	}
 }
 
@@ -178,6 +227,8 @@ NavigationPanel::NavigationPanel(QWidget* parent)
 
 	connect(m_newnote, SIGNAL(clicked()), this, SIGNAL(newnote()));
 	connect(m_treeview, SIGNAL(clicked(const QModelIndex&)), this, SIGNAL(clicked(const QModelIndex&)));
+	connect(m_treeview, SIGNAL(clickObj(const QModelIndex&, MOUSE_HINT)), this,
+		SLOT(onObjClick(const QModelIndex&, MOUSE_HINT)));
 }
 
 NavigationPanel::~NavigationPanel()
@@ -189,6 +240,24 @@ void NavigationPanel::paintEvent(QPaintEvent* event)
 	QPainter painter(this);
 	QPen pen;
 	painter.fillRect(rect(), QColor(42, 51, 60));
+}
+
+void NavigationPanel::addNotebookItem(int core_idx, INotebook* pNotebook)
+{
+	QModelIndex booksIdx = leftsidemodel->index((int)ITEM_CONTENT_TYPE::ITEM_NOTEBOOK, 0);
+	QString bookName = AppHelper::GetNotebookName(pNotebook);
+	//QStandardItem* pItem = new QStandardItem(bookName);
+	//pItem->setEditable(false);
+	//pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
+	//	ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM), ItemContentTypeRole);
+	//pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
+	//	ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
+
+	leftsidemodel->insertRow(core_idx, booksIdx);
+
+	QModelIndex newItem = booksIdx.child(core_idx, 0);
+	QStandardItem* pItem = leftsidemodel->itemFromIndex(newItem);
+	pItem->setText(bookName);
 }
 
 void NavigationPanel::initModel()
@@ -276,6 +345,18 @@ void NavigationPanel::initModel()
 
 	m_treeview->setModel(leftsidemodel);
 	m_treeview->setItemDelegate(new LeftSideItemDelegate(m_treeview));
+}
+
+void NavigationPanel::onObjClick(const QModelIndex& index, MOUSE_HINT hint)
+{
+	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
+	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
+	{
+		if (hint == MOUSE_IN_ADD)
+			emit addnotebook();
+		else if (hint == MOUSE_IN_EXPAND)
+			emit expand_changed(index);
+	}
 }
 
 void NavigationPanel::initNotebookItem()

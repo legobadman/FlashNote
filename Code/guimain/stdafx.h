@@ -20,6 +20,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QDialog>
+#include <QPushbutton>
 #include <QTextEdit>
 #include <QListView>
 #include <QTimer>

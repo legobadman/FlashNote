@@ -19,6 +19,7 @@ public:
 public slots:
 	void onLeftTreeClicked(const QModelIndex& index);
 	void onNewNote();
+	void onAddNotebook();
 	void initNotesView(int idxNotebook, int idxNote);
 
 protected:

@@ -2,6 +2,7 @@
 #include "LeftSideItemDelegate.h"
 #include "moc_LeftSideItemDelegate.cpp"
 #include "MyStyle.h"
+#include "listpane.h"
 
 
 LeftSideItemDelegate::LeftSideItemDelegate(QWidget* parent)
@@ -173,7 +174,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 
 	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
 
-	QTreeView* treeview = (QTreeView*)parent();
+	NoteItemTreeView* pTreeview = qobject_cast<NoteItemTreeView*>(parent());
 
 	painter->save();
 
@@ -223,6 +224,26 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	// draw the icon
 	QIcon::State state = opt.state & QStyle::State_Open ? QIcon::On : QIcon::Off;
 	opt.icon.paint(painter, iconRect, opt.decorationAlignment, QIcon::Normal, state);
+
+	// 添加按钮
+	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK && (opt.state & QStyle::State_MouseOver))
+	{
+		QIcon icon;
+
+		if (pTreeview->GetHoverObj() == MOUSE_IN_ADD)
+			icon.addFile(":/icons/16x16/add_hover.png");
+		else
+			icon.addFile(":/icons/16x16/add_normal.png");
+
+		iconSize = 16;
+		int icon_offset = 10;
+
+		QRect addiconRect(opt.rect.width() - icon_offset - iconSize, 
+			opt.rect.y() + icon_offset, iconSize, iconSize);
+
+		if (opt.state & QStyle::State_MouseOver)
+			icon.paint(painter, addiconRect, opt.decorationAlignment, QIcon::Normal, state);
+	}
 
 	// draw the text
 	if (!opt.text.isEmpty())

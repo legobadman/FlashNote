@@ -7,6 +7,7 @@
 #include "guihelper.h"
 #include "rpcservice.h"
 #include "newnotewindow.h"
+#include "addbookdlg.h"
 
 
 NoteMainWindow::NoteMainWindow(QWidget* parent)
@@ -34,6 +35,7 @@ void NoteMainWindow::init()
 	connect(m_ui->listpane, SIGNAL(clicked(const QModelIndex&)),
 		this, SLOT(onLeftTreeClicked(const QModelIndex&)));
 	connect(m_ui->listpane, SIGNAL(newnote()), this, SLOT(onNewNote()));
+	connect(m_ui->listpane, SIGNAL(addnotebook()), this, SLOT(onAddNotebook()));
 }
 
 void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
@@ -57,6 +59,29 @@ void NoteMainWindow::onNewNote()
 	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL);
 	pNewNoteWindow->init(getActiveBookIndex());
 	pNewNoteWindow->showMaximized();
+}
+
+void NoteMainWindow::onAddNotebook()
+{
+	AddBookDlg* pDlg = new AddBookDlg(this);
+	int ret = pDlg->exec();
+	if (ret == QDialog::Accepted)
+	{
+		QString bookName = pDlg->getName();
+		com_sptr<INotebook> spNotebook;
+		HRESULT hr = CreateNotebook(&spNotebook);
+		if (hr == S_OK)
+		{
+			BSTR bstrTitle = SysAllocString(bookName.toStdWString().c_str());
+			spNotebook->SetName(bstrTitle);
+			bool ret = RPCService::GetInstance().SynchronizeNotebook(spNotebook);
+			if (ret)
+			{
+				int idx = coreApp->GetNoteBookIdx(spNotebook);
+				m_ui->listpane->addNotebookItem(idx, spNotebook);
+			}
+		}
+	}
 }
 
 int NoteMainWindow::getActiveNoteInBook(int bookidx)

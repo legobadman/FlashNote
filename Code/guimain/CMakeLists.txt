@@ -44,7 +44,10 @@ find_package(Qt5 REQUIRED COMPONENTS Widgets)
 link_directories(../3rdparty/boost_1_55_0/stage/lib)
 
 # Tell CMake to create the helloworld executable
-add_executable(guimain 
+add_executable(guimain
+    ./addbookdlg.cpp
+    ./addbookdlg.h
+    ./addbookdlg.ui
     ./alignmentcombobox.cpp
     ./alignmentcombobox.h
     ./booklistview.cpp

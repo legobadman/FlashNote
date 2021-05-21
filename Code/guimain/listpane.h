@@ -29,14 +29,34 @@ private:
 	bool m_bPressed;
 };
 
+enum MOUSE_HINT
+{
+	MOUSE_IN_EXPAND,
+	MOUSE_IN_ADD,
+	MOUSE_IN_SEARCH,
+	MOUSE_IN_OTHER,
+};
+
 class NoteItemTreeView : public QTreeView
 {
 	Q_OBJECT
 public:
 	NoteItemTreeView(QWidget* parent = nullptr);
+	MOUSE_HINT GetHoverObj() { return m_hoverObj; }
 
 protected:
 	void mousePressEvent(QMouseEvent* e) override;
+	void mouseMoveEvent(QMouseEvent* e) override;
+
+signals:
+	void clickObj(const QModelIndex&, MOUSE_HINT);
+
+private:
+	void updateHoverState(QPoint pos);
+
+private:
+	MOUSE_HINT m_hoverObj;
+	QPoint m_mousepos;
 };
 
 class NavigationPanel : public QWidget
@@ -46,6 +66,7 @@ public:
 	NavigationPanel(QWidget* parent = nullptr);
 	~NavigationPanel();
 	QTreeView* treeview() { return m_treeview; }
+	void addNotebookItem(int core_idx, INotebook* pNotebook);
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
@@ -56,7 +77,12 @@ private:
 
 signals:
 	void newnote();
+	void expand_changed(const QModelIndex&);
+	void addnotebook();
 	void clicked(const QModelIndex&);
+
+private slots:
+	void onObjClick(const QModelIndex&, MOUSE_HINT);
 
 private:
 	QStandardItemModel* leftsidemodel;
