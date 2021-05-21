@@ -246,18 +246,19 @@ void NavigationPanel::addNotebookItem(int core_idx, INotebook* pNotebook)
 {
 	QModelIndex booksIdx = leftsidemodel->index((int)ITEM_CONTENT_TYPE::ITEM_NOTEBOOK, 0);
 	QString bookName = AppHelper::GetNotebookName(pNotebook);
-	//QStandardItem* pItem = new QStandardItem(bookName);
-	//pItem->setEditable(false);
-	//pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
-	//	ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM), ItemContentTypeRole);
-	//pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
-	//	ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
 
 	leftsidemodel->insertRow(core_idx, booksIdx);
 
 	QModelIndex newItem = booksIdx.child(core_idx, 0);
 	QStandardItem* pItem = leftsidemodel->itemFromIndex(newItem);
+
+	ITEM_WIDGET_TYPE widgetType = newItem.data(ItemWidgetTypeRole).value<ITEM_WIDGET_TYPE>();
 	pItem->setText(bookName);
+	pItem->setEditable(false);
+	pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
+		ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM), ItemContentTypeRole);
+	pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
+		ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
 }
 
 void NavigationPanel::initModel()
