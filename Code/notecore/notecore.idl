@@ -1,0 +1,88 @@
+import "unknwn.idl";
+import "ocidl.idl";
+
+
+interface ICoreNotify;
+interface INoteCoreObj;
+
+typedef enum NOTE_TYPE
+{
+	NORMAL_NOTE = 0,
+	UNKNOWN_TYPE,
+}NOTE_TYPE;
+
+typedef enum NotifyOperator
+{
+	Add = 0,
+	Delete,
+	Update,
+	Other,
+}NotifyOperator;
+
+typedef struct
+{
+	enum NotifyOperator ope;
+	int idx;
+	wchar_t* wid;
+	INoteCoreObj* pObj;
+} NotifyArg;
+
+
+[object, uuid (956003E7-3C5A-42EB-BA19-D8EEF54DABFF)]
+interface ICoreNotify : IUnknown {
+	HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
+};
+
+
+[object, uuid(A13F359A-007B-472A-AC14-97FE79C404FE)]
+interface INoteCoreObj : IUnknown {
+	HRESULT addWatcher(ICoreNotify* pNotify);
+};
+
+
+[object, uuid(8FD93C3C-28FD-43E0-88B5-61D1AC4C42F0)]
+interface INote : INoteCoreObj {
+	HRESULT GetId([out, retval] BSTR* pbstrId);
+	HRESULT SetId([in] BSTR bstrId);
+	HRESULT GetTitle([out] BSTR* pbstrName);
+	HRESULT SetTitle([in] BSTR title);
+	HRESULT GetType([out]NOTE_TYPE* pType);
+	HRESULT SetType([in]NOTE_TYPE type);
+	HRESULT GetContent([out] BSTR* pbstrContent);
+	HRESULT SetContent([in] BSTR content);
+	HRESULT GetAbbreText([out] BSTR* pbstrAbbre);
+	HRESULT SetPlainText([in] BSTR content);
+	HRESULT GetCreateTime([out] long* pTime);
+	HRESULT SetCreateTime([in] long time);
+	HRESULT GetModifyTime([out] long* pTime);
+	HRESULT SetModifyTime([in] long time);
+};
+
+
+[object, uuid(701090AB-4965-46F3-AEA5-36C30FBDC57A)]
+interface INotebook : INoteCoreObj {
+	HRESULT GetId([out, retval] BSTR* pbstrId);
+	HRESULT SetId([in] BSTR bstrId);
+	HRESULT GetName([out] BSTR* pbstrName);
+	HRESULT SetName([in] BSTR bstrName);
+	HRESULT GetCreateTime([out] long* pTime);
+	HRESULT SetCreateTime([in] long time);
+	HRESULT GetModifyTime([out] long* pTime);
+	HRESULT SetModifyTime([in] long time);
+	HRESULT GetCount([out] int* pCount);
+	HRESULT Item([in] VARIANT index, [out]INote** ppNote);
+	HRESULT AddNote([in]INote* pNote);
+	HRESULT RemoveNote([in]INote* pNote);
+	HRESULT GetNoteIdx([in]INote* pNote, [out]int* pIndex);
+};
+
+
+[object, uuid(9ACA0D9D-3CFF-4644-92E9-863B5FBB3D02)]
+interface INoteApplication : INoteCoreObj {
+	HRESULT GetCount([out] int* pCount);
+	HRESULT GetNotebook([in] VARIANT index, [out]INotebook** ppNotebook);
+	HRESULT AddNotebook([in]INotebook* pNotebook);
+	HRESULT GetUserId([out]BSTR* pbstrId);
+	HRESULT SetUserId([in]BSTR bstrId);
+	HRESULT GetNotebookIdx([in]INotebook* pNotebook, [out]int* pIdx);
+};

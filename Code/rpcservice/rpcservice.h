@@ -20,7 +20,7 @@ public:
 	void InitcoreFromRPC(INoteApplication* pApp);
 	void SynchronizeNote(INotebook* pNotebook, INote* pNote);
 	bool SynchronizeNotebook(INotebook* pNotebook);
-	void RemoveNote(int bookid, INote* pNote);
+	bool RemoveNote(INotebook* pNotebook, INote* pNote);
 	std::wstring NewNote(std::wstring bookid, std::wstring title);
 	std::wstring NewNotebook(std::wstring name);
 

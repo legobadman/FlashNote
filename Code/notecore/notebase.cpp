@@ -13,7 +13,7 @@ NoteBase::~NoteBase()
 	//TODO: Îö¹¹bstr
 }
 
-HRESULT NoteBase::GetId(OUT BSTR* pbstrId) const
+HRESULT NoteBase::GetId(OUT BSTR* pbstrId)
 {
 	return m_id.CopyTo(pbstrId);
 }
@@ -24,7 +24,7 @@ HRESULT NoteBase::SetId(IN BSTR bstrId)
 	return S_OK;
 }
 
-HRESULT NoteBase::GetTitle(OUT BSTR* pbstrName) const
+HRESULT NoteBase::GetTitle(OUT BSTR* pbstrName)
 {
 	return m_bstrTitle.CopyTo(pbstrName);
 }
@@ -35,9 +35,10 @@ HRESULT NoteBase::SetTitle(IN BSTR title)
 	return S_OK;
 }
 
-NOTE_TYPE NoteBase::GetType() const
+HRESULT NoteBase::GetType(NOTE_TYPE* pType)
 {
-	return m_type;
+	*pType = m_type;
+	return S_OK;
 }
 
 HRESULT NoteBase::SetType(NOTE_TYPE type)
@@ -46,7 +47,7 @@ HRESULT NoteBase::SetType(NOTE_TYPE type)
 	return S_OK;
 }
 
-HRESULT NoteBase::GetContent(OUT BSTR* pbstrContent) const
+HRESULT NoteBase::GetContent(OUT BSTR* pbstrContent)
 {
 	return m_bstrContent.CopyTo(pbstrContent);
 }
@@ -57,7 +58,7 @@ HRESULT NoteBase::SetContent(IN BSTR content)
 	return S_OK;
 }
 
-HRESULT NoteBase::GetAbbreText(OUT BSTR* pbstrAbbre) const
+HRESULT NoteBase::GetAbbreText(OUT BSTR* pbstrAbbre)
 {
 	if (!pbstrAbbre)
 		return E_POINTER;
@@ -76,26 +77,24 @@ HRESULT NoteBase::SetPlainText(IN BSTR content)
 	return S_OK;
 }
 
-std::tm NoteBase::GetCreateTime() const
+HRESULT NoteBase::GetCreateTime(long* pTime)
 {
-	return m_createtime;
+	return E_NOTIMPL;
 }
 
-HRESULT NoteBase::SetCreateTime(std::tm create_time)
+HRESULT NoteBase::SetCreateTime(long create_time)
 {
-	m_createtime = create_time;
-	return S_OK;
+	return E_NOTIMPL;
 }
 
-std::tm NoteBase::GetModifyTime() const
+HRESULT NoteBase::GetModifyTime(long* pTime)
 {
-	return m_modifytime;
+	return E_NOTIMPL;
 }
 
-HRESULT NoteBase::SetModifyTime(std::tm modify_time)
+HRESULT NoteBase::SetModifyTime(long modify_time)
 {
-	m_modifytime = modify_time;
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 HRESULT STDMETHODCALLTYPE NoteBase::QueryInterface(
@@ -125,6 +124,12 @@ ULONG STDMETHODCALLTYPE NoteBase::Release(void)
 	return m_ref;
 }
 
+HRESULT NoteBase::addWatcher(ICoreNotify* pNotify)
+{
+	m_notifies.push_back(pNotify);
+	return S_OK;
+}
+
 
 /////////////////////////////////////////////////
 NotebookBase::NotebookBase()
@@ -134,14 +139,14 @@ NotebookBase::NotebookBase()
 
 NotebookBase::~NotebookBase()
 {
-	for (int i = 0; i < m_vecNotes.size(); i++)
+	for (int i = 0; i < (int)m_vecNotes.size(); i++)
 	{
 		m_vecNotes[i]->Release();
 	}
 	m_vecNotes.clear();
 }
 
-HRESULT NotebookBase::GetId(OUT BSTR* pbstrId) const
+HRESULT NotebookBase::GetId(OUT BSTR* pbstrId)
 {
 	return m_id.CopyTo(pbstrId);
 }
@@ -152,7 +157,7 @@ HRESULT NotebookBase::SetId(IN BSTR bstrId)
 	return S_OK;
 }
 
-HRESULT NotebookBase::GetName(OUT BSTR* pbstrName) const
+HRESULT NotebookBase::GetName(OUT BSTR* pbstrName)
 {
 	return m_strName.CopyTo(pbstrName);
 }
@@ -163,31 +168,30 @@ HRESULT NotebookBase::SetName(IN BSTR bstrName)
 	return S_OK;
 }
 
-std::tm NotebookBase::GetCreateTime() const
+HRESULT NotebookBase::GetCreateTime(long* pTime)
 {
-	return m_createtime;
+	return E_NOTIMPL;
 }
 
-HRESULT NotebookBase::SetCreateTime(std::tm create_time)
+HRESULT NotebookBase::SetCreateTime(long create_time)
 {
-	m_createtime = create_time;
+	return E_NOTIMPL;
+}
+
+HRESULT NotebookBase::GetModifyTime(long* pTime)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT NotebookBase::SetModifyTime(long modify_time)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT NotebookBase::GetCount(int* pCount)
+{
+	*pCount = m_vecNotes.size();
 	return S_OK;
-}
-
-std::tm NotebookBase::GetModifyTime() const
-{
-	return m_modifytime;
-}
-
-HRESULT NotebookBase::SetModifyTime(std::tm modify_time)
-{
-	m_modifytime = modify_time;
-	return S_OK;
-}
-
-int NotebookBase::GetCount() const
-{
-	return m_vecNotes.size();
 }
 
 HRESULT NotebookBase::Item(VARIANT Index, INote** ppNote)
@@ -199,7 +203,7 @@ HRESULT NotebookBase::Item(VARIANT Index, INote** ppNote)
 	if (V_VT(&Index) == VT_I4)
 	{
 		int nIndex = V_I4(&Index);
-		if (nIndex >= 0 && nIndex < m_vecNotes.size())
+		if (nIndex >= 0 && nIndex < (int)m_vecNotes.size())
 		{
 			*ppNote = m_vecNotes[nIndex];
 			(*ppNote)->AddRef();
@@ -209,6 +213,22 @@ HRESULT NotebookBase::Item(VARIANT Index, INote** ppNote)
 		{
 			return E_INVALIDARG;
 		}
+	}
+	else if (V_VT(&Index) == VT_BSTR)
+	{
+		BSTR bstrId = V_BSTR(&Index);
+		for (auto it = m_vecNotes.begin(); it != m_vecNotes.end(); it++)
+		{
+			BSTR _id;
+			(*it)->GetId(&_id);
+			if (0 == wcscmp(bstrId, _id))
+			{
+				*ppNote = *it;
+				(*ppNote)->AddRef();
+				return S_OK;
+			}
+		}
+		return E_FAIL;
 	}
 	return E_NOTIMPL;
 }
@@ -220,7 +240,22 @@ HRESULT NotebookBase::AddNote(INote* pNote)
 
 	pNote->AddRef();
 	m_vecNotes.push_back(pNote);
+	NotifyThisObj(Add, pNote);
 	return S_OK;
+}
+
+void NotebookBase::NotifyThisObj(NotifyOperator ope, INote* pNote)
+{
+	for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
+	{
+		BSTR bstrId;
+		pNote->GetId(&bstrId);
+		std::wstring noteid(bstrId, SysStringLen(bstrId));
+		NotifyArg arg;
+		arg.ope = ope;
+		arg.pObj = pNote;
+		(*it)->onCoreNotify(this, arg);
+	}
 }
 
 HRESULT NotebookBase::RemoveNote(INote* pNote)
@@ -234,20 +269,34 @@ HRESULT NotebookBase::RemoveNote(INote* pNote)
 		{
 			m_vecNotes.erase(it);
 			pNote->Release();
+			NotifyThisObj(Delete, pNote);
+			return S_OK;
+		}
+		else
+		{
+			it++;
+		}
+	}
+	return E_FAIL;
+}
+
+HRESULT NotebookBase::GetNoteIdx(INote* pNote, int* pIndex)
+{
+	for (int i = 0; i < (int)m_vecNotes.size(); i++)
+	{
+		if (m_vecNotes[i] == pNote)
+		{
+			*pIndex = i;
 			return S_OK;
 		}
 	}
 	return E_FAIL;
 }
 
-int NotebookBase::GetNoteIdx(INote* pNote)
+HRESULT NotebookBase::addWatcher(ICoreNotify* pNotify)
 {
-	for (int i = 0; i < m_vecNotes.size(); i++)
-	{
-		if (m_vecNotes[i] == pNote)
-			return i;
-	}
-	return -1;
+	m_notifies.insert(pNotify);
+	return S_OK;
 }
 
 HRESULT NotebookBase::QueryInterface(
@@ -297,7 +346,7 @@ HRESULT NoteApplication::GetNotebook(VARIANT Index, INotebook** ppNotebook)
 	if (V_VT(&Index) == VT_I4)
 	{
 		int nIndex = V_I4(&Index);
-		if (nIndex >= 0 && nIndex < m_vecBooks.size())
+		if (nIndex >= 0 && nIndex < (int)m_vecBooks.size())
 		{
 			*ppNotebook = m_vecBooks[nIndex];
 			(*ppNotebook)->AddRef();
@@ -321,12 +370,13 @@ HRESULT NoteApplication::AddNotebook(INotebook* pNotebook)
 	return S_OK;
 }
 
-int NoteApplication::GetCount() const
+HRESULT NoteApplication::GetCount(int* pCount)
 {
-	return m_vecBooks.size();
+	*pCount = m_vecBooks.size();
+	return S_OK;
 }
 
-HRESULT NoteApplication::GetUserId(OUT BSTR* pbstrId) const
+HRESULT NoteApplication::GetUserId(OUT BSTR* pbstrId)
 {
 	return m_id.CopyTo(pbstrId);
 }
@@ -337,14 +387,23 @@ HRESULT NoteApplication::SetUserId(IN BSTR bstrId)
 	return S_OK;
 }
 
-int NoteApplication::GetNoteBookIdx(INotebook* pNote)
+HRESULT NoteApplication::GetNotebookIdx(INotebook* pNote, int* pIdx)
 {
-	for (int i = 0; i < m_vecBooks.size(); i++)
+	for (int i = 0; i < (int)m_vecBooks.size(); i++)
 	{
 		if (m_vecBooks[i] == pNote)
-			return i;
+		{
+			*pIdx = i;
+			return S_OK;
+		}
 	}
-	return -1;
+	return E_FAIL;
+}
+
+HRESULT NoteApplication::addWatcher(ICoreNotify* pNotify)
+{
+	m_notifies.push_back(pNotify);
+	return S_OK;
 }
 
 HRESULT NoteApplication::QueryInterface(

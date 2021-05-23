@@ -13,6 +13,8 @@ public:
 	static QString GetNoteAbbre(INote* pNote);
 	static QString GetNoteTitle(INote* pNote);
 	static QString GetNoteId(INote* pNote);
+
+	static int GetNoteCounts(INotebook* pNotebook);
 };
 
 #endif

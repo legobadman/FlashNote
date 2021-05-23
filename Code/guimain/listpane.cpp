@@ -373,8 +373,10 @@ void NavigationPanel::initNotebookItem()
 		ITEM_WIDGET_TYPE::ITEM_TOPLEVEL), ItemWidgetTypeRole);
 
 	com_sptr<INoteApplication> spApp = coreApp;
+	int count = 0;
+	spApp->GetCount(&count);
 	QModelIndex activeIndex;
-	for (int i = 0; i < spApp->GetCount(); i++)
+	for (int i = 0; i < count; i++)
 	{
 		VARIANT index;
 		V_VT(&index) = VT_I4;

@@ -1,7 +1,6 @@
 #include "notecore.h"
 #include "notebase.h"
 
-
 HRESULT CreateNote(NOTE_TYPE type, INote** ppNote)
 {
 	if (ppNote == NULL)

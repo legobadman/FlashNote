@@ -5,7 +5,9 @@
 #include <xstring>
 #include <combaseapi.h>
 #include <vector>
+#include <map>
 #include <atlcomcli.h>
 #include <com_sptr.h>
+#include <unordered_set>
 
 using namespace std;

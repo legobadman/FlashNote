@@ -97,3 +97,11 @@ QString AppHelper::GetNoteTitle(INote* pNote)
 	QString content = QString::fromUtf16(reinterpret_cast<ushort*>(bstrContent));
 	return content;
 }
+
+int AppHelper::GetNoteCounts(INotebook* pNotebook)
+{
+	int nCount = 0;
+	Q_ASSERT(pNotebook);
+	pNotebook->GetCount(&nCount);
+	return nCount;
+}

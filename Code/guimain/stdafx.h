@@ -28,6 +28,8 @@
 #include <QSystemTrayIcon>
 #include "com_sptr.h"
 #include "notecore.h"
+#include "notecore.h"
+#include "notecoreinit.h"
 #include "note_types.h"
 
 #endif

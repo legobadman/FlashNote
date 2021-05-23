@@ -27,7 +27,7 @@ enum LEFT_SIDE_ROLE
 {
 	ItemWidgetTypeRole = Qt::UserRole + 1,
 	ItemContentTypeRole,
-	ItemUnkInterfaceRole,
+	ItemCoreObjIdRole,
 };
 
 enum CONTENT_MAIN_VIEW

@@ -1,26 +1,30 @@
 #ifndef __NOTE_BASE_H__
 #define __NOTE_BASE_H__
 
+#include "framework.h"
+
 class NoteBase : public INote
 {
 public:
 	NoteBase();
 	~NoteBase();
 
-	HRESULT GetId(OUT BSTR* pbstrId) const;
-	HRESULT SetId(IN BSTR bstrId);
-	HRESULT GetTitle(OUT BSTR* pbstrName) const;
-	HRESULT SetTitle(IN BSTR title);
-	NOTE_TYPE GetType() const;
-	HRESULT SetType(NOTE_TYPE type);
-	HRESULT GetContent(OUT BSTR* pbstrContent) const;
-	HRESULT SetContent(IN BSTR content);
-	HRESULT GetAbbreText(OUT BSTR* pbstrAbbre) const;
-	HRESULT SetPlainText(IN BSTR content);
-	std::tm GetCreateTime() const;
-	HRESULT SetCreateTime(std::tm create_time);
-	std::tm GetModifyTime() const;
-	HRESULT SetModifyTime(std::tm create_time);
+	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
+
+	HRESULT STDMETHODCALLTYPE GetId(OUT BSTR* pbstrId);
+	HRESULT STDMETHODCALLTYPE SetId(IN BSTR bstrId);
+	HRESULT STDMETHODCALLTYPE GetTitle(OUT BSTR* pbstrName);
+	HRESULT STDMETHODCALLTYPE SetTitle(IN BSTR title);
+	HRESULT STDMETHODCALLTYPE GetType(NOTE_TYPE* pType);
+	HRESULT STDMETHODCALLTYPE SetType(NOTE_TYPE type);
+	HRESULT STDMETHODCALLTYPE GetContent(OUT BSTR* pbstrContent);
+	HRESULT STDMETHODCALLTYPE SetContent(IN BSTR content);
+	HRESULT STDMETHODCALLTYPE GetAbbreText(OUT BSTR* pbstrAbbre);
+	HRESULT STDMETHODCALLTYPE SetPlainText(IN BSTR content);
+	HRESULT STDMETHODCALLTYPE GetCreateTime(long* pTime);
+	HRESULT STDMETHODCALLTYPE SetCreateTime(long time);
+	HRESULT STDMETHODCALLTYPE GetModifyTime(long* pTime);
+	HRESULT STDMETHODCALLTYPE SetModifyTime(long time);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -37,6 +41,8 @@ private:
 	std::tm m_createtime;
 	std::tm m_modifytime;
 
+	std::vector<ICoreNotify*> m_notifies;
+
 	NOTE_TYPE m_type;
 	int m_ref;
 };
@@ -47,19 +53,21 @@ public:
 	NotebookBase();
 	~NotebookBase();
 
-	HRESULT GetId(OUT BSTR* pbstrId) const;
-	HRESULT SetId(IN BSTR bstrId);
-	HRESULT GetName(OUT BSTR* pbstrName) const;
-	HRESULT SetName(IN BSTR bstrName);
-	std::tm GetCreateTime() const;
-	HRESULT SetCreateTime(std::tm create_time);
-	std::tm GetModifyTime() const;
-	HRESULT SetModifyTime(std::tm create_time);
-	int GetCount() const;
-	HRESULT Item(VARIANT Index, INote** ppNote);
-	HRESULT AddNote(INote* pNote);
-	HRESULT RemoveNote(INote* pNote);
-	int GetNoteIdx(INote* pNote);
+	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
+
+	HRESULT STDMETHODCALLTYPE GetId(OUT BSTR* pbstrId);
+	HRESULT STDMETHODCALLTYPE SetId(IN BSTR bstrId);
+	HRESULT STDMETHODCALLTYPE GetName(OUT BSTR* pbstrName);
+	HRESULT STDMETHODCALLTYPE SetName(IN BSTR bstrName);
+	HRESULT STDMETHODCALLTYPE GetCreateTime(long* pTime);
+	HRESULT STDMETHODCALLTYPE SetCreateTime(long create_time);
+	HRESULT STDMETHODCALLTYPE GetModifyTime(long* pTime);
+	HRESULT STDMETHODCALLTYPE SetModifyTime(long time);
+	HRESULT STDMETHODCALLTYPE GetCount(int* pCount);
+	HRESULT STDMETHODCALLTYPE Item(VARIANT Index, INote** ppNote);
+	HRESULT STDMETHODCALLTYPE AddNote(INote* pNote);
+	HRESULT STDMETHODCALLTYPE RemoveNote(INote* pNote);
+	HRESULT STDMETHODCALLTYPE GetNoteIdx(INote* pNote, int* pIndex);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -69,11 +77,16 @@ public:
 	ULONG STDMETHODCALLTYPE Release(void);
 
 private:
+	void NotifyThisObj(NotifyOperator ope, INote* pNote);
+
+private:
 	CComBSTR m_id;
 	CComBSTR m_strName;
 	std::tm m_createtime;
 	std::tm m_modifytime;
 	std::vector<INote*> m_vecNotes;
+	//std::vector<ICoreNotify*> m_notifies;
+	std::unordered_set<ICoreNotify*> m_notifies;
 	int m_ref;
 };
 
@@ -82,12 +95,15 @@ class NoteApplication : public INoteApplication
 public:
 	NoteApplication();
 	~NoteApplication();
-	HRESULT GetNotebook(VARIANT Index, INotebook** ppNotebook);
-	HRESULT AddNotebook(INotebook* pNotebook);
-	int GetCount() const;
-	HRESULT GetUserId(OUT BSTR* pbstrId) const;
-	HRESULT SetUserId(IN BSTR bstrId);
-	int GetNoteBookIdx(INotebook* pNote);
+
+	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
+
+	HRESULT STDMETHODCALLTYPE GetNotebook(VARIANT Index, INotebook** ppNotebook);
+	HRESULT STDMETHODCALLTYPE AddNotebook(INotebook* pNotebook);
+	HRESULT STDMETHODCALLTYPE GetCount(int* pCount);
+	HRESULT STDMETHODCALLTYPE GetUserId(OUT BSTR* pbstrId);
+	HRESULT STDMETHODCALLTYPE SetUserId(IN BSTR bstrId);
+	HRESULT STDMETHODCALLTYPE GetNotebookIdx(INotebook* pNote, int* pIdx);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -99,6 +115,7 @@ public:
 private:
 	CComBSTR m_id;
 	std::vector<INotebook*> m_vecBooks;
+	std::vector<ICoreNotify*> m_notifies;
 	int m_ref;
 };
 

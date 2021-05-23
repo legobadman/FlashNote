@@ -77,7 +77,8 @@ void NoteMainWindow::onAddNotebook()
 			bool ret = RPCService::GetInstance().SynchronizeNotebook(spNotebook);
 			if (ret)
 			{
-				int idx = coreApp->GetNoteBookIdx(spNotebook);
+				int idx = -1;
+				coreApp->GetNotebookIdx(spNotebook, &idx);
 				m_ui->listpane->addNotebookItem(idx, spNotebook);
 			}
 		}

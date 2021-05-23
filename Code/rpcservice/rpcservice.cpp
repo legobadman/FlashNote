@@ -5,6 +5,8 @@
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
 #include <thrift/transport/TTransportUtils.h>
+#include "notecore.h"
+#include "com_sptr.h"
 #include "hello_types.h"
 #include "Hello.h"
 #include "UserInfo.h"
@@ -12,6 +14,7 @@
 #include "rpcservice.h"
 #include "notecore.h"
 #include "../guimain/guihelper.h"
+#include "notecoreinit.h"
 
 
 using namespace apache::thrift;
@@ -105,9 +108,18 @@ std::wstring RPCService::NewNotebook(std::wstring name)
 	return converter.from_bytes(bookid);
 }
 
-void RPCService::RemoveNote(int bookid, INote* pNote)
+bool RPCService::RemoveNote(INotebook* pNotebook, INote* pNote)
 {
-
+	bool bRet = m_pClient->TrashNote(_userid,
+		converter.to_bytes(AppHelper::GetNotebookId(pNotebook).toStdWString()),
+		converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString())
+		);
+	HRESULT hr = pNotebook->RemoveNote(pNote);
+	if (FAILED(hr))
+	{
+		Q_ASSERT(false);
+	}
+	return bRet;
 }
 
 void RPCService::InitcoreFromRPC(INoteApplication* pApp)
@@ -128,17 +140,9 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 			std::wstring str_ = notebook.name.toStdWString();
 			BSTR bstrName = SysAllocString(str_.c_str());
 			spNotebook->SetName(bstrName);
-			std::tm create_t;
-			create_t.tm_year = notebook.create_time.date().year();
-			create_t.tm_mon = notebook.create_time.date().month();
-			create_t.tm_mday = notebook.create_time.date().day();
-			spNotebook->SetCreateTime(create_t);
 
-			std::tm modify_t;
-			modify_t.tm_year = notebook.modify_time.date().year();
-			modify_t.tm_mon = notebook.modify_time.date().month();
-			modify_t.tm_mday = notebook.modify_time.date().day();
-			spNotebook->SetModifyTime(modify_t);
+			spNotebook->SetCreateTime(notebook.create_time.toMSecsSinceEpoch());
+			spNotebook->SetModifyTime(notebook.modify_time.toMSecsSinceEpoch());
 			
 			BSTR bstrId = SysAllocString(notebook.id.toStdWString().c_str());
 			spNotebook->SetId(bstrId);
@@ -158,15 +162,8 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 				BSTR bstrContent = SysAllocString(content.c_str());
 				spNote->SetContent(bstrContent);
 
-				create_t.tm_year = note.create_time.date().year();
-				create_t.tm_mon = note.create_time.date().month();
-				create_t.tm_mday = note.create_time.date().day();
-				spNote->SetCreateTime(create_t);
-
-				modify_t.tm_year = note.modify_time.date().year();
-				modify_t.tm_mon = note.modify_time.date().month();
-				modify_t.tm_mday = note.modify_time.date().day();
-				spNote->SetModifyTime(modify_t);
+				spNote->SetCreateTime(note.create_time.toMSecsSinceEpoch());
+				spNote->SetModifyTime(note.modify_time.toMSecsSinceEpoch());
 
 				bstrId = SysAllocString(note.id.toStdWString().c_str());
 				spNote->SetId(bstrId);

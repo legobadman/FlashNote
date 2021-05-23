@@ -4,6 +4,7 @@
 #include "noteseditview.h"
 #include "guihelper.h"
 #include "MyStyle.h"
+#include "LeftSideItemDelegate.h"
 
 
 MySplitter::MySplitter(QWidget* parent /* = nullptr */)
@@ -110,9 +111,17 @@ void NotesEditView::setNotebook(INotebook* pNotebook)
 
 void NotesEditView::onNoteItemClicked(const QModelIndex& index)
 {
-	int idx = index.row();
+	QString noteid = index.data(ItemCoreObjIdRole).toString();
+	
+	std::wstring str_ = noteid.toStdWString();
+	BSTR bstrId = SysAllocString(str_.c_str());
+
+	VARIANT varIndex;
+	V_VT(&varIndex) = VT_BSTR;
+	V_BSTR(&varIndex) = bstrId;
+
 	com_sptr<INote> spNote;
-	AppHelper::GetNote(m_pNotebook, idx, &spNote);
+	m_pNotebook->Item(varIndex, &spNote);
 	m_pEditView->updateNoteInfo(m_pNotebook, spNote);
 }
 
