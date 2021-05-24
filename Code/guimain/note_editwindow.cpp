@@ -560,15 +560,6 @@ QString NoteEditWindow::toHtml() const {
 	return s;
 }
 
-void NoteEditWindow::updateTitle()
-{
-	std::wstring title = m_ui->editTitle->text().toStdWString();
-	BSTR bstrContent = SysAllocString(title.c_str());
-	m_pNote->SetTitle(bstrContent);
-
-	RPCService::GetInstance().SynchronizeNote(m_pNotebook, m_pNote);
-}
-
 void NoteEditWindow::saveNote()
 {
 	Q_ASSERT(m_pNote);

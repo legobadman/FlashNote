@@ -34,6 +34,9 @@ public:
 	ULONG STDMETHODCALLTYPE Release(void);
 
 private:
+	void NotifyThisObj(NotifyOperator ope);
+
+private:
 	CComBSTR m_id;
 	CComBSTR m_bstrTitle;
 	CComBSTR m_bstrContent;

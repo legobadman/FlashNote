@@ -35,6 +35,11 @@ public slots:
 	void onCustomContextMenu(const QPoint& point);
 	void MenuActionSlot(QAction *action);
 
+private:
+	HRESULT onNotebookNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
+	HRESULT onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
+	QString GetShowContent(INote* pNote);
+
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, _COM_Outptr_ void __RPC_FAR* __RPC_FAR*) { return E_NOTIMPL; }
 	ULONG STDMETHODCALLTYPE AddRef(void) { return 1; }

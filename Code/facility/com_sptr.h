@@ -2,6 +2,7 @@
 #define __COM_SPTR_H__
 
 #include <combaseapi.h>
+#include "../notecore/guiddefine.h"
 
 template <class T>
 class com_sptr
@@ -17,12 +18,11 @@ public:
 	com_sptr(IUnknown* pObj)
 		: m_ptr(NULL)
 	{
-		GUID wtf;
 		if (pObj)
 			pObj->AddRef();
 		if (m_ptr)
 			m_ptr->Release();
-		pObj->QueryInterface(wtf, (void**)&m_ptr);
+		pObj->QueryInterface(__uuid(T), (void**)&m_ptr);
 	}
 
 	com_sptr(const T* ptr) : m_ptr(ptr) {}

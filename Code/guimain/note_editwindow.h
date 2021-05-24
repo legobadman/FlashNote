@@ -34,7 +34,6 @@ public slots:
 	void checkDocument();
 	void onTitleChanged();
 	void onTextChanged();
-	void updateTitle();
 	void saveNote();
 	void switchtobook(int bookidx);
 

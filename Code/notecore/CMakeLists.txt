@@ -7,8 +7,13 @@ include_directories(
 ADD_LIBRARY(notecore STATIC
 	framework.h
 	dllmain.cpp
+	guiddefine.h
+	guiddefine.cpp
 	notebase.cpp
 	notebase.h
 	notecore.h
 	notecoreinit.cpp
-	notecoreinit.h)
+	notecoreinit.h
+	notecore_c.c
+	notecore_i.c
+	notecore_p.c)

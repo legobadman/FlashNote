@@ -88,15 +88,46 @@ void BookListView::MenuActionSlot(QAction* action)
 	}
 }
 
+QString BookListView::GetShowContent(INote* pNote)
+{
+	QString title = AppHelper::GetNoteTitle(pNote);
+	QString content = AppHelper::GetNoteContent(pNote);
+	QString showContent;
+
+	QTextDocument html;
+	html.setHtml(content);
+	QString text_abbre = html.toPlainText();
+	text_abbre = text_abbre.mid(0, nContentLimit);
+	showContent = title + "\n" + text_abbre;
+	return showContent;
+}
+
 HRESULT BookListView::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 {
-	GUID wtf;
-	com_sptr<INotebook> pNotebook(pCoreObj);
+	if (com_sptr<INotebook>(pCoreObj))
+	{
+		return onNotebookNotify(pCoreObj, arg);
+	}
+	else if (com_sptr<INote>(pCoreObj))
+	{
+		return onNoteNotify(pCoreObj, arg);
+	}
+	else if (com_sptr<INoteApplication>(pCoreObj))
+	{
+		return E_NOTIMPL;
+	}
+	return S_OK;
+}
+
+HRESULT BookListView::onNotebookNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
+{
+	com_sptr<INotebook> pNotebook = pCoreObj;
 	if (pNotebook != m_spNotebook)
 	{
 		//当前页面如果不是接收通知的对象，那就不需要刷新（点击自然会更新）
 		return S_OK;
 	}
+
 	//先添加到最后的位置
 	Q_ASSERT(arg.pObj);
 	com_sptr<INote> spNote(arg.pObj);
@@ -106,30 +137,22 @@ HRESULT BookListView::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 
 	switch (arg.ope)
 	{
-	case NotifyOperator::Add:
+		case NotifyOperator::Add:
 		{
 			//监听Notebook::AddWorkbook
-
 			m_model->insertRow(0);
 			QModelIndex newItem = m_model->index(0, 0);
 			QStandardItem* pItem = m_model->itemFromIndex(newItem);
-			QString title = AppHelper::GetNoteTitle(spNote);
-			QString content = AppHelper::GetNoteContent(spNote);
-			QString showContent;
-
-			QTextDocument html;
-			html.setHtml(content);
-			QString text_abbre = html.toPlainText();
-			text_abbre = text_abbre.mid(0, nContentLimit);
-			showContent = title + "\n" + text_abbre;
+			QString showContent = GetShowContent(spNote);
 			pItem->setText(showContent);
 			pItem->setData(QVariant(noteid), ItemCoreObjIdRole);
 			pItem->setSelectable(true);
 			pItem->setEditable(false);
-		}
-		break;
 
-	case NotifyOperator::Delete:
+			spNote->addWatcher(this);
+			break;
+		}
+		case NotifyOperator::Delete:
 		{
 			QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
 			if (!indexs.isEmpty())
@@ -141,16 +164,43 @@ HRESULT BookListView::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 				QModelIndex newIndex = pModel->currentIndex();
 				emit noteitemclicked(newIndex);
 			}
+			break;
 		}
-		break;
-
-	case NotifyOperator::Update:
+		case NotifyOperator::Update:
 		{
+			//更新bookName
 			QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
 			Q_ASSERT(indexs.size() == 1);
 			QModelIndex index = indexs.at(0);
+			break;
 		}
-		break;
+	}
+}
+
+HRESULT BookListView::onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
+{
+	com_sptr<INote> pNote = pCoreObj;
+	switch (arg.ope)
+	{
+		case NotifyOperator::Delete:
+		case NotifyOperator::Add:
+		{
+			//notebook已经做了。
+			break;
+		}
+		case NotifyOperator::Update:
+		{
+			QString noteid = AppHelper::GetNoteId(pNote);
+			QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
+			if (!indexs.isEmpty())
+			{
+				Q_ASSERT(indexs.size() == 1);
+				QModelIndex index = indexs.at(0);
+				QStandardItem* pItem = m_model->itemFromIndex(index);
+				QString showContent = GetShowContent(pNote);
+				pItem->setText(showContent);
+			}
+		}
 	}
 	return S_OK;
 }
@@ -170,6 +220,9 @@ void BookListView::updateNotebook(INotebook* pNotebook, int idxNote)
 	{
 		com_sptr<INote> spNote;
 		AppHelper::GetNote(m_spNotebook, i, &spNote);
+
+		spNote->addWatcher(this);
+
 		QString title = AppHelper::GetNoteTitle(spNote);
 		QString content = AppHelper::GetNoteContent(spNote);
 		QString noteid = AppHelper::GetNoteId(spNote);

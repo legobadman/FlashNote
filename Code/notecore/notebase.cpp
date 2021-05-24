@@ -32,6 +32,7 @@ HRESULT NoteBase::GetTitle(OUT BSTR* pbstrName)
 HRESULT NoteBase::SetTitle(IN BSTR title)
 {
 	m_bstrTitle.Attach(title);
+	NotifyThisObj(NotifyOperator::Update);
 	return S_OK;
 }
 
@@ -55,6 +56,7 @@ HRESULT NoteBase::GetContent(OUT BSTR* pbstrContent)
 HRESULT NoteBase::SetContent(IN BSTR content)
 {
 	m_bstrContent.AssignBSTR(content);
+	NotifyThisObj(NotifyOperator::Update);
 	return S_OK;
 }
 
@@ -104,7 +106,16 @@ HRESULT STDMETHODCALLTYPE NoteBase::QueryInterface(
 	if (!ppvObject)
 		return E_FAIL;
 
-	*ppvObject = this;
+	if (riid == IID_INoteCoreObj)
+	{
+		*ppvObject = static_cast<INoteCoreObj*>(this);
+	}
+	else if (riid == IID_INote)
+	{
+		*ppvObject = static_cast<INote*>(this);
+	}
+
+	//*ppvObject = this;
 	return S_OK;
 }
 
@@ -128,6 +139,17 @@ HRESULT NoteBase::addWatcher(ICoreNotify* pNotify)
 {
 	m_notifies.push_back(pNotify);
 	return S_OK;
+}
+
+void NoteBase::NotifyThisObj(NotifyOperator ope)
+{
+	for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
+	{
+		NotifyArg arg;
+		arg.ope = ope;
+		arg.pObj = this;
+		(*it)->onCoreNotify(this, arg);
+	}
 }
 
 
@@ -306,7 +328,18 @@ HRESULT NotebookBase::QueryInterface(
 	if (!ppvObject)
 		return E_FAIL;
 
-	*ppvObject = this;
+	if (riid == IID_INoteCoreObj)
+	{
+		*ppvObject = static_cast<INoteCoreObj*>(this);
+	}
+	else if (riid == IID_INotebook)
+	{
+		*ppvObject = static_cast<INotebook*>(this);
+	}
+	else
+	{
+		return E_FAIL;
+	}
 	return S_OK;
 }
 
@@ -413,7 +446,18 @@ HRESULT NoteApplication::QueryInterface(
 	if (!ppvObject)
 		return E_FAIL;
 
-	*ppvObject = this;
+	if (riid == IID_INoteCoreObj)
+	{
+		*ppvObject = static_cast<INoteCoreObj*>(this);
+	}
+	else if (riid == IID_INoteApplication)
+	{
+		*ppvObject = static_cast<INoteApplication*>(this);
+	}
+	else
+	{
+		return E_FAIL;
+	}
 	return S_OK;
 }
 
