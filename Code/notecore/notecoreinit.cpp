@@ -32,6 +32,18 @@ HRESULT CreateNotebook(INotebook** ppNotebook)
 	return S_OK;
 }
 
+HRESULT CreateNotebooks(INotebooks** ppNotebooks)
+{
+	if (ppNotebooks == NULL)
+	{
+		return E_POINTER;
+	}
+	INotebooks* pNotebooks = new NotebooksBase;
+	(*ppNotebooks) = pNotebooks;
+	(*ppNotebooks)->AddRef();
+	return S_OK;
+}
+
 HRESULT CreateApplication(INoteApplication** pApp)
 {
 	if (!pApp)

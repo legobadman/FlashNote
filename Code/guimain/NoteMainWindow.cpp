@@ -75,12 +75,7 @@ void NoteMainWindow::onAddNotebook()
 			BSTR bstrTitle = SysAllocString(bookName.toStdWString().c_str());
 			spNotebook->SetName(bstrTitle);
 			bool ret = RPCService::GetInstance().SynchronizeNotebook(spNotebook);
-			if (ret)
-			{
-				int idx = -1;
-				coreApp->GetNotebookIdx(spNotebook, &idx);
-				m_ui->listpane->addNotebookItem(idx, spNotebook);
-			}
+			Q_ASSERT(ret);
 		}
 	}
 }
@@ -100,10 +95,20 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
 		{
 			m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
-			int bookidx = getActiveBookIndex();
+			QString bookid = index.data(ItemCoreObjIdRole).toString();
+			com_sptr<INotebooks> spNotebooks;
+			coreApp->GetNotebooks(&spNotebooks);
+
+			VARIANT varIndex;
+			V_VT(&varIndex) = VT_BSTR;
+			V_BSTR(&varIndex) = SysAllocString(bookid.toStdWString().data());
+
 			com_sptr<INotebook> spNotebook;
-			AppHelper::GetNotebook(bookidx, &spNotebook);
-			m_ui->notesview->setNotebook(spNotebook);
+			HRESULT hr = spNotebooks->Item(varIndex, &spNotebook);
+			if (hr == S_OK)
+			{
+				m_ui->notesview->setNotebook(spNotebook);
+			}
 		}
 	}
 	else

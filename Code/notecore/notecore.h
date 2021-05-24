@@ -73,6 +73,13 @@ typedef interface INotebook INotebook;
 #endif 	/* __INotebook_FWD_DEFINED__ */
 
 
+#ifndef __INotebooks_FWD_DEFINED__
+#define __INotebooks_FWD_DEFINED__
+typedef interface INotebooks INotebooks;
+
+#endif 	/* __INotebooks_FWD_DEFINED__ */
+
+
 #ifndef __INoteApplication_FWD_DEFINED__
 #define __INoteApplication_FWD_DEFINED__
 typedef interface INoteApplication INoteApplication;
@@ -715,6 +722,126 @@ EXTERN_C const IID IID_INotebook;
 #endif 	/* __INotebook_INTERFACE_DEFINED__ */
 
 
+#ifndef __INotebooks_INTERFACE_DEFINED__
+#define __INotebooks_INTERFACE_DEFINED__
+
+/* interface INotebooks */
+/* [uuid][object] */ 
+
+
+EXTERN_C const IID IID_INotebooks;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("279EE392-286F-4423-81B9-4DF9E2F4309E")
+    INotebooks : public INoteCoreObj
+    {
+    public:
+        virtual HRESULT STDMETHODCALLTYPE GetCount( 
+            /* [out] */ int *pCount) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE Item( 
+            /* [in] */ VARIANT index,
+            /* [out] */ INotebook **ppNote) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE AddNotebook( 
+            /* [in] */ INotebook *pNotebook) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE DeleteNotebook( 
+            /* [in] */ INotebook *pNotebook) = 0;
+        
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct INotebooksVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            INotebooks * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            INotebooks * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            INotebooks * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *addWatcher )( 
+            INotebooks * This,
+            ICoreNotify *pNotify);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetCount )( 
+            INotebooks * This,
+            /* [out] */ int *pCount);
+        
+        HRESULT ( STDMETHODCALLTYPE *Item )( 
+            INotebooks * This,
+            /* [in] */ VARIANT index,
+            /* [out] */ INotebook **ppNote);
+        
+        HRESULT ( STDMETHODCALLTYPE *AddNotebook )( 
+            INotebooks * This,
+            /* [in] */ INotebook *pNotebook);
+        
+        HRESULT ( STDMETHODCALLTYPE *DeleteNotebook )( 
+            INotebooks * This,
+            /* [in] */ INotebook *pNotebook);
+        
+        END_INTERFACE
+    } INotebooksVtbl;
+
+    interface INotebooks
+    {
+        CONST_VTBL struct INotebooksVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define INotebooks_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define INotebooks_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define INotebooks_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define INotebooks_addWatcher(This,pNotify)	\
+    ( (This)->lpVtbl -> addWatcher(This,pNotify) ) 
+
+
+#define INotebooks_GetCount(This,pCount)	\
+    ( (This)->lpVtbl -> GetCount(This,pCount) ) 
+
+#define INotebooks_Item(This,index,ppNote)	\
+    ( (This)->lpVtbl -> Item(This,index,ppNote) ) 
+
+#define INotebooks_AddNotebook(This,pNotebook)	\
+    ( (This)->lpVtbl -> AddNotebook(This,pNotebook) ) 
+
+#define INotebooks_DeleteNotebook(This,pNotebook)	\
+    ( (This)->lpVtbl -> DeleteNotebook(This,pNotebook) ) 
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __INotebooks_INTERFACE_DEFINED__ */
+
+
 #ifndef __INoteApplication_INTERFACE_DEFINED__
 #define __INoteApplication_INTERFACE_DEFINED__
 
@@ -730,25 +857,17 @@ EXTERN_C const IID IID_INoteApplication;
     INoteApplication : public INoteCoreObj
     {
     public:
-        virtual HRESULT STDMETHODCALLTYPE GetCount( 
-            /* [out] */ int *pCount) = 0;
+        virtual HRESULT STDMETHODCALLTYPE GetNotebooks( 
+            /* [out] */ INotebooks **ppNotebooks) = 0;
         
-        virtual HRESULT STDMETHODCALLTYPE GetNotebook( 
-            /* [in] */ VARIANT index,
-            /* [out] */ INotebook **ppNotebook) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE AddNotebook( 
-            /* [in] */ INotebook *pNotebook) = 0;
+        virtual HRESULT STDMETHODCALLTYPE SetNotebooks( 
+            /* [in] */ INotebooks *pNotebooks) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE GetUserId( 
             /* [out] */ BSTR *pbstrId) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetUserId( 
             /* [in] */ BSTR bstrId) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE GetNotebookIdx( 
-            /* [in] */ INotebook *pNotebook,
-            /* [out] */ int *pIdx) = 0;
         
     };
     
@@ -775,18 +894,13 @@ EXTERN_C const IID IID_INoteApplication;
             INoteApplication * This,
             ICoreNotify *pNotify);
         
-        HRESULT ( STDMETHODCALLTYPE *GetCount )( 
+        HRESULT ( STDMETHODCALLTYPE *GetNotebooks )( 
             INoteApplication * This,
-            /* [out] */ int *pCount);
+            /* [out] */ INotebooks **ppNotebooks);
         
-        HRESULT ( STDMETHODCALLTYPE *GetNotebook )( 
+        HRESULT ( STDMETHODCALLTYPE *SetNotebooks )( 
             INoteApplication * This,
-            /* [in] */ VARIANT index,
-            /* [out] */ INotebook **ppNotebook);
-        
-        HRESULT ( STDMETHODCALLTYPE *AddNotebook )( 
-            INoteApplication * This,
-            /* [in] */ INotebook *pNotebook);
+            /* [in] */ INotebooks *pNotebooks);
         
         HRESULT ( STDMETHODCALLTYPE *GetUserId )( 
             INoteApplication * This,
@@ -795,11 +909,6 @@ EXTERN_C const IID IID_INoteApplication;
         HRESULT ( STDMETHODCALLTYPE *SetUserId )( 
             INoteApplication * This,
             /* [in] */ BSTR bstrId);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetNotebookIdx )( 
-            INoteApplication * This,
-            /* [in] */ INotebook *pNotebook,
-            /* [out] */ int *pIdx);
         
         END_INTERFACE
     } INoteApplicationVtbl;
@@ -828,23 +937,17 @@ EXTERN_C const IID IID_INoteApplication;
     ( (This)->lpVtbl -> addWatcher(This,pNotify) ) 
 
 
-#define INoteApplication_GetCount(This,pCount)	\
-    ( (This)->lpVtbl -> GetCount(This,pCount) ) 
+#define INoteApplication_GetNotebooks(This,ppNotebooks)	\
+    ( (This)->lpVtbl -> GetNotebooks(This,ppNotebooks) ) 
 
-#define INoteApplication_GetNotebook(This,index,ppNotebook)	\
-    ( (This)->lpVtbl -> GetNotebook(This,index,ppNotebook) ) 
-
-#define INoteApplication_AddNotebook(This,pNotebook)	\
-    ( (This)->lpVtbl -> AddNotebook(This,pNotebook) ) 
+#define INoteApplication_SetNotebooks(This,pNotebooks)	\
+    ( (This)->lpVtbl -> SetNotebooks(This,pNotebooks) ) 
 
 #define INoteApplication_GetUserId(This,pbstrId)	\
     ( (This)->lpVtbl -> GetUserId(This,pbstrId) ) 
 
 #define INoteApplication_SetUserId(This,bstrId)	\
     ( (This)->lpVtbl -> SetUserId(This,bstrId) ) 
-
-#define INoteApplication_GetNotebookIdx(This,pNotebook,pIdx)	\
-    ( (This)->lpVtbl -> GetNotebookIdx(This,pNotebook,pIdx) ) 
 
 #endif /* COBJMACROS */
 

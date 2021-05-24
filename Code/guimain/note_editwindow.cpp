@@ -584,7 +584,9 @@ void NoteEditWindow::switchtobook(int bookidx)
 	V_VT(&newindex) = VT_I4;
 	V_I4(&newindex) = bookidx;
 	com_sptr<INotebook> spNewbook;
-	HRESULT hr = coreApp->GetNotebook(newindex, &spNewbook);
+	com_sptr<INotebooks> spNotebooks;
+	coreApp->GetNotebooks(&spNotebooks);
+	HRESULT hr = spNotebooks->Item(newindex, &spNewbook);
 	if (FAILED(hr) || !spNewbook)
 	{
 		Q_ASSERT(FALSE);

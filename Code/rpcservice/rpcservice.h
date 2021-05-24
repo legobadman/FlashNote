@@ -21,6 +21,7 @@ public:
 	void SynchronizeNote(INotebook* pNotebook, INote* pNote);
 	bool SynchronizeNotebook(INotebook* pNotebook);
 	bool RemoveNote(INotebook* pNotebook, INote* pNote);
+	bool RemoveNotebook(INotebook* pNotebook);
 	std::wstring NewNote(std::wstring bookid, std::wstring title);
 	std::wstring NewNotebook(std::wstring name);
 

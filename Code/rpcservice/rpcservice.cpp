@@ -60,7 +60,10 @@ bool RPCService::SynchronizeNotebook(INotebook* pNotebook)
 			return false;
 
 		pNotebook->SetId(SysAllocString(bookid.c_str()));
-		coreApp->AddNotebook(pNotebook);
+		
+		com_sptr<INotebooks> spNotebooks;
+		coreApp->GetNotebooks(&spNotebooks);
+		spNotebooks->AddNotebook(pNotebook);
 	}
 
 	//其他更新待续
@@ -122,10 +125,33 @@ bool RPCService::RemoveNote(INotebook* pNotebook, INote* pNote)
 	return bRet;
 }
 
+bool RPCService::RemoveNotebook(INotebook* pNotebook)
+{
+	std::string bookid = converter.to_bytes(AppHelper::GetNotebookId(pNotebook).toStdWString());
+	bool bRet = m_pClient->DeleteNotebook(_userid, bookid);
+	if (bRet)
+	{
+		com_sptr<INotebooks> spNotebooks;
+		coreApp->GetNotebooks(&spNotebooks);
+		HRESULT hr = spNotebooks->DeleteNotebook(pNotebook);
+		return (hr == S_OK);
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 {
 	if (!pApp)
 		return;
+
+	//创建notebooks
+	com_sptr<INotebooks> spNotebooks;
+	CreateNotebooks(&spNotebooks);
+
+	coreApp->SetNotebooks(spNotebooks);
 
 	std::vector<NOTEBOOK> vecBooks;
 	RPCService::GetInstance().getnotebooks(vecBooks);
@@ -171,7 +197,10 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 				spNotebook->AddNote(spNote);
 			}
 		}
-		pApp->AddNotebook(spNotebook);
+
+		com_sptr<INotebooks> spNotebooks;
+		pApp->GetNotebooks(&spNotebooks);
+		spNotebooks->AddNotebook(spNotebook);
 	}
 }
 

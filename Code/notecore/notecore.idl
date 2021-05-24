@@ -77,12 +77,20 @@ interface INotebook : INoteCoreObj {
 };
 
 
+[object, uuid(279EE392-286F-4423-81B9-4DF9E2F4309E)]
+interface INotebooks : INoteCoreObj {
+	HRESULT GetCount([out] int* pCount);
+	HRESULT Item([in] VARIANT index, [out]INotebook** ppNote);
+	HRESULT AddNotebook([in]INotebook* pNotebook);
+	HRESULT DeleteNotebook([in]INotebook* pNotebook);
+};
+
+
 [object, uuid(9ACA0D9D-3CFF-4644-92E9-863B5FBB3D02)]
 interface INoteApplication : INoteCoreObj {
-	HRESULT GetCount([out] int* pCount);
-	HRESULT GetNotebook([in] VARIANT index, [out]INotebook** ppNotebook);
-	HRESULT AddNotebook([in]INotebook* pNotebook);
+	HRESULT GetNotebooks([out]INotebooks** ppNotebooks);
+	HRESULT SetNotebooks([in]INotebooks* pNotebooks);
+
 	HRESULT GetUserId([out]BSTR* pbstrId);
 	HRESULT SetUserId([in]BSTR bstrId);
-	HRESULT GetNotebookIdx([in]INotebook* pNotebook, [out]int* pIdx);
 };

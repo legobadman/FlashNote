@@ -40,6 +40,8 @@ enum MOUSE_HINT
 class NoteItemTreeView : public QTreeView
 {
 	Q_OBJECT
+
+
 public:
 	NoteItemTreeView(QWidget* parent = nullptr);
 	MOUSE_HINT GetHoverObj() { return m_hoverObj; }
@@ -60,13 +62,25 @@ private:
 };
 
 class NavigationPanel : public QWidget
+					  , public ICoreNotify
 {
 	Q_OBJECT
+	enum MENU_ITEM
+	{
+		DELETE_NOTEBOOK = 0,
+	};
+
 public:
 	NavigationPanel(QWidget* parent = nullptr);
 	~NavigationPanel();
 	QTreeView* treeview() { return m_treeview; }
-	void addNotebookItem(int core_idx, INotebook* pNotebook);
+
+	HRESULT STDMETHODCALLTYPE onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
+
+public:
+	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, _COM_Outptr_ void __RPC_FAR* __RPC_FAR*) { return E_NOTIMPL; }
+	ULONG STDMETHODCALLTYPE AddRef(void) { return 1; }
+	ULONG STDMETHODCALLTYPE Release(void) { return 1; }
 
 protected:
 	void paintEvent(QPaintEvent* event) override;
@@ -83,11 +97,14 @@ signals:
 
 private slots:
 	void onObjClick(const QModelIndex&, MOUSE_HINT);
+	void onCustomContextMenu(const QPoint& point);
+	void MenuActionSlot(QAction* action);
 
 private:
-	QStandardItemModel* leftsidemodel;
+	QStandardItemModel* m_model;
 	NoteItemTreeView* m_treeview;
 	NewNoteItem* m_newnote;
+	QMenu* m_pCustomMenu;
 };
 
 #endif

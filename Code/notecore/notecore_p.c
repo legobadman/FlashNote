@@ -49,8 +49,8 @@
 
 #include "notecore.h"
 
-#define TYPE_FORMAT_STRING_SIZE   1171                              
-#define PROC_FORMAT_STRING_SIZE   1147                              
+#define TYPE_FORMAT_STRING_SIZE   1193                              
+#define PROC_FORMAT_STRING_SIZE   1141                              
 #define EXPR_FORMAT_STRING_SIZE   1                                 
 #define TRANSMIT_AS_TABLE_SIZE    0            
 #define WIRE_MARSHAL_TABLE_SIZE   2            
@@ -109,6 +109,13 @@ extern const MIDL_STUB_DESC Object_StubDesc;
 
 extern const MIDL_SERVER_INFO INotebook_ServerInfo;
 extern const MIDL_STUBLESS_PROXY_INFO INotebook_ProxyInfo;
+
+
+extern const MIDL_STUB_DESC Object_StubDesc;
+
+
+extern const MIDL_SERVER_INFO INotebooks_ServerInfo;
+extern const MIDL_STUBLESS_PROXY_INFO INotebooks_ProxyInfo;
 
 
 extern const MIDL_STUB_DESC Object_StubDesc;
@@ -281,6 +288,9 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 148 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
+	/* Procedure GetUserId */
+
+
 	/* Procedure GetName */
 
 
@@ -301,6 +311,9 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 170 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 172 */	NdrFcShort( 0x0 ),	/* 0 */
 
+	/* Parameter pbstrId */
+
+
 	/* Parameter pbstrName */
 
 
@@ -315,10 +328,16 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 
 	/* Return value */
 
+
+	/* Return value */
+
 /* 180 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
 /* 182 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
 /* 184 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
+
+	/* Procedure SetUserId */
+
 
 	/* Procedure SetName */
 
@@ -340,6 +359,9 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 206 */	NdrFcShort( 0x1 ),	/* 1 */
 /* 208 */	NdrFcShort( 0x0 ),	/* 0 */
 
+	/* Parameter bstrId */
+
+
 	/* Parameter bstrName */
 
 
@@ -348,6 +370,9 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 210 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
 /* 212 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
 /* 214 */	NdrFcShort( 0x66 ),	/* Type Offset=102 */
+
+	/* Return value */
+
 
 	/* Return value */
 
@@ -983,7 +1008,7 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 952 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
-	/* Procedure GetNotebook */
+	/* Procedure Item */
 
 /* 954 */	0x33,		/* FC_AUTO_HANDLE */
 			0x6c,		/* Old Flags:  object, Oi2 */
@@ -1006,7 +1031,7 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 980 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
 /* 982 */	NdrFcShort( 0x45c ),	/* Type Offset=1116 */
 
-	/* Parameter ppNotebook */
+	/* Parameter ppNote */
 
 /* 984 */	NdrFcShort( 0x13 ),	/* Flags:  must size, must free, out, */
 /* 986 */	NdrFcShort( 0x14 ),	/* x86 Stack size/offset = 20 */
@@ -1049,7 +1074,7 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 1030 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
-	/* Procedure GetUserId */
+	/* Procedure DeleteNotebook */
 
 /* 1032 */	0x33,		/* FC_AUTO_HANDLE */
 			0x6c,		/* Old Flags:  object, Oi2 */
@@ -1058,19 +1083,19 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 1040 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
 /* 1042 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1044 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 1046 */	0x45,		/* Oi2 Flags:  srv must size, has return, has ext, */
+/* 1046 */	0x46,		/* Oi2 Flags:  clt must size, has return, has ext, */
 			0x2,		/* 2 */
 /* 1048 */	0x8,		/* 8 */
-			0x3,		/* Ext Flags:  new corr desc, clt corr check, */
-/* 1050 */	NdrFcShort( 0x1 ),	/* 1 */
+			0x1,		/* Ext Flags:  new corr desc, */
+/* 1050 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1052 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1054 */	NdrFcShort( 0x0 ),	/* 0 */
 
-	/* Parameter pbstrId */
+	/* Parameter pNotebook */
 
-/* 1056 */	NdrFcShort( 0x2113 ),	/* Flags:  must size, must free, out, simple ref, srv alloc size=8 */
+/* 1056 */	NdrFcShort( 0xb ),	/* Flags:  must size, must free, in, */
 /* 1058 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1060 */	NdrFcShort( 0x58 ),	/* Type Offset=88 */
+/* 1060 */	NdrFcShort( 0x480 ),	/* Type Offset=1152 */
 
 	/* Return value */
 
@@ -1079,28 +1104,28 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 1066 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
-	/* Procedure SetUserId */
+	/* Procedure GetNotebooks */
 
 /* 1068 */	0x33,		/* FC_AUTO_HANDLE */
 			0x6c,		/* Old Flags:  object, Oi2 */
 /* 1070 */	NdrFcLong( 0x0 ),	/* 0 */
-/* 1074 */	NdrFcShort( 0x8 ),	/* 8 */
+/* 1074 */	NdrFcShort( 0x4 ),	/* 4 */
 /* 1076 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
 /* 1078 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1080 */	NdrFcShort( 0x8 ),	/* 8 */
-/* 1082 */	0x46,		/* Oi2 Flags:  clt must size, has return, has ext, */
+/* 1082 */	0x45,		/* Oi2 Flags:  srv must size, has return, has ext, */
 			0x2,		/* 2 */
 /* 1084 */	0x8,		/* 8 */
-			0x5,		/* Ext Flags:  new corr desc, srv corr check, */
+			0x1,		/* Ext Flags:  new corr desc, */
 /* 1086 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 1088 */	NdrFcShort( 0x1 ),	/* 1 */
+/* 1088 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1090 */	NdrFcShort( 0x0 ),	/* 0 */
 
-	/* Parameter bstrId */
+	/* Parameter ppNotebooks */
 
-/* 1092 */	NdrFcShort( 0x8b ),	/* Flags:  must size, must free, in, by val, */
+/* 1092 */	NdrFcShort( 0x13 ),	/* Flags:  must size, must free, out, */
 /* 1094 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1096 */	NdrFcShort( 0x66 ),	/* Type Offset=102 */
+/* 1096 */	NdrFcShort( 0x492 ),	/* Type Offset=1170 */
 
 	/* Return value */
 
@@ -1109,41 +1134,34 @@ static const notecore_MIDL_PROC_FORMAT_STRING notecore__MIDL_ProcFormatString =
 /* 1102 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
-	/* Procedure GetNotebookIdx */
+	/* Procedure SetNotebooks */
 
 /* 1104 */	0x33,		/* FC_AUTO_HANDLE */
 			0x6c,		/* Old Flags:  object, Oi2 */
 /* 1106 */	NdrFcLong( 0x0 ),	/* 0 */
-/* 1110 */	NdrFcShort( 0x9 ),	/* 9 */
-/* 1112 */	NdrFcShort( 0x10 ),	/* x86 Stack size/offset = 16 */
+/* 1110 */	NdrFcShort( 0x5 ),	/* 5 */
+/* 1112 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
 /* 1114 */	NdrFcShort( 0x0 ),	/* 0 */
-/* 1116 */	NdrFcShort( 0x24 ),	/* 36 */
+/* 1116 */	NdrFcShort( 0x8 ),	/* 8 */
 /* 1118 */	0x46,		/* Oi2 Flags:  clt must size, has return, has ext, */
-			0x3,		/* 3 */
+			0x2,		/* 2 */
 /* 1120 */	0x8,		/* 8 */
 			0x1,		/* Ext Flags:  new corr desc, */
 /* 1122 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1124 */	NdrFcShort( 0x0 ),	/* 0 */
 /* 1126 */	NdrFcShort( 0x0 ),	/* 0 */
 
-	/* Parameter pNotebook */
+	/* Parameter pNotebooks */
 
 /* 1128 */	NdrFcShort( 0xb ),	/* Flags:  must size, must free, in, */
 /* 1130 */	NdrFcShort( 0x4 ),	/* x86 Stack size/offset = 4 */
-/* 1132 */	NdrFcShort( 0x480 ),	/* Type Offset=1152 */
-
-	/* Parameter pIdx */
-
-/* 1134 */	NdrFcShort( 0x2150 ),	/* Flags:  out, base type, simple ref, srv alloc size=8 */
-/* 1136 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
-/* 1138 */	0x8,		/* FC_LONG */
-			0x0,		/* 0 */
+/* 1132 */	NdrFcShort( 0x496 ),	/* Type Offset=1174 */
 
 	/* Return value */
 
-/* 1140 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
-/* 1142 */	NdrFcShort( 0xc ),	/* x86 Stack size/offset = 12 */
-/* 1144 */	0x8,		/* FC_LONG */
+/* 1134 */	NdrFcShort( 0x70 ),	/* Flags:  out, return, base type, */
+/* 1136 */	NdrFcShort( 0x8 ),	/* x86 Stack size/offset = 8 */
+/* 1138 */	0x8,		/* FC_LONG */
 			0x0,		/* 0 */
 
 			0x0
@@ -1956,6 +1974,23 @@ static const notecore_MIDL_TYPE_FORMAT_STRING notecore__MIDL_TypeFormatString =
 			0xbd,		/* 189 */
 /* 1168 */	0xc5,		/* 197 */
 			0x7a,		/* 122 */
+/* 1170 */	
+			0x11, 0x10,	/* FC_RP [pointer_deref] */
+/* 1172 */	NdrFcShort( 0x2 ),	/* Offset= 2 (1174) */
+/* 1174 */	
+			0x2f,		/* FC_IP */
+			0x5a,		/* FC_CONSTANT_IID */
+/* 1176 */	NdrFcLong( 0x279ee392 ),	/* 664724370 */
+/* 1180 */	NdrFcShort( 0x286f ),	/* 10351 */
+/* 1182 */	NdrFcShort( 0x4423 ),	/* 17443 */
+/* 1184 */	0x81,		/* 129 */
+			0xb9,		/* 185 */
+/* 1186 */	0x4d,		/* 77 */
+			0xf9,		/* 249 */
+/* 1188 */	0xe2,		/* 226 */
+			0xf4,		/* 244 */
+/* 1190 */	0x30,		/* 48 */
+			0x9e,		/* 158 */
 
 			0x0
         }
@@ -2243,6 +2278,64 @@ const CInterfaceStubVtbl _INotebookStubVtbl =
 };
 
 
+/* Object interface: INotebooks, ver. 0.0,
+   GUID={0x279EE392,0x286F,0x4423,{0x81,0xB9,0x4D,0xF9,0xE2,0xF4,0x30,0x9E}} */
+
+#pragma code_seg(".orpc")
+static const unsigned short INotebooks_FormatStringOffsetTable[] =
+    {
+    42,
+    918,
+    954,
+    996,
+    1032
+    };
+
+static const MIDL_STUBLESS_PROXY_INFO INotebooks_ProxyInfo =
+    {
+    &Object_StubDesc,
+    notecore__MIDL_ProcFormatString.Format,
+    &INotebooks_FormatStringOffsetTable[-3],
+    0,
+    0,
+    0
+    };
+
+
+static const MIDL_SERVER_INFO INotebooks_ServerInfo = 
+    {
+    &Object_StubDesc,
+    0,
+    notecore__MIDL_ProcFormatString.Format,
+    &INotebooks_FormatStringOffsetTable[-3],
+    0,
+    0,
+    0,
+    0};
+CINTERFACE_PROXY_VTABLE(8) _INotebooksProxyVtbl = 
+{
+    &INotebooks_ProxyInfo,
+    &IID_INotebooks,
+    IUnknown_QueryInterface_Proxy,
+    IUnknown_AddRef_Proxy,
+    IUnknown_Release_Proxy ,
+    (void *) (INT_PTR) -1 /* INoteCoreObj::addWatcher */ ,
+    (void *) (INT_PTR) -1 /* INotebooks::GetCount */ ,
+    (void *) (INT_PTR) -1 /* INotebooks::Item */ ,
+    (void *) (INT_PTR) -1 /* INotebooks::AddNotebook */ ,
+    (void *) (INT_PTR) -1 /* INotebooks::DeleteNotebook */
+};
+
+const CInterfaceStubVtbl _INotebooksStubVtbl =
+{
+    &IID_INotebooks,
+    &INotebooks_ServerInfo,
+    8,
+    0, /* pure interpreted */
+    CStdStubBuffer_METHODS
+};
+
+
 /* Object interface: INoteApplication, ver. 0.0,
    GUID={0x9ACA0D9D,0x3CFF,0x4644,{0x92,0xE9,0x86,0x3B,0x5F,0xBB,0x3D,0x02}} */
 
@@ -2250,12 +2343,10 @@ const CInterfaceStubVtbl _INotebookStubVtbl =
 static const unsigned short INoteApplication_FormatStringOffsetTable[] =
     {
     42,
-    918,
-    954,
-    996,
-    1032,
     1068,
-    1104
+    1104,
+    150,
+    186
     };
 
 static const MIDL_STUBLESS_PROXY_INFO INoteApplication_ProxyInfo =
@@ -2279,7 +2370,7 @@ static const MIDL_SERVER_INFO INoteApplication_ServerInfo =
     0,
     0,
     0};
-CINTERFACE_PROXY_VTABLE(10) _INoteApplicationProxyVtbl = 
+CINTERFACE_PROXY_VTABLE(8) _INoteApplicationProxyVtbl = 
 {
     &INoteApplication_ProxyInfo,
     &IID_INoteApplication,
@@ -2287,19 +2378,17 @@ CINTERFACE_PROXY_VTABLE(10) _INoteApplicationProxyVtbl =
     IUnknown_AddRef_Proxy,
     IUnknown_Release_Proxy ,
     (void *) (INT_PTR) -1 /* INoteCoreObj::addWatcher */ ,
-    (void *) (INT_PTR) -1 /* INoteApplication::GetCount */ ,
-    (void *) (INT_PTR) -1 /* INoteApplication::GetNotebook */ ,
-    (void *) (INT_PTR) -1 /* INoteApplication::AddNotebook */ ,
+    (void *) (INT_PTR) -1 /* INoteApplication::GetNotebooks */ ,
+    (void *) (INT_PTR) -1 /* INoteApplication::SetNotebooks */ ,
     (void *) (INT_PTR) -1 /* INoteApplication::GetUserId */ ,
-    (void *) (INT_PTR) -1 /* INoteApplication::SetUserId */ ,
-    (void *) (INT_PTR) -1 /* INoteApplication::GetNotebookIdx */
+    (void *) (INT_PTR) -1 /* INoteApplication::SetUserId */
 };
 
 const CInterfaceStubVtbl _INoteApplicationStubVtbl =
 {
     &IID_INoteApplication,
     &INoteApplication_ServerInfo,
-    10,
+    8,
     0, /* pure interpreted */
     CStdStubBuffer_METHODS
 };
@@ -2331,6 +2420,7 @@ static const MIDL_STUB_DESC Object_StubDesc =
 const CInterfaceProxyVtbl * const _notecore_ProxyVtblList[] = 
 {
     ( CInterfaceProxyVtbl *) &_INoteProxyVtbl,
+    ( CInterfaceProxyVtbl *) &_INotebooksProxyVtbl,
     ( CInterfaceProxyVtbl *) &_INoteCoreObjProxyVtbl,
     ( CInterfaceProxyVtbl *) &_INoteApplicationProxyVtbl,
     ( CInterfaceProxyVtbl *) &_INotebookProxyVtbl,
@@ -2341,6 +2431,7 @@ const CInterfaceProxyVtbl * const _notecore_ProxyVtblList[] =
 const CInterfaceStubVtbl * const _notecore_StubVtblList[] = 
 {
     ( CInterfaceStubVtbl *) &_INoteStubVtbl,
+    ( CInterfaceStubVtbl *) &_INotebooksStubVtbl,
     ( CInterfaceStubVtbl *) &_INoteCoreObjStubVtbl,
     ( CInterfaceStubVtbl *) &_INoteApplicationStubVtbl,
     ( CInterfaceStubVtbl *) &_INotebookStubVtbl,
@@ -2351,6 +2442,7 @@ const CInterfaceStubVtbl * const _notecore_StubVtblList[] =
 PCInterfaceName const _notecore_InterfaceNamesList[] = 
 {
     "INote",
+    "INotebooks",
     "INoteCoreObj",
     "INoteApplication",
     "INotebook",
@@ -2365,10 +2457,10 @@ int __stdcall _notecore_IID_Lookup( const IID * pIID, int * pIndex )
 {
     IID_BS_LOOKUP_SETUP
 
-    IID_BS_LOOKUP_INITIAL_TEST( _notecore, 5, 4 )
+    IID_BS_LOOKUP_INITIAL_TEST( _notecore, 6, 4 )
     IID_BS_LOOKUP_NEXT_TEST( _notecore, 2 )
     IID_BS_LOOKUP_NEXT_TEST( _notecore, 1 )
-    IID_BS_LOOKUP_RETURN_RESULT( _notecore, 5, *pIndex )
+    IID_BS_LOOKUP_RETURN_RESULT( _notecore, 6, *pIndex )
     
 }
 
@@ -2379,7 +2471,7 @@ const ExtendedProxyFileInfo notecore_ProxyFileInfo =
     (const PCInterfaceName * ) & _notecore_InterfaceNamesList,
     0, /* no delegation */
     & _notecore_IID_Lookup, 
-    5,
+    6,
     2,
     0, /* table of [async_uuid] interfaces */
     0, /* Filler1 */

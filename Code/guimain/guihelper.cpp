@@ -8,7 +8,10 @@ void AppHelper::GetNotebook(int idx, INotebook** ppNotebook)
 	V_VT(&varBook) = VT_I4;
 	V_I4(&varBook) = idx;
 
-	HRESULT hr = coreApp->GetNotebook(varBook, ppNotebook);
+	com_sptr<INotebooks> spNotebooks;
+	coreApp->GetNotebooks(&spNotebooks);
+
+	HRESULT hr = spNotebooks->Item(varBook, ppNotebook);
 	if (FAILED(hr) || *ppNotebook == NULL)
 	{
 		Q_ASSERT(FALSE);
@@ -49,6 +52,18 @@ QString AppHelper::GetNotebookId(INotebook* pNotebook)
 	pNotebook->GetId(&bstrId);
 	QString bookId = QString::fromUtf16(reinterpret_cast<ushort*>(bstrId));
 	return bookId;
+}
+
+void AppHelper::GetNotebookById(const QString& bookid, INotebook** ppNotebook)
+{
+	com_sptr<INotebooks> spNotebooks;
+	coreApp->GetNotebooks(&spNotebooks);
+
+	VARIANT varIndex;
+	V_VT(&varIndex) = VT_BSTR;
+	V_BSTR(&varIndex) = SysAllocString(bookid.toStdWString().data());
+
+	HRESULT hr = spNotebooks->Item(varIndex, ppNotebook);
 }
 
 QString AppHelper::GetNoteId(INote* pNote)

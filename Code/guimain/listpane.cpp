@@ -6,6 +6,7 @@
 #include "notewinservice.h"
 #include "MyStyle.h"
 #include "guihelper.h"
+#include <QMenu>
 #include "moc_listpane.cpp"
 
 
@@ -204,8 +205,9 @@ void NoteItemTreeView::updateHoverState(QPoint pos)
 
 NavigationPanel::NavigationPanel(QWidget* parent)
 	: QWidget(parent)
-	, leftsidemodel(NULL)
+	, m_model(NULL)
 	, m_treeview(NULL)
+	, m_pCustomMenu(NULL)
 {
 	m_treeview = new NoteItemTreeView(this);
 	m_treeview->setFrameShape(QFrame::NoFrame);
@@ -229,6 +231,10 @@ NavigationPanel::NavigationPanel(QWidget* parent)
 	connect(m_treeview, SIGNAL(clicked(const QModelIndex&)), this, SIGNAL(clicked(const QModelIndex&)));
 	connect(m_treeview, SIGNAL(clickObj(const QModelIndex&, MOUSE_HINT)), this,
 		SLOT(onObjClick(const QModelIndex&, MOUSE_HINT)));
+
+	m_treeview->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(m_treeview, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
+
 }
 
 NavigationPanel::~NavigationPanel()
@@ -242,28 +248,9 @@ void NavigationPanel::paintEvent(QPaintEvent* event)
 	painter.fillRect(rect(), QColor(42, 51, 60));
 }
 
-void NavigationPanel::addNotebookItem(int core_idx, INotebook* pNotebook)
-{
-	QModelIndex booksIdx = leftsidemodel->index((int)ITEM_CONTENT_TYPE::ITEM_NOTEBOOK, 0);
-	QString bookName = AppHelper::GetNotebookName(pNotebook);
-
-	leftsidemodel->insertRow(core_idx, booksIdx);
-
-	QModelIndex newItem = booksIdx.child(core_idx, 0);
-	QStandardItem* pItem = leftsidemodel->itemFromIndex(newItem);
-
-	ITEM_WIDGET_TYPE widgetType = newItem.data(ItemWidgetTypeRole).value<ITEM_WIDGET_TYPE>();
-	pItem->setText(bookName);
-	pItem->setEditable(false);
-	pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
-		ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM), ItemContentTypeRole);
-	pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
-		ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
-}
-
 void NavigationPanel::initModel()
 {
-	leftsidemodel = new	QStandardItemModel(this);
+	m_model = new	QStandardItemModel(this);
 
 	QStandardItem* pAllNotesItem = new QStandardItem(
 		QIcon(":/icons/allnotes.png"),
@@ -335,17 +322,114 @@ void NavigationPanel::initModel()
 	pTrashItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
 		ITEM_WIDGET_TYPE::ITEM_TOPLEVEL), ItemWidgetTypeRole);
 
-	leftsidemodel->appendRow(pAllNotesItem);
+	m_model->appendRow(pAllNotesItem);
 	initNotebookItem();
-	leftsidemodel->appendRow(pMaterialItem);
-	leftsidemodel->appendRow(pFragmentItem);
-	leftsidemodel->appendRow(pDiaryItem);
-	leftsidemodel->appendRow(pScheduleItem);
-	leftsidemodel->appendRow(pDraftItem);
-	leftsidemodel->appendRow(pTrashItem);
+	m_model->appendRow(pMaterialItem);
+	m_model->appendRow(pFragmentItem);
+	m_model->appendRow(pDiaryItem);
+	m_model->appendRow(pScheduleItem);
+	m_model->appendRow(pDraftItem);
+	m_model->appendRow(pTrashItem);
 
-	m_treeview->setModel(leftsidemodel);
+	m_treeview->setModel(m_model);
 	m_treeview->setItemDelegate(new LeftSideItemDelegate(m_treeview));
+}
+
+void NavigationPanel::onCustomContextMenu(const QPoint& point)
+{
+	if (m_pCustomMenu == NULL)
+	{
+		m_pCustomMenu = new QMenu(this);
+		connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
+	}
+
+	//QModelIndex index = m_treeview->indexAt(point);
+	m_pCustomMenu->clear();
+
+	QAction* pDelete = new QAction(u8"É¾³ý±Ê¼Ç", m_pCustomMenu);
+	pDelete->setData((int)NavigationPanel::DELETE_NOTEBOOK);
+	m_pCustomMenu->addAction(pDelete);
+
+	m_pCustomMenu->popup(QCursor::pos());
+}
+
+void NavigationPanel::MenuActionSlot(QAction* action)
+{
+	if (action == NULL)
+		return;
+
+	MENU_ITEM nIndex = (MENU_ITEM)action->data().toInt();
+	if (nIndex == DELETE_NOTEBOOK)
+	{
+		QModelIndex index = m_treeview->currentIndex();
+		QString bookid = index.data(ItemCoreObjIdRole).toString();
+
+		com_sptr<INotebook> spNotebook;
+		AppHelper::GetNotebookById(bookid, &spNotebook);
+
+		bool bRet = RPCService::GetInstance().RemoveNotebook(spNotebook);
+	}
+}
+
+HRESULT NavigationPanel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
+{
+	if (com_sptr<INotebooks>(pCoreObj))
+	{
+		com_sptr<INotebooks> spNotebooks = pCoreObj;
+		QModelIndex booksIdx = m_model->index((int)ITEM_CONTENT_TYPE::ITEM_NOTEBOOK, 0);
+		
+		switch (arg.ope)
+		{
+			case NotifyOperator::Add:
+			{
+				//Notebook::AddNotebook
+				com_sptr<INotebook> spNotebook = arg.pObj;
+				Q_ASSERT(spNotebook);
+				QString bookName = AppHelper::GetNotebookName(spNotebook);
+				QString bookId = AppHelper::GetNotebookId(spNotebook);
+
+				int insertIdx = 0;
+				bool bRet = m_model->insertRow(insertIdx, booksIdx);
+				Q_ASSERT(bRet);
+
+				QModelIndex newItem = booksIdx.child(insertIdx, 0);
+				QStandardItem* pItem = m_model->itemFromIndex(newItem);
+
+				QString showContent = bookName;
+				pItem->setText(showContent);
+				pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
+					ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM), ItemContentTypeRole);
+				pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
+					ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
+				pItem->setData(QVariant(bookId), ItemCoreObjIdRole);
+				pItem->setSelectable(true);
+				pItem->setEditable(false);
+				break;
+			}
+			case NotifyOperator::Delete:
+			{
+				//Notebook::DeleteNotebook
+				com_sptr<INotebook> spNotebook = arg.pObj;
+			 	QString bookid = AppHelper::GetNotebookId(spNotebook);
+				QModelIndexList indexs = m_model->match(
+						m_model->index(0,0),
+						ItemCoreObjIdRole,
+						QVariant(bookid),
+						1,		//hits
+						Qt::MatchRecursive);
+				if (!indexs.isEmpty())
+				{
+					Q_ASSERT(indexs.size() == 1);
+					QModelIndex index = indexs.at(0);
+					m_model->removeRow(index.row(), booksIdx);
+					QItemSelectionModel* pModel = m_treeview->selectionModel();
+					QModelIndex newIndex = pModel->currentIndex();
+					emit clicked(newIndex);
+				}
+			}
+		}
+	}
+	return E_NOTIMPL;
 }
 
 void NavigationPanel::onObjClick(const QModelIndex& index, MOUSE_HINT hint)
@@ -373,21 +457,25 @@ void NavigationPanel::initNotebookItem()
 		ITEM_WIDGET_TYPE::ITEM_TOPLEVEL), ItemWidgetTypeRole);
 
 	com_sptr<INoteApplication> spApp = coreApp;
+	com_sptr<INotebooks> spNotebooks;
+	spApp->GetNotebooks(&spNotebooks);
+
+	spNotebooks->addWatcher(this);
+
 	int count = 0;
-	spApp->GetCount(&count);
+	spNotebooks->GetCount(&count);
 	QModelIndex activeIndex;
 	for (int i = 0; i < count; i++)
 	{
 		VARIANT index;
 		V_VT(&index) = VT_I4;
 		V_I4(&index) = i;
-		
+
 		com_sptr<INotebook> spNotebook;
-		spApp->GetNotebook(index, &spNotebook);
-		BSTR bstrName;
-		spNotebook->GetName(&bstrName);
-		QString bookName = QString::fromUtf16(
-			reinterpret_cast<ushort*>(bstrName));
+		spNotebooks->Item(index, &spNotebook);
+
+		QString bookName = AppHelper::GetNotebookName(spNotebook);
+		QString bookId = AppHelper::GetNotebookId(spNotebook);
 
 		QStandardItem* pItem = new QStandardItem(bookName);
 		pItem->setEditable(false);
@@ -395,9 +483,10 @@ void NavigationPanel::initNotebookItem()
 			ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM), ItemContentTypeRole);
 		pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
 			ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
+		pItem->setData(QVariant(bookId), ItemCoreObjIdRole);
 
 		pNoteBookItem->appendRow(pItem);
 		activeIndex = pItem->index();
 	}
-	leftsidemodel->appendRow(pNoteBookItem);
+	m_model->appendRow(pNoteBookItem);
 }

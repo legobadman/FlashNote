@@ -88,7 +88,34 @@ private:
 	std::tm m_createtime;
 	std::tm m_modifytime;
 	std::vector<INote*> m_vecNotes;
-	//std::vector<ICoreNotify*> m_notifies;
+	std::unordered_set<ICoreNotify*> m_notifies;
+	int m_ref;
+};
+
+class NotebooksBase : public INotebooks
+{
+public:
+	NotebooksBase();
+	~NotebooksBase();
+
+	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
+	HRESULT STDMETHODCALLTYPE GetCount(/* [out] */ int* pCount);
+	HRESULT STDMETHODCALLTYPE Item(VARIANT index, INotebook** ppNote);
+	HRESULT STDMETHODCALLTYPE AddNotebook(INotebook* pNotebook);
+	HRESULT STDMETHODCALLTYPE DeleteNotebook(INotebook* pNotebook);
+
+public:
+	HRESULT STDMETHODCALLTYPE QueryInterface(
+		/* [in] */ REFIID riid,
+		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
+	ULONG STDMETHODCALLTYPE AddRef(void);
+	ULONG STDMETHODCALLTYPE Release(void);
+
+private:
+	void NotifyThisObj(NotifyOperator ope, INotebook* pNote);
+
+private:
+	std::vector<INotebook*> m_vecBooks;
 	std::unordered_set<ICoreNotify*> m_notifies;
 	int m_ref;
 };
@@ -100,13 +127,10 @@ public:
 	~NoteApplication();
 
 	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
-
-	HRESULT STDMETHODCALLTYPE GetNotebook(VARIANT Index, INotebook** ppNotebook);
-	HRESULT STDMETHODCALLTYPE AddNotebook(INotebook* pNotebook);
-	HRESULT STDMETHODCALLTYPE GetCount(int* pCount);
+	HRESULT STDMETHODCALLTYPE GetNotebooks(INotebooks** ppNotebooks);
+	HRESULT STDMETHODCALLTYPE SetNotebooks(INotebooks* pNotebooks);
 	HRESULT STDMETHODCALLTYPE GetUserId(OUT BSTR* pbstrId);
 	HRESULT STDMETHODCALLTYPE SetUserId(IN BSTR bstrId);
-	HRESULT STDMETHODCALLTYPE GetNotebookIdx(INotebook* pNote, int* pIdx);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -118,7 +142,8 @@ public:
 private:
 	CComBSTR m_id;
 	std::vector<INotebook*> m_vecBooks;
-	std::vector<ICoreNotify*> m_notifies;
+	com_sptr<INotebooks> m_spNotebooks;
+	std::unordered_set<ICoreNotify*> m_notifies;
 	int m_ref;
 };
 

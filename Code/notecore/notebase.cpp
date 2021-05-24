@@ -360,25 +360,40 @@ ULONG NotebookBase::Release(void)
 }
 
 
-//////////////////////////////////////////////////
-NoteApplication::NoteApplication()
+///////////////////////////////////////////////////////////////////
+
+NotebooksBase::NotebooksBase()
 	: m_ref(0)
 {
+
 }
 
-NoteApplication::~NoteApplication()
+NotebooksBase::~NotebooksBase()
 {
+
 }
 
-HRESULT NoteApplication::GetNotebook(VARIANT Index, INotebook** ppNotebook)
+HRESULT NotebooksBase::addWatcher(ICoreNotify* pNotify)
+{
+	m_notifies.insert(pNotify);
+	return S_OK;
+}
+
+HRESULT NotebooksBase::GetCount(/* [out] */ int* pCount)
+{
+	*pCount = m_vecBooks.size();
+	return S_OK;
+}
+
+HRESULT NotebooksBase::Item(VARIANT index, INotebook** ppNotebook)
 {
 	if (!ppNotebook)
 	{
 		return E_POINTER;
 	}
-	if (V_VT(&Index) == VT_I4)
+	if (V_VT(&index) == VT_I4)
 	{
-		int nIndex = V_I4(&Index);
+		int nIndex = V_I4(&index);
 		if (nIndex >= 0 && nIndex < (int)m_vecBooks.size())
 		{
 			*ppNotebook = m_vecBooks[nIndex];
@@ -390,22 +405,137 @@ HRESULT NoteApplication::GetNotebook(VARIANT Index, INotebook** ppNotebook)
 			return E_INVALIDARG;
 		}
 	}
+	else if (V_VT(&index) == VT_BSTR)
+	{
+		BSTR bstrId = V_BSTR(&index);
+		for (auto it = m_vecBooks.begin(); it != m_vecBooks.end(); it++)
+		{
+			BSTR _id;
+			(*it)->GetId(&_id);
+			if (0 == wcscmp(bstrId, _id))
+			{
+				*ppNotebook = *it;
+				(*ppNotebook)->AddRef();
+				return S_OK;
+			}
+		}
+		return E_FAIL;
+	}
 	return E_NOTIMPL;
 }
 
-HRESULT NoteApplication::AddNotebook(INotebook* pNotebook)
+void NotebooksBase::NotifyThisObj(NotifyOperator ope, INotebook* pNotebook)
+{
+	for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
+	{
+		BSTR bstrId;
+		pNotebook->GetId(&bstrId);
+		std::wstring noteid(bstrId, SysStringLen(bstrId));
+		NotifyArg arg;
+		arg.ope = ope;
+		arg.pObj = pNotebook;
+		(*it)->onCoreNotify(this, arg);
+	}
+}
+
+HRESULT NotebooksBase::AddNotebook(INotebook* pNotebook)
 {
 	if (!pNotebook)
 		return E_NOTIMPL;
 
 	pNotebook->AddRef();
 	m_vecBooks.push_back(pNotebook);
+
+	NotifyThisObj(NotifyOperator::Add, pNotebook);
 	return S_OK;
 }
 
-HRESULT NoteApplication::GetCount(int* pCount)
+HRESULT NotebooksBase::DeleteNotebook(INotebook* pNotebook)
 {
-	*pCount = m_vecBooks.size();
+	if (!pNotebook)
+		return E_POINTER;
+
+	for (auto it = m_vecBooks.begin(); it != m_vecBooks.end(); )
+	{
+		if (*it == pNotebook)
+		{
+			m_vecBooks.erase(it);
+			pNotebook->Release();
+			NotifyThisObj(Delete, pNotebook);
+			return S_OK;
+		}
+		else
+		{
+			it++;
+		}
+	}
+	return E_FAIL;
+
+
+	return E_NOTIMPL;
+}
+
+HRESULT NotebooksBase::QueryInterface(
+	/* [in] */ REFIID riid,
+	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+{
+	if (!ppvObject)
+		return E_FAIL;
+
+	if (riid == IID_INoteCoreObj)
+	{
+		*ppvObject = static_cast<INoteCoreObj*>(this);
+	}
+	else if (riid == IID_INotebooks)
+	{
+		*ppvObject = static_cast<INotebooks*>(this);
+	}
+	else
+	{
+		return E_FAIL;
+	}
+	return S_OK;
+}
+
+ULONG NotebooksBase::AddRef(void)
+{
+	m_ref++;
+	return m_ref;
+}
+
+ULONG NotebooksBase::Release(void)
+{
+	m_ref--;
+	if (m_ref == 0)
+	{
+		delete this;
+	}
+	return m_ref;
+}
+
+
+//////////////////////////////////////////////////
+NoteApplication::NoteApplication()
+	: m_ref(0)
+{
+}
+
+NoteApplication::~NoteApplication()
+{
+}
+
+HRESULT NoteApplication::GetNotebooks(INotebooks** ppNotebooks)
+{
+	if (!ppNotebooks)
+		return E_FAIL;
+
+	*ppNotebooks = m_spNotebooks;
+	(*ppNotebooks)->AddRef();
+}
+
+HRESULT NoteApplication::SetNotebooks(INotebooks* pNotebooks)
+{
+	m_spNotebooks = pNotebooks;
 	return S_OK;
 }
 
@@ -420,22 +550,9 @@ HRESULT NoteApplication::SetUserId(IN BSTR bstrId)
 	return S_OK;
 }
 
-HRESULT NoteApplication::GetNotebookIdx(INotebook* pNote, int* pIdx)
-{
-	for (int i = 0; i < (int)m_vecBooks.size(); i++)
-	{
-		if (m_vecBooks[i] == pNote)
-		{
-			*pIdx = i;
-			return S_OK;
-		}
-	}
-	return E_FAIL;
-}
-
 HRESULT NoteApplication::addWatcher(ICoreNotify* pNotify)
 {
-	m_notifies.push_back(pNotify);
+	m_notifies.insert(pNotify);
 	return S_OK;
 }
 
