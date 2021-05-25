@@ -337,20 +337,26 @@ void NavigationPanel::initModel()
 
 void NavigationPanel::onCustomContextMenu(const QPoint& point)
 {
+	QModelIndex index = m_treeview->indexAt(point);
+
 	if (m_pCustomMenu == NULL)
 	{
 		m_pCustomMenu = new QMenu(this);
 		connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
 	}
 
-	//QModelIndex index = m_treeview->indexAt(point);
-	m_pCustomMenu->clear();
+	//暂时只处理Notebooks
+	ITEM_CONTENT_TYPE type = index.data(LEFT_SIDE_ROLE::ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
+	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM)
+	{
+		m_pCustomMenu->clear();
 
-	QAction* pDelete = new QAction(u8"删除笔记", m_pCustomMenu);
-	pDelete->setData((int)NavigationPanel::DELETE_NOTEBOOK);
-	m_pCustomMenu->addAction(pDelete);
+		QAction* pDelete = new QAction(u8"删除笔记本", m_pCustomMenu);
+		pDelete->setData((int)NavigationPanel::DELETE_NOTEBOOK);
+		m_pCustomMenu->addAction(pDelete);
 
-	m_pCustomMenu->popup(QCursor::pos());
+		m_pCustomMenu->popup(QCursor::pos());
+	}
 }
 
 void NavigationPanel::MenuActionSlot(QAction* action)

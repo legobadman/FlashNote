@@ -57,7 +57,7 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 void NoteMainWindow::onNewNote()
 {
 	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL);
-	pNewNoteWindow->init(getActiveBookIndex());
+	pNewNoteWindow->init(getActiveBookId());
 	pNewNoteWindow->showMaximized();
 }
 
@@ -121,26 +121,26 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	}
 }
 
-int NoteMainWindow::getActiveBookIndex()
+QString NoteMainWindow::getActiveBookId()
 {
-	QModelIndex idx = m_ui->listpane->treeview()->currentIndex();
-	QModelIndex parent;
+	QModelIndex index = m_ui->listpane->treeview()->currentIndex();
 
-	QModelIndexList idxSelectedItems = m_ui->listpane->treeview()->selectionModel()->selectedRows();
-	for (auto iter = idxSelectedItems.constBegin();
-		iter != idxSelectedItems.constEnd();
-		++iter)
+	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
+	QString bookId;
+	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM)
 	{
-		parent = iter->parent();
+		bookId = index.data(ItemCoreObjIdRole).toString();
 	}
-
-	if (parent.isValid() &&
-		parent.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>() == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
+	else
 	{
-		int bookidx = idx.row();
-		return bookidx;
+		//TODO: default暂时设为第一个book吧
+		com_sptr<INotebooks> spNotebooks;
+		coreApp->GetNotebooks(&spNotebooks);
+		com_sptr<INotebook> spNotebook;
+		AppHelper::GetNotebook(0, &spNotebook);
+		bookId = AppHelper::GetNotebookId(spNotebook);
 	}
-	return -1;
+	return bookId;
 }
 
 void NoteMainWindow::closeEvent(QCloseEvent* event)

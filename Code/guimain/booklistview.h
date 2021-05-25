@@ -23,13 +23,13 @@ public:
 	~BookListView();
 
 	void init();
-	void updateNotebook(INotebook* pNotebook, int idxNote);
+	void updateNotebook(INotebook* pNotebook, QString noteid);
 	HRESULT STDMETHODCALLTYPE onCoreNotify(
 		INoteCoreObj* pCoreObj,
 		NotifyArg arg);
 
 signals:
-	void noteitemclicked(const QModelIndex&);
+	void noteitemselected(const QModelIndex&);
 
 public slots:
 	void onCustomContextMenu(const QPoint& point);

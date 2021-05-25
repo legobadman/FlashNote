@@ -39,11 +39,10 @@ void BookListView::init()
 	m_ui->more->setIcon(QIcon(":/icons/24x24/more.png"));
 	m_ui->more->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
 
-	connect(m_ui->listView, SIGNAL(clicked(const QModelIndex&)),
-		this, SIGNAL(noteitemclicked(const QModelIndex&)));
+	m_ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-	//m_selectionModel = new QItemSelectionModel;
-	//m_ui->listView->setSelectionModel(m_selectionModel);
+	connect(m_ui->listView, SIGNAL(clicked(const QModelIndex&)),
+		this, SIGNAL(noteitemselected(const QModelIndex&)));
 
 	m_ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(m_ui->listView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
@@ -140,7 +139,8 @@ HRESULT BookListView::onNotebookNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 		case NotifyOperator::Add:
 		{
 			//¼àÌýNotebook::AddWorkbook
-			m_model->insertRow(0);
+			bool bRet = m_model->insertRow(0);
+			
 			QModelIndex newItem = m_model->index(0, 0);
 			QStandardItem* pItem = m_model->itemFromIndex(newItem);
 			QString showContent = GetShowContent(spNote);
@@ -162,7 +162,7 @@ HRESULT BookListView::onNotebookNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 				m_ui->listView->model()->removeRow(index.row());
 				QItemSelectionModel* pModel = m_ui->listView->selectionModel();
 				QModelIndex newIndex = pModel->currentIndex();
-				emit noteitemclicked(newIndex);
+				emit noteitemselected(newIndex);
 			}
 			break;
 		}
@@ -205,8 +205,11 @@ HRESULT BookListView::onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	return S_OK;
 }
 
-void BookListView::updateNotebook(INotebook* pNotebook, int idxNote)
+void BookListView::updateNotebook(INotebook* pNotebook, QString noteid)
 {
+	if (m_spNotebook == pNotebook)
+		return;
+
 	m_spNotebook = pNotebook;
 	m_spNotebook->addWatcher(this);
 
@@ -216,7 +219,8 @@ void BookListView::updateNotebook(INotebook* pNotebook, int idxNote)
 		QString::number(AppHelper::GetNoteCounts(m_spNotebook))));
 
 	m_model = new QStandardItemModel(this);
-	for (int i = 0; i < AppHelper::GetNoteCounts(m_spNotebook); i++)
+	int n = AppHelper::GetNoteCounts(m_spNotebook);
+	for (int i = 0; i < n; i++)
 	{
 		com_sptr<INote> spNote;
 		AppHelper::GetNote(m_spNotebook, i, &spNote);
@@ -243,7 +247,23 @@ void BookListView::updateNotebook(INotebook* pNotebook, int idxNote)
 		m_model->appendRow(pNoteItem);
 	}
 
+	m_model->setColumnCount(1);
 	m_ui->listView->setModel(m_model);
-	QModelIndex selectedIndex = m_model->index(idxNote, 0);
+	if (n == 0)
+	{
+		return;
+	}
+
+	QModelIndex selectedIndex;
+	QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
+	if (indexs.empty())
+	{
+		selectedIndex = m_model->index(0, 0);
+	}
+	else
+	{
+		Q_ASSERT(indexs.size() == 1);
+		selectedIndex = indexs.at(0);
+	}
 	m_ui->listView->setCurrentIndex(selectedIndex);
 }

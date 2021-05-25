@@ -27,6 +27,13 @@ class NotesEditView : public QWidget
 #endif
 {
 	Q_OBJECT
+
+	enum PAGE_IDX
+	{
+		PAGE_EDITVIEW,
+		PAGE_NOEDIT,
+	};
+
 public:
 	NotesEditView(QWidget* parent = NULL);
 	~NotesEditView();
@@ -41,10 +48,10 @@ protected:
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
 public slots:
-	void onNoteItemClicked(const QModelIndex& index);
+	void onNoteItemSelected(const QModelIndex& index);
 
 private:
-	void onShowNotesView(int idxNote);
+	void onShowNotesView(QString noteid);
 	
 private:
 	QWidget* m_pNoView;

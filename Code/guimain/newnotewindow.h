@@ -12,7 +12,7 @@ class NewNoteWindow : public QMainWindow
 public:
 	NewNoteWindow(QWidget* parent);
 	~NewNoteWindow();
-	void init(int bookid);
+	void init(QString bookid);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

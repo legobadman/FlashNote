@@ -26,7 +26,7 @@ protected:
 	void closeEvent(QCloseEvent* event) override;
 
 private:
-	int getActiveBookIndex();
+	QString getActiveBookId();
 	int getActiveNoteInBook(int bookidx);
 
 private:

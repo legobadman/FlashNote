@@ -16,15 +16,12 @@ NewNoteWindow::~NewNoteWindow()
 {
 }
 
-void NewNoteWindow::init(int bookid)
+void NewNoteWindow::init(QString bookid)
 {
-	if (bookid == -1)
-	{
-		//TODO: 后续应安排default book
-		bookid = 0;
-	}
+	Q_ASSERT(!bookid.isEmpty());
+
 	com_sptr<INotebook> spNotebook;
-	AppHelper::GetNotebook(bookid, &spNotebook);
+	AppHelper::GetNotebookById(bookid, &spNotebook);
 	HRESULT hr = CreateNote(NORMAL_NOTE, &m_pNote);
 	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote);
 }

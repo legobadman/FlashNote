@@ -58,8 +58,8 @@ NotesEditView::NotesEditView(QWidget* parent)
 
 	m_pNoView->installEventFilter(this);
 
-	connect(m_pBookView, SIGNAL(noteitemclicked(const QModelIndex&)),
-		this, SLOT(onNoteItemClicked(const QModelIndex&)));
+	connect(m_pBookView, SIGNAL(noteitemselected(const QModelIndex&)),
+		this, SLOT(onNoteItemSelected(const QModelIndex&)));
 }
 
 NotesEditView::~NotesEditView()
@@ -105,40 +105,36 @@ bool NotesEditView::eventFilter(QObject* watched, QEvent* event)
 void NotesEditView::setNotebook(INotebook* pNotebook)
 {
 	m_pNotebook = pNotebook;
-	int idxNote = 0;	//TODO: 注册表实现
-	onShowNotesView(idxNote);
+	QString noteid;	//TODO: 注册表实现
+	//暂时用book的第一个note
+	com_sptr<INote> spNote;
+	AppHelper::GetNote(pNotebook, 0, &spNote);
+	if (spNote)
+	{
+		noteid = AppHelper::GetNoteId(spNote);
+	}
+	onShowNotesView(noteid);
 }
 
-void NotesEditView::onNoteItemClicked(const QModelIndex& index)
+void NotesEditView::onNoteItemSelected(const QModelIndex& index)
 {
 	QString noteid = index.data(ItemCoreObjIdRole).toString();
-	
-	std::wstring str_ = noteid.toStdWString();
-	BSTR bstrId = SysAllocString(str_.c_str());
-
-	VARIANT varIndex;
-	V_VT(&varIndex) = VT_BSTR;
-	V_BSTR(&varIndex) = bstrId;
-
-	com_sptr<INote> spNote;
-	m_pNotebook->Item(varIndex, &spNote);
-	m_pEditView->updateNoteInfo(m_pNotebook, spNote);
+	onShowNotesView(noteid);
 }
 
-void NotesEditView::onShowNotesView(int idxNote)
+void NotesEditView::onShowNotesView(QString noteid)
 {
-	QString bookName = AppHelper::GetNotebookName(m_pNotebook);
-	m_pBookView->updateNotebook(m_pNotebook, idxNote);
+	m_pBookView->updateNotebook(m_pNotebook, noteid);
 
 	com_sptr<INote> spNote;
-	AppHelper::GetNote(m_pNotebook, idxNote, &spNote);
+	AppHelper::GetNoteById(m_pNotebook, noteid, &spNote);
 	if (spNote == NULL)
 	{
-		m_pStackedWidget->setCurrentIndex(1);
+		m_pStackedWidget->setCurrentIndex(PAGE_NOEDIT);
 	}
 	else
 	{
-		m_pStackedWidget->setCurrentIndex(0);
+		m_pStackedWidget->setCurrentIndex(PAGE_EDITVIEW);
 		m_pEditView->updateNoteInfo(m_pNotebook, spNote);
 	}
 }
