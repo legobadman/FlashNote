@@ -178,5 +178,63 @@ class Notebook {
 void swap(Notebook &a, Notebook &b);
 
 
+class Trash {
+ public:
+
+  static const char* ascii_fingerprint; // = "49F40AF7F6EF2525B146C3AFC11BA377";
+  static const uint8_t binary_fingerprint[16]; // = {0x49,0xF4,0x0A,0xF7,0xF6,0xEF,0x25,0x25,0xB1,0x46,0xC3,0xAF,0xC1,0x1B,0xA3,0x77};
+
+  Trash() : trash_id(), trash_time(0) {
+  }
+
+  virtual ~Trash() throw() {}
+
+  std::string trash_id;
+  Timestamp trash_time;
+  Note note;
+  Notebook notebook;
+
+  void __set_trash_id(const std::string& val) {
+    trash_id = val;
+  }
+
+  void __set_trash_time(const Timestamp val) {
+    trash_time = val;
+  }
+
+  void __set_note(const Note& val) {
+    note = val;
+  }
+
+  void __set_notebook(const Notebook& val) {
+    notebook = val;
+  }
+
+  bool operator == (const Trash & rhs) const
+  {
+    if (!(trash_id == rhs.trash_id))
+      return false;
+    if (!(trash_time == rhs.trash_time))
+      return false;
+    if (!(note == rhs.note))
+      return false;
+    if (!(notebook == rhs.notebook))
+      return false;
+    return true;
+  }
+  bool operator != (const Trash &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const Trash & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+void swap(Trash &a, Trash &b);
+
+
 
 #endif

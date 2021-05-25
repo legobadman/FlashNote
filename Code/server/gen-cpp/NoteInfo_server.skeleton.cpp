@@ -60,6 +60,11 @@ class NoteInfoHandler : virtual public NoteInfoIf {
     printf("TrashNote\n");
   }
 
+  void GetTrashes(std::vector<Trash> & _return, const std::string& userid) {
+    // Your implementation goes here
+    printf("GetTrashes\n");
+  }
+
   bool RecoverNote(const std::string& userid, const std::string& noteid) {
     // Your implementation goes here
     printf("RecoverNote\n");

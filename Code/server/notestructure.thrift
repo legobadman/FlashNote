@@ -20,6 +20,13 @@ struct Notebook {
 	7:required bool share;	//共享属性
 }
 
+struct Trash {
+	1:required string trash_id;
+	2:required Timestamp trash_time;
+	3:required Note note;
+	4:required Notebook notebook;
+}
+
 service UserInfo {
 	string GetUserId(1:required string username);
 }
@@ -63,6 +70,8 @@ service NoteInfo {
 	 
 	 */
 	bool TrashNote(1:required string userid, 2:required string bookid, 3:required string noteid);
+
+	list<Trash> GetTrashes(1:required string userid);
 
 	// 将userid的废纸篓中的noteid笔记恢复。
 	//Q: 如果工作簿已经删除，那么Recover如何定义？

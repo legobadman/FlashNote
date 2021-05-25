@@ -23,6 +23,7 @@ class NoteInfoIf {
   virtual void GetContent(std::string& _return, const std::string& noteid) = 0;
   virtual bool MoveNote(const std::string& noteid, const std::string& src_bookid, const std::string& dest_bookid) = 0;
   virtual bool TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid) = 0;
+  virtual void GetTrashes(std::vector<Trash> & _return, const std::string& userid) = 0;
   virtual bool RecoverNote(const std::string& userid, const std::string& noteid) = 0;
   virtual bool DeleteNote(const std::string& userid, const std::string& noteid) = 0;
 };
@@ -81,6 +82,9 @@ class NoteInfoNull : virtual public NoteInfoIf {
   bool TrashNote(const std::string& /* userid */, const std::string& /* bookid */, const std::string& /* noteid */) {
     bool _return = false;
     return _return;
+  }
+  void GetTrashes(std::vector<Trash> & /* _return */, const std::string& /* userid */) {
+    return;
   }
   bool RecoverNote(const std::string& /* userid */, const std::string& /* noteid */) {
     bool _return = false;
@@ -989,6 +993,108 @@ class NoteInfo_TrashNote_presult {
 };
 
 
+class NoteInfo_GetTrashes_args {
+ public:
+
+  NoteInfo_GetTrashes_args() : userid() {
+  }
+
+  virtual ~NoteInfo_GetTrashes_args() throw() {}
+
+  std::string userid;
+
+  void __set_userid(const std::string& val) {
+    userid = val;
+  }
+
+  bool operator == (const NoteInfo_GetTrashes_args & rhs) const
+  {
+    if (!(userid == rhs.userid))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_GetTrashes_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_GetTrashes_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_GetTrashes_pargs {
+ public:
+
+
+  virtual ~NoteInfo_GetTrashes_pargs() throw() {}
+
+  const std::string* userid;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_GetTrashes_result__isset {
+  _NoteInfo_GetTrashes_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_GetTrashes_result__isset;
+
+class NoteInfo_GetTrashes_result {
+ public:
+
+  NoteInfo_GetTrashes_result() {
+  }
+
+  virtual ~NoteInfo_GetTrashes_result() throw() {}
+
+  std::vector<Trash>  success;
+
+  _NoteInfo_GetTrashes_result__isset __isset;
+
+  void __set_success(const std::vector<Trash> & val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_GetTrashes_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_GetTrashes_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_GetTrashes_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_GetTrashes_presult__isset {
+  _NoteInfo_GetTrashes_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_GetTrashes_presult__isset;
+
+class NoteInfo_GetTrashes_presult {
+ public:
+
+
+  virtual ~NoteInfo_GetTrashes_presult() throw() {}
+
+  std::vector<Trash> * success;
+
+  _NoteInfo_GetTrashes_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
 class NoteInfo_RecoverNote_args {
  public:
 
@@ -1252,6 +1358,9 @@ class NoteInfoClient : virtual public NoteInfoIf {
   bool TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid);
   void send_TrashNote(const std::string& userid, const std::string& bookid, const std::string& noteid);
   bool recv_TrashNote();
+  void GetTrashes(std::vector<Trash> & _return, const std::string& userid);
+  void send_GetTrashes(const std::string& userid);
+  void recv_GetTrashes(std::vector<Trash> & _return);
   bool RecoverNote(const std::string& userid, const std::string& noteid);
   void send_RecoverNote(const std::string& userid, const std::string& noteid);
   bool recv_RecoverNote();
@@ -1281,6 +1390,7 @@ class NoteInfoProcessor : public ::apache::thrift::TDispatchProcessor {
   void process_GetContent(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_MoveNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_TrashNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_GetTrashes(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_RecoverNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_DeleteNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
@@ -1294,6 +1404,7 @@ class NoteInfoProcessor : public ::apache::thrift::TDispatchProcessor {
     processMap_["GetContent"] = &NoteInfoProcessor::process_GetContent;
     processMap_["MoveNote"] = &NoteInfoProcessor::process_MoveNote;
     processMap_["TrashNote"] = &NoteInfoProcessor::process_TrashNote;
+    processMap_["GetTrashes"] = &NoteInfoProcessor::process_GetTrashes;
     processMap_["RecoverNote"] = &NoteInfoProcessor::process_RecoverNote;
     processMap_["DeleteNote"] = &NoteInfoProcessor::process_DeleteNote;
   }
@@ -1398,6 +1509,16 @@ class NoteInfoMultiface : virtual public NoteInfoIf {
       ifaces_[i]->TrashNote(userid, bookid, noteid);
     }
     return ifaces_[i]->TrashNote(userid, bookid, noteid);
+  }
+
+  void GetTrashes(std::vector<Trash> & _return, const std::string& userid) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->GetTrashes(_return, userid);
+    }
+    ifaces_[i]->GetTrashes(_return, userid);
+    return;
   }
 
   bool RecoverNote(const std::string& userid, const std::string& noteid) {

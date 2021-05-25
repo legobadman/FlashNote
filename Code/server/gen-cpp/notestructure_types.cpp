@@ -350,4 +350,116 @@ void swap(Notebook &a, Notebook &b) {
   swap(a.share, b.share);
 }
 
+const char* Trash::ascii_fingerprint = "49F40AF7F6EF2525B146C3AFC11BA377";
+const uint8_t Trash::binary_fingerprint[16] = {0x49,0xF4,0x0A,0xF7,0xF6,0xEF,0x25,0x25,0xB1,0x46,0xC3,0xAF,0xC1,0x1B,0xA3,0x77};
+
+uint32_t Trash::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+  bool isset_trash_id = false;
+  bool isset_trash_time = false;
+  bool isset_note = false;
+  bool isset_notebook = false;
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->trash_id);
+          isset_trash_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->trash_time);
+          isset_trash_time = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 3:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->note.read(iprot);
+          isset_note = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_STRUCT) {
+          xfer += this->notebook.read(iprot);
+          isset_notebook = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  if (!isset_trash_id)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_trash_time)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_note)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_notebook)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  return xfer;
+}
+
+uint32_t Trash::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("Trash");
+
+  xfer += oprot->writeFieldBegin("trash_id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->trash_id);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("trash_time", ::apache::thrift::protocol::T_I64, 2);
+  xfer += oprot->writeI64(this->trash_time);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("note", ::apache::thrift::protocol::T_STRUCT, 3);
+  xfer += this->note.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("notebook", ::apache::thrift::protocol::T_STRUCT, 4);
+  xfer += this->notebook.write(oprot);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+void swap(Trash &a, Trash &b) {
+  using ::std::swap;
+  swap(a.trash_id, b.trash_id);
+  swap(a.trash_time, b.trash_time);
+  swap(a.note, b.note);
+  swap(a.notebook, b.notebook);
+}
+
 
