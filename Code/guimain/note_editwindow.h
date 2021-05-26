@@ -77,7 +77,7 @@ private:
 private:
 	Ui::NoteEditWindow* m_ui;
 	com_sptr<INote> m_pNote;
-	com_sptr<INotebook> m_pNotebook;
+	com_sptr<INoteCollection> m_pNoteColl;
 
 	QStringList m_paragraphItems;
 	int m_fontsize_h1;
@@ -97,6 +97,7 @@ private:
 	QPointer<QTextList> m_lastBlockList;
 	std::wstring m_bookid;
 	bool m_bEnableBase64;
+	bool m_bEdittable;
 };
 
 #endif

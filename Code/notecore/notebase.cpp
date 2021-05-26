@@ -750,7 +750,7 @@ HRESULT TrashBase::QueryInterface(
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	else if (riid == IID_INoteApplication)
+	else if (riid == IID_ITrash)
 	{
 		*ppvObject = static_cast<ITrash*>(this);
 	}

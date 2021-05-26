@@ -27,6 +27,7 @@
 NoteEditWindow::NoteEditWindow(QWidget* parent)
     : QWidget(parent)
 	, m_bEnableBase64(true)
+	, m_bEdittable(false)
 {
     init();
     initContent();
@@ -43,10 +44,19 @@ INote* NoteEditWindow::GetNote()
 
 void NoteEditWindow::updateNoteInfo(INoteCollection* pNotebook, INote* pNote)
 {
-	m_pNotebook = pNotebook;
+	m_pNoteColl = pNotebook;
 	m_pNote = pNote;
 
-	QString bookName = AppHelper::GetNotebookName(m_pNotebook);
+	if (com_sptr<ITrash>(pNotebook))
+	{
+		m_bEdittable = false;
+	}
+	else
+	{
+		m_bEdittable = true;
+	}
+
+	QString bookName = AppHelper::GetNotebookName(m_pNoteColl);
 	m_ui->bookmenu->blockSignals(true);
 	m_ui->bookmenu->setText(bookName);
 	m_ui->bookmenu->blockSignals(false);
@@ -60,6 +70,8 @@ void NoteEditWindow::updateNoteInfo(INoteCollection* pNotebook, INote* pNote)
 
 	m_ui->textEdit->blockSignals(true);
 	m_ui->textEdit->setText(content);
+	m_ui->textEdit->setReadOnly(!m_bEdittable);
+	m_ui->editTitle->setReadOnly(!m_bEdittable);
 	m_ui->textEdit->blockSignals(false);
 	
 	update();
@@ -197,7 +209,6 @@ void NoteEditWindow::initContent()
 {
     m_ui->editTitle->setPlaceholderText(u8"БъЬт");
 }
-
 
 void NoteEditWindow::textSource() {
 	QDialog* dialog = new QDialog(this);
@@ -575,7 +586,8 @@ void NoteEditWindow::saveNote()
 	BSTR bstrPlainText = SysAllocString(plainText.toStdWString().c_str());
 	m_pNote->SetPlainText(bstrPlainText);
 
-	RPCService::GetInstance().SynchronizeNote(m_pNotebook, m_pNote);
+	com_sptr<INotebook> spNotebook = m_pNoteColl;
+	RPCService::GetInstance().SynchronizeNote(spNotebook, m_pNote);
 }
 
 void NoteEditWindow::switchtobook(int bookidx)
@@ -592,13 +604,13 @@ void NoteEditWindow::switchtobook(int bookidx)
 		Q_ASSERT(FALSE);
 	}
 
-	hr = m_pNotebook->RemoveNote(m_pNote);
+	hr = m_pNoteColl->RemoveNote(m_pNote);
 	if (FAILED(hr))
 		Q_ASSERT(FALSE);
 	hr = spNewbook->AddNote(m_pNote);
 	if (FAILED(hr))
 		Q_ASSERT(FALSE);
-	m_pNotebook = spNewbook;
+	m_pNoteColl = spNewbook;
 }
 
 void NoteEditWindow::onTitleChanged()
