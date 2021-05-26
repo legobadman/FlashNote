@@ -73,6 +73,7 @@
       <widget class="QStackedWidget" name="stackedWidget2">
        <widget class="NotesEditView" name="notesview"/>
        <widget class="QWidget" name="booksview"/>
+       <widget class="NotesEditView" name="trashview"/>
       </widget>
      </widget>
     </item>

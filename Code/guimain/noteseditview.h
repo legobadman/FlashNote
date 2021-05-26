@@ -38,7 +38,7 @@ public:
 	NotesEditView(QWidget* parent = NULL);
 	~NotesEditView();
 
-	void setNotebook(INotebook* pNotebook);
+	void setNotebook(INoteCollection* pNotebook);
 
 #ifndef SPLITTER_BASE
 	QSize sizeHint() const override;
@@ -52,13 +52,13 @@ public slots:
 
 private:
 	void onShowNotesView(QString noteid);
-	
+
 private:
 	QWidget* m_pNoView;
 	BookListView* m_pBookView;
 	NoteEditWindow* m_pEditView;
 	QStackedWidget* m_pStackedWidget;
-	com_sptr<INotebook> m_pNotebook;
+	com_sptr<INoteCollection> m_pNotebook;
 };
 
 #endif

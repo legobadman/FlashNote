@@ -470,7 +470,6 @@ void NavigationPanel::initNotebookItem()
 
 	int count = 0;
 	spNotebooks->GetCount(&count);
-	QModelIndex activeIndex;
 	for (int i = 0; i < count; i++)
 	{
 		VARIANT index;
@@ -492,7 +491,6 @@ void NavigationPanel::initNotebookItem()
 		pItem->setData(QVariant(bookId), ItemCoreObjIdRole);
 
 		pNoteBookItem->appendRow(pItem);
-		activeIndex = pItem->index();
 	}
 	m_model->appendRow(pNoteBookItem);
 }

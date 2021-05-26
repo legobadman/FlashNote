@@ -33,7 +33,8 @@ enum LEFT_SIDE_ROLE
 enum CONTENT_MAIN_VIEW
 {
 	NOTES_VIEW,
-	NOTEBOOKS_VIEW
+	NOTEBOOKS_VIEW,
+	TRASH_VIEW,
 };
 
 class LeftSideItemDelegate : public QStyledItemDelegate

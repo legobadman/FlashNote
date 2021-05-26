@@ -17,10 +17,11 @@ class RPCService
 public:
 	static RPCService& GetInstance();
 	void getnotebooks(std::vector<NOTEBOOK>& vecBooks);
+	void inittrashes(INoteApplication* pApp);
 	void InitcoreFromRPC(INoteApplication* pApp);
 	void SynchronizeNote(INotebook* pNotebook, INote* pNote);
 	bool SynchronizeNotebook(INotebook* pNotebook);
-	bool RemoveNote(INotebook* pNotebook, INote* pNote);
+	bool RemoveNote(INoteCollection* pNotebook, INote* pNote);
 	bool RemoveNotebook(INotebook* pNotebook);
 	std::wstring NewNote(std::wstring bookid, std::wstring title);
 	std::wstring NewNotebook(std::wstring name);

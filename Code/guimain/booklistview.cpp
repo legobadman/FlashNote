@@ -205,7 +205,7 @@ HRESULT BookListView::onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	return S_OK;
 }
 
-void BookListView::updateNotebook(INotebook* pNotebook, QString noteid)
+void BookListView::updateNotebook(INoteCollection* pNotebook, QString noteid)
 {
 	if (m_spNotebook == pNotebook)
 		return;

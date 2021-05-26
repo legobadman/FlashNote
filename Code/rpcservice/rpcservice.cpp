@@ -111,8 +111,10 @@ std::wstring RPCService::NewNotebook(std::wstring name)
 	return converter.from_bytes(bookid);
 }
 
-bool RPCService::RemoveNote(INotebook* pNotebook, INote* pNote)
+bool RPCService::RemoveNote(INoteCollection* pNoteColl, INote* pNote)
 {
+	//TODO: ITrash的处理
+	com_sptr<INotebook> pNotebook = pNoteColl;
 	bool bRet = m_pClient->TrashNote(_userid,
 		converter.to_bytes(AppHelper::GetNotebookId(pNotebook).toStdWString()),
 		converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString())
@@ -194,14 +196,17 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 				bstrId = SysAllocString(note.id.toStdWString().c_str());
 				spNote->SetId(bstrId);
 
+				bstrId = SysAllocString(notebook.id.toStdWString().c_str());
+				spNote->SetBookId(bstrId);
+
 				spNotebook->AddNote(spNote);
 			}
 		}
-
 		com_sptr<INotebooks> spNotebooks;
 		pApp->GetNotebooks(&spNotebooks);
 		spNotebooks->AddNotebook(spNotebook);
 	}
+	inittrashes(pApp);
 }
 
 void RPCService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
@@ -233,4 +238,51 @@ void RPCService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
 		}
 		vecBooks.push_back(notebook);
 	}
+}
+
+void RPCService::inittrashes(INoteApplication* pApp)
+{
+	//trash涉及到note和notebook的索引，因此用core的note对象来初始化方便些。
+	com_sptr<ITrash> spTrash;
+	CreateTrash(&spTrash);
+
+	std::vector<Trash> trashes;
+	m_pClient->GetTrashes(trashes, _userid);
+	for (int i = 0; i < trashes.size(); i++)
+	{
+		QString trash_id = QString::fromUtf8(trashes[i].trash_id.c_str());
+		QString bookid = QString::fromUtf8(trashes[i].notebook.id.c_str());
+		QString noteid = QString::fromUtf8(trashes[i].note.id.c_str());
+		
+		QString note_title = QString::fromUtf8(trashes[i].note.title.c_str());
+		QString note_content = QString::fromUtf8(trashes[i].note.text_abbre.c_str());
+		QDateTime create_time = QDateTime::fromMSecsSinceEpoch(trashes[i].note.create_time, Qt::UTC);
+		QDateTime modify_time = QDateTime::fromMSecsSinceEpoch(trashes[i].note.modify_time, Qt::UTC);
+		QDateTime trash_time = QDateTime::fromMSecsSinceEpoch(trashes[i].trash_time, Qt::UTC);
+		QString note_id = QString::fromUtf8(trashes[i].note.id.c_str());
+
+		com_sptr<INote> spNote;
+		CreateNote(NORMAL_NOTE, &spNote);
+		{
+			std::wstring title = note_title.toStdWString();
+			BSTR bstrTitle = SysAllocString(title.c_str());
+			spNote->SetTitle(bstrTitle);
+
+			std::wstring content = note_content.toStdWString();
+			BSTR bstrContent = SysAllocString(content.c_str());
+			spNote->SetContent(bstrContent);
+
+			spNote->SetCreateTime(create_time.toMSecsSinceEpoch());
+			//目前暂时用modifytime作为移除至trash的时间。
+			spNote->SetModifyTime(trash_time.toMSecsSinceEpoch());
+
+			BSTR bstrId = SysAllocString(note_id.toStdWString().c_str());
+			spNote->SetId(bstrId);
+
+			BSTR bstrBookId = SysAllocString(bookid.toStdWString().c_str());
+			spNote->SetBookId(bstrBookId);
+		}
+		spTrash->AddNote(spNote);
+	}
+	pApp->SetTrash(spTrash);
 }

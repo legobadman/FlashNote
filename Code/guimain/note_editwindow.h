@@ -18,7 +18,7 @@ public:
 	void init();
 	void initCustomWidget();
 	void initContent();
-	void updateNoteInfo(INotebook* pNotebook, INote* pNote);
+	void updateNoteInfo(INoteCollection* pNotebook, INote* pNote);
 	INote* GetNote();
 
 	QString toPlainText() const { return m_ui->textEdit->toPlainText(); }

@@ -24,6 +24,19 @@ HRESULT NoteBase::SetId(IN BSTR bstrId)
 	return S_OK;
 }
 
+HRESULT NoteBase::GetBookId(BSTR* pBookId)
+{
+	if (!pBookId)
+		return E_FAIL;
+	return m_bookid.CopyTo(pBookId);
+}
+
+HRESULT NoteBase::SetBookId(BSTR bookId)
+{
+	m_bookid.Attach(bookId);
+	return S_OK;
+}
+
 HRESULT NoteBase::GetTitle(OUT BSTR* pbstrName)
 {
 	return m_bstrTitle.CopyTo(pbstrName);
@@ -515,6 +528,266 @@ ULONG NotebooksBase::Release(void)
 
 
 //////////////////////////////////////////////////
+TrashRecord::TrashRecord()
+{
+
+}
+
+TrashRecord::~TrashRecord()
+{
+}
+
+HRESULT TrashRecord::GetId(BSTR* pbstrId)
+{
+	if (!pbstrId)
+		return E_POINTER;
+
+	*pbstrId = m_id;
+	return S_OK;
+}
+
+HRESULT TrashRecord::SetId(BSTR bstrId)
+{
+	m_id = bstrId;
+	return S_OK;
+}
+
+HRESULT TrashRecord::addWatcher(ICoreNotify* pNotify)
+{
+	m_notifies.insert(pNotify);
+	return S_OK;
+}
+
+HRESULT TrashRecord::GetNote(INote** ppNote)
+{
+	if (!ppNote)
+		return E_POINTER;
+
+	*ppNote = m_spNote;
+	(*ppNote)->AddRef();
+	return S_OK;
+}
+
+HRESULT TrashRecord::SetNote(INote* pNote)
+{
+	if (!pNote)
+		return E_POINTER;
+
+	m_spNote = pNote;
+	return S_OK;
+}
+
+HRESULT TrashRecord::GetNotebook(INotebook** ppNotebook)
+{
+	if (!ppNotebook)
+		return E_POINTER;
+
+	*ppNotebook = m_spNotebook;
+	(*ppNotebook)->AddRef();
+	return S_OK;
+}
+
+HRESULT TrashRecord::SetNotebook(INotebook* pNotebook)
+{
+	if (!pNotebook)
+		return E_POINTER;
+
+	m_spNotebook = pNotebook;
+	return S_OK;
+}
+
+HRESULT TrashRecord::QueryInterface(
+	/* [in] */ REFIID riid,
+	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+{
+	if (!ppvObject)
+		return E_FAIL;
+
+	if (riid == IID_INoteCoreObj)
+	{
+		*ppvObject = static_cast<INoteCoreObj*>(this);
+	}
+	else if (riid == IID_INoteApplication)
+	{
+		*ppvObject = static_cast<ITrashRecord*>(this);
+	}
+	else
+	{
+		return E_FAIL;
+	}
+	return S_OK;
+}
+
+ULONG TrashRecord::AddRef(void)
+{
+	m_ref++;
+	return m_ref;
+}
+
+ULONG TrashRecord::Release(void)
+{
+	m_ref--;
+	if (m_ref == 0)
+	{
+		delete this;
+	}
+	return m_ref;
+}
+
+
+//////////////////////////////////////////////////////
+TrashBase::TrashBase()
+{
+
+}
+
+TrashBase::~TrashBase()
+{
+	for (auto it = m_container.begin(); it != m_container.end(); it++)
+	{
+		it->second->Release();
+	}
+	m_container.clear();
+}
+
+HRESULT TrashBase::addWatcher(ICoreNotify* pNotify)
+{
+	m_notifies.insert(pNotify);
+	return S_OK;
+}
+
+HRESULT TrashBase::GetCount(int* pCount)
+{
+	if (!pCount)
+		return E_POINTER;
+
+	*pCount = m_container.size();
+	return S_OK;
+}
+
+HRESULT TrashBase::Item(VARIANT index, INote** ppNote)
+{
+	if (!ppNote)
+		return E_POINTER;
+
+	if (V_VT(&index) == VT_BSTR)
+	{
+		CComBSTR bstrTrashId(V_BSTR(&index));
+		if (m_container.find(bstrTrashId) == m_container.end())
+		{
+			return E_FAIL;
+		}
+		*ppNote = m_container[bstrTrashId];
+		(*ppNote)->AddRef();
+		return S_OK;
+	}
+	else if (V_VT(&index) == VT_I4)
+	{
+		int idx = V_I4(&index);
+		for (auto it = m_container.begin(); it != m_container.end(); it++)
+		{
+			if (idx == 0)
+			{
+				*ppNote = it->second;
+				(*ppNote)->AddRef();
+				return S_OK;
+			}
+			idx--;
+		}
+		return E_INVALIDARG;
+	}
+	else
+	{
+		return E_INVALIDARG;
+	}
+}
+
+HRESULT TrashBase::AddNote(INote* pNote)
+{
+	if (!pNote)
+		return E_FAIL;
+
+	CComBSTR bstrTrashId;
+	pNote->GetId(&bstrTrashId);
+
+	pNote->AddRef();
+	m_container.insert(std::pair<CComBSTR, INote*>(bstrTrashId, pNote));
+	return S_OK;
+}
+
+HRESULT TrashBase::RemoveNote(INote* pNote)
+{
+	if (!pNote)
+		return E_FAIL;
+
+	CComBSTR bstrNoteId;
+	pNote->GetId(&bstrNoteId);
+
+	auto it = m_container.find(bstrNoteId);
+	if (it == m_container.end())
+	{
+		return E_FAIL;
+	}
+
+	pNote->Release();
+	m_container.erase(bstrNoteId);
+	return S_OK;
+}
+
+HRESULT TrashBase::DeleteNote(INote* pNote)
+{
+	return E_NOTIMPL;
+}
+
+HRESULT TrashBase::QueryInterface(
+	/* [in] */ REFIID riid,
+	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+{
+	if (!ppvObject)
+		return E_FAIL;
+
+	if (riid == IID_INoteCoreObj)
+	{
+		*ppvObject = static_cast<INoteCoreObj*>(this);
+	}
+	else if (riid == IID_INoteApplication)
+	{
+		*ppvObject = static_cast<ITrash*>(this);
+	}
+	else
+	{
+		return E_FAIL;
+	}
+	return S_OK;
+}
+
+ULONG TrashBase::AddRef(void)
+{
+	m_ref++;
+	return m_ref;
+}
+
+ULONG TrashBase::Release(void)
+{
+	m_ref--;
+	if (m_ref == 0)
+	{
+		delete this;
+	}
+	return m_ref;
+}
+
+HRESULT TrashBase::GetName(BSTR* pbstrName)
+{
+	if (!pbstrName)
+		return E_POINTER;
+
+	*pbstrName = SysAllocString(L"·ÏÖ½Â¨");
+	return S_OK;
+}
+
+
+//////////////////////////////////////////////////
 NoteApplication::NoteApplication()
 	: m_ref(0)
 {
@@ -531,11 +804,31 @@ HRESULT NoteApplication::GetNotebooks(INotebooks** ppNotebooks)
 
 	*ppNotebooks = m_spNotebooks;
 	(*ppNotebooks)->AddRef();
+	return S_OK;
 }
 
 HRESULT NoteApplication::SetNotebooks(INotebooks* pNotebooks)
 {
 	m_spNotebooks = pNotebooks;
+	return S_OK;
+}
+
+HRESULT NoteApplication::GetTrash(ITrash** ppTrash)
+{
+	if (!ppTrash)
+		return E_POINTER;
+
+	*ppTrash = m_spTrash;
+	(*ppTrash)->AddRef();
+	return S_OK;
+}
+
+HRESULT NoteApplication::SetTrash(ITrash* pTrash)
+{
+	if (!pTrash)
+		return E_POINTER;
+
+	m_spTrash = pTrash;
 	return S_OK;
 }
 

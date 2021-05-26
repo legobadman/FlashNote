@@ -13,6 +13,8 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetId(OUT BSTR* pbstrId);
 	HRESULT STDMETHODCALLTYPE SetId(IN BSTR bstrId);
+	HRESULT STDMETHODCALLTYPE GetBookId(BSTR* pBookId);
+	HRESULT STDMETHODCALLTYPE SetBookId(BSTR bookId);
 	HRESULT STDMETHODCALLTYPE GetTitle(OUT BSTR* pbstrName);
 	HRESULT STDMETHODCALLTYPE SetTitle(IN BSTR title);
 	HRESULT STDMETHODCALLTYPE GetType(NOTE_TYPE* pType);
@@ -38,6 +40,7 @@ private:
 
 private:
 	CComBSTR m_id;
+	CComBSTR m_bookid;
 	CComBSTR m_bstrTitle;
 	CComBSTR m_bstrContent;
 	CComBSTR m_bstrPlainText;
@@ -120,6 +123,65 @@ private:
 	int m_ref;
 };
 
+class TrashRecord : public ITrashRecord
+{
+public:
+	TrashRecord();
+	~TrashRecord();
+
+	HRESULT STDMETHODCALLTYPE GetId(BSTR* pbstrId);
+	HRESULT STDMETHODCALLTYPE SetId(BSTR bstrId);
+	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
+	HRESULT STDMETHODCALLTYPE GetNote(INote** ppNote);
+	HRESULT STDMETHODCALLTYPE SetNote(INote* pNote);
+	HRESULT STDMETHODCALLTYPE GetNotebook(INotebook** ppNotebook);
+	HRESULT STDMETHODCALLTYPE SetNotebook(INotebook* pNotebook);
+
+public:
+	HRESULT STDMETHODCALLTYPE QueryInterface(
+		/* [in] */ REFIID riid,
+		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
+	ULONG STDMETHODCALLTYPE AddRef(void);
+	ULONG STDMETHODCALLTYPE Release(void);
+
+private:
+	CComBSTR m_id;
+	std::unordered_set<ICoreNotify*> m_notifies;
+	com_sptr<INotebook> m_spNotebook;
+	com_sptr<INote> m_spNote;
+	int m_ref;
+};
+
+
+class TrashBase : public ITrash
+{
+public:
+	TrashBase();
+	~TrashBase();
+
+	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
+	/* INoteCollection */
+	HRESULT STDMETHODCALLTYPE GetName(BSTR* pbstrName);
+	HRESULT STDMETHODCALLTYPE GetCount(int* pCount);
+	HRESULT STDMETHODCALLTYPE Item(VARIANT index, INote** ppNote);
+	HRESULT STDMETHODCALLTYPE AddNote(INote* pNote);
+	HRESULT STDMETHODCALLTYPE RemoveNote(INote* pNote);
+	/* ITrash */
+	HRESULT STDMETHODCALLTYPE DeleteNote(INote* pNote);
+
+public:
+	HRESULT STDMETHODCALLTYPE QueryInterface(
+		/* [in] */ REFIID riid,
+		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
+	ULONG STDMETHODCALLTYPE AddRef(void);
+	ULONG STDMETHODCALLTYPE Release(void);
+
+private:
+	std::unordered_set<ICoreNotify*> m_notifies;
+	std::map<CComBSTR, INote*> m_container;
+	int m_ref;
+};
+
 class NoteApplication : public INoteApplication
 {
 public:
@@ -131,6 +193,8 @@ public:
 	HRESULT STDMETHODCALLTYPE SetNotebooks(INotebooks* pNotebooks);
 	HRESULT STDMETHODCALLTYPE GetUserId(OUT BSTR* pbstrId);
 	HRESULT STDMETHODCALLTYPE SetUserId(IN BSTR bstrId);
+	HRESULT STDMETHODCALLTYPE GetTrash(ITrash** ppTrash);
+	HRESULT STDMETHODCALLTYPE SetTrash(ITrash* pTrash);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -143,6 +207,7 @@ private:
 	CComBSTR m_id;
 	std::vector<INotebook*> m_vecBooks;
 	com_sptr<INotebooks> m_spNotebooks;
+	com_sptr<ITrash> m_spTrash;
 	std::unordered_set<ICoreNotify*> m_notifies;
 	int m_ref;
 };

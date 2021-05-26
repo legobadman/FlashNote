@@ -4,6 +4,7 @@ import "ocidl.idl";
 
 interface ICoreNotify;
 interface INoteCoreObj;
+interface ITrash;
 
 typedef enum NOTE_TYPE
 {
@@ -44,6 +45,8 @@ interface INoteCoreObj : IUnknown {
 interface INote : INoteCoreObj {
 	HRESULT GetId([out, retval] BSTR* pbstrId);
 	HRESULT SetId([in] BSTR bstrId);
+	HRESULT GetBookId([out] BSTR* pBookId);
+	HRESULT SetBookId([in] BSTR bookId);
 	HRESULT GetTitle([out] BSTR* pbstrName);
 	HRESULT SetTitle([in] BSTR title);
 	HRESULT GetType([out]NOTE_TYPE* pType);
@@ -59,20 +62,25 @@ interface INote : INoteCoreObj {
 };
 
 
+[object, uuid(6FC8017C-D8CD-41D0-8C27-4C9FB7CC4CA5)]
+interface INoteCollection : INoteCoreObj {
+	HRESULT GetName([out] BSTR* pbstrName);
+	HRESULT GetCount([out] int* pCount);
+	HRESULT Item([in] VARIANT index, [out]INote** ppNote);
+	HRESULT AddNote([in]INote* pNote);
+	HRESULT RemoveNote([in]INote* pNote);
+};
+
+
 [object, uuid(701090AB-4965-46F3-AEA5-36C30FBDC57A)]
-interface INotebook : INoteCoreObj {
+interface INotebook : INoteCollection {
 	HRESULT GetId([out, retval] BSTR* pbstrId);
 	HRESULT SetId([in] BSTR bstrId);
-	HRESULT GetName([out] BSTR* pbstrName);
 	HRESULT SetName([in] BSTR bstrName);
 	HRESULT GetCreateTime([out] long* pTime);
 	HRESULT SetCreateTime([in] long time);
 	HRESULT GetModifyTime([out] long* pTime);
 	HRESULT SetModifyTime([in] long time);
-	HRESULT GetCount([out] int* pCount);
-	HRESULT Item([in] VARIANT index, [out]INote** ppNote);
-	HRESULT AddNote([in]INote* pNote);
-	HRESULT RemoveNote([in]INote* pNote);
 	HRESULT GetNoteIdx([in]INote* pNote, [out]int* pIndex);
 };
 
@@ -90,7 +98,25 @@ interface INotebooks : INoteCoreObj {
 interface INoteApplication : INoteCoreObj {
 	HRESULT GetNotebooks([out]INotebooks** ppNotebooks);
 	HRESULT SetNotebooks([in]INotebooks* pNotebooks);
-
+	HRESULT GetTrash([out]ITrash** ppTrash);
+	HRESULT SetTrash([in]ITrash* pTrash);
 	HRESULT GetUserId([out]BSTR* pbstrId);
 	HRESULT SetUserId([in]BSTR bstrId);
+};
+
+
+[object, uuid(BEDCB647-62CD-4B76-A6ED-33DE73BC2E7A)]
+interface ITrashRecord : INoteCoreObj {
+	HRESULT GetId([out]BSTR* pbstrId);
+	HRESULT SetId([in]BSTR bstrId);
+	HRESULT GetNote([out]INote** ppNote);
+	HRESULT SetNote([in]INote* pNote);
+	HRESULT GetNotebook([out]INotebook** ppNotebook);
+	HRESULT SetNotebook([in]INotebook* pNotebook);
+};
+
+
+[object, uuid(982D1B17-C848-4701-A112-7F03E4D50C70)]
+interface ITrash : INoteCollection {
+	HRESULT DeleteNote([in]INote* pNote);
 };

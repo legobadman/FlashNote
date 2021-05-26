@@ -89,35 +89,35 @@ int NoteMainWindow::getActiveNoteInBook(int bookidx)
 void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 {
 	QModelIndex root = index.parent();
-	if (root.isValid())
+	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
+	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM)
 	{
-		ITEM_CONTENT_TYPE type = root.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
-		if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
+		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
+		QString bookid = index.data(ItemCoreObjIdRole).toString();
+		com_sptr<INotebooks> spNotebooks;
+		coreApp->GetNotebooks(&spNotebooks);
+
+		VARIANT varIndex;
+		V_VT(&varIndex) = VT_BSTR;
+		V_BSTR(&varIndex) = SysAllocString(bookid.toStdWString().data());
+
+		com_sptr<INotebook> spNotebook;
+		HRESULT hr = spNotebooks->Item(varIndex, &spNotebook);
+		if (hr == S_OK)
 		{
-			m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
-			QString bookid = index.data(ItemCoreObjIdRole).toString();
-			com_sptr<INotebooks> spNotebooks;
-			coreApp->GetNotebooks(&spNotebooks);
-
-			VARIANT varIndex;
-			V_VT(&varIndex) = VT_BSTR;
-			V_BSTR(&varIndex) = SysAllocString(bookid.toStdWString().data());
-
-			com_sptr<INotebook> spNotebook;
-			HRESULT hr = spNotebooks->Item(varIndex, &spNotebook);
-			if (hr == S_OK)
-			{
-				m_ui->notesview->setNotebook(spNotebook);
-			}
+			m_ui->notesview->setNotebook(spNotebook);
 		}
 	}
-	else
+	else if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
 	{
-		ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
-		if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
-		{
-			m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTEBOOKS_VIEW);
-		}
+		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTEBOOKS_VIEW);
+	}
+	else if (type == ITEM_CONTENT_TYPE::ITEM_TRASH)
+	{
+		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::TRASH_VIEW);
+		com_sptr<ITrash> spTrash;
+		coreApp->GetTrash(&spTrash);
+		m_ui->trashview->setNotebook(spTrash);
 	}
 }
 

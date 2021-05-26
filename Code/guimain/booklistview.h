@@ -23,7 +23,7 @@ public:
 	~BookListView();
 
 	void init();
-	void updateNotebook(INotebook* pNotebook, QString noteid);
+	void updateNotebook(INoteCollection* pNotebook, QString noteid);
 	HRESULT STDMETHODCALLTYPE onCoreNotify(
 		INoteCoreObj* pCoreObj,
 		NotifyArg arg);
@@ -49,7 +49,7 @@ private:
 	Ui::BookListView* m_ui;
 	QStandardItemModel* m_model;
 	QItemSelectionModel* m_selectionModel;
-	com_sptr<INotebook> m_spNotebook;
+	com_sptr<INoteCollection> m_spNotebook;
 	QMenu* m_pCustomMenu;
 };
 

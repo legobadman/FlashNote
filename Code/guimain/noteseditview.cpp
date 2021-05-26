@@ -102,7 +102,7 @@ bool NotesEditView::eventFilter(QObject* watched, QEvent* event)
 	return QSplitter::eventFilter(watched, event);
 }
 
-void NotesEditView::setNotebook(INotebook* pNotebook)
+void NotesEditView::setNotebook(INoteCollection* pNotebook)
 {
 	m_pNotebook = pNotebook;
 	QString noteid;	//TODO: ×¢²á±íÊµÏÖ

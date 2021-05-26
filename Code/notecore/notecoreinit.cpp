@@ -53,3 +53,23 @@ HRESULT CreateApplication(INoteApplication** pApp)
 	(*pApp)->AddRef();
 	return S_OK;
 }
+
+HRESULT CreateTrash(ITrash** ppTrash)
+{
+	if (!ppTrash)
+		return E_POINTER;
+
+	*ppTrash = new TrashBase;
+	(*ppTrash)->AddRef();
+	return S_OK;
+}
+
+HRESULT CreateTrashRecord(ITrashRecord** ppRecord)
+{
+	if (!ppRecord)
+		return E_FAIL;
+
+	*ppRecord = new TrashRecord;
+	(*ppRecord)->AddRef();
+	return S_OK;
+}

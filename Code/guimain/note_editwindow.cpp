@@ -41,7 +41,7 @@ INote* NoteEditWindow::GetNote()
     return m_pNote;
 }
 
-void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote)
+void NoteEditWindow::updateNoteInfo(INoteCollection* pNotebook, INote* pNote)
 {
 	m_pNotebook = pNotebook;
 	m_pNote = pNote;

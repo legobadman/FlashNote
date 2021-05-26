@@ -18,7 +18,7 @@ void AppHelper::GetNotebook(int idx, INotebook** ppNotebook)
 	}
 }
 
-void AppHelper::GetNote(INotebook* pNotebook, int idxNote, INote** ppNote)
+void AppHelper::GetNote(INoteCollection* pNotebook, int idxNote, INote** ppNote)
 {
 	VARIANT varNote;
 	V_VT(&varNote) = VT_I4;
@@ -26,25 +26,25 @@ void AppHelper::GetNote(INotebook* pNotebook, int idxNote, INote** ppNote)
 
 	if (!pNotebook || !ppNote)
 	{
-		Q_ASSERT(FALSE);
+		return;
 	}
 
 	HRESULT hr = pNotebook->Item(varNote, ppNote);
 }
 
-void AppHelper::GetNoteById(INotebook* pNotebook, QString noteid, INote** ppNote)
+void AppHelper::GetNoteById(INoteCollection* pNotebook, QString noteid, INote** ppNote)
 {
 	VARIANT varNote;
 	V_VT(&varNote) = VT_BSTR;
 	V_BSTR(&varNote) = SysAllocString(noteid.toStdWString().data());
 	if (!pNotebook || !ppNote)
 	{
-		Q_ASSERT(FALSE);
+		return;
 	}
 	HRESULT hr = pNotebook->Item(varNote, ppNote);
 }
 
-QString AppHelper::GetNotebookName(INotebook* pNotebook)
+QString AppHelper::GetNotebookName(INoteCollection* pNotebook)
 {
 	if (!pNotebook)
 		return "";
@@ -125,7 +125,7 @@ QString AppHelper::GetNoteTitle(INote* pNote)
 	return content;
 }
 
-int AppHelper::GetNoteCounts(INotebook* pNotebook)
+int AppHelper::GetNoteCounts(INoteCollection* pNotebook)
 {
 	int nCount = 0;
 	Q_ASSERT(pNotebook);
