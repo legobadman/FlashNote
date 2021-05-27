@@ -15,7 +15,9 @@ class BookListView : public QWidget
 
 	enum MENU_ITEM
 	{
-		DELETE_NOTE = 0,
+		REMOVE_NOTE = 0,	//将笔记本中的笔记移除至废纸篓
+		RECOVER_NOTE,		//恢复废纸篓中的笔记。
+		DELETE_NOTE,		//彻底删除笔记。
 	};
 
 public:

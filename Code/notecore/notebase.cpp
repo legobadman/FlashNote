@@ -345,6 +345,10 @@ HRESULT NotebookBase::QueryInterface(
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
+	else if (riid == IID_INoteCollection)
+	{
+		*ppvObject = static_cast<INoteCollection*>(this);
+	}
 	else if (riid == IID_INotebook)
 	{
 		*ppvObject = static_cast<INotebook*>(this);
@@ -729,6 +733,7 @@ HRESULT TrashBase::RemoveNote(INote* pNote)
 		return E_FAIL;
 	}
 
+	NotifyThisObj(Delete, pNote);
 	pNote->Release();
 	m_container.erase(bstrNoteId);
 	return S_OK;
@@ -749,6 +754,10 @@ HRESULT TrashBase::QueryInterface(
 	if (riid == IID_INoteCoreObj)
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
+	}
+	else if (riid == IID_INoteCollection)
+	{
+		*ppvObject = static_cast<INoteCollection*>(this);
 	}
 	else if (riid == IID_ITrash)
 	{
@@ -784,6 +793,20 @@ HRESULT TrashBase::GetName(BSTR* pbstrName)
 
 	*pbstrName = SysAllocString(L"·ÏÖ½Â¨");
 	return S_OK;
+}
+
+void TrashBase::NotifyThisObj(NotifyOperator ope, INote* pNote)
+{
+	for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
+	{
+		BSTR bstrId;
+		pNote->GetId(&bstrId);
+		std::wstring noteid(bstrId, SysStringLen(bstrId));
+		NotifyArg arg;
+		arg.ope = ope;
+		arg.pObj = pNote;
+		(*it)->onCoreNotify(this, arg);
+	}
 }
 
 

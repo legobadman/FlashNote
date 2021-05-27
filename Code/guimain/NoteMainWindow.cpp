@@ -114,10 +114,10 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_TRASH)
 	{
-		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::TRASH_VIEW);
+		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
 		com_sptr<ITrash> spTrash;
 		coreApp->GetTrash(&spTrash);
-		m_ui->trashview->setNotebook(spTrash);
+		m_ui->notesview->setNotebook(spTrash);
 	}
 }
 

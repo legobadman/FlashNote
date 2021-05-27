@@ -177,6 +177,9 @@ public:
 	ULONG STDMETHODCALLTYPE Release(void);
 
 private:
+	void NotifyThisObj(NotifyOperator ope, INote* pNote);
+
+private:
 	std::unordered_set<ICoreNotify*> m_notifies;
 	std::map<CComBSTR, INote*> m_container;
 	int m_ref;

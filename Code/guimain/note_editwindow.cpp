@@ -42,21 +42,27 @@ INote* NoteEditWindow::GetNote()
     return m_pNote;
 }
 
-void NoteEditWindow::updateNoteInfo(INoteCollection* pNotebook, INote* pNote)
+void NoteEditWindow::updateNoteInfo(INoteCollection* pNoteCollection, INote* pNote)
 {
-	m_pNoteColl = pNotebook;
+	m_pNoteColl = pNoteCollection;
 	m_pNote = pNote;
 
-	if (com_sptr<ITrash>(pNotebook))
+	com_sptr<INotebook> spNotebook;
+	if (com_sptr<ITrash>(pNoteCollection))
 	{
 		m_bEdittable = false;
+		BSTR bstrBookid;
+		pNote->GetBookId(&bstrBookid);
+		std::wstring bookid(bstrBookid);
+		AppHelper::GetNotebookById(QString::fromStdWString(bstrBookid), &spNotebook);
 	}
 	else
 	{
 		m_bEdittable = true;
+		spNotebook = pNoteCollection;
 	}
 
-	QString bookName = AppHelper::GetNotebookName(m_pNoteColl);
+	QString bookName = AppHelper::GetNotebookName(spNotebook);
 	m_ui->bookmenu->blockSignals(true);
 	m_ui->bookmenu->setText(bookName);
 	m_ui->bookmenu->blockSignals(false);
@@ -592,6 +598,7 @@ void NoteEditWindow::saveNote()
 
 void NoteEditWindow::switchtobook(int bookidx)
 {
+	//TODO
 	VARIANT newindex;
 	V_VT(&newindex) = VT_I4;
 	V_I4(&newindex) = bookidx;

@@ -95,7 +95,6 @@ private:
 	};
 
 	QPointer<QTextList> m_lastBlockList;
-	std::wstring m_bookid;
 	bool m_bEnableBase64;
 	bool m_bEdittable;
 };

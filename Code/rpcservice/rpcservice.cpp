@@ -81,6 +81,7 @@ void RPCService::SynchronizeNote(INotebook* pNotebook, INote* pNote)
 		//新建的note，需要先向服务端申请id
 		id = RPCService::GetInstance().NewNote(bookid, L"");
 		pNote->SetId(SysAllocString(id.c_str()));
+		pNote->SetBookId(SysAllocString(bookid.c_str()));
 		pNotebook->AddNote(pNote);
 		if (id.empty())
 		{
@@ -111,18 +112,33 @@ std::wstring RPCService::NewNotebook(std::wstring name)
 	return converter.from_bytes(bookid);
 }
 
-bool RPCService::RemoveNote(INoteCollection* pNoteColl, INote* pNote)
+bool RPCService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, INote* pNote)
 {
-	//TODO: ITrash的处理
 	com_sptr<INotebook> pNotebook = pNoteColl;
 	bool bRet = m_pClient->TrashNote(_userid,
 		converter.to_bytes(AppHelper::GetNotebookId(pNotebook).toStdWString()),
 		converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString())
 		);
+
+	com_sptr<ITrash> pTrash;
+	pApp->GetTrash(&pTrash);
+	pTrash->AddNote(pNote);
+
 	HRESULT hr = pNotebook->RemoveNote(pNote);
 	if (FAILED(hr))
 	{
 		Q_ASSERT(false);
+	}
+	return bRet;
+}
+
+bool RPCService::DeleteNote(ITrash* pTrash, INote* pNote)
+{
+	bool bRet = m_pClient->DeleteNote(_userid, converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString()));
+	if (bRet)
+	{
+		bRet = pTrash->RemoveNote(pNote);
+		Q_ASSERT(bRet);
 	}
 	return bRet;
 }
@@ -141,6 +157,29 @@ bool RPCService::RemoveNotebook(INotebook* pNotebook)
 	else
 	{
 		return false;
+	}
+}
+
+bool RPCService::RecoverNote(INoteCollection* pSrcNoteColl, INote* pNote)
+{
+	std::string noteid = converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString());
+	bool bRet = m_pClient->RecoverNote(_userid, noteid);
+	if (bRet)
+	{
+		BSTR bstrBookId;
+		pNote->GetBookId(&bstrBookId);
+
+		std::wstring bookid(bstrBookId);
+		com_sptr<INotebook> spNotebook;
+		AppHelper::GetNotebookById(QString::fromStdWString(bookid), &spNotebook);
+		if (!spNotebook)
+		{
+			//TODO: book不存在。
+			Q_ASSERT(false);
+			return false;
+		}
+		spNotebook->AddNote(pNote);
+		pSrcNoteColl->RemoveNote(pNote);
 	}
 }
 

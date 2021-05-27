@@ -21,8 +21,10 @@ public:
 	void InitcoreFromRPC(INoteApplication* pApp);
 	void SynchronizeNote(INotebook* pNotebook, INote* pNote);
 	bool SynchronizeNotebook(INotebook* pNotebook);
-	bool RemoveNote(INoteCollection* pNotebook, INote* pNote);
+	bool RemoveNote(INoteApplication* pApp, INoteCollection* pNotebook, INote* pNote);
+	bool DeleteNote(ITrash* pTrash, INote* pNote);
 	bool RemoveNotebook(INotebook* pNotebook);
+	bool RecoverNote(INoteCollection* pSrcNoteColl, INote* pNote);
 	std::wstring NewNote(std::wstring bookid, std::wstring title);
 	std::wstring NewNotebook(std::wstring name);
 
