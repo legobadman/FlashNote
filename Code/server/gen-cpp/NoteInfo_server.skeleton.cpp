@@ -25,6 +25,11 @@ class NoteInfoHandler : virtual public NoteInfoIf {
     printf("GetNotebooks\n");
   }
 
+  void GetFreeNotes(std::vector<Note> & _return, const std::string& userid) {
+    // Your implementation goes here
+    printf("GetFreeNotes\n");
+  }
+
   void NewNotebook(std::string& _return, const std::string& userid, const std::string& name) {
     // Your implementation goes here
     printf("NewNotebook\n");

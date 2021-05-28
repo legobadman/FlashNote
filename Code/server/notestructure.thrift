@@ -34,6 +34,8 @@ service UserInfo {
 service NoteInfo {
 	list<Notebook> GetNotebooks(1:required string userid);
 
+	list<Note> GetFreeNotes(1:required string userid);
+
 	string NewNotebook(1:required string userid, 2:required string name); //·µ»Øid
 	
 	/*É¾³ý±Ê¼Ç±¾

@@ -16,6 +16,7 @@ class NoteInfoIf {
  public:
   virtual ~NoteInfoIf() {}
   virtual void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid) = 0;
+  virtual void GetFreeNotes(std::vector<Note> & _return, const std::string& userid) = 0;
   virtual void NewNotebook(std::string& _return, const std::string& userid, const std::string& name) = 0;
   virtual bool DeleteNotebook(const std::string& userid, const std::string& bookid) = 0;
   virtual void NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title) = 0;
@@ -56,6 +57,9 @@ class NoteInfoNull : virtual public NoteInfoIf {
  public:
   virtual ~NoteInfoNull() {}
   void GetNotebooks(std::vector<Notebook> & /* _return */, const std::string& /* userid */) {
+    return;
+  }
+  void GetFreeNotes(std::vector<Note> & /* _return */, const std::string& /* userid */) {
     return;
   }
   void NewNotebook(std::string& /* _return */, const std::string& /* userid */, const std::string& /* name */) {
@@ -193,6 +197,108 @@ class NoteInfo_GetNotebooks_presult {
   std::vector<Notebook> * success;
 
   _NoteInfo_GetNotebooks_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class NoteInfo_GetFreeNotes_args {
+ public:
+
+  NoteInfo_GetFreeNotes_args() : userid() {
+  }
+
+  virtual ~NoteInfo_GetFreeNotes_args() throw() {}
+
+  std::string userid;
+
+  void __set_userid(const std::string& val) {
+    userid = val;
+  }
+
+  bool operator == (const NoteInfo_GetFreeNotes_args & rhs) const
+  {
+    if (!(userid == rhs.userid))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_GetFreeNotes_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_GetFreeNotes_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class NoteInfo_GetFreeNotes_pargs {
+ public:
+
+
+  virtual ~NoteInfo_GetFreeNotes_pargs() throw() {}
+
+  const std::string* userid;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_GetFreeNotes_result__isset {
+  _NoteInfo_GetFreeNotes_result__isset() : success(false) {}
+  bool success;
+} _NoteInfo_GetFreeNotes_result__isset;
+
+class NoteInfo_GetFreeNotes_result {
+ public:
+
+  NoteInfo_GetFreeNotes_result() {
+  }
+
+  virtual ~NoteInfo_GetFreeNotes_result() throw() {}
+
+  std::vector<Note>  success;
+
+  _NoteInfo_GetFreeNotes_result__isset __isset;
+
+  void __set_success(const std::vector<Note> & val) {
+    success = val;
+  }
+
+  bool operator == (const NoteInfo_GetFreeNotes_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const NoteInfo_GetFreeNotes_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const NoteInfo_GetFreeNotes_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _NoteInfo_GetFreeNotes_presult__isset {
+  _NoteInfo_GetFreeNotes_presult__isset() : success(false) {}
+  bool success;
+} _NoteInfo_GetFreeNotes_presult__isset;
+
+class NoteInfo_GetFreeNotes_presult {
+ public:
+
+
+  virtual ~NoteInfo_GetFreeNotes_presult() throw() {}
+
+  std::vector<Note> * success;
+
+  _NoteInfo_GetFreeNotes_presult__isset __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
@@ -1337,6 +1443,9 @@ class NoteInfoClient : virtual public NoteInfoIf {
   void GetNotebooks(std::vector<Notebook> & _return, const std::string& userid);
   void send_GetNotebooks(const std::string& userid);
   void recv_GetNotebooks(std::vector<Notebook> & _return);
+  void GetFreeNotes(std::vector<Note> & _return, const std::string& userid);
+  void send_GetFreeNotes(const std::string& userid);
+  void recv_GetFreeNotes(std::vector<Note> & _return);
   void NewNotebook(std::string& _return, const std::string& userid, const std::string& name);
   void send_NewNotebook(const std::string& userid, const std::string& name);
   void recv_NewNotebook(std::string& _return);
@@ -1383,6 +1492,7 @@ class NoteInfoProcessor : public ::apache::thrift::TDispatchProcessor {
   typedef std::map<std::string, ProcessFunction> ProcessMap;
   ProcessMap processMap_;
   void process_GetNotebooks(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_GetFreeNotes(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_NewNotebook(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_DeleteNotebook(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_NewNote(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext);
@@ -1397,6 +1507,7 @@ class NoteInfoProcessor : public ::apache::thrift::TDispatchProcessor {
   NoteInfoProcessor(boost::shared_ptr<NoteInfoIf> iface) :
     iface_(iface) {
     processMap_["GetNotebooks"] = &NoteInfoProcessor::process_GetNotebooks;
+    processMap_["GetFreeNotes"] = &NoteInfoProcessor::process_GetFreeNotes;
     processMap_["NewNotebook"] = &NoteInfoProcessor::process_NewNotebook;
     processMap_["DeleteNotebook"] = &NoteInfoProcessor::process_DeleteNotebook;
     processMap_["NewNote"] = &NoteInfoProcessor::process_NewNote;
@@ -1442,6 +1553,16 @@ class NoteInfoMultiface : virtual public NoteInfoIf {
       ifaces_[i]->GetNotebooks(_return, userid);
     }
     ifaces_[i]->GetNotebooks(_return, userid);
+    return;
+  }
+
+  void GetFreeNotes(std::vector<Note> & _return, const std::string& userid) {
+    size_t sz = ifaces_.size();
+    size_t i = 0;
+    for (; i < (sz - 1); ++i) {
+      ifaces_[i]->GetFreeNotes(_return, userid);
+    }
+    ifaces_[i]->GetFreeNotes(_return, userid);
     return;
   }
 

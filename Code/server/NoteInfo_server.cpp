@@ -196,6 +196,52 @@ public:
 		}
 	}
 
+	void GetFreeNotes(std::vector<Note>& freenotes, const std::string& userid)
+	{
+		ApiLogger apilogger("GetFreeNotes");
+		
+		auto note_coll = conn["flashnote"]["notes"];
+		auto users = conn["flashnote"]["user"];
+		auto freenotes_coll = conn["flashnote"]["freenotes"];
+
+		auto user_result = users.find_one(document{} << "_id" << get_bsonid(userid) << finalize);
+		if (!user_result)
+		{
+			apilogger.append_err("User (id = " + userid + ") is invalid");
+			return;
+		}
+
+		freenotes.clear();
+
+		mongocxx::cursor cursor = freenotes_coll.find({ document{} << "user_id"
+			<< TO_BSON_OID(userid) << finalize });
+		for (auto doc : cursor)
+		{
+			std::string noteid = doc["noteid"].get_oid().value.to_string();
+			
+			auto note_result = note_coll.find_one(document{}
+				<< "_id"
+				<< get_bsonid(noteid)
+				<< finalize);
+			if (!note_result)
+			{
+				apilogger.append_err("no note with id = " + noteid);
+			}
+
+			bsoncxx::document::view note_view = note_result->view();
+
+			Note note;
+			note.title = note_view["title"].get_utf8().value.to_string();
+			note.text_abbre = note_view["content"].get_utf8().value.to_string();
+			note.id = noteid;
+			note.create_time = note_view["create_time"].get_date().to_int64();
+			note.modify_time = note_view["modify_time"].get_date().to_int64();
+			note.creater_id = note_view["creater"].get_oid().value.to_string();
+
+			freenotes.push_back(note);
+		}
+	}
+
 	void NewNotebook(std::string& newbookid, const std::string& userid, const std::string& name)
 	{
 		ApiLogger apilogger("NewNotebook");
@@ -386,6 +432,7 @@ public:
 		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
 		mongocxx::collection notes = conn["flashnote"]["notes"];
 		mongocxx::collection users = conn["flashnote"]["user"];
+		mongocxx::collection freenotes = conn["flashnote"]["freenotes"];
 
 		//合法性检查
 		auto user_result = users.find_one(document{} << "_id" << get_bsonid(userid) << finalize);
@@ -395,11 +442,17 @@ public:
 			return;
 		}
 
-		auto book_result = notebooks.find_one(document{} << "_id" << get_bsonid(bookid) << finalize);
-		if (!book_result)
+		//空bookid表示游离的note
+		bool bFreeNote = bookid.empty();
+		
+		if (!bFreeNote)
 		{
-			apilogger.append_err("no book with bookid = " + bookid);
-			return;
+			auto book_result = notebooks.find_one(document{} << "_id" << get_bsonid(bookid) << finalize);
+			if (!book_result)
+			{
+				apilogger.append_err("no book with bookid = " + bookid);
+				return;
+			}
 		}
 
 		const bsoncxx::document::value& note = bsoncxx::builder::basic::make_document(
@@ -425,20 +478,40 @@ public:
 			apilogger.append_info("new note(id=" + newnoteid +
 				") has been inserted into notes");
 
-			auto update_result = notebooks.update_one(
-				document{} << "_id" << TO_BSON_OID(bookid) << finalize,
-				document{} << "$addToSet" << open_document <<
-				"notes" << TO_BSON_OID(newnoteid) << close_document << finalize
-			);
-			if (update_result && update_result->result().modified_count() == 1)
+			if (!bFreeNote)
 			{
-				apilogger.append_info("new note(id=" + newnoteid +
-					") has been inserted into notebook.");
+				auto update_result = notebooks.update_one(
+					document{} << "_id" << TO_BSON_OID(bookid) << finalize,
+					document{} << "$addToSet" << open_document <<
+					"notes" << TO_BSON_OID(newnoteid) << close_document << finalize
+				);
+				if (update_result && update_result->result().modified_count() == 1)
+				{
+					apilogger.append_info("new note(id=" + newnoteid +
+						") has been inserted into notebook.");
+				}
+				else
+				{
+					apilogger.append_err("note cannot insert into the notebook");
+					newnoteid = "";
+				}
 			}
 			else
 			{
-				apilogger.append_err("note cannot insert into the notebook");
-				newnoteid = "";
+				const bsoncxx::document::value& freenote = bsoncxx::builder::basic::make_document(
+					kvp("noteid", TO_BSON_OID(newnoteid)),
+					kvp("userid", TO_BSON_OID(userid))
+					);
+				retVal = freenotes.insert_one(freenote.view());
+				if (!retVal || retVal->result().inserted_count() != 1)
+				{
+					apilogger.append_err("freenotes insert_one failed");
+				}
+				else
+				{
+					apilogger.append_info("new free note(id=" + newnoteid +
+						") has been inserted into freenote.");
+				}
 			}
 		}
 	}
@@ -611,6 +684,52 @@ public:
 		}
 	}
 
+	void GetTrashes(std::vector<Trash> & trashes, const std::string & userid)
+	{
+		// Your implementation goes here
+		ApiLogger apilogger("GetTrashes");
+		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
+		mongocxx::collection notes = conn["flashnote"]["notes"];
+		mongocxx::collection users = conn["flashnote"]["user"];
+		mongocxx::collection trash_conn = conn["flashnote"]["trash"];
+
+		trashes.clear();
+
+		mongocxx::cursor cursor = trash_conn.find({ document{} << "user_id" 
+			<< TO_BSON_OID(userid) << finalize });
+		for (auto doc : cursor)
+		{
+			Trash trash;
+			trash.trash_id = doc["_id"].get_oid().value.to_string();
+			trash.trash_time = doc["trash_time"].get_date().to_int64();
+			trash.notebook.id = doc["srcbook_id"].get_oid().value.to_string();	//只返回id，然后客户端从内核中取。
+
+			//检索note
+			std::string noteid = doc["note_id"].get_oid().value.to_string();
+			auto note_result = notes.find_one(document{}
+				<< "_id"
+				<< get_bsonid(noteid)
+				<< finalize);
+			if (!note_result)
+			{
+				apilogger.append_err("no note with id = " + noteid);
+			}
+
+			bsoncxx::document::view note_view = note_result->view();
+
+			Note note;
+			note.title = note_view["title"].get_utf8().value.to_string();
+			note.text_abbre = note_view["content"].get_utf8().value.to_string();
+			note.id = noteid;
+			note.create_time = note_view["create_time"].get_date().to_int64();
+			note.modify_time = note_view["modify_time"].get_date().to_int64();
+			note.creater_id = note_view["creater"].get_oid().value.to_string();
+
+			trash.note = note;
+			trashes.push_back(trash);
+		}
+	}
+
 	bool RecoverNote(const std::string& userid, const std::string& noteid)
 	{
 		ApiLogger apilogger("RecoverNote");
@@ -619,6 +738,7 @@ public:
 		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
 		mongocxx::collection notes = conn["flashnote"]["notes"];
 		mongocxx::collection trash_conn = conn["flashnote"]["trash"];
+		mongocxx::collection freenotes = conn["flashnote"]["freenotes"];
 
 		auto note_result = notes.find_one(document{} << "_id" << get_bsonid(noteid) << finalize);
 		if (!note_result)
@@ -657,29 +777,45 @@ public:
 		bsoncxx::types::b_oid trashid = trashview["_id"].get_oid();
 		bsoncxx::types::b_oid bookOid = trashview["srcbook_id"].get_oid();
 		//检查bookOid的合法性
+
+		//从trash中移除该记录。
+		auto delete_result = trash_conn.delete_one(document{} << "_id" << trashid.value << finalize);
+		if (!delete_result || delete_result->result().deleted_count() != 1)
+		{
+			apilogger.append_err("delete trash-record from collection trash failed.");
+			return false;
+		}
+		apilogger.append_info("Trash record has been removed.");
+
+		//将该note重新添加到notebook
 		auto book_result = notebooks.find_one(document{} << "_id" << bookOid.value << finalize);
+		bool bRet = true;
 		if (book_result)
 		{
-			//从trash中移除该记录。
-			auto delete_result = trash_conn.delete_one(document{} << "_id" << trashid.value << finalize);
-			if (!delete_result || delete_result->result().deleted_count() != 1)
-			{
-				apilogger.append_err("delete trash-record from collection trash failed.");
-				return false;
-			}
-			apilogger.append_info("Trash record has been removed.");
-			//将该note重新添加到notebook
 			apilogger.add_level();
-			bool bRet = AddNoteToBook(bookOid.value.to_string(), noteid);
+			bRet = AddNoteToBook(bookOid.value.to_string(), noteid);
 			apilogger.down_level();
-			return bRet;
 		}
 		else
 		{
-			apilogger.append_err("The book (id=" + bookOid.value.to_string()+
-				"in trash is not valid");
+			const bsoncxx::document::value& freenote = bsoncxx::builder::basic::make_document(
+				kvp("noteid", TO_BSON_OID(noteid)),
+				kvp("userid", TO_BSON_OID(userid))
+				);
+			auto retVal = freenotes.insert_one(freenote.view());
+			if (!retVal || retVal->result().inserted_count() != 1)
+			{
+				bRet = false;
+				apilogger.append_err("freenotes insert_one failed");
+			}
+			else
+			{
+				bRet = true;
+				apilogger.append_info("new free note(id=" + noteid +
+					") has been inserted into freenote.");
+			}
 		}
-		return false;
+		return bRet;
 	}
 
 	bool DeleteNote(const std::string& userid, const std::string& noteid)
