@@ -5,6 +5,7 @@ import "ocidl.idl";
 interface ICoreNotify;
 interface INoteCoreObj;
 interface ITrash;
+interface IFreeNotes;
 
 typedef enum NOTE_TYPE
 {
@@ -69,6 +70,7 @@ interface INoteCollection : INoteCoreObj {
 	HRESULT Item([in] VARIANT index, [out]INote** ppNote);
 	HRESULT AddNote([in]INote* pNote);
 	HRESULT RemoveNote([in]INote* pNote);
+	HRESULT Clear();
 };
 
 
@@ -100,8 +102,10 @@ interface INoteApplication : INoteCoreObj {
 	HRESULT SetNotebooks([in]INotebooks* pNotebooks);
 	HRESULT GetTrash([out]ITrash** ppTrash);
 	HRESULT SetTrash([in]ITrash* pTrash);
+	HRESULT GetFreeNotes([in]IFreeNotes** ppTrash);
 	HRESULT GetUserId([out]BSTR* pbstrId);
 	HRESULT SetUserId([in]BSTR bstrId);
+	HRESULT GetAllNotes([out]INoteCollection** pCollection);
 };
 
 
@@ -120,3 +124,17 @@ interface ITrashRecord : INoteCoreObj {
 interface ITrash : INoteCollection {
 	HRESULT DeleteNote([in]INote* pNote);
 };
+
+
+[object, uuid(C97AE266-5822-4FAE-8755-DCDE145D97B6)]
+interface IFreeNotes : INoteCollection {
+
+};
+
+
+//// AllNotes另外包含了所有笔记本下的笔记（不包括废纸篓下的笔记）。
+//// 如果移除/移动了一份笔记，就得在原book下同样移除。
+//[object, uuid(2F2D26C4-FCA7-4A9F-B062-69A682937F70)]
+//interface INotes : INoteCollection {
+//	HRESULT Search(BSTR content)
+//};

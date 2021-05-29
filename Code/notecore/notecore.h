@@ -108,6 +108,13 @@ typedef interface ITrash ITrash;
 #endif 	/* __ITrash_FWD_DEFINED__ */
 
 
+#ifndef __IFreeNotes_FWD_DEFINED__
+#define __IFreeNotes_FWD_DEFINED__
+typedef interface IFreeNotes IFreeNotes;
+
+#endif 	/* __IFreeNotes_FWD_DEFINED__ */
+
+
 /* header files for imported files */
 #include "unknwn.h"
 #include "ocidl.h"
@@ -119,6 +126,7 @@ extern "C"{
 
 /* interface __MIDL_itf_notecore_0000_0000 */
 /* [local] */ 
+
 
 
 
@@ -583,6 +591,8 @@ EXTERN_C const IID IID_INoteCollection;
         virtual HRESULT STDMETHODCALLTYPE RemoveNote( 
             /* [in] */ INote *pNote) = 0;
         
+        virtual HRESULT STDMETHODCALLTYPE Clear( void) = 0;
+        
     };
     
     
@@ -629,6 +639,9 @@ EXTERN_C const IID IID_INoteCollection;
             INoteCollection * This,
             /* [in] */ INote *pNote);
         
+        HRESULT ( STDMETHODCALLTYPE *Clear )( 
+            INoteCollection * This);
+        
         END_INTERFACE
     } INoteCollectionVtbl;
 
@@ -670,6 +683,9 @@ EXTERN_C const IID IID_INoteCollection;
 
 #define INoteCollection_RemoveNote(This,pNote)	\
     ( (This)->lpVtbl -> RemoveNote(This,pNote) ) 
+
+#define INoteCollection_Clear(This)	\
+    ( (This)->lpVtbl -> Clear(This) ) 
 
 #endif /* COBJMACROS */
 
@@ -768,6 +784,9 @@ EXTERN_C const IID IID_INotebook;
             INotebook * This,
             /* [in] */ INote *pNote);
         
+        HRESULT ( STDMETHODCALLTYPE *Clear )( 
+            INotebook * This);
+        
         HRESULT ( STDMETHODCALLTYPE *GetId )( 
             INotebook * This,
             /* [retval][out] */ BSTR *pbstrId);
@@ -842,6 +861,9 @@ EXTERN_C const IID IID_INotebook;
 
 #define INotebook_RemoveNote(This,pNote)	\
     ( (This)->lpVtbl -> RemoveNote(This,pNote) ) 
+
+#define INotebook_Clear(This)	\
+    ( (This)->lpVtbl -> Clear(This) ) 
 
 
 #define INotebook_GetId(This,pbstrId)	\
@@ -1026,11 +1048,17 @@ EXTERN_C const IID IID_INoteApplication;
         virtual HRESULT STDMETHODCALLTYPE SetTrash( 
             /* [in] */ ITrash *pTrash) = 0;
         
+        virtual HRESULT STDMETHODCALLTYPE GetFreeNotes( 
+            /* [in] */ IFreeNotes **ppTrash) = 0;
+        
         virtual HRESULT STDMETHODCALLTYPE GetUserId( 
             /* [out] */ BSTR *pbstrId) = 0;
         
         virtual HRESULT STDMETHODCALLTYPE SetUserId( 
             /* [in] */ BSTR bstrId) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE GetAllNotes( 
+            /* [out] */ INoteCollection **pCollection) = 0;
         
     };
     
@@ -1073,6 +1101,10 @@ EXTERN_C const IID IID_INoteApplication;
             INoteApplication * This,
             /* [in] */ ITrash *pTrash);
         
+        HRESULT ( STDMETHODCALLTYPE *GetFreeNotes )( 
+            INoteApplication * This,
+            /* [in] */ IFreeNotes **ppTrash);
+        
         HRESULT ( STDMETHODCALLTYPE *GetUserId )( 
             INoteApplication * This,
             /* [out] */ BSTR *pbstrId);
@@ -1080,6 +1112,10 @@ EXTERN_C const IID IID_INoteApplication;
         HRESULT ( STDMETHODCALLTYPE *SetUserId )( 
             INoteApplication * This,
             /* [in] */ BSTR bstrId);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetAllNotes )( 
+            INoteApplication * This,
+            /* [out] */ INoteCollection **pCollection);
         
         END_INTERFACE
     } INoteApplicationVtbl;
@@ -1120,11 +1156,17 @@ EXTERN_C const IID IID_INoteApplication;
 #define INoteApplication_SetTrash(This,pTrash)	\
     ( (This)->lpVtbl -> SetTrash(This,pTrash) ) 
 
+#define INoteApplication_GetFreeNotes(This,ppTrash)	\
+    ( (This)->lpVtbl -> GetFreeNotes(This,ppTrash) ) 
+
 #define INoteApplication_GetUserId(This,pbstrId)	\
     ( (This)->lpVtbl -> GetUserId(This,pbstrId) ) 
 
 #define INoteApplication_SetUserId(This,bstrId)	\
     ( (This)->lpVtbl -> SetUserId(This,bstrId) ) 
+
+#define INoteApplication_GetAllNotes(This,pCollection)	\
+    ( (This)->lpVtbl -> GetAllNotes(This,pCollection) ) 
 
 #endif /* COBJMACROS */
 
@@ -1339,6 +1381,9 @@ EXTERN_C const IID IID_ITrash;
             ITrash * This,
             /* [in] */ INote *pNote);
         
+        HRESULT ( STDMETHODCALLTYPE *Clear )( 
+            ITrash * This);
+        
         HRESULT ( STDMETHODCALLTYPE *DeleteNote )( 
             ITrash * This,
             /* [in] */ INote *pNote);
@@ -1385,6 +1430,9 @@ EXTERN_C const IID IID_ITrash;
 #define ITrash_RemoveNote(This,pNote)	\
     ( (This)->lpVtbl -> RemoveNote(This,pNote) ) 
 
+#define ITrash_Clear(This)	\
+    ( (This)->lpVtbl -> Clear(This) ) 
+
 
 #define ITrash_DeleteNote(This,pNote)	\
     ( (This)->lpVtbl -> DeleteNote(This,pNote) ) 
@@ -1398,6 +1446,127 @@ EXTERN_C const IID IID_ITrash;
 
 
 #endif 	/* __ITrash_INTERFACE_DEFINED__ */
+
+
+#ifndef __IFreeNotes_INTERFACE_DEFINED__
+#define __IFreeNotes_INTERFACE_DEFINED__
+
+/* interface IFreeNotes */
+/* [uuid][object] */ 
+
+
+EXTERN_C const IID IID_IFreeNotes;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("C97AE266-5822-4FAE-8755-DCDE145D97B6")
+    IFreeNotes : public INoteCollection
+    {
+    public:
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct IFreeNotesVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            IFreeNotes * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            IFreeNotes * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            IFreeNotes * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *addWatcher )( 
+            IFreeNotes * This,
+            ICoreNotify *pNotify);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetName )( 
+            IFreeNotes * This,
+            /* [out] */ BSTR *pbstrName);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetCount )( 
+            IFreeNotes * This,
+            /* [out] */ int *pCount);
+        
+        HRESULT ( STDMETHODCALLTYPE *Item )( 
+            IFreeNotes * This,
+            /* [in] */ VARIANT index,
+            /* [out] */ INote **ppNote);
+        
+        HRESULT ( STDMETHODCALLTYPE *AddNote )( 
+            IFreeNotes * This,
+            /* [in] */ INote *pNote);
+        
+        HRESULT ( STDMETHODCALLTYPE *RemoveNote )( 
+            IFreeNotes * This,
+            /* [in] */ INote *pNote);
+        
+        HRESULT ( STDMETHODCALLTYPE *Clear )( 
+            IFreeNotes * This);
+        
+        END_INTERFACE
+    } IFreeNotesVtbl;
+
+    interface IFreeNotes
+    {
+        CONST_VTBL struct IFreeNotesVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define IFreeNotes_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define IFreeNotes_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define IFreeNotes_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define IFreeNotes_addWatcher(This,pNotify)	\
+    ( (This)->lpVtbl -> addWatcher(This,pNotify) ) 
+
+
+#define IFreeNotes_GetName(This,pbstrName)	\
+    ( (This)->lpVtbl -> GetName(This,pbstrName) ) 
+
+#define IFreeNotes_GetCount(This,pCount)	\
+    ( (This)->lpVtbl -> GetCount(This,pCount) ) 
+
+#define IFreeNotes_Item(This,index,ppNote)	\
+    ( (This)->lpVtbl -> Item(This,index,ppNote) ) 
+
+#define IFreeNotes_AddNote(This,pNote)	\
+    ( (This)->lpVtbl -> AddNote(This,pNote) ) 
+
+#define IFreeNotes_RemoveNote(This,pNote)	\
+    ( (This)->lpVtbl -> RemoveNote(This,pNote) ) 
+
+#define IFreeNotes_Clear(This)	\
+    ( (This)->lpVtbl -> Clear(This) ) 
+
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __IFreeNotes_INTERFACE_DEFINED__ */
 
 
 /* Additional Prototypes for ALL interfaces */

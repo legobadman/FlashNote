@@ -124,10 +124,13 @@ void NotesEditView::onNoteItemSelected(const QModelIndex& index)
 
 void NotesEditView::onShowNotesView(QString noteid)
 {
+	//TODO: 要通过noteid取到note接口指针，从而取得bookid
+	//，再取得book接口，而不能缓存	。
+
 	m_pBookView->updateNotebook(m_pNotebook, noteid);
 
 	com_sptr<INote> spNote;
-	AppHelper::GetNoteById(m_pNotebook, noteid, &spNote);
+	AppHelper::GetNoteById(noteid, &spNote);
 	if (spNote == NULL)
 	{
 		m_pStackedWidget->setCurrentIndex(PAGE_NOEDIT);

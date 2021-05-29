@@ -70,7 +70,36 @@ bool RPCService::SynchronizeNotebook(INotebook* pNotebook)
 	return true;
 }
 
-void RPCService::SynchronizeNote(INotebook* pNotebook, INote* pNote)
+void RPCService::SynchronizeFreeNote(INoteApplication* pApp, INote* pNote)
+{
+	BSTR bstrId, bstrTitle, bstrContent;
+	pNote->GetId(&bstrId);
+	std::wstring id(bstrId, SysStringLen(bstrId));
+	if (id.empty())
+	{
+		//新建的note，需要先向服务端申请id
+		id = RPCService::GetInstance().NewNote(L"", L"");
+		pNote->SetId(SysAllocString(id.c_str()));
+		com_sptr<IFreeNotes> spFreeNotes;
+		pApp->GetFreeNotes(&spFreeNotes);
+		spFreeNotes->AddNote(pNote);
+		if (id.empty())
+		{
+			Q_ASSERT(FALSE);
+		}
+	}
+
+	pNote->GetTitle(&bstrTitle);
+	pNote->GetContent(&bstrContent);
+
+	std::wstring title(bstrTitle, SysStringLen(bstrTitle));
+	std::wstring content(bstrContent, SysStringLen(bstrContent));
+
+	bool ret = m_pClient->UpdateNote(converter.to_bytes(id), converter.to_bytes(title), converter.to_bytes(content));
+	Q_ASSERT(ret);
+}
+
+void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote)
 {
 	BSTR bstrId, bstrTitle, bstrContent;
 	pNote->GetId(&bstrId);
@@ -83,6 +112,12 @@ void RPCService::SynchronizeNote(INotebook* pNotebook, INote* pNote)
 		pNote->SetId(SysAllocString(id.c_str()));
 		pNote->SetBookId(SysAllocString(bookid.c_str()));
 		pNotebook->AddNote(pNote);
+
+		//登记全局
+		com_sptr<INoteCollection> spNotes;
+		pApp->GetAllNotes(&spNotes);
+		spNotes->AddNote(pNote);
+
 		if (id.empty())
 		{
 			Q_ASSERT(FALSE);
@@ -137,20 +172,35 @@ bool RPCService::DeleteNote(ITrash* pTrash, INote* pNote)
 	bool bRet = m_pClient->DeleteNote(_userid, converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString()));
 	if (bRet)
 	{
-		bRet = pTrash->RemoveNote(pNote);
-		Q_ASSERT(bRet);
+		HRESULT hr = pTrash->RemoveNote(pNote);
+		Q_ASSERT(hr == S_OK);
 	}
 	return bRet;
 }
 
-bool RPCService::RemoveNotebook(INotebook* pNotebook)
+bool RPCService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 {
 	std::string bookid = converter.to_bytes(AppHelper::GetNotebookId(pNotebook).toStdWString());
 	bool bRet = m_pClient->DeleteNotebook(_userid, bookid);
 	if (bRet)
 	{
+		// 移除notebook下所有note至FreeNotes
+		com_sptr<ITrash> spTrash;
+		pApp->GetTrash(&spTrash);
+
+		int nCount = 0;
+		pNotebook->GetCount(&nCount);
+		for (int i = 0; i < nCount; i++)
+		{
+			com_sptr<INote> spNote;
+			AppHelper::GetNote(pNotebook, i, &spNote);
+			spNote->SetBookId(L"");
+			spTrash->AddNote(spNote);
+		}
+		pNotebook->Clear();
+
 		com_sptr<INotebooks> spNotebooks;
-		coreApp->GetNotebooks(&spNotebooks);
+		pApp->GetNotebooks(&spNotebooks);
 		HRESULT hr = spNotebooks->DeleteNotebook(pNotebook);
 		return (hr == S_OK);
 	}
@@ -160,7 +210,7 @@ bool RPCService::RemoveNotebook(INotebook* pNotebook)
 	}
 }
 
-bool RPCService::RecoverNote(INoteCollection* pSrcNoteColl, INote* pNote)
+bool RPCService::RecoverNote(INoteApplication* pApp, INoteCollection* pSrcNoteColl, INote* pNote)
 {
 	std::string noteid = converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString());
 	bool bRet = m_pClient->RecoverNote(_userid, noteid);
@@ -168,19 +218,32 @@ bool RPCService::RecoverNote(INoteCollection* pSrcNoteColl, INote* pNote)
 	{
 		BSTR bstrBookId;
 		pNote->GetBookId(&bstrBookId);
-
-		std::wstring bookid(bstrBookId);
-		com_sptr<INotebook> spNotebook;
-		AppHelper::GetNotebookById(QString::fromStdWString(bookid), &spNotebook);
-		if (!spNotebook)
+		if (0 == SysStringLen(bstrBookId))
 		{
-			//TODO: book不存在。
-			Q_ASSERT(false);
-			return false;
+			com_sptr<IFreeNotes> spFreeNotes;
+			pApp->GetFreeNotes(&spFreeNotes);
+			spFreeNotes->AddNote(pNote);
 		}
-		spNotebook->AddNote(pNote);
+		else
+		{
+			std::wstring bookid(bstrBookId);
+			com_sptr<INotebook> spNotebook;
+			AppHelper::GetNotebookById(QString::fromStdWString(bookid), &spNotebook);
+			if (!spNotebook)
+			{
+				//bookid已经不存在了，加入游离book
+				com_sptr<IFreeNotes> spFreeNotes;
+				pApp->GetFreeNotes(&spFreeNotes);
+				spFreeNotes->AddNote(pNote);
+			}
+			else
+			{
+				spNotebook->AddNote(pNote);
+			}
+		}
 		pSrcNoteColl->RemoveNote(pNote);
 	}
+	return bRet;
 }
 
 void RPCService::InitcoreFromRPC(INoteApplication* pApp)
@@ -192,7 +255,13 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 	com_sptr<INotebooks> spNotebooks;
 	CreateNotebooks(&spNotebooks);
 
-	coreApp->SetNotebooks(spNotebooks);
+	pApp->SetNotebooks(spNotebooks);
+
+	com_sptr<INoteCollection> spNotes;
+	pApp->GetAllNotes(&spNotes);
+
+	com_sptr<IFreeNotes> spFreeNotes;
+	pApp->GetFreeNotes(&spFreeNotes);
 
 	std::vector<NOTEBOOK> vecBooks;
 	RPCService::GetInstance().getnotebooks(vecBooks);
@@ -239,13 +308,47 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 				spNote->SetBookId(bstrId);
 
 				spNotebook->AddNote(spNote);
+				spNotes->AddNote(spNote);
 			}
 		}
 		com_sptr<INotebooks> spNotebooks;
 		pApp->GetNotebooks(&spNotebooks);
 		spNotebooks->AddNotebook(spNotebook);
 	}
+
 	inittrashes(pApp);
+
+	std::vector<Note> vecNotes;
+	m_pClient->GetFreeNotes(vecNotes, _userid);
+	for (int i = 0; i < vecNotes.size(); i++)
+	{
+		Note note = vecNotes[i];
+
+		com_sptr<INote> spNote;
+		CreateNote(NORMAL_NOTE, &spNote);
+
+		QString noteid = QString::fromUtf8(note.id.c_str());
+
+		std::wstring title = QString::fromUtf8(note.title.c_str()).toStdWString();
+		BSTR bstrTitle = SysAllocString(title.c_str());
+		spNote->SetTitle(bstrTitle);
+
+		std::wstring content = QString::fromUtf8(note.text_abbre.c_str()).toStdWString();
+		BSTR bstrContent = SysAllocString(content.c_str());
+		spNote->SetContent(bstrContent);
+
+		QDateTime create_time = QDateTime::fromMSecsSinceEpoch(note.create_time, Qt::UTC);
+		QDateTime modify_time = QDateTime::fromMSecsSinceEpoch(note.modify_time, Qt::UTC);
+
+		spNote->SetCreateTime(create_time.toMSecsSinceEpoch());
+		spNote->SetModifyTime(modify_time.toMSecsSinceEpoch());
+
+		BSTR bstrId = SysAllocString(noteid.toStdWString().c_str());
+		spNote->SetId(bstrId);
+
+		spFreeNotes->AddNote(spNote);
+		spNotes->AddNote(spNote);
+	}
 }
 
 void RPCService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
@@ -285,6 +388,9 @@ void RPCService::inittrashes(INoteApplication* pApp)
 	com_sptr<ITrash> spTrash;
 	CreateTrash(&spTrash);
 
+	com_sptr<INoteCollection> spNotes;
+	pApp->GetAllNotes(&spNotes);
+
 	std::vector<Trash> trashes;
 	m_pClient->GetTrashes(trashes, _userid);
 	for (int i = 0; i < trashes.size(); i++)
@@ -322,6 +428,7 @@ void RPCService::inittrashes(INoteApplication* pApp)
 			spNote->SetBookId(bstrBookId);
 		}
 		spTrash->AddNote(spNote);
+		spNotes->AddNote(spNote);
 	}
 	pApp->SetTrash(spTrash);
 }

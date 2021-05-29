@@ -373,7 +373,7 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebookById(bookid, &spNotebook);
 
-		bool bRet = RPCService::GetInstance().RemoveNotebook(spNotebook);
+		bool bRet = RPCService::GetInstance().RemoveNotebook(coreApp, spNotebook);
 	}
 }
 

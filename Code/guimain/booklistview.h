@@ -2,6 +2,7 @@
 #define __BOOK_LIST_VIEW_H__
 
 #include <QMenu>
+#include "LeftSideItemDelegate.h"
 
 namespace Ui
 {
@@ -41,6 +42,7 @@ private:
 	HRESULT onNotebookNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
 	HRESULT onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
 	QString GetShowContent(INote* pNote);
+	ITEM_CONTENT_TYPE getItemContentType(INoteCollection* pNotebook);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, _COM_Outptr_ void __RPC_FAR* __RPC_FAR*) { return E_NOTIMPL; }
@@ -51,7 +53,7 @@ private:
 	Ui::BookListView* m_ui;
 	QStandardItemModel* m_model;
 	QItemSelectionModel* m_selectionModel;
-	com_sptr<INoteCollection> m_spNotebook;
+	com_sptr<INoteCollection> m_viewCollection;
 	QMenu* m_pCustomMenu;
 };
 

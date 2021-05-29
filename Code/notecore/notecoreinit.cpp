@@ -63,13 +63,3 @@ HRESULT CreateTrash(ITrash** ppTrash)
 	(*ppTrash)->AddRef();
 	return S_OK;
 }
-
-HRESULT CreateTrashRecord(ITrashRecord** ppRecord)
-{
-	if (!ppRecord)
-		return E_FAIL;
-
-	*ppRecord = new TrashRecord;
-	(*ppRecord)->AddRef();
-	return S_OK;
-}

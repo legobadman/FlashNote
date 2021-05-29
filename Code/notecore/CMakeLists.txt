@@ -11,6 +11,7 @@ ADD_LIBRARY(notecore STATIC
 	guiddefine.cpp
 	notebase.cpp
 	notebase.h
+	notecontainer.h
 	notecore.h
 	notecoreinit.cpp
 	notecoreinit.h

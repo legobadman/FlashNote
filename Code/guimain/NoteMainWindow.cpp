@@ -119,6 +119,10 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		coreApp->GetTrash(&spTrash);
 		m_ui->notesview->setNotebook(spTrash);
 	}
+	else if (type == ITEM_CONTENT_TYPE::ITEM_ALLNOTE)
+	{
+		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
+	}
 }
 
 QString NoteMainWindow::getActiveBookId()

@@ -19,12 +19,13 @@ public:
 	void getnotebooks(std::vector<NOTEBOOK>& vecBooks);
 	void inittrashes(INoteApplication* pApp);
 	void InitcoreFromRPC(INoteApplication* pApp);
-	void SynchronizeNote(INotebook* pNotebook, INote* pNote);
+	void SynchronizeFreeNote(INoteApplication* pApp, INote* pNote);
+	void SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote);
 	bool SynchronizeNotebook(INotebook* pNotebook);
 	bool RemoveNote(INoteApplication* pApp, INoteCollection* pNotebook, INote* pNote);
 	bool DeleteNote(ITrash* pTrash, INote* pNote);
-	bool RemoveNotebook(INotebook* pNotebook);
-	bool RecoverNote(INoteCollection* pSrcNoteColl, INote* pNote);
+	bool RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook);
+	bool RecoverNote(INoteApplication* pApp, INoteCollection* pSrcNoteColl, INote* pNote);
 	std::wstring NewNote(std::wstring bookid, std::wstring title);
 	std::wstring NewNotebook(std::wstring name);
 

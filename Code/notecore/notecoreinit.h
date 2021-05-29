@@ -8,6 +8,5 @@ HRESULT CreateNotebook(INotebook** ppNotebook);
 HRESULT CreateApplication(INoteApplication** pApp);
 HRESULT CreateNotebooks(INotebooks** ppNotebooks);
 HRESULT CreateTrash(ITrash** ppTrash);
-HRESULT CreateTrashRecord(ITrashRecord** ppRecord);
 
 #endif

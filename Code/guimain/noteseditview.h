@@ -7,6 +7,7 @@
 class NoteEditWindow;
 class BookListView;
 
+
 class MySplitter : public QSplitter
 {
 	Q_OBJECT
@@ -55,6 +56,7 @@ private:
 
 private:
 	QWidget* m_pNoView;
+	QString m_bookid;
 	BookListView* m_pBookView;
 	NoteEditWindow* m_pEditView;
 	QStackedWidget* m_pStackedWidget;

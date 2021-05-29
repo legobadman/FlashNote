@@ -2,6 +2,7 @@
 #define __NOTE_BASE_H__
 
 #include "framework.h"
+#include "notecontainer.h"
 
 class NoteBase : public INote
 {
@@ -53,13 +54,11 @@ private:
 	int m_ref;
 };
 
-class NotebookBase : public INotebook
+class NotebookBase : public NoteCollection<INotebook>
 {
 public:
 	NotebookBase();
 	~NotebookBase();
-
-	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
 
 	HRESULT STDMETHODCALLTYPE GetId(OUT BSTR* pbstrId);
 	HRESULT STDMETHODCALLTYPE SetId(IN BSTR bstrId);
@@ -69,31 +68,33 @@ public:
 	HRESULT STDMETHODCALLTYPE SetCreateTime(long create_time);
 	HRESULT STDMETHODCALLTYPE GetModifyTime(long* pTime);
 	HRESULT STDMETHODCALLTYPE SetModifyTime(long time);
-	HRESULT STDMETHODCALLTYPE GetCount(int* pCount);
-	HRESULT STDMETHODCALLTYPE Item(VARIANT Index, INote** ppNote);
-	HRESULT STDMETHODCALLTYPE AddNote(INote* pNote);
-	HRESULT STDMETHODCALLTYPE RemoveNote(INote* pNote);
+
 	HRESULT STDMETHODCALLTYPE GetNoteIdx(INote* pNote, int* pIndex);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
 		/* [in] */ REFIID riid,
 		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-	ULONG STDMETHODCALLTYPE AddRef(void);
-	ULONG STDMETHODCALLTYPE Release(void);
-
-private:
-	void NotifyThisObj(NotifyOperator ope, INote* pNote);
 
 private:
 	CComBSTR m_id;
 	CComBSTR m_strName;
 	std::tm m_createtime;
 	std::tm m_modifytime;
-	std::vector<INote*> m_vecNotes;
-	std::unordered_set<ICoreNotify*> m_notifies;
-	int m_ref;
 };
+
+
+class Notes : public NoteCollection<INoteCollection>
+{
+public:
+	Notes();
+	~Notes();
+
+	HRESULT STDMETHODCALLTYPE QueryInterface(
+		/* [in] */ REFIID riid,
+		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
+};
+
 
 class NotebooksBase : public INotebooks
 {
@@ -123,49 +124,33 @@ private:
 	int m_ref;
 };
 
-class TrashRecord : public ITrashRecord
+
+class FreeNotes : public NoteCollection<IFreeNotes>
 {
 public:
-	TrashRecord();
-	~TrashRecord();
-
-	HRESULT STDMETHODCALLTYPE GetId(BSTR* pbstrId);
-	HRESULT STDMETHODCALLTYPE SetId(BSTR bstrId);
-	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
-	HRESULT STDMETHODCALLTYPE GetNote(INote** ppNote);
-	HRESULT STDMETHODCALLTYPE SetNote(INote* pNote);
-	HRESULT STDMETHODCALLTYPE GetNotebook(INotebook** ppNotebook);
-	HRESULT STDMETHODCALLTYPE SetNotebook(INotebook* pNotebook);
+	FreeNotes();
+	~FreeNotes();
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
 		/* [in] */ REFIID riid,
 		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-	ULONG STDMETHODCALLTYPE AddRef(void);
-	ULONG STDMETHODCALLTYPE Release(void);
 
 private:
-	CComBSTR m_id;
 	std::unordered_set<ICoreNotify*> m_notifies;
-	com_sptr<INotebook> m_spNotebook;
-	com_sptr<INote> m_spNote;
+	std::map<CComBSTR, INote*> m_container;
 	int m_ref;
 };
 
 
-class TrashBase : public ITrash
+class TrashBase : public NoteCollection<ITrash>
 {
 public:
 	TrashBase();
 	~TrashBase();
 
-	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
 	/* INoteCollection */
 	HRESULT STDMETHODCALLTYPE GetName(BSTR* pbstrName);
-	HRESULT STDMETHODCALLTYPE GetCount(int* pCount);
-	HRESULT STDMETHODCALLTYPE Item(VARIANT index, INote** ppNote);
-	HRESULT STDMETHODCALLTYPE AddNote(INote* pNote);
-	HRESULT STDMETHODCALLTYPE RemoveNote(INote* pNote);
 	/* ITrash */
 	HRESULT STDMETHODCALLTYPE DeleteNote(INote* pNote);
 
@@ -173,16 +158,6 @@ public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
 		/* [in] */ REFIID riid,
 		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-	ULONG STDMETHODCALLTYPE AddRef(void);
-	ULONG STDMETHODCALLTYPE Release(void);
-
-private:
-	void NotifyThisObj(NotifyOperator ope, INote* pNote);
-
-private:
-	std::unordered_set<ICoreNotify*> m_notifies;
-	std::map<CComBSTR, INote*> m_container;
-	int m_ref;
 };
 
 class NoteApplication : public INoteApplication
@@ -196,6 +171,8 @@ public:
 	HRESULT STDMETHODCALLTYPE SetNotebooks(INotebooks* pNotebooks);
 	HRESULT STDMETHODCALLTYPE GetUserId(OUT BSTR* pbstrId);
 	HRESULT STDMETHODCALLTYPE SetUserId(IN BSTR bstrId);
+	HRESULT STDMETHODCALLTYPE GetFreeNotes(IFreeNotes** ppTrash);
+	HRESULT STDMETHODCALLTYPE GetAllNotes(INoteCollection** ppCollection);
 	HRESULT STDMETHODCALLTYPE GetTrash(ITrash** ppTrash);
 	HRESULT STDMETHODCALLTYPE SetTrash(ITrash* pTrash);
 
@@ -211,6 +188,8 @@ private:
 	std::vector<INotebook*> m_vecBooks;
 	com_sptr<INotebooks> m_spNotebooks;
 	com_sptr<ITrash> m_spTrash;
+	com_sptr<IFreeNotes> m_spFreeNotes;
+	com_sptr<INoteCollection> m_spAllNotes;
 	std::unordered_set<ICoreNotify*> m_notifies;
 	int m_ref;
 };

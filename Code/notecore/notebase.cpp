@@ -168,17 +168,11 @@ void NoteBase::NotifyThisObj(NotifyOperator ope)
 
 /////////////////////////////////////////////////
 NotebookBase::NotebookBase()
-	: m_ref(0)
 {
 }
 
 NotebookBase::~NotebookBase()
 {
-	for (int i = 0; i < (int)m_vecNotes.size(); i++)
-	{
-		m_vecNotes[i]->Release();
-	}
-	m_vecNotes.clear();
 }
 
 HRESULT NotebookBase::GetId(OUT BSTR* pbstrId)
@@ -223,115 +217,9 @@ HRESULT NotebookBase::SetModifyTime(long modify_time)
 	return E_NOTIMPL;
 }
 
-HRESULT NotebookBase::GetCount(int* pCount)
-{
-	*pCount = m_vecNotes.size();
-	return S_OK;
-}
-
-HRESULT NotebookBase::Item(VARIANT Index, INote** ppNote)
-{
-	if (!ppNote)
-	{
-		return E_POINTER;
-	}
-	if (V_VT(&Index) == VT_I4)
-	{
-		int nIndex = V_I4(&Index);
-		if (nIndex >= 0 && nIndex < (int)m_vecNotes.size())
-		{
-			*ppNote = m_vecNotes[nIndex];
-			(*ppNote)->AddRef();
-			return S_OK;
-		}
-		else
-		{
-			return E_INVALIDARG;
-		}
-	}
-	else if (V_VT(&Index) == VT_BSTR)
-	{
-		BSTR bstrId = V_BSTR(&Index);
-		for (auto it = m_vecNotes.begin(); it != m_vecNotes.end(); it++)
-		{
-			BSTR _id;
-			(*it)->GetId(&_id);
-			if (0 == wcscmp(bstrId, _id))
-			{
-				*ppNote = *it;
-				(*ppNote)->AddRef();
-				return S_OK;
-			}
-		}
-		return E_FAIL;
-	}
-	return E_NOTIMPL;
-}
-
-HRESULT NotebookBase::AddNote(INote* pNote)
-{
-	if (!pNote)
-		return E_NOTIMPL;
-
-	pNote->AddRef();
-	m_vecNotes.push_back(pNote);
-	NotifyThisObj(Add, pNote);
-	return S_OK;
-}
-
-void NotebookBase::NotifyThisObj(NotifyOperator ope, INote* pNote)
-{
-	for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
-	{
-		BSTR bstrId;
-		pNote->GetId(&bstrId);
-		std::wstring noteid(bstrId, SysStringLen(bstrId));
-		NotifyArg arg;
-		arg.ope = ope;
-		arg.pObj = pNote;
-		(*it)->onCoreNotify(this, arg);
-	}
-}
-
-HRESULT NotebookBase::RemoveNote(INote* pNote)
-{
-	if (!pNote)
-		return E_POINTER;
-
-	for (auto it = m_vecNotes.begin(); it != m_vecNotes.end(); )
-	{
-		if (*it == pNote)
-		{
-			m_vecNotes.erase(it);
-			pNote->Release();
-			NotifyThisObj(Delete, pNote);
-			return S_OK;
-		}
-		else
-		{
-			it++;
-		}
-	}
-	return E_FAIL;
-}
-
 HRESULT NotebookBase::GetNoteIdx(INote* pNote, int* pIndex)
 {
-	for (int i = 0; i < (int)m_vecNotes.size(); i++)
-	{
-		if (m_vecNotes[i] == pNote)
-		{
-			*pIndex = i;
-			return S_OK;
-		}
-	}
-	return E_FAIL;
-}
-
-HRESULT NotebookBase::addWatcher(ICoreNotify* pNotify)
-{
-	m_notifies.insert(pNotify);
-	return S_OK;
+	return E_NOTIMPL;
 }
 
 HRESULT NotebookBase::QueryInterface(
@@ -360,20 +248,35 @@ HRESULT NotebookBase::QueryInterface(
 	return S_OK;
 }
 
-ULONG NotebookBase::AddRef(void)
+
+Notes::Notes()
 {
-	m_ref++;
-	return m_ref;
 }
 
-ULONG NotebookBase::Release(void)
+Notes::~Notes()
 {
-	m_ref--;
-	if (m_ref == 0)
+}
+
+HRESULT Notes::QueryInterface(
+	/* [in] */ REFIID riid,
+	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+{
+	if (!ppvObject)
+		return E_FAIL;
+
+	if (riid == IID_INoteCoreObj)
 	{
-		delete this;
+		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	return m_ref;
+	else if (riid == IID_INoteCollection)
+	{
+		*ppvObject = static_cast<INoteCollection*>(this);
+	}
+	else
+	{
+		return E_FAIL;
+	}
+	return S_OK;
 }
 
 
@@ -531,76 +434,23 @@ ULONG NotebooksBase::Release(void)
 }
 
 
-//////////////////////////////////////////////////
-TrashRecord::TrashRecord()
+//////////////////////////////////////////////////////
+FreeNotes::FreeNotes()
+	: m_ref(0)
 {
 
 }
 
-TrashRecord::~TrashRecord()
+FreeNotes::~FreeNotes()
 {
+	for (auto it = m_container.begin(); it != m_container.end(); it++)
+	{
+		it->second->Release();
+	}
+	m_container.clear();
 }
 
-HRESULT TrashRecord::GetId(BSTR* pbstrId)
-{
-	if (!pbstrId)
-		return E_POINTER;
-
-	*pbstrId = m_id;
-	return S_OK;
-}
-
-HRESULT TrashRecord::SetId(BSTR bstrId)
-{
-	m_id = bstrId;
-	return S_OK;
-}
-
-HRESULT TrashRecord::addWatcher(ICoreNotify* pNotify)
-{
-	m_notifies.insert(pNotify);
-	return S_OK;
-}
-
-HRESULT TrashRecord::GetNote(INote** ppNote)
-{
-	if (!ppNote)
-		return E_POINTER;
-
-	*ppNote = m_spNote;
-	(*ppNote)->AddRef();
-	return S_OK;
-}
-
-HRESULT TrashRecord::SetNote(INote* pNote)
-{
-	if (!pNote)
-		return E_POINTER;
-
-	m_spNote = pNote;
-	return S_OK;
-}
-
-HRESULT TrashRecord::GetNotebook(INotebook** ppNotebook)
-{
-	if (!ppNotebook)
-		return E_POINTER;
-
-	*ppNotebook = m_spNotebook;
-	(*ppNotebook)->AddRef();
-	return S_OK;
-}
-
-HRESULT TrashRecord::SetNotebook(INotebook* pNotebook)
-{
-	if (!pNotebook)
-		return E_POINTER;
-
-	m_spNotebook = pNotebook;
-	return S_OK;
-}
-
-HRESULT TrashRecord::QueryInterface(
+HRESULT FreeNotes::QueryInterface(
 	/* [in] */ REFIID riid,
 	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
 {
@@ -611,31 +461,19 @@ HRESULT TrashRecord::QueryInterface(
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	else if (riid == IID_INoteApplication)
+	else if (riid == IID_INoteCollection)
 	{
-		*ppvObject = static_cast<ITrashRecord*>(this);
+		*ppvObject = static_cast<INoteCollection*>(this);
+	}
+	else if (riid == IID_ITrash)
+	{
+		*ppvObject = static_cast<IFreeNotes*>(this);
 	}
 	else
 	{
 		return E_FAIL;
 	}
 	return S_OK;
-}
-
-ULONG TrashRecord::AddRef(void)
-{
-	m_ref++;
-	return m_ref;
-}
-
-ULONG TrashRecord::Release(void)
-{
-	m_ref--;
-	if (m_ref == 0)
-	{
-		delete this;
-	}
-	return m_ref;
 }
 
 
@@ -647,96 +485,6 @@ TrashBase::TrashBase()
 
 TrashBase::~TrashBase()
 {
-	for (auto it = m_container.begin(); it != m_container.end(); it++)
-	{
-		it->second->Release();
-	}
-	m_container.clear();
-}
-
-HRESULT TrashBase::addWatcher(ICoreNotify* pNotify)
-{
-	m_notifies.insert(pNotify);
-	return S_OK;
-}
-
-HRESULT TrashBase::GetCount(int* pCount)
-{
-	if (!pCount)
-		return E_POINTER;
-
-	*pCount = m_container.size();
-	return S_OK;
-}
-
-HRESULT TrashBase::Item(VARIANT index, INote** ppNote)
-{
-	if (!ppNote)
-		return E_POINTER;
-
-	if (V_VT(&index) == VT_BSTR)
-	{
-		CComBSTR bstrTrashId(V_BSTR(&index));
-		if (m_container.find(bstrTrashId) == m_container.end())
-		{
-			return E_FAIL;
-		}
-		*ppNote = m_container[bstrTrashId];
-		(*ppNote)->AddRef();
-		return S_OK;
-	}
-	else if (V_VT(&index) == VT_I4)
-	{
-		int idx = V_I4(&index);
-		for (auto it = m_container.begin(); it != m_container.end(); it++)
-		{
-			if (idx == 0)
-			{
-				*ppNote = it->second;
-				(*ppNote)->AddRef();
-				return S_OK;
-			}
-			idx--;
-		}
-		return E_INVALIDARG;
-	}
-	else
-	{
-		return E_INVALIDARG;
-	}
-}
-
-HRESULT TrashBase::AddNote(INote* pNote)
-{
-	if (!pNote)
-		return E_FAIL;
-
-	CComBSTR bstrTrashId;
-	pNote->GetId(&bstrTrashId);
-
-	pNote->AddRef();
-	m_container.insert(std::pair<CComBSTR, INote*>(bstrTrashId, pNote));
-	return S_OK;
-}
-
-HRESULT TrashBase::RemoveNote(INote* pNote)
-{
-	if (!pNote)
-		return E_FAIL;
-
-	CComBSTR bstrNoteId;
-	pNote->GetId(&bstrNoteId);
-
-	auto it = m_container.find(bstrNoteId);
-	if (it == m_container.end())
-	{
-		return E_FAIL;
-	}
-
-	NotifyThisObj(Delete, pNote);
-	pNote->Release();
-	m_container.erase(bstrNoteId);
-	return S_OK;
 }
 
 HRESULT TrashBase::DeleteNote(INote* pNote)
@@ -770,22 +518,6 @@ HRESULT TrashBase::QueryInterface(
 	return S_OK;
 }
 
-ULONG TrashBase::AddRef(void)
-{
-	m_ref++;
-	return m_ref;
-}
-
-ULONG TrashBase::Release(void)
-{
-	m_ref--;
-	if (m_ref == 0)
-	{
-		delete this;
-	}
-	return m_ref;
-}
-
 HRESULT TrashBase::GetName(BSTR* pbstrName)
 {
 	if (!pbstrName)
@@ -795,25 +527,13 @@ HRESULT TrashBase::GetName(BSTR* pbstrName)
 	return S_OK;
 }
 
-void TrashBase::NotifyThisObj(NotifyOperator ope, INote* pNote)
-{
-	for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
-	{
-		BSTR bstrId;
-		pNote->GetId(&bstrId);
-		std::wstring noteid(bstrId, SysStringLen(bstrId));
-		NotifyArg arg;
-		arg.ope = ope;
-		arg.pObj = pNote;
-		(*it)->onCoreNotify(this, arg);
-	}
-}
-
 
 //////////////////////////////////////////////////
 NoteApplication::NoteApplication()
 	: m_ref(0)
 {
+	m_spFreeNotes = new FreeNotes;
+	m_spAllNotes = new Notes;
 }
 
 NoteApplication::~NoteApplication()
@@ -863,6 +583,26 @@ HRESULT NoteApplication::GetUserId(OUT BSTR* pbstrId)
 HRESULT NoteApplication::SetUserId(IN BSTR bstrId)
 {
 	m_id.Attach(bstrId);
+	return S_OK;
+}
+
+HRESULT NoteApplication::GetFreeNotes(IFreeNotes** ppFreeNotes)
+{
+	if (!ppFreeNotes)
+		return E_POINTER;
+
+	*ppFreeNotes = m_spFreeNotes;
+	(*ppFreeNotes)->AddRef();
+	return S_OK;
+}
+
+HRESULT NoteApplication::GetAllNotes(INoteCollection** ppCollection)
+{
+	if (!ppCollection)
+		return E_POINTER;
+
+	*ppCollection = m_spAllNotes;
+	(*ppCollection)->AddRef();
 	return S_OK;
 }
 

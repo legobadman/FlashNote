@@ -6,7 +6,7 @@ class AppHelper
 public:
 	static void GetNotebook(int idx, INotebook** ppNotebook);
 	static void GetNote(INoteCollection* pNotebook, int idxNote, INote** ppNote);
-	static void GetNoteById(INoteCollection* pNotebook, QString noteid, INote** ppNote);
+	static void GetNoteById(QString noteid, INote** ppNote);
 	static QString GetNotebookName(INoteCollection* pNotebook);
 	static QString GetNotebookId(INotebook* pNotebook);
 	static void GetNotebookById(const QString& id, INotebook** ppNotebook);

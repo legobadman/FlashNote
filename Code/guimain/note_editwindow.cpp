@@ -593,7 +593,7 @@ void NoteEditWindow::saveNote()
 	m_pNote->SetPlainText(bstrPlainText);
 
 	com_sptr<INotebook> spNotebook = m_pNoteColl;
-	RPCService::GetInstance().SynchronizeNote(spNotebook, m_pNote);
+	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
 }
 
 void NoteEditWindow::switchtobook(int bookidx)

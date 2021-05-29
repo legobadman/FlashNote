@@ -213,7 +213,7 @@ public:
 
 		freenotes.clear();
 
-		mongocxx::cursor cursor = freenotes_coll.find({ document{} << "user_id"
+		mongocxx::cursor cursor = freenotes_coll.find({ document{} << "userid"
 			<< TO_BSON_OID(userid) << finalize });
 		for (auto doc : cursor)
 		{
@@ -635,52 +635,6 @@ public:
 		{
 			apilogger.append_err("trash record insert failed");
 			return false;
-		}
-	}
-
-	void GetTrashes(std::vector<Trash> & trashes, const std::string & userid)
-	{
-		// Your implementation goes here
-		ApiLogger apilogger("GetTrashes");
-		mongocxx::collection notebooks = conn["flashnote"]["notebooks"];
-		mongocxx::collection notes = conn["flashnote"]["notes"];
-		mongocxx::collection users = conn["flashnote"]["user"];
-		mongocxx::collection trash_conn = conn["flashnote"]["trash"];
-
-		trashes.clear();
-
-		mongocxx::cursor cursor = trash_conn.find({ document{} << "user_id" 
-			<< TO_BSON_OID(userid) << finalize });
-		for (auto doc : cursor)
-		{
-			Trash trash;
-			trash.trash_id = doc["_id"].get_oid().value.to_string();
-			trash.trash_time = doc["trash_time"].get_date().to_int64();
-			trash.notebook.id = doc["srcbook_id"].get_oid().value.to_string();	//只返回id，然后客户端从内核中取。
-
-			//检索note
-			std::string noteid = doc["note_id"].get_oid().value.to_string();
-			auto note_result = notes.find_one(document{}
-				<< "_id"
-				<< get_bsonid(noteid)
-				<< finalize);
-			if (!note_result)
-			{
-				apilogger.append_err("no note with id = " + noteid);
-			}
-
-			bsoncxx::document::view note_view = note_result->view();
-
-			Note note;
-			note.title = note_view["title"].get_utf8().value.to_string();
-			note.text_abbre = note_view["content"].get_utf8().value.to_string();
-			note.id = noteid;
-			note.create_time = note_view["create_time"].get_date().to_int64();
-			note.modify_time = note_view["modify_time"].get_date().to_int64();
-			note.creater_id = note_view["creater"].get_oid().value.to_string();
-
-			trash.note = note;
-			trashes.push_back(trash);
 		}
 	}
 
