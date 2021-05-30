@@ -9,10 +9,10 @@
 static const int nContentLimit = 74;
 
 
-
 BookListView::BookListView(QWidget* parent)
 	: QWidget(parent)
 	, m_pCustomMenu(NULL)
+	, m_type(VIEW_ALLNOTES)
 {
 	init();
 }
@@ -46,6 +46,8 @@ void BookListView::init()
 
 	m_ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(m_ui->listView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
+
+	m_model = new QStandardItemModel(this);
 }
 
 BookListView::~BookListView()
@@ -156,9 +158,15 @@ QString BookListView::GetShowContent(INote* pNote)
 
 HRESULT BookListView::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 {
-	if (com_sptr<INoteCollection>(pCoreObj))
+	if (com_sptr<INotebook>(pCoreObj))
 	{
-		return onNotebookNotify(pCoreObj, arg);
+		com_sptr<INotebook> spNotebook(pCoreObj);
+		return onNotebookNotify(spNotebook, arg);
+	}
+	else if (com_sptr<ITrash>(pCoreObj))
+	{
+		com_sptr<ITrash> spTrash(pCoreObj);
+		return onTrashNotify(spTrash, arg);
 	}
 	else if (com_sptr<INote>(pCoreObj))
 	{
@@ -171,12 +179,24 @@ HRESULT BookListView::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	return S_OK;
 }
 
-HRESULT BookListView::onNotebookNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
+HRESULT BookListView::onTrashNotify(ITrash* pCoreObj, NotifyArg arg)
 {
-	com_sptr<INoteCollection> pCollection = pCoreObj;
-	if (pCollection != m_viewCollection)
+	if (m_type != VIEW_TRASH)
 	{
-		//当前页面如果不是接收通知的对象，那就不需要刷新（点击自然会更新）
+		return S_OK;
+	}
+
+	Q_ASSERT(pCoreObj);
+	com_sptr<INote> spNote(arg.pObj);
+	Q_ASSERT(spNote);
+	return updateView(arg, spNote);
+}
+
+HRESULT BookListView::onNotebookNotify(INotebook* pNotebook, NotifyArg arg)
+{
+	QString bookid = AppHelper::GetNotebookId(pNotebook);
+	if (m_type != VIEW_NOTEBOOK || bookid != m_bookid)
+	{
 		return S_OK;
 	}
 
@@ -184,55 +204,64 @@ HRESULT BookListView::onNotebookNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	Q_ASSERT(arg.pObj);
 	com_sptr<INote> spNote(arg.pObj);
 	Q_ASSERT(spNote);
+	return updateView(arg, spNote);
+}
 
-	QString noteid = AppHelper::GetNoteId(spNote);
-	ITEM_CONTENT_TYPE contentType = getItemContentType(pCollection);
+HRESULT BookListView::updateView(NotifyArg arg, INote* pNote)
+{
+	QString noteid = AppHelper::GetNoteId(pNote);
+
+	ITEM_CONTENT_TYPE itemType = ITEM_CONTENT_TYPE::ITEM_UNKNOWN;
+	if (m_type == VIEW_ALLNOTES || m_type == VIEW_NOTEBOOK)
+		itemType = ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM;
+	else
+		itemType = ITEM_CONTENT_TYPE::ITEM_TRASHITEM;
 
 	switch (arg.ope)
 	{
-		case NotifyOperator::Add:
-		{
-			//监听Notebook::AddWorkbook
-			bool bRet = m_model->insertRow(0);
-			
-			QModelIndex newItem = m_model->index(0, 0);
-			QStandardItem* pItem = m_model->itemFromIndex(newItem);
-			QString showContent = GetShowContent(spNote);
-			pItem->setText(showContent);
-			pItem->setData(QVariant(noteid), ItemCoreObjIdRole);
-			pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(contentType), ItemContentTypeRole);
-			pItem->setSelectable(true);
-			pItem->setEditable(false);
+	case NotifyOperator::Add:
+	{
+		//监听Notebook::AddWorkbook
+		bool bRet = m_model->insertRow(0);
 
-			spNote->addWatcher(this);
-			break;
-		}
-		case NotifyOperator::Delete:
+		QModelIndex newItem = m_model->index(0, 0);
+		QStandardItem* pItem = m_model->itemFromIndex(newItem);
+		QString showContent = GetShowContent(pNote);
+		pItem->setText(showContent);
+		pItem->setData(QVariant(noteid), ItemCoreObjIdRole);
+		pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(itemType), ItemContentTypeRole);
+		pItem->setSelectable(true);
+		pItem->setEditable(false);
+
+		pNote->addWatcher(this);
+		break;
+	}
+	case NotifyOperator::Delete:
+	{
+		QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
+		if (!indexs.isEmpty())
 		{
-			QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
-			if (!indexs.isEmpty())
-			{
-				Q_ASSERT(indexs.size() == 1);
-				QModelIndex index = indexs.at(0);
-				m_model->removeRow(index.row());
-				QItemSelectionModel* pModel = m_ui->listView->selectionModel();
-				QModelIndex newIndex = pModel->currentIndex();
-				emit noteitemselected(newIndex);
-			}
-			if (m_model->rowCount() == 0)
-			{
-				m_ui->lblNumberNotes->setText(QString(u8"0条笔记"));
-			}
-			break;
-		}
-		case NotifyOperator::Update:
-		{
-			//更新bookName
-			QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
 			Q_ASSERT(indexs.size() == 1);
 			QModelIndex index = indexs.at(0);
-			break;
+			m_model->removeRow(index.row());
+			QItemSelectionModel* pModel = m_ui->listView->selectionModel();
+			QModelIndex newIndex = pModel->currentIndex();
+			emit noteitemselected(newIndex);
 		}
+		if (m_model->rowCount() == 0)
+		{
+			m_ui->lblNumberNotes->setText(QString(u8"0条笔记"));
+		}
+		break;
+	}
+	case NotifyOperator::Update:
+	{
+		//更新bookName
+		QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
+		Q_ASSERT(indexs.size() == 1);
+		QModelIndex index = indexs.at(0);
+		break;
+	}
 	}
 	return S_OK;
 }
@@ -265,27 +294,49 @@ HRESULT BookListView::onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	return S_OK;
 }
 
-void BookListView::updateNotebook(INoteCollection* pNotebook, QString noteid)
+void BookListView::resetNotebook(INoteCollection* pNoteCollection, QString noteid)
 {
-	if (m_viewCollection == pNotebook)
-		return;
+	com_sptr<ITrash> spTrash;
+	com_sptr<INotebook> spNotebook;
+	if (spNotebook = pNoteCollection)
+	{
+		QString bookid = AppHelper::GetNotebookId(spNotebook);
+		if (bookid == m_bookid && m_type == VIEW_NOTEBOOK)
+		{
+			return;
+		}
+		m_bookid = bookid;
+		m_type = VIEW_NOTEBOOK;
+		spNotebook->addWatcher(this);
+	}
+	else if (spTrash = pNoteCollection)
+	{
+		if (m_type == VIEW_TRASH)
+			return;
 
-	m_viewCollection = pNotebook;
-	m_viewCollection->addWatcher(this);
+		m_type = VIEW_TRASH;
+		m_bookid = "";
+	}
+	else
+	{
+		Q_ASSERT(false);
+	}
 
-	ITEM_CONTENT_TYPE contentType = getItemContentType(pNotebook);
+	pNoteCollection->addWatcher(this);
 
-	QString bookName = AppHelper::GetNotebookName(pNotebook);
+	ITEM_CONTENT_TYPE contentType = getItemContentType(pNoteCollection);
+
+	QString bookName = AppHelper::GetNotebookName(pNoteCollection);
 	m_ui->lblNotebook->setText(bookName);
 	m_ui->lblNumberNotes->setText(QString(u8"%1条笔记").arg(
-		QString::number(AppHelper::GetNoteCounts(pNotebook))));
+		QString::number(AppHelper::GetNoteCounts(pNoteCollection))));
 
-	m_model = new QStandardItemModel(this);
-	int n = AppHelper::GetNoteCounts(pNotebook);
+	m_model->clear();
+	int n = AppHelper::GetNoteCounts(pNoteCollection);
 	for (int i = 0; i < n; i++)
 	{
 		com_sptr<INote> spNote;
-		AppHelper::GetNote(pNotebook, i, &spNote);
+		AppHelper::GetNote(pNoteCollection, i, &spNote);
 
 		spNote->addWatcher(this);
 

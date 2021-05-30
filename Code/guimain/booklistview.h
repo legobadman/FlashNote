@@ -3,6 +3,7 @@
 
 #include <QMenu>
 #include "LeftSideItemDelegate.h"
+#include "noteseditview.h"
 
 namespace Ui
 {
@@ -26,7 +27,7 @@ public:
 	~BookListView();
 
 	void init();
-	void updateNotebook(INoteCollection* pNotebook, QString noteid);
+	void resetNotebook(INoteCollection* pNotebook, QString noteid);
 	HRESULT STDMETHODCALLTYPE onCoreNotify(
 		INoteCoreObj* pCoreObj,
 		NotifyArg arg);
@@ -39,8 +40,10 @@ public slots:
 	void MenuActionSlot(QAction *action);
 
 private:
-	HRESULT onNotebookNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
+	HRESULT onNotebookNotify(INotebook* pCoreObj, NotifyArg arg);
+	HRESULT onTrashNotify(ITrash* pCoreObj, NotifyArg arg);
 	HRESULT onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
+	HRESULT updateView(NotifyArg arg, INote* pNote);
 	QString GetShowContent(INote* pNote);
 	ITEM_CONTENT_TYPE getItemContentType(INoteCollection* pNotebook);
 
@@ -53,8 +56,10 @@ private:
 	Ui::BookListView* m_ui;
 	QStandardItemModel* m_model;
 	QItemSelectionModel* m_selectionModel;
-	com_sptr<INoteCollection> m_viewCollection;
 	QMenu* m_pCustomMenu;
+
+	QString m_bookid;
+	BOOKVIEW_TYPE m_type;
 };
 
 #endif

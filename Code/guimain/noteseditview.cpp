@@ -39,12 +39,17 @@ NotesEditView::NotesEditView(QWidget* parent)
 	palette.setBrush(QPalette::Window, QBrush(QColor(204, 204, 204)));
 	setPalette(palette);
 
-	m_pStackedWidget = new QStackedWidget(this);
-	m_pStackedWidget->addWidget(m_pEditView);
-	m_pStackedWidget->addWidget(m_pNoView);
+	//m_pAllBookView = new BookListView;
+	//m_pStackedListView = new QStackedWidget(this);
+	//m_pStackedListView->addWidget(m_pAllBookView);
+	//m_pStackedListView->addWidget(m_pBookView);
+
+	m_pStackedEdit = new QStackedWidget(this);
+	m_pStackedEdit->addWidget(m_pEditView);
+	m_pStackedEdit->addWidget(m_pNoView);
 
 	addWidget(m_pBookView);
-	addWidget(m_pStackedWidget);
+	addWidget(m_pStackedEdit);
 #else
 	QSplitter* splitter = new QSplitter(this);
 	splitter->setObjectName(QString::fromUtf8("splitter233"));
@@ -116,6 +121,11 @@ void NotesEditView::setNotebook(INoteCollection* pNotebook)
 	onShowNotesView(noteid);
 }
 
+void NotesEditView::setAllNotes()
+{
+
+}
+
 void NotesEditView::onNoteItemSelected(const QModelIndex& index)
 {
 	QString noteid = index.data(ItemCoreObjIdRole).toString();
@@ -127,17 +137,17 @@ void NotesEditView::onShowNotesView(QString noteid)
 	//TODO: 要通过noteid取到note接口指针，从而取得bookid
 	//，再取得book接口，而不能缓存	。
 
-	m_pBookView->updateNotebook(m_pNotebook, noteid);
+	m_pBookView->resetNotebook(m_pNotebook, noteid);
 
 	com_sptr<INote> spNote;
 	AppHelper::GetNoteById(noteid, &spNote);
 	if (spNote == NULL)
 	{
-		m_pStackedWidget->setCurrentIndex(PAGE_NOEDIT);
+		m_pStackedEdit->setCurrentIndex(PAGE_NOEDIT);
 	}
 	else
 	{
-		m_pStackedWidget->setCurrentIndex(PAGE_EDITVIEW);
+		m_pStackedEdit->setCurrentIndex(PAGE_EDITVIEW);
 		m_pEditView->updateNoteInfo(m_pNotebook, spNote);
 	}
 }

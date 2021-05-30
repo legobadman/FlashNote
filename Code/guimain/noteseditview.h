@@ -21,6 +21,14 @@ protected:
 //以后再研究QWidget的布局。
 #define SPLITTER_BASE
 
+enum BOOKVIEW_TYPE
+{
+	VIEW_ALLNOTES,
+	VIEW_NOTEBOOK,
+	VIEW_TRASH
+};
+
+
 #ifdef SPLITTER_BASE
 class NotesEditView : public QSplitter
 #else
@@ -40,6 +48,7 @@ public:
 	~NotesEditView();
 
 	void setNotebook(INoteCollection* pNotebook);
+	void setAllNotes();
 
 #ifndef SPLITTER_BASE
 	QSize sizeHint() const override;
@@ -57,9 +66,11 @@ private:
 private:
 	QWidget* m_pNoView;
 	QString m_bookid;
+	BookListView* m_pAllBookView;
 	BookListView* m_pBookView;
 	NoteEditWindow* m_pEditView;
-	QStackedWidget* m_pStackedWidget;
+	QStackedWidget* m_pStackedListView;
+	QStackedWidget* m_pStackedEdit;
 	com_sptr<INoteCollection> m_pNotebook;
 };
 
