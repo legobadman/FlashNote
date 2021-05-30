@@ -8,6 +8,7 @@
 #include "rpcservice.h"
 #include "newnotewindow.h"
 #include "addbookdlg.h"
+#include "noteseditview.h"
 
 
 NoteMainWindow::NoteMainWindow(QWidget* parent)
@@ -51,7 +52,7 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebook(idxNotebook, &spNotebook);
 
-	m_ui->notesview->setNotebook(spNotebook);
+	m_ui->notesview->setNotebook(VIEW_NOTEBOOK, spNotebook);
 }
 
 void NoteMainWindow::onNewNote()
@@ -105,7 +106,7 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		HRESULT hr = spNotebooks->Item(varIndex, &spNotebook);
 		if (hr == S_OK)
 		{
-			m_ui->notesview->setNotebook(spNotebook);
+			m_ui->notesview->setNotebook(VIEW_NOTEBOOK, spNotebook);
 		}
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
@@ -117,11 +118,12 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
 		com_sptr<ITrash> spTrash;
 		coreApp->GetTrash(&spTrash);
-		m_ui->notesview->setNotebook(spTrash);
+		m_ui->notesview->setNotebook(VIEW_TRASH, spTrash);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_ALLNOTE)
 	{
 		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
+		m_ui->notesview->setNotebook(VIEW_ALLNOTES, NULL);
 	}
 }
 

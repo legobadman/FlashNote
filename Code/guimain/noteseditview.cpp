@@ -24,8 +24,10 @@ NotesEditView::NotesEditView(QWidget* parent)
 #else
 	: QWidget(parent)
 #endif
+	, m_type(VIEW_NOTEBOOK)
+	, m_pAllNotesView(NULL)
+	, m_pTrashView(NULL)
 {
-	m_pBookView = new BookListView;
 	m_pEditView = new NoteEditWindow;
 	m_pNoView = new QWidget;
 
@@ -39,16 +41,13 @@ NotesEditView::NotesEditView(QWidget* parent)
 	palette.setBrush(QPalette::Window, QBrush(QColor(204, 204, 204)));
 	setPalette(palette);
 
-	//m_pAllBookView = new BookListView;
-	//m_pStackedListView = new QStackedWidget(this);
-	//m_pStackedListView->addWidget(m_pAllBookView);
-	//m_pStackedListView->addWidget(m_pBookView);
+	m_pStackedListView = new QStackedWidget(this);
 
 	m_pStackedEdit = new QStackedWidget(this);
 	m_pStackedEdit->addWidget(m_pEditView);
 	m_pStackedEdit->addWidget(m_pNoView);
 
-	addWidget(m_pBookView);
+	addWidget(m_pStackedListView);
 	addWidget(m_pStackedEdit);
 #else
 	QSplitter* splitter = new QSplitter(this);
@@ -62,9 +61,6 @@ NotesEditView::NotesEditView(QWidget* parent)
 #endif
 
 	m_pNoView->installEventFilter(this);
-
-	connect(m_pBookView, SIGNAL(noteitemselected(const QModelIndex&)),
-		this, SLOT(onNoteItemSelected(const QModelIndex&)));
 }
 
 NotesEditView::~NotesEditView()
@@ -107,23 +103,59 @@ bool NotesEditView::eventFilter(QObject* watched, QEvent* event)
 	return QSplitter::eventFilter(watched, event);
 }
 
-void NotesEditView::setNotebook(INoteCollection* pNotebook)
+void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
 {
-	m_pNotebook = pNotebook;
-	QString noteid;	//TODO: 注册表实现
-	//暂时用book的第一个note
-	com_sptr<INote> spNote;
-	AppHelper::GetNote(pNotebook, 0, &spNote);
-	if (spNote)
+	m_type = type;
+	BookListView* pListView = NULL;
+	if (VIEW_ALLNOTES == m_type)
 	{
-		noteid = AppHelper::GetNoteId(spNote);
+		if (m_pAllNotesView == NULL)
+		{
+			m_pAllNotesView = new BookListView(this);
+			m_pAllNotesView->initAllNotes();
+			m_pStackedListView->addWidget(m_pAllNotesView);
+		}
+		pListView = m_pAllNotesView;
 	}
+	else if (VIEW_NOTEBOOK == m_type)
+	{
+		com_sptr<INotebook> spNotebook = com_sptr<INotebook>(pNoteCollection);
+		QString bookid = AppHelper::GetNotebookId(spNotebook);
+		auto iter = m_pNotebookViews.find(bookid);
+		if (iter == m_pNotebookViews.end())
+		{
+			pListView = new BookListView(this);
+			pListView->initNoteContainer(m_type, spNotebook);
+			spNotebook->addWatcher(pListView);
+			m_pNotebookViews.insert(bookid, pListView);
+			m_pStackedListView->addWidget(pListView);
+		}
+		else
+		{
+			pListView = iter.value();
+		}
+	}
+	else if (VIEW_TRASH == m_type)
+	{
+		com_sptr<ITrash> spTrash = com_sptr<ITrash>(pNoteCollection);
+		if (m_pTrashView == NULL)
+		{
+			m_pTrashView = new BookListView(this);
+			m_pTrashView->initNoteContainer(m_type, spTrash);
+			m_pStackedListView->addWidget(m_pTrashView);
+			spTrash->addWatcher(m_pTrashView);
+		}
+		pListView = m_pTrashView;
+	}
+	else
+	{
+		Q_ASSERT(false);
+	}
+
+	//代替原来的update
+	m_pStackedListView->setCurrentWidget(pListView);
+	QString noteid = pListView->getCurrentNoteId();
 	onShowNotesView(noteid);
-}
-
-void NotesEditView::setAllNotes()
-{
-
 }
 
 void NotesEditView::onNoteItemSelected(const QModelIndex& index)
@@ -134,11 +166,6 @@ void NotesEditView::onNoteItemSelected(const QModelIndex& index)
 
 void NotesEditView::onShowNotesView(QString noteid)
 {
-	//TODO: 要通过noteid取到note接口指针，从而取得bookid
-	//，再取得book接口，而不能缓存	。
-
-	m_pBookView->resetNotebook(m_pNotebook, noteid);
-
 	com_sptr<INote> spNote;
 	AppHelper::GetNoteById(noteid, &spNote);
 	if (spNote == NULL)
@@ -148,6 +175,13 @@ void NotesEditView::onShowNotesView(QString noteid)
 	else
 	{
 		m_pStackedEdit->setCurrentIndex(PAGE_EDITVIEW);
-		m_pEditView->updateNoteInfo(m_pNotebook, spNote);
+
+		com_sptr<INotebook> spNotebook;
+		BSTR bstrBookid;
+		spNote->GetBookId(&bstrBookid);
+		std::wstring bookid(bstrBookid);
+		AppHelper::GetNotebookById(QString::fromStdWString(bstrBookid), &spNotebook);
+
+		m_pEditView->updateNoteInfo(spNotebook, spNote, VIEW_TRASH != m_type);
 	}
 }

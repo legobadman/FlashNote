@@ -42,27 +42,14 @@ INote* NoteEditWindow::GetNote()
     return m_pNote;
 }
 
-void NoteEditWindow::updateNoteInfo(INoteCollection* pNoteCollection, INote* pNote)
+void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edittable)
 {
-	m_pNoteColl = pNoteCollection;
+	m_pNotebook = pNotebook;
 	m_pNote = pNote;
 
-	com_sptr<INotebook> spNotebook;
-	if (com_sptr<ITrash>(pNoteCollection))
-	{
-		m_bEdittable = false;
-		BSTR bstrBookid;
-		pNote->GetBookId(&bstrBookid);
-		std::wstring bookid(bstrBookid);
-		AppHelper::GetNotebookById(QString::fromStdWString(bstrBookid), &spNotebook);
-	}
-	else
-	{
-		m_bEdittable = true;
-		spNotebook = pNoteCollection;
-	}
+	m_bEdittable = edittable;
 
-	QString bookName = AppHelper::GetNotebookName(spNotebook);
+	QString bookName = AppHelper::GetNotebookName(m_pNotebook);
 	m_ui->bookmenu->blockSignals(true);
 	m_ui->bookmenu->setText(bookName);
 	m_ui->bookmenu->blockSignals(false);
@@ -592,7 +579,7 @@ void NoteEditWindow::saveNote()
 	BSTR bstrPlainText = SysAllocString(plainText.toStdWString().c_str());
 	m_pNote->SetPlainText(bstrPlainText);
 
-	com_sptr<INotebook> spNotebook = m_pNoteColl;
+	com_sptr<INotebook> spNotebook = m_pNotebook;
 	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
 }
 
@@ -611,13 +598,13 @@ void NoteEditWindow::switchtobook(int bookidx)
 		Q_ASSERT(FALSE);
 	}
 
-	hr = m_pNoteColl->RemoveNote(m_pNote);
+	hr = m_pNotebook->RemoveNote(m_pNote);
 	if (FAILED(hr))
 		Q_ASSERT(FALSE);
 	hr = spNewbook->AddNote(m_pNote);
 	if (FAILED(hr))
 		Q_ASSERT(FALSE);
-	m_pNoteColl = spNewbook;
+	m_pNotebook = spNewbook;
 }
 
 void NoteEditWindow::onTitleChanged()

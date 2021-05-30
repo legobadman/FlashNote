@@ -23,7 +23,7 @@ void NewNoteWindow::init(QString bookid)
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebookById(bookid, &spNotebook);
 	HRESULT hr = CreateNote(NORMAL_NOTE, &m_pNote);
-	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote);
+	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
 }
 
 void NewNoteWindow::closeEvent(QCloseEvent* event)

@@ -9,10 +9,11 @@
 static const int nContentLimit = 74;
 
 
-BookListView::BookListView(QWidget* parent)
+BookListView::BookListView(NotesEditView* parent)
 	: QWidget(parent)
 	, m_pCustomMenu(NULL)
 	, m_type(VIEW_ALLNOTES)
+	, m_pNotesView(parent)
 {
 	init();
 }
@@ -46,6 +47,9 @@ void BookListView::init()
 
 	m_ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(m_ui->listView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
+
+	connect(this, SIGNAL(noteitemselected(const QModelIndex&)), 
+		m_pNotesView, SLOT(onNoteItemSelected(const QModelIndex&)));
 
 	m_model = new QStandardItemModel(this);
 }
@@ -156,6 +160,31 @@ QString BookListView::GetShowContent(INote* pNote)
 	return showContent;
 }
 
+QString BookListView::GetDefaultNoteId(INoteCollection* pNoteCollection)
+{
+	//TODO: QSettings获取和设置Noteid
+	QString noteid;
+	if (m_type == VIEW_ALLNOTES)
+	{
+		
+	}
+	else if (m_type == VIEW_TRASH)
+	{
+
+	}
+	else if (m_type == VIEW_NOTEBOOK)
+	{
+
+	}
+
+	int n = m_model->rowCount();
+	if (n > 0)
+	{
+		noteid = m_model->index(0,0).data(ItemCoreObjIdRole).toString();
+	}
+	return noteid;
+}
+
 HRESULT BookListView::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 {
 	if (com_sptr<INotebook>(pCoreObj))
@@ -194,12 +223,6 @@ HRESULT BookListView::onTrashNotify(ITrash* pCoreObj, NotifyArg arg)
 
 HRESULT BookListView::onNotebookNotify(INotebook* pNotebook, NotifyArg arg)
 {
-	QString bookid = AppHelper::GetNotebookId(pNotebook);
-	if (m_type != VIEW_NOTEBOOK || bookid != m_bookid)
-	{
-		return S_OK;
-	}
-
 	//先添加到最后的位置
 	Q_ASSERT(arg.pObj);
 	com_sptr<INote> spNote(arg.pObj);
@@ -209,6 +232,7 @@ HRESULT BookListView::onNotebookNotify(INotebook* pNotebook, NotifyArg arg)
 
 HRESULT BookListView::updateView(NotifyArg arg, INote* pNote)
 {
+	//TODO: noteid不在列表或在列表的异常情况。
 	QString noteid = AppHelper::GetNoteId(pNote);
 
 	ITEM_CONTENT_TYPE itemType = ITEM_CONTENT_TYPE::ITEM_UNKNOWN;
@@ -294,44 +318,50 @@ HRESULT BookListView::onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	return S_OK;
 }
 
-void BookListView::resetNotebook(INoteCollection* pNoteCollection, QString noteid)
+void BookListView::initAllNotes()
 {
-	com_sptr<ITrash> spTrash;
-	com_sptr<INotebook> spNotebook;
-	if (spNotebook = pNoteCollection)
-	{
-		QString bookid = AppHelper::GetNotebookId(spNotebook);
-		if (bookid == m_bookid && m_type == VIEW_NOTEBOOK)
-		{
-			return;
-		}
-		m_bookid = bookid;
-		m_type = VIEW_NOTEBOOK;
-		spNotebook->addWatcher(this);
-	}
-	else if (spTrash = pNoteCollection)
-	{
-		if (m_type == VIEW_TRASH)
-			return;
+	m_type = VIEW_ALLNOTES;
 
-		m_type = VIEW_TRASH;
-		m_bookid = "";
+	//遍历所有笔记本
+	com_sptr<INotebooks> spNotebooks;
+	coreApp->GetNotebooks(&spNotebooks);
+
+	int nCount = 0;
+	spNotebooks->GetCount(&nCount);
+	for (int i = 0; i < nCount; i++)
+	{
+		com_sptr<INotebook> spNotebook;
+		AppHelper::GetNotebook(i, &spNotebook);
+		spNotebook->addWatcher(this);
+		appendNotes(ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM, spNotebook);
+	}
+
+	m_model->clear();
+	m_model->setColumnCount(1);
+	m_ui->listView->setModel(m_model);
+	int n = m_model->rowCount();
+	if (n == 0)
+	{
+		return;
+	}
+
+	QModelIndex selectedIndex;
+	QString activeNoteId = GetDefaultNoteId(NULL);
+	QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(activeNoteId));
+	if (indexs.empty())
+	{
+		selectedIndex = m_model->index(0, 0);
 	}
 	else
 	{
-		Q_ASSERT(false);
+		Q_ASSERT(indexs.size() == 1);
+		selectedIndex = indexs.at(0);
 	}
+	m_ui->listView->setCurrentIndex(selectedIndex);
+}
 
-	pNoteCollection->addWatcher(this);
-
-	ITEM_CONTENT_TYPE contentType = getItemContentType(pNoteCollection);
-
-	QString bookName = AppHelper::GetNotebookName(pNoteCollection);
-	m_ui->lblNotebook->setText(bookName);
-	m_ui->lblNumberNotes->setText(QString(u8"%1条笔记").arg(
-		QString::number(AppHelper::GetNoteCounts(pNoteCollection))));
-
-	m_model->clear();
+void BookListView::appendNotes(ITEM_CONTENT_TYPE itemType, INoteCollection* pNoteCollection)
+{
 	int n = AppHelper::GetNoteCounts(pNoteCollection);
 	for (int i = 0; i < n; i++)
 	{
@@ -356,10 +386,30 @@ void BookListView::resetNotebook(INoteCollection* pNoteCollection, QString notei
 		pNoteItem->setSelectable(true);
 		pNoteItem->setEditable(false);
 		pNoteItem->setData(QVariant(noteid), ItemCoreObjIdRole);
-		pNoteItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(contentType), ItemContentTypeRole);
+		pNoteItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(itemType), ItemContentTypeRole);
 
 		m_model->appendRow(pNoteItem);
 	}
+}
+
+void BookListView::initNoteContainer(BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
+{
+	m_type = type;
+
+	pNoteCollection->addWatcher(this);
+
+	ITEM_CONTENT_TYPE contentType = getItemContentType(pNoteCollection);
+
+	QString bookName = AppHelper::GetNotebookName(pNoteCollection);
+	m_ui->lblNotebook->setText(bookName);
+	m_ui->lblNumberNotes->setText(QString(u8"%1条笔记").arg(
+		QString::number(AppHelper::GetNoteCounts(pNoteCollection))));
+
+	m_model->clear();
+
+	appendNotes(contentType, pNoteCollection);
+
+	int n = AppHelper::GetNoteCounts(pNoteCollection);
 
 	m_model->setColumnCount(1);
 	m_ui->listView->setModel(m_model);
@@ -369,7 +419,8 @@ void BookListView::resetNotebook(INoteCollection* pNoteCollection, QString notei
 	}
 
 	QModelIndex selectedIndex;
-	QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(noteid));
+	QString activeNoteId = GetDefaultNoteId(pNoteCollection);
+	QModelIndexList indexs = m_model->match(m_model->index(0, 0), ItemCoreObjIdRole, QVariant(activeNoteId));
 	if (indexs.empty())
 	{
 		selectedIndex = m_model->index(0, 0);
@@ -380,4 +431,12 @@ void BookListView::resetNotebook(INoteCollection* pNoteCollection, QString notei
 		selectedIndex = indexs.at(0);
 	}
 	m_ui->listView->setCurrentIndex(selectedIndex);
+}
+
+QString BookListView::getCurrentNoteId()
+{
+	QString noteid;
+	if (m_model->rowCount() == 0)
+		return noteid;
+	return m_ui->listView->currentIndex().data(ItemCoreObjIdRole).toString();
 }

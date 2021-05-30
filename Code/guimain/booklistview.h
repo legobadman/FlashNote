@@ -23,14 +23,16 @@ class BookListView : public QWidget
 	};
 
 public:
-	BookListView(QWidget* parent = nullptr);
+	BookListView(NotesEditView* parent);
 	~BookListView();
 
 	void init();
-	void resetNotebook(INoteCollection* pNotebook, QString noteid);
+	void initNoteContainer(BOOKVIEW_TYPE type, INoteCollection* pNotebook);
+	void initAllNotes();
 	HRESULT STDMETHODCALLTYPE onCoreNotify(
 		INoteCoreObj* pCoreObj,
 		NotifyArg arg);
+	QString getCurrentNoteId();
 
 signals:
 	void noteitemselected(const QModelIndex&);
@@ -45,7 +47,9 @@ private:
 	HRESULT onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
 	HRESULT updateView(NotifyArg arg, INote* pNote);
 	QString GetShowContent(INote* pNote);
+	QString GetDefaultNoteId(INoteCollection* pNoteCollection);
 	ITEM_CONTENT_TYPE getItemContentType(INoteCollection* pNotebook);
+	void appendNotes(ITEM_CONTENT_TYPE itemType, INoteCollection* pNoteCollection);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, _COM_Outptr_ void __RPC_FAR* __RPC_FAR*) { return E_NOTIMPL; }
@@ -57,8 +61,7 @@ private:
 	QStandardItemModel* m_model;
 	QItemSelectionModel* m_selectionModel;
 	QMenu* m_pCustomMenu;
-
-	QString m_bookid;
+	NotesEditView* m_pNotesView;
 	BOOKVIEW_TYPE m_type;
 };
 

@@ -47,8 +47,7 @@ public:
 	NotesEditView(QWidget* parent = NULL);
 	~NotesEditView();
 
-	void setNotebook(INoteCollection* pNotebook);
-	void setAllNotes();
+	void setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNotebook);
 
 #ifndef SPLITTER_BASE
 	QSize sizeHint() const override;
@@ -66,12 +65,16 @@ private:
 private:
 	QWidget* m_pNoView;
 	QString m_bookid;
-	BookListView* m_pAllBookView;
-	BookListView* m_pBookView;
+
 	NoteEditWindow* m_pEditView;
 	QStackedWidget* m_pStackedListView;
 	QStackedWidget* m_pStackedEdit;
-	com_sptr<INoteCollection> m_pNotebook;
+
+	BookListView* m_pAllNotesView;
+	QMap<QString, BookListView*> m_pNotebookViews;
+	BookListView* m_pTrashView;
+
+	BOOKVIEW_TYPE m_type;
 };
 
 #endif

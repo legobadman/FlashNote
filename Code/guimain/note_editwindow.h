@@ -18,7 +18,7 @@ public:
 	void init();
 	void initCustomWidget();
 	void initContent();
-	void updateNoteInfo(INoteCollection* pNotebook, INote* pNote);
+	void updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edittable);
 	INote* GetNote();
 
 	QString toPlainText() const { return m_ui->textEdit->toPlainText(); }
@@ -77,7 +77,7 @@ private:
 private:
 	Ui::NoteEditWindow* m_ui;
 	com_sptr<INote> m_pNote;
-	com_sptr<INoteCollection> m_pNoteColl;
+	com_sptr<INotebook> m_pNotebook;
 
 	QStringList m_paragraphItems;
 	int m_fontsize_h1;
