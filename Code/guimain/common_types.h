@@ -1,0 +1,12 @@
+#ifndef __COMMON_TYPES_H__
+#define __COMMON_TYPES_H__
+
+enum BOOKVIEW_TYPE
+{
+	VIEW_ALLNOTES,
+	VIEW_NOTEBOOK,
+	VIEW_TRASH
+};
+
+
+#endif

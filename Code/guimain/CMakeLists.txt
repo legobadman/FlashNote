@@ -53,6 +53,8 @@ add_executable(guimain
     ./booklistview.cpp
     ./booklistview.h
     ./booklistview.ui
+    ./bookviewmodel.cpp
+    ./bookviewmodel.h
     ./colorgallery.cpp
     ./colorgallery.h
     ./coloritemdelegate.cpp
@@ -63,6 +65,7 @@ add_executable(guimain
     ./comctrl/menubutton.h
     ./comctrl/toolbutton.cpp
     ./comctrl/toolbutton.h
+    ./common_types.h
     ./DrawerFunc.cpp
     ./DrawerFunc.h
     ./guimain.cpp

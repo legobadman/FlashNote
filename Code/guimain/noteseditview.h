@@ -3,37 +3,13 @@
 
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStackedWidget>
+#include "common_types.h"
+#include "bookviewmodel.h"
 
 class NoteEditWindow;
 class BookListView;
 
-
-class MySplitter : public QSplitter
-{
-	Q_OBJECT
-public:
-	MySplitter(QWidget* parent = nullptr);
-
-protected:
-	void paintEvent(QPaintEvent* event);
-};
-
-//以后再研究QWidget的布局。
-#define SPLITTER_BASE
-
-enum BOOKVIEW_TYPE
-{
-	VIEW_ALLNOTES,
-	VIEW_NOTEBOOK,
-	VIEW_TRASH
-};
-
-
-#ifdef SPLITTER_BASE
 class NotesEditView : public QSplitter
-#else
-class NotesEditView : public QWidget
-#endif
 {
 	Q_OBJECT
 
@@ -49,10 +25,6 @@ public:
 
 	void setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNotebook);
 
-#ifndef SPLITTER_BASE
-	QSize sizeHint() const override;
-#endif
-
 protected:
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
@@ -64,16 +36,14 @@ private:
 
 private:
 	QWidget* m_pNoView;
-	QString m_bookid;
 
 	NoteEditWindow* m_pEditView;
-	QStackedWidget* m_pStackedListView;
 	QStackedWidget* m_pStackedEdit;
 
-	BookListView* m_pAllNotesView;
-	QMap<QString, BookListView*> m_pNotebookViews;
-	BookListView* m_pTrashView;
-
+	QMap<QString, BookViewModel*> m_models;
+	AllNotesModel* m_pAllNotesModel;
+	BookViewModel* m_pTrashModel;
+	BookListView* m_pListView;
 	BOOKVIEW_TYPE m_type;
 };
 

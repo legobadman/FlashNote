@@ -7,31 +7,18 @@
 #include "LeftSideItemDelegate.h"
 
 
-MySplitter::MySplitter(QWidget* parent /* = nullptr */)
-	: QSplitter(parent)
-{
-}
-
-void MySplitter::paintEvent(QPaintEvent* event)
-{
-	QSplitter::paintEvent(event);
-}
-
-
 NotesEditView::NotesEditView(QWidget* parent)
-#ifdef SPLITTER_BASE
 	: QSplitter(parent)
-#else
-	: QWidget(parent)
-#endif
 	, m_type(VIEW_NOTEBOOK)
-	, m_pAllNotesView(NULL)
-	, m_pTrashView(NULL)
+	, m_pListView(NULL)
+	, m_pAllNotesModel(NULL)
+	, m_pTrashModel(NULL)
 {
 	m_pEditView = new NoteEditWindow;
 	m_pNoView = new QWidget;
 
-#ifdef SPLITTER_BASE
+	m_pListView = new BookListView(this);
+
 	setObjectName(QString::fromUtf8("splitter233"));
 	setOrientation(Qt::Horizontal);
 	setFrameShape(QFrame::VLine);
@@ -41,24 +28,12 @@ NotesEditView::NotesEditView(QWidget* parent)
 	palette.setBrush(QPalette::Window, QBrush(QColor(204, 204, 204)));
 	setPalette(palette);
 
-	m_pStackedListView = new QStackedWidget(this);
-
 	m_pStackedEdit = new QStackedWidget(this);
 	m_pStackedEdit->addWidget(m_pEditView);
 	m_pStackedEdit->addWidget(m_pNoView);
 
-	addWidget(m_pStackedListView);
+	addWidget(m_pListView);
 	addWidget(m_pStackedEdit);
-#else
-	QSplitter* splitter = new QSplitter(this);
-	splitter->setObjectName(QString::fromUtf8("splitter233"));
-	splitter->setOrientation(Qt::Horizontal);
-	splitter->setFrameShape(QFrame::VLine);
-	splitter->setHandleWidth(1);
-
-	splitter->addWidget(m_pBookView);
-	splitter->addWidget(m_pEditView);
-#endif
 
 	m_pNoView->installEventFilter(this);
 }
@@ -66,31 +41,6 @@ NotesEditView::NotesEditView(QWidget* parent)
 NotesEditView::~NotesEditView()
 {
 }
-
-#ifndef SPLITTER_BASE
-QSize NotesEditView::sizeHint() const
-{
-	int l = 0;
-	int t = 0;
-
-	QSize s;
-	s = m_pBookView->sizeHint();
-	if (s.isValid())
-	{
-		l += m_pBookView->width();
-		t = qMax(t, s.width());
-	}
-
-	s = m_pEditView->sizeHint();
-	if (s.isValid())
-	{
-		l += m_pBookView->width();
-		t = qMax(t, s.width());
-	}
-
-	return QSize(l, t);
-}
-#endif
 
 bool NotesEditView::eventFilter(QObject* watched, QEvent* event)
 {
@@ -103,58 +53,62 @@ bool NotesEditView::eventFilter(QObject* watched, QEvent* event)
 	return QSplitter::eventFilter(watched, event);
 }
 
+//临时noteid的获取
+QString getCurrentNoteId(INoteCollection* pNoteCollection)
+{
+	com_sptr<INote> spNote;
+	AppHelper::GetNote(pNoteCollection, 0, &spNote);
+	return AppHelper::GetNoteId(spNote);
+}
+
 void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
 {
 	m_type = type;
-	BookListView* pListView = NULL;
+	
+	QString noteid;
 	if (VIEW_ALLNOTES == m_type)
 	{
-		if (m_pAllNotesView == NULL)
+		if (m_pAllNotesModel == NULL)
 		{
-			m_pAllNotesView = new BookListView(this);
-			m_pAllNotesView->initAllNotes();
-			m_pStackedListView->addWidget(m_pAllNotesView);
+			m_pAllNotesModel = new AllNotesModel(this);
+			m_pAllNotesModel->initAllNotes();
 		}
-		pListView = m_pAllNotesView;
+		m_pListView->resetModel(m_pAllNotesModel, VIEW_ALLNOTES, NULL);
 	}
 	else if (VIEW_NOTEBOOK == m_type)
 	{
 		com_sptr<INotebook> spNotebook = com_sptr<INotebook>(pNoteCollection);
 		QString bookid = AppHelper::GetNotebookId(spNotebook);
-		auto iter = m_pNotebookViews.find(bookid);
-		if (iter == m_pNotebookViews.end())
+
+		BookViewModel* pModel = NULL;
+		auto iter = m_models.find(bookid);
+		if (iter == m_models.end())
 		{
-			pListView = new BookListView(this);
-			pListView->initNoteContainer(m_type, spNotebook);
-			spNotebook->addWatcher(pListView);
-			m_pNotebookViews.insert(bookid, pListView);
-			m_pStackedListView->addWidget(pListView);
+			pModel = new BookViewModel(this);
+			pModel->initFromCollection(pNoteCollection);
+			noteid = getCurrentNoteId(pNoteCollection);
+			m_models.insert(bookid, pModel);
 		}
 		else
 		{
-			pListView = iter.value();
+			pModel = iter.value();
 		}
+		m_pListView->resetModel(pModel, VIEW_NOTEBOOK, pNoteCollection);
 	}
 	else if (VIEW_TRASH == m_type)
 	{
-		com_sptr<ITrash> spTrash = com_sptr<ITrash>(pNoteCollection);
-		if (m_pTrashView == NULL)
+		if (m_pTrashModel == NULL)
 		{
-			m_pTrashView = new BookListView(this);
-			m_pTrashView->initNoteContainer(m_type, spTrash);
-			m_pStackedListView->addWidget(m_pTrashView);
-			spTrash->addWatcher(m_pTrashView);
+			m_pTrashModel = new BookViewModel(this);
+			m_pTrashModel->initFromCollection(pNoteCollection);
+			noteid = getCurrentNoteId(pNoteCollection);
 		}
-		pListView = m_pTrashView;
+		m_pListView->resetModel(m_pTrashModel, VIEW_TRASH, pNoteCollection);
 	}
 	else
 	{
 		Q_ASSERT(false);
 	}
-
-	//代替原来的update
-	m_pStackedListView->setCurrentWidget(pListView);
-	QString noteid = pListView->getCurrentNoteId();
 	onShowNotesView(noteid);
 }
 
