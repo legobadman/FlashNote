@@ -66,6 +66,30 @@ void AppHelper::GetNotebookById(const QString& bookid, INotebook** ppNotebook)
 	HRESULT hr = spNotebooks->Item(varIndex, ppNotebook);
 }
 
+void AppHelper::GetNotebookByNote(INote* pNote, INotebook** ppNotebook)
+{
+	Q_ASSERT(pNote);
+
+	BSTR bstrBookid;
+	pNote->GetBookId(&bstrBookid);
+
+	com_sptr<INotebooks> spNotebooks;
+	coreApp->GetNotebooks(&spNotebooks);
+
+	VARIANT varIndex;
+	V_VT(&varIndex) = VT_BSTR;
+	V_BSTR(&varIndex) = bstrBookid;
+
+	HRESULT hr = spNotebooks->Item(varIndex, ppNotebook);
+	if (FAILED(hr))
+	{
+		V_VT(&varIndex) = VT_I4;
+		V_I4(&varIndex) = 0;
+		//µÚÒ»¸önotebook
+		hr = spNotebooks->Item(varIndex, ppNotebook);
+	}
+}
+
 QString AppHelper::GetNoteId(INote* pNote)
 {
 	if (!pNote)

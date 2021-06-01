@@ -135,11 +135,7 @@ void NotesEditView::onShowNotesView(INote* pNote)
 		m_pStackedEdit->setCurrentIndex(PAGE_EDITVIEW);
 
 		com_sptr<INotebook> spNotebook;
-		BSTR bstrBookid;
-		pNote->GetBookId(&bstrBookid);
-		std::wstring bookid(bstrBookid);
-		AppHelper::GetNotebookById(QString::fromStdWString(bstrBookid), &spNotebook);
-
+		AppHelper::GetNotebookByNote(pNote, &spNotebook);
 		m_pEditView->updateNoteInfo(spNotebook, pNote, VIEW_TRASH != m_type);
 	}
 }

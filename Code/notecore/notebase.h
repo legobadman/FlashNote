@@ -124,25 +124,6 @@ private:
 	int m_ref;
 };
 
-
-class FreeNotes : public NoteCollection<IFreeNotes>
-{
-public:
-	FreeNotes();
-	~FreeNotes();
-
-public:
-	HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-
-private:
-	std::unordered_set<ICoreNotify*> m_notifies;
-	std::map<CComBSTR, INote*> m_container;
-	int m_ref;
-};
-
-
 class TrashBase : public NoteCollection<ITrash>
 {
 public:
@@ -171,7 +152,6 @@ public:
 	HRESULT STDMETHODCALLTYPE SetNotebooks(INotebooks* pNotebooks);
 	HRESULT STDMETHODCALLTYPE GetUserId(OUT BSTR* pbstrId);
 	HRESULT STDMETHODCALLTYPE SetUserId(IN BSTR bstrId);
-	HRESULT STDMETHODCALLTYPE GetFreeNotes(IFreeNotes** ppTrash);
 	HRESULT STDMETHODCALLTYPE GetTrash(ITrash** ppTrash);
 	HRESULT STDMETHODCALLTYPE SetTrash(ITrash* pTrash);
 
@@ -187,7 +167,6 @@ private:
 
 	com_sptr<INotebooks> m_spNotebooks;
 	com_sptr<ITrash> m_spTrash;
-	com_sptr<IFreeNotes> m_spFreeNotes;
 
 	std::unordered_set<ICoreNotify*> m_notifies;
 	int m_ref;

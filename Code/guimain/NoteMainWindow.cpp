@@ -139,7 +139,6 @@ QString NoteMainWindow::getActiveBookId()
 	}
 	else
 	{
-		//TODO: default暂时设为第一个book吧
 		com_sptr<INotebooks> spNotebooks;
 		coreApp->GetNotebooks(&spNotebooks);
 		com_sptr<INotebook> spNotebook;

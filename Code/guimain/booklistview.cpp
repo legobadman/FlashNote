@@ -99,13 +99,11 @@ void BookListView::MenuActionSlot(QAction* action)
 
 	com_sptr<INote> spNote = index.data(ItemCoreObjRole).value<com_sptr<INote>>();
 
-	BSTR bookId;
-	spNote->GetBookId(&bookId);
-
-	QString bookid = QString::fromUtf16(reinterpret_cast<ushort*>(bookId));
-
 	if (nIndex == REMOVE_NOTE)
 	{
+		BSTR bookId;
+		spNote->GetBookId(&bookId);
+		QString bookid = QString::fromUtf16(reinterpret_cast<ushort*>(bookId));
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebookById(bookid, &spNotebook);
 		bool bRet = RPCService::GetInstance().RemoveNote(coreApp, spNotebook, spNote);

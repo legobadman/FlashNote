@@ -435,49 +435,6 @@ ULONG NotebooksBase::Release(void)
 
 
 //////////////////////////////////////////////////////
-FreeNotes::FreeNotes()
-	: m_ref(0)
-{
-
-}
-
-FreeNotes::~FreeNotes()
-{
-	for (auto it = m_container.begin(); it != m_container.end(); it++)
-	{
-		it->second->Release();
-	}
-	m_container.clear();
-}
-
-HRESULT FreeNotes::QueryInterface(
-	/* [in] */ REFIID riid,
-	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
-{
-	if (!ppvObject)
-		return E_FAIL;
-
-	if (riid == IID_INoteCoreObj)
-	{
-		*ppvObject = static_cast<INoteCoreObj*>(this);
-	}
-	else if (riid == IID_INoteCollection)
-	{
-		*ppvObject = static_cast<INoteCollection*>(this);
-	}
-	else if (riid == IID_ITrash)
-	{
-		*ppvObject = static_cast<IFreeNotes*>(this);
-	}
-	else
-	{
-		return E_FAIL;
-	}
-	return S_OK;
-}
-
-
-//////////////////////////////////////////////////////
 TrashBase::TrashBase()
 {
 
@@ -532,7 +489,6 @@ HRESULT TrashBase::GetName(BSTR* pbstrName)
 NoteApplication::NoteApplication()
 	: m_ref(0)
 {
-	m_spFreeNotes = new FreeNotes;
 }
 
 NoteApplication::~NoteApplication()
@@ -582,16 +538,6 @@ HRESULT NoteApplication::GetUserId(OUT BSTR* pbstrId)
 HRESULT NoteApplication::SetUserId(IN BSTR bstrId)
 {
 	m_id.Attach(bstrId);
-	return S_OK;
-}
-
-HRESULT NoteApplication::GetFreeNotes(IFreeNotes** ppFreeNotes)
-{
-	if (!ppFreeNotes)
-		return E_POINTER;
-
-	*ppFreeNotes = m_spFreeNotes;
-	(*ppFreeNotes)->AddRef();
 	return S_OK;
 }
 

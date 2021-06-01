@@ -70,35 +70,6 @@ bool RPCService::SynchronizeNotebook(INotebook* pNotebook)
 	return true;
 }
 
-void RPCService::SynchronizeFreeNote(INoteApplication* pApp, INote* pNote)
-{
-	BSTR bstrId, bstrTitle, bstrContent;
-	pNote->GetId(&bstrId);
-	std::wstring id(bstrId, SysStringLen(bstrId));
-	if (id.empty())
-	{
-		//新建的note，需要先向服务端申请id
-		id = RPCService::GetInstance().NewNote(L"", L"");
-		pNote->SetId(SysAllocString(id.c_str()));
-		com_sptr<IFreeNotes> spFreeNotes;
-		pApp->GetFreeNotes(&spFreeNotes);
-		spFreeNotes->AddNote(pNote);
-		if (id.empty())
-		{
-			Q_ASSERT(FALSE);
-		}
-	}
-
-	pNote->GetTitle(&bstrTitle);
-	pNote->GetContent(&bstrContent);
-
-	std::wstring title(bstrTitle, SysStringLen(bstrTitle));
-	std::wstring content(bstrContent, SysStringLen(bstrContent));
-
-	bool ret = m_pClient->UpdateNote(converter.to_bytes(id), converter.to_bytes(title), converter.to_bytes(content));
-	Q_ASSERT(ret);
-}
-
 void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote)
 {
 	BSTR bstrId, bstrTitle, bstrContent;
@@ -205,38 +176,16 @@ bool RPCService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 	}
 }
 
-bool RPCService::RecoverNote(INoteApplication* pApp, INoteCollection* pSrcNoteColl, INote* pNote)
+bool RPCService::RecoverNote(INoteApplication* pApp, ITrash* pTrash, INote* pNote)
 {
 	std::string noteid = converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString());
 	bool bRet = m_pClient->RecoverNote(_userid, noteid);
 	if (bRet)
 	{
-		BSTR bstrBookId;
-		pNote->GetBookId(&bstrBookId);
-		if (0 == SysStringLen(bstrBookId))
-		{
-			com_sptr<IFreeNotes> spFreeNotes;
-			pApp->GetFreeNotes(&spFreeNotes);
-			spFreeNotes->AddNote(pNote);
-		}
-		else
-		{
-			std::wstring bookid(bstrBookId);
-			com_sptr<INotebook> spNotebook;
-			AppHelper::GetNotebookById(QString::fromStdWString(bookid), &spNotebook);
-			if (!spNotebook)
-			{
-				//bookid已经不存在了，加入游离book
-				com_sptr<IFreeNotes> spFreeNotes;
-				pApp->GetFreeNotes(&spFreeNotes);
-				spFreeNotes->AddNote(pNote);
-			}
-			else
-			{
-				spNotebook->AddNote(pNote);
-			}
-		}
-		pSrcNoteColl->RemoveNote(pNote);
+		com_sptr<INotebook> spNotebook;
+		AppHelper::GetNotebookByNote(pNote, &spNotebook);
+		spNotebook->AddNote(pNote);
+		pTrash->RemoveNote(pNote);
 	}
 	return bRet;
 }
@@ -249,11 +198,7 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 	//创建notebooks
 	com_sptr<INotebooks> spNotebooks;
 	CreateNotebooks(&spNotebooks);
-
 	pApp->SetNotebooks(spNotebooks);
-
-	com_sptr<IFreeNotes> spFreeNotes;
-	pApp->GetFreeNotes(&spFreeNotes);
 
 	std::vector<NOTEBOOK> vecBooks;
 	RPCService::GetInstance().getnotebooks(vecBooks);
@@ -308,37 +253,6 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 	}
 
 	inittrashes(pApp);
-
-	std::vector<Note> vecNotes;
-	m_pClient->GetFreeNotes(vecNotes, _userid);
-	for (int i = 0; i < vecNotes.size(); i++)
-	{
-		Note note = vecNotes[i];
-
-		com_sptr<INote> spNote;
-		CreateNote(NORMAL_NOTE, &spNote);
-
-		QString noteid = QString::fromUtf8(note.id.c_str());
-
-		std::wstring title = QString::fromUtf8(note.title.c_str()).toStdWString();
-		BSTR bstrTitle = SysAllocString(title.c_str());
-		spNote->SetTitle(bstrTitle);
-
-		std::wstring content = QString::fromUtf8(note.text_abbre.c_str()).toStdWString();
-		BSTR bstrContent = SysAllocString(content.c_str());
-		spNote->SetContent(bstrContent);
-
-		QDateTime create_time = QDateTime::fromMSecsSinceEpoch(note.create_time, Qt::UTC);
-		QDateTime modify_time = QDateTime::fromMSecsSinceEpoch(note.modify_time, Qt::UTC);
-
-		spNote->SetCreateTime(create_time.toMSecsSinceEpoch());
-		spNote->SetModifyTime(modify_time.toMSecsSinceEpoch());
-
-		BSTR bstrId = SysAllocString(noteid.toStdWString().c_str());
-		spNote->SetId(bstrId);
-
-		spFreeNotes->AddNote(spNote);
-	}
 }
 
 void RPCService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)

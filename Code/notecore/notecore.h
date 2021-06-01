@@ -94,25 +94,11 @@ typedef interface INoteApplication INoteApplication;
 #endif 	/* __INoteApplication_FWD_DEFINED__ */
 
 
-#ifndef __ITrashRecord_FWD_DEFINED__
-#define __ITrashRecord_FWD_DEFINED__
-typedef interface ITrashRecord ITrashRecord;
-
-#endif 	/* __ITrashRecord_FWD_DEFINED__ */
-
-
 #ifndef __ITrash_FWD_DEFINED__
 #define __ITrash_FWD_DEFINED__
 typedef interface ITrash ITrash;
 
 #endif 	/* __ITrash_FWD_DEFINED__ */
-
-
-#ifndef __IFreeNotes_FWD_DEFINED__
-#define __IFreeNotes_FWD_DEFINED__
-typedef interface IFreeNotes IFreeNotes;
-
-#endif 	/* __IFreeNotes_FWD_DEFINED__ */
 
 
 /* header files for imported files */
@@ -126,7 +112,6 @@ extern "C"{
 
 /* interface __MIDL_itf_notecore_0000_0000 */
 /* [local] */ 
-
 
 
 
@@ -1048,9 +1033,6 @@ EXTERN_C const IID IID_INoteApplication;
         virtual HRESULT STDMETHODCALLTYPE SetTrash( 
             /* [in] */ ITrash *pTrash) = 0;
         
-        virtual HRESULT STDMETHODCALLTYPE GetFreeNotes( 
-            /* [in] */ IFreeNotes **ppTrash) = 0;
-        
         virtual HRESULT STDMETHODCALLTYPE GetUserId( 
             /* [out] */ BSTR *pbstrId) = 0;
         
@@ -1097,10 +1079,6 @@ EXTERN_C const IID IID_INoteApplication;
         HRESULT ( STDMETHODCALLTYPE *SetTrash )( 
             INoteApplication * This,
             /* [in] */ ITrash *pTrash);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetFreeNotes )( 
-            INoteApplication * This,
-            /* [in] */ IFreeNotes **ppTrash);
         
         HRESULT ( STDMETHODCALLTYPE *GetUserId )( 
             INoteApplication * This,
@@ -1149,9 +1127,6 @@ EXTERN_C const IID IID_INoteApplication;
 #define INoteApplication_SetTrash(This,pTrash)	\
     ( (This)->lpVtbl -> SetTrash(This,pTrash) ) 
 
-#define INoteApplication_GetFreeNotes(This,ppTrash)	\
-    ( (This)->lpVtbl -> GetFreeNotes(This,ppTrash) ) 
-
 #define INoteApplication_GetUserId(This,pbstrId)	\
     ( (This)->lpVtbl -> GetUserId(This,pbstrId) ) 
 
@@ -1167,144 +1142,6 @@ EXTERN_C const IID IID_INoteApplication;
 
 
 #endif 	/* __INoteApplication_INTERFACE_DEFINED__ */
-
-
-#ifndef __ITrashRecord_INTERFACE_DEFINED__
-#define __ITrashRecord_INTERFACE_DEFINED__
-
-/* interface ITrashRecord */
-/* [uuid][object] */ 
-
-
-EXTERN_C const IID IID_ITrashRecord;
-
-#if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("BEDCB647-62CD-4B76-A6ED-33DE73BC2E7A")
-    ITrashRecord : public INoteCoreObj
-    {
-    public:
-        virtual HRESULT STDMETHODCALLTYPE GetId( 
-            /* [out] */ BSTR *pbstrId) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE SetId( 
-            /* [in] */ BSTR bstrId) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE GetNote( 
-            /* [out] */ INote **ppNote) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE SetNote( 
-            /* [in] */ INote *pNote) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE GetNotebook( 
-            /* [out] */ INotebook **ppNotebook) = 0;
-        
-        virtual HRESULT STDMETHODCALLTYPE SetNotebook( 
-            /* [in] */ INotebook *pNotebook) = 0;
-        
-    };
-    
-    
-#else 	/* C style interface */
-
-    typedef struct ITrashRecordVtbl
-    {
-        BEGIN_INTERFACE
-        
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            ITrashRecord * This,
-            /* [in] */ REFIID riid,
-            /* [annotation][iid_is][out] */ 
-            _COM_Outptr_  void **ppvObject);
-        
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            ITrashRecord * This);
-        
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            ITrashRecord * This);
-        
-        HRESULT ( STDMETHODCALLTYPE *addWatcher )( 
-            ITrashRecord * This,
-            ICoreNotify *pNotify);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetId )( 
-            ITrashRecord * This,
-            /* [out] */ BSTR *pbstrId);
-        
-        HRESULT ( STDMETHODCALLTYPE *SetId )( 
-            ITrashRecord * This,
-            /* [in] */ BSTR bstrId);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetNote )( 
-            ITrashRecord * This,
-            /* [out] */ INote **ppNote);
-        
-        HRESULT ( STDMETHODCALLTYPE *SetNote )( 
-            ITrashRecord * This,
-            /* [in] */ INote *pNote);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetNotebook )( 
-            ITrashRecord * This,
-            /* [out] */ INotebook **ppNotebook);
-        
-        HRESULT ( STDMETHODCALLTYPE *SetNotebook )( 
-            ITrashRecord * This,
-            /* [in] */ INotebook *pNotebook);
-        
-        END_INTERFACE
-    } ITrashRecordVtbl;
-
-    interface ITrashRecord
-    {
-        CONST_VTBL struct ITrashRecordVtbl *lpVtbl;
-    };
-
-    
-
-#ifdef COBJMACROS
-
-
-#define ITrashRecord_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
-
-#define ITrashRecord_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
-
-#define ITrashRecord_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
-
-
-#define ITrashRecord_addWatcher(This,pNotify)	\
-    ( (This)->lpVtbl -> addWatcher(This,pNotify) ) 
-
-
-#define ITrashRecord_GetId(This,pbstrId)	\
-    ( (This)->lpVtbl -> GetId(This,pbstrId) ) 
-
-#define ITrashRecord_SetId(This,bstrId)	\
-    ( (This)->lpVtbl -> SetId(This,bstrId) ) 
-
-#define ITrashRecord_GetNote(This,ppNote)	\
-    ( (This)->lpVtbl -> GetNote(This,ppNote) ) 
-
-#define ITrashRecord_SetNote(This,pNote)	\
-    ( (This)->lpVtbl -> SetNote(This,pNote) ) 
-
-#define ITrashRecord_GetNotebook(This,ppNotebook)	\
-    ( (This)->lpVtbl -> GetNotebook(This,ppNotebook) ) 
-
-#define ITrashRecord_SetNotebook(This,pNotebook)	\
-    ( (This)->lpVtbl -> SetNotebook(This,pNotebook) ) 
-
-#endif /* COBJMACROS */
-
-
-#endif 	/* C style interface */
-
-
-
-
-#endif 	/* __ITrashRecord_INTERFACE_DEFINED__ */
 
 
 #ifndef __ITrash_INTERFACE_DEFINED__
@@ -1436,127 +1273,6 @@ EXTERN_C const IID IID_ITrash;
 
 
 #endif 	/* __ITrash_INTERFACE_DEFINED__ */
-
-
-#ifndef __IFreeNotes_INTERFACE_DEFINED__
-#define __IFreeNotes_INTERFACE_DEFINED__
-
-/* interface IFreeNotes */
-/* [uuid][object] */ 
-
-
-EXTERN_C const IID IID_IFreeNotes;
-
-#if defined(__cplusplus) && !defined(CINTERFACE)
-    
-    MIDL_INTERFACE("C97AE266-5822-4FAE-8755-DCDE145D97B6")
-    IFreeNotes : public INoteCollection
-    {
-    public:
-    };
-    
-    
-#else 	/* C style interface */
-
-    typedef struct IFreeNotesVtbl
-    {
-        BEGIN_INTERFACE
-        
-        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
-            IFreeNotes * This,
-            /* [in] */ REFIID riid,
-            /* [annotation][iid_is][out] */ 
-            _COM_Outptr_  void **ppvObject);
-        
-        ULONG ( STDMETHODCALLTYPE *AddRef )( 
-            IFreeNotes * This);
-        
-        ULONG ( STDMETHODCALLTYPE *Release )( 
-            IFreeNotes * This);
-        
-        HRESULT ( STDMETHODCALLTYPE *addWatcher )( 
-            IFreeNotes * This,
-            ICoreNotify *pNotify);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetName )( 
-            IFreeNotes * This,
-            /* [out] */ BSTR *pbstrName);
-        
-        HRESULT ( STDMETHODCALLTYPE *GetCount )( 
-            IFreeNotes * This,
-            /* [out] */ int *pCount);
-        
-        HRESULT ( STDMETHODCALLTYPE *Item )( 
-            IFreeNotes * This,
-            /* [in] */ VARIANT index,
-            /* [out] */ INote **ppNote);
-        
-        HRESULT ( STDMETHODCALLTYPE *AddNote )( 
-            IFreeNotes * This,
-            /* [in] */ INote *pNote);
-        
-        HRESULT ( STDMETHODCALLTYPE *RemoveNote )( 
-            IFreeNotes * This,
-            /* [in] */ INote *pNote);
-        
-        HRESULT ( STDMETHODCALLTYPE *Clear )( 
-            IFreeNotes * This);
-        
-        END_INTERFACE
-    } IFreeNotesVtbl;
-
-    interface IFreeNotes
-    {
-        CONST_VTBL struct IFreeNotesVtbl *lpVtbl;
-    };
-
-    
-
-#ifdef COBJMACROS
-
-
-#define IFreeNotes_QueryInterface(This,riid,ppvObject)	\
-    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
-
-#define IFreeNotes_AddRef(This)	\
-    ( (This)->lpVtbl -> AddRef(This) ) 
-
-#define IFreeNotes_Release(This)	\
-    ( (This)->lpVtbl -> Release(This) ) 
-
-
-#define IFreeNotes_addWatcher(This,pNotify)	\
-    ( (This)->lpVtbl -> addWatcher(This,pNotify) ) 
-
-
-#define IFreeNotes_GetName(This,pbstrName)	\
-    ( (This)->lpVtbl -> GetName(This,pbstrName) ) 
-
-#define IFreeNotes_GetCount(This,pCount)	\
-    ( (This)->lpVtbl -> GetCount(This,pCount) ) 
-
-#define IFreeNotes_Item(This,index,ppNote)	\
-    ( (This)->lpVtbl -> Item(This,index,ppNote) ) 
-
-#define IFreeNotes_AddNote(This,pNote)	\
-    ( (This)->lpVtbl -> AddNote(This,pNote) ) 
-
-#define IFreeNotes_RemoveNote(This,pNote)	\
-    ( (This)->lpVtbl -> RemoveNote(This,pNote) ) 
-
-#define IFreeNotes_Clear(This)	\
-    ( (This)->lpVtbl -> Clear(This) ) 
-
-
-#endif /* COBJMACROS */
-
-
-#endif 	/* C style interface */
-
-
-
-
-#endif 	/* __IFreeNotes_INTERFACE_DEFINED__ */
 
 
 /* Additional Prototypes for ALL interfaces */
