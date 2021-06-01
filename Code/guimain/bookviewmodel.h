@@ -41,6 +41,7 @@ public:
 	void initFromCollection(INoteCollection* pNoteCollection);
 	QModelIndex findIdOf(const QString& objid);
 	void getNote(const QString& objId, INote** ppNote);
+	void removeRows(const QSet<QString>& objSet);
 
 	virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 	virtual QModelIndex parent(const QModelIndex& child) const override;
@@ -66,6 +67,7 @@ public:
 
 protected:
 	void GetShowContent(INote* pNote, QString& noteid, QString& title, QString& content, QString& text_abbr);
+	void AddBookItems(INoteCollection* pNoteCollection);
 	virtual HRESULT onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg);
 	virtual HRESULT onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg);
 	virtual HRESULT onTrashNotify(ITrash* pCoreObj, NotifyArg arg);

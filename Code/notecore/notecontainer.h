@@ -108,6 +108,7 @@ public:
 		//TODO: Notify
 		for (auto it = m_container.begin(); it != m_container.end(); it++)
 		{
+			NotifyThisObj(Delete, it->second);
 			it->second->Release();
 		}
 		m_container.clear();

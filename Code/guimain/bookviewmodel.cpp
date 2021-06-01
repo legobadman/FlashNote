@@ -22,21 +22,8 @@ void BookViewModel::initFromCollection(INoteCollection* pNoteCollection)
 	else if (com_sptr<ITrash>(pNoteCollection))
 		m_type = VIEW_TRASH;
 	m_spNotebook = pNoteCollection;
-	int nCount = 0;
-	m_spNotebook->GetCount(&nCount);
-	for (int i = 0; i < nCount; i++)
-	{
-		com_sptr<INote> spNote;
-		AppHelper::GetNote(pNoteCollection, i, &spNote);
-		QString id, title, content, textabbre;
-		GetShowContent(spNote, id, title, content, textabbre);
-		NoteItem* pItem = new NoteItem(id, title, textabbre);
-		pItem->m_content = content;
-		pItem->m_spNote = spNote;
-		m_vec.push_back(pItem);
-		spNote->addWatcher(this);
-	}
-	m_spNotebook->addWatcher(this);
+
+	AddBookItems(m_spNotebook);
 }
 
 QModelIndex BookViewModel::findIdOf(const QString& objid)
@@ -79,6 +66,29 @@ void BookViewModel::GetShowContent(INote* pNote, QString& noteid, QString& title
 	text_abbre = text_abbre.mid(0, nContentLimit);
 }
 
+void BookViewModel::AddBookItems(INoteCollection* pNoteCollection)
+{
+	if (!pNoteCollection)
+		return;
+
+	int nNoteCount = 0;
+	pNoteCollection->GetCount(&nNoteCount);
+	for (int j = 0; j < nNoteCount; j++)
+	{
+		com_sptr<INote> spNote;
+		AppHelper::GetNote(pNoteCollection, j, &spNote);
+		QString id, title, content, textabbre;
+		GetShowContent(spNote, id, title, content, textabbre);
+		NoteItem* pItem = new NoteItem(id, title, textabbre);
+		pItem->m_content = content;
+		pItem->m_spNote = spNote;
+		m_vec.push_back(pItem);
+		m_mapper.insert(id, pItem);
+		spNote->addWatcher(this);
+	}
+	pNoteCollection->addWatcher(this);
+}
+
 HRESULT BookViewModel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 {
 	if (com_sptr<INotebook>(pCoreObj))
@@ -94,6 +104,11 @@ HRESULT BookViewModel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	else if (com_sptr<INote>(pCoreObj))
 	{
 		return onNoteNotify(pCoreObj, arg);
+	}
+	else if (com_sptr<INotebooks>(pCoreObj))
+	{
+		com_sptr<INotebooks> spNotebooks(pCoreObj);
+		return onNotebooksNotify(spNotebooks, arg);
 	}
 	return S_OK;
 }
@@ -125,6 +140,7 @@ HRESULT BookViewModel::onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg
 		}
 		case NotifyOperator::Delete:
 		{
+			m_mapper.remove(noteid);
 			//暂时用遍历的方式去掉
 			for (int i = 0; i < m_vec.size(); i++)
 			{
@@ -201,6 +217,7 @@ bool BookViewModel::insertRow(INote* pNote)
 	pItem->m_content = content;
 	pItem->m_spNote = pNote;
 	m_vec.push_back(pItem);
+	m_mapper.insert(noteid, pItem);
 
 	endInsertRows();
 	return false;
@@ -229,6 +246,26 @@ void BookViewModel::getNote(const QString& objId, INote** ppNote)
 			break;
 		}
 	}
+}
+
+void BookViewModel::removeRows(const QSet<QString>& objSet)
+{
+	QVector<NoteItem*> vec;
+	for (int i = 0; i < m_vec.size(); i++)
+	{
+		NoteItem* pItem = m_vec[i];
+		if (objSet.contains(pItem->m_id))
+		{
+			delete pItem;
+			m_vec[i] = NULL;
+		}
+		else
+		{
+			vec.push_back(m_vec[i]);
+		}
+	}
+	m_vec.clear();
+	m_vec = vec;
 }
 
 QVariant BookViewModel::data(const QModelIndex& index, int role) const
@@ -306,23 +343,7 @@ void AllNotesModel::initAllNotes()
 	{
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebook(i, &spNotebook);
-		spNotebook->addWatcher(this);
-
-		int nNoteCount = 0;
-		spNotebook->GetCount(&nNoteCount);
-		for (int j = 0; j < nNoteCount; j++)
-		{
-			com_sptr<INote> spNote;
-			AppHelper::GetNote(spNotebook, j, &spNote);
-			QString id, title, content, textabbre;
-			GetShowContent(spNote, id, title, content, textabbre);
-			NoteItem* pItem = new NoteItem(id, title, textabbre);
-			pItem->m_content = content;
-			pItem->m_spNote = spNote;
-			m_vec.push_back(pItem);
-			spNote->addWatcher(this);
-		}
-		spNotebook->addWatcher(this);
+		AddBookItems(spNotebook);
 	}
 }
 
@@ -331,14 +352,17 @@ HRESULT AllNotesModel::onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg)
 	com_sptr<INotebook> spNotebook = arg.pObj;
 	switch (arg.ope)
 	{
-	case NotifyOperator::Delete:
-	{
-		//TODO：delete掉所有notebook下的note。
-	}
-	case NotifyOperator::Add:
-	{
-		//TODO: 将所有notebook下的note加到模型中。
-	}
+		case NotifyOperator::Delete:
+		{
+			//TODO: DeleteNotebook的时候就分别release了每个note，每次release都会notify，
+			//这样删除性能会有问题，如果在这里统一移除，需要改内核，暂且搁置。
+			break;
+		}
+		case NotifyOperator::Add:
+		{
+			AddBookItems(spNotebook);
+			break;
+		}
 	}
 	return S_OK;
 }
