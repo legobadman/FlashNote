@@ -8,6 +8,7 @@
 class NoteItem
 {
 public:
+	NoteItem() {}
 	NoteItem(const QString& id, const QString& title, const QString& textAbbre)
 		: m_id(id)
 		, m_title(title)
@@ -24,7 +25,10 @@ public:
 	QString m_title;
 	QString m_textAbbre;
 	QString m_content;
+	com_sptr<INote> m_spNote;
 };
+Q_DECLARE_METATYPE(NoteItem)
+
 
 class BookViewModel : public QAbstractItemModel
 					, public ICoreNotify
@@ -36,6 +40,7 @@ public:
 	~BookViewModel();
 	void initFromCollection(INoteCollection* pNoteCollection);
 	QModelIndex findIdOf(const QString& objid);
+	void getNote(const QString& objId, INote** ppNote);
 
 	virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 	virtual QModelIndex parent(const QModelIndex& child) const override;

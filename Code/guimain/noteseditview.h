@@ -22,7 +22,6 @@ class NotesEditView : public QSplitter
 public:
 	NotesEditView(QWidget* parent = NULL);
 	~NotesEditView();
-
 	void setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNotebook);
 
 protected:
@@ -32,7 +31,7 @@ public slots:
 	void onNoteItemSelected(const QModelIndex& index);
 
 private:
-	void onShowNotesView(QString noteid);
+	void onShowNotesView(INote* pNote);
 
 private:
 	QWidget* m_pNoView;

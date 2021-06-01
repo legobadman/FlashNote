@@ -1057,9 +1057,6 @@ EXTERN_C const IID IID_INoteApplication;
         virtual HRESULT STDMETHODCALLTYPE SetUserId( 
             /* [in] */ BSTR bstrId) = 0;
         
-        virtual HRESULT STDMETHODCALLTYPE GetAllNotes( 
-            /* [out] */ INoteCollection **pCollection) = 0;
-        
     };
     
     
@@ -1113,10 +1110,6 @@ EXTERN_C const IID IID_INoteApplication;
             INoteApplication * This,
             /* [in] */ BSTR bstrId);
         
-        HRESULT ( STDMETHODCALLTYPE *GetAllNotes )( 
-            INoteApplication * This,
-            /* [out] */ INoteCollection **pCollection);
-        
         END_INTERFACE
     } INoteApplicationVtbl;
 
@@ -1164,9 +1157,6 @@ EXTERN_C const IID IID_INoteApplication;
 
 #define INoteApplication_SetUserId(This,bstrId)	\
     ( (This)->lpVtbl -> SetUserId(This,bstrId) ) 
-
-#define INoteApplication_GetAllNotes(This,pCollection)	\
-    ( (This)->lpVtbl -> GetAllNotes(This,pCollection) ) 
 
 #endif /* COBJMACROS */
 

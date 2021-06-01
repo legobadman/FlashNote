@@ -96,9 +96,8 @@ void BookListView::MenuActionSlot(QAction* action)
 
 	MENU_ITEM nIndex = (MENU_ITEM)action->data().toInt();
 	QModelIndex index = m_ui->listView->currentIndex();
-	QString noteid = index.data(ItemCoreObjIdRole).toString();
-	com_sptr<INote> spNote;
-	AppHelper::GetNoteById(noteid, &spNote);
+
+	com_sptr<INote> spNote = index.data(ItemCoreObjRole).value<com_sptr<INote>>();
 
 	BSTR bookId;
 	spNote->GetBookId(&bookId);

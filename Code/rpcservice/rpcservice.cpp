@@ -113,11 +113,6 @@ void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 		pNote->SetBookId(SysAllocString(bookid.c_str()));
 		pNotebook->AddNote(pNote);
 
-		//µÇ¼ÇÈ«¾Ö
-		com_sptr<INoteCollection> spNotes;
-		pApp->GetAllNotes(&spNotes);
-		spNotes->AddNote(pNote);
-
 		if (id.empty())
 		{
 			Q_ASSERT(FALSE);
@@ -257,9 +252,6 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 
 	pApp->SetNotebooks(spNotebooks);
 
-	com_sptr<INoteCollection> spNotes;
-	pApp->GetAllNotes(&spNotes);
-
 	com_sptr<IFreeNotes> spFreeNotes;
 	pApp->GetFreeNotes(&spFreeNotes);
 
@@ -308,7 +300,6 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 				spNote->SetBookId(bstrId);
 
 				spNotebook->AddNote(spNote);
-				spNotes->AddNote(spNote);
 			}
 		}
 		com_sptr<INotebooks> spNotebooks;
@@ -347,7 +338,6 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 		spNote->SetId(bstrId);
 
 		spFreeNotes->AddNote(spNote);
-		spNotes->AddNote(spNote);
 	}
 }
 
@@ -388,9 +378,6 @@ void RPCService::inittrashes(INoteApplication* pApp)
 	com_sptr<ITrash> spTrash;
 	CreateTrash(&spTrash);
 
-	com_sptr<INoteCollection> spNotes;
-	pApp->GetAllNotes(&spNotes);
-
 	std::vector<Trash> trashes;
 	m_pClient->GetTrashes(trashes, _userid);
 	for (int i = 0; i < trashes.size(); i++)
@@ -428,7 +415,6 @@ void RPCService::inittrashes(INoteApplication* pApp)
 			spNote->SetBookId(bstrBookId);
 		}
 		spTrash->AddNote(spNote);
-		spNotes->AddNote(spNote);
 	}
 	pApp->SetTrash(spTrash);
 }

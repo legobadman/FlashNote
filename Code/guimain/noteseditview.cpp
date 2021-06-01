@@ -66,12 +66,14 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 	m_type = type;
 	
 	QString noteid;
+	QModelIndex index;	//暂时只取model第一个索引作为当前note。
 	if (VIEW_ALLNOTES == m_type)
 	{
 		if (m_pAllNotesModel == NULL)
 		{
 			m_pAllNotesModel = new AllNotesModel(this);
 			m_pAllNotesModel->initAllNotes();
+			index = m_pAllNotesModel->index(0, 0);
 		}
 		m_pListView->resetModel(m_pAllNotesModel, VIEW_ALLNOTES, NULL);
 	}
@@ -93,6 +95,7 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 		{
 			pModel = iter.value();
 		}
+		index = pModel->index(0, 0);
 		m_pListView->resetModel(pModel, VIEW_NOTEBOOK, pNoteCollection);
 	}
 	else if (VIEW_TRASH == m_type)
@@ -103,26 +106,27 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 			m_pTrashModel->initFromCollection(pNoteCollection);
 			noteid = getCurrentNoteId(pNoteCollection);
 		}
+		index = m_pTrashModel->index(0, 0);
 		m_pListView->resetModel(m_pTrashModel, VIEW_TRASH, pNoteCollection);
 	}
 	else
 	{
 		Q_ASSERT(false);
 	}
-	onShowNotesView(noteid);
+	com_sptr<INote> spNote = index.data(ItemCoreObjRole).value<com_sptr<INote>>();
+	onShowNotesView(spNote);
 }
 
 void NotesEditView::onNoteItemSelected(const QModelIndex& index)
 {
 	QString noteid = index.data(ItemCoreObjIdRole).toString();
-	onShowNotesView(noteid);
+	com_sptr<INote> spNote = index.data(ItemCoreObjRole).value<com_sptr<INote>>();
+	onShowNotesView(spNote);
 }
 
-void NotesEditView::onShowNotesView(QString noteid)
+void NotesEditView::onShowNotesView(INote* pNote)
 {
-	com_sptr<INote> spNote;
-	AppHelper::GetNoteById(noteid, &spNote);
-	if (spNote == NULL)
+	if (pNote == NULL)
 	{
 		m_pStackedEdit->setCurrentIndex(PAGE_NOEDIT);
 	}
@@ -132,10 +136,10 @@ void NotesEditView::onShowNotesView(QString noteid)
 
 		com_sptr<INotebook> spNotebook;
 		BSTR bstrBookid;
-		spNote->GetBookId(&bstrBookid);
+		pNote->GetBookId(&bstrBookid);
 		std::wstring bookid(bstrBookid);
 		AppHelper::GetNotebookById(QString::fromStdWString(bstrBookid), &spNotebook);
 
-		m_pEditView->updateNoteInfo(spNotebook, spNote, VIEW_TRASH != m_type);
+		m_pEditView->updateNoteInfo(spNotebook, pNote, VIEW_TRASH != m_type);
 	}
 }

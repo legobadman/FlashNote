@@ -172,7 +172,6 @@ public:
 	HRESULT STDMETHODCALLTYPE GetUserId(OUT BSTR* pbstrId);
 	HRESULT STDMETHODCALLTYPE SetUserId(IN BSTR bstrId);
 	HRESULT STDMETHODCALLTYPE GetFreeNotes(IFreeNotes** ppTrash);
-	HRESULT STDMETHODCALLTYPE GetAllNotes(INoteCollection** ppCollection);
 	HRESULT STDMETHODCALLTYPE GetTrash(ITrash** ppTrash);
 	HRESULT STDMETHODCALLTYPE SetTrash(ITrash* pTrash);
 
@@ -185,11 +184,11 @@ public:
 
 private:
 	CComBSTR m_id;
-	std::vector<INotebook*> m_vecBooks;
+
 	com_sptr<INotebooks> m_spNotebooks;
 	com_sptr<ITrash> m_spTrash;
 	com_sptr<IFreeNotes> m_spFreeNotes;
-	com_sptr<INoteCollection> m_spAllNotes;
+
 	std::unordered_set<ICoreNotify*> m_notifies;
 	int m_ref;
 };

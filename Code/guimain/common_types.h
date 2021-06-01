@@ -8,5 +8,6 @@ enum BOOKVIEW_TYPE
 	VIEW_TRASH
 };
 
+Q_DECLARE_METATYPE(com_sptr<INote>)
 
 #endif

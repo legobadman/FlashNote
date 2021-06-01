@@ -105,7 +105,6 @@ interface INoteApplication : INoteCoreObj {
 	HRESULT GetFreeNotes([in]IFreeNotes** ppTrash);
 	HRESULT GetUserId([out]BSTR* pbstrId);
 	HRESULT SetUserId([in]BSTR bstrId);
-	HRESULT GetAllNotes([out]INoteCollection** pCollection);
 };
 
 

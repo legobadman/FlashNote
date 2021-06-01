@@ -32,20 +32,6 @@ void AppHelper::GetNote(INoteCollection* pNotebook, int idxNote, INote** ppNote)
 	HRESULT hr = pNotebook->Item(varNote, ppNote);
 }
 
-void AppHelper::GetNoteById(QString noteid, INote** ppNote)
-{
-	VARIANT varNote;
-	V_VT(&varNote) = VT_BSTR;
-	V_BSTR(&varNote) = SysAllocString(noteid.toStdWString().data());
-	if (!ppNote)
-	{
-		return;
-	}
-	com_sptr<INoteCollection> spNotes;
-	coreApp->GetAllNotes(&spNotes);
-	HRESULT hr = spNotes->Item(varNote, ppNote);
-}
-
 QString AppHelper::GetNotebookName(INoteCollection* pNotebook)
 {
 	if (!pNotebook)

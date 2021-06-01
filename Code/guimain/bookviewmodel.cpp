@@ -32,6 +32,7 @@ void BookViewModel::initFromCollection(INoteCollection* pNoteCollection)
 		GetShowContent(spNote, id, title, content, textabbre);
 		NoteItem* pItem = new NoteItem(id, title, textabbre);
 		pItem->m_content = content;
+		pItem->m_spNote = spNote;
 		m_vec.push_back(pItem);
 		spNote->addWatcher(this);
 	}
@@ -198,6 +199,7 @@ bool BookViewModel::insertRow(INote* pNote)
 	GetShowContent(pNote, noteid, title, content, textAbbre);
 	NoteItem* pItem = new NoteItem(noteid, title, textAbbre);
 	pItem->m_content = content;
+	pItem->m_spNote = pNote;
 	m_vec.push_back(pItem);
 
 	endInsertRows();
@@ -212,6 +214,21 @@ QModelIndex BookViewModel::parent(const QModelIndex& child) const
 int BookViewModel::rowCount(const QModelIndex& parent) const
 {
 	return m_vec.size();
+}
+
+void BookViewModel::getNote(const QString& objId, INote** ppNote)
+{
+	if (!ppNote)
+		return;
+	for (int i = 0; i < m_vec.size(); i++)
+	{
+		if (m_vec[i]->m_id == objId)
+		{
+			*ppNote = m_vec[i]->m_spNote;
+			(*ppNote)->AddRef();
+			break;
+		}
+	}
 }
 
 QVariant BookViewModel::data(const QModelIndex& index, int role) const
@@ -239,6 +256,11 @@ QVariant BookViewModel::data(const QModelIndex& index, int role) const
 			return QVariant::fromValue<ITEM_CONTENT_TYPE>(ITEM_CONTENT_TYPE::ITEM_TRASHITEM);
 		else
 			return QVariant::fromValue<ITEM_CONTENT_TYPE>(ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM);
+	}
+	else if (role == ItemCoreObjRole)
+	{
+		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+		return QVariant::fromValue<com_sptr<INote>>(pItem->m_spNote);
 	}
 	else
 	{
@@ -276,6 +298,8 @@ void AllNotesModel::initAllNotes()
 	com_sptr<INotebooks> spNotebooks;
 	coreApp->GetNotebooks(&spNotebooks);
 
+	spNotebooks->addWatcher(this);
+
 	int nCount = 0;
 	spNotebooks->GetCount(&nCount);
 	for (int i = 0; i < nCount; i++)
@@ -294,6 +318,7 @@ void AllNotesModel::initAllNotes()
 			GetShowContent(spNote, id, title, content, textabbre);
 			NoteItem* pItem = new NoteItem(id, title, textabbre);
 			pItem->m_content = content;
+			pItem->m_spNote = spNote;
 			m_vec.push_back(pItem);
 			spNote->addWatcher(this);
 		}

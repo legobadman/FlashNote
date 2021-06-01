@@ -533,7 +533,6 @@ NoteApplication::NoteApplication()
 	: m_ref(0)
 {
 	m_spFreeNotes = new FreeNotes;
-	m_spAllNotes = new Notes;
 }
 
 NoteApplication::~NoteApplication()
@@ -593,16 +592,6 @@ HRESULT NoteApplication::GetFreeNotes(IFreeNotes** ppFreeNotes)
 
 	*ppFreeNotes = m_spFreeNotes;
 	(*ppFreeNotes)->AddRef();
-	return S_OK;
-}
-
-HRESULT NoteApplication::GetAllNotes(INoteCollection** ppCollection)
-{
-	if (!ppCollection)
-		return E_POINTER;
-
-	*ppCollection = m_spAllNotes;
-	(*ppCollection)->AddRef();
 	return S_OK;
 }
 
