@@ -62,6 +62,7 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 	m_ui->editTitle->blockSignals(false);
 
 	m_ui->textEdit->blockSignals(true);
+
 	m_ui->textEdit->setText(content);
 	m_ui->textEdit->setReadOnly(!m_bEdittable);
 	m_ui->editTitle->setReadOnly(!m_bEdittable);
@@ -260,18 +261,22 @@ void NoteEditWindow::textRemoveAllFormat() {
 	m_ui->textEdit->setPlainText(text);
 }
 
-
-void NoteEditWindow::textBold() {
+void NoteEditWindow::textBold()
+{
 	QTextCharFormat fmt;
 	fmt.setFontWeight(m_ui->bold->isChecked() ? QFont::Bold : QFont::Normal);
 	mergeFormatOnWordOrSelection(fmt);
 }
 
-
-void NoteEditWindow::focusInEvent(QFocusEvent*) {
+void NoteEditWindow::focusInEvent(QFocusEvent*)
+{
 	m_ui->textEdit->setFocus(Qt::TabFocusReason);
 }
 
+void NoteEditWindow::mousePressEvent(QMouseEvent* event)
+{
+	QWidget::mousePressEvent(event);
+}
 
 void NoteEditWindow::textUnderline() {
 	QTextCharFormat fmt;
@@ -668,43 +673,32 @@ void NoteEditWindow::checkDocument()
 
 void NoteEditWindow::insertImage()
 {
-	QString file = QFileDialog::getOpenFileName(this, tr("Select an image"),
+	QString original = QFileDialog::getOpenFileName(this, tr("Select an image"),
 		".", tr("JPEG (*.jpg *jpeg)\n"
 			"GIF (*.gif)\n"
 			"PNG (*.png)\n"
 			"Bitmap Files (*.bmp)\n"));
-	if (file.isEmpty())
+
+	if (original.isEmpty())
 		return;
-	QUrl Uri(QString("file://%1").arg(file));
-	QImage image = QImageReader(file).read();
 
-	QTextDocument* textDocument = m_ui->textEdit->document();
+	QImage image = QImageReader(original).read();
+	m_ui->textEdit->dropImage(QUrl(original), image);
 
-	if (m_bEnableBase64)
-	{
-        QByteArray byteArray;
-        QBuffer buffer(&byteArray);
-        image.save(&buffer, "PNG");
-        Uri = QString("data:image/png;base64,") + byteArray.toBase64();
-        //Uri = QString("<img src=\"data:image/png;base64,") + byteArray.toBase64() + "\"/>";
-        textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
-	}
-	else
-	{
-		textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
-	}
+	//QTextDocument* textDocument = m_ui->textEdit->document();
+	//textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
 
-	QTextCursor cursor = m_ui->textEdit->textCursor();
-	QTextImageFormat imageFormat;
+	//QTextCursor cursor = m_ui->textEdit->textCursor();
+	//QTextImageFormat imageFormat;
 
-	//调整图片的宽度。
-	//TODO: resize的时候自动调宽
-	int w = m_ui->textEdit->width();
-	float ratio = (float)image.width() / image.height();
-	int h = w / ratio;
+	////调整图片的宽度。
+	////TODO: resize的时候自动调宽
+	//int w = m_ui->textEdit->width();
+	//float ratio = (float)image.width() / image.height();
+	//int h = w / ratio;
 
-	imageFormat.setWidth(w);
-	imageFormat.setHeight(h);
-	imageFormat.setName(Uri.toString());
-	cursor.insertImage(imageFormat);
+	//imageFormat.setWidth(w);
+	//imageFormat.setHeight(h);
+	//imageFormat.setName(Uri.toString());
+	//cursor.insertImage(imageFormat);
 }

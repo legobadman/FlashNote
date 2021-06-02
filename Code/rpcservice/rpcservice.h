@@ -3,14 +3,11 @@
 
 #include "note_types.h"
 #include "notecore.h"
-//#include "NoteInfo.h"
 #include <codecvt>
 #include <string>
 #include <locale>
 
-class NoteInfoClient;
-//class TTransport;
-//class TProtocol;
+class ThriftClient;
 
 class RPCService
 {
@@ -31,9 +28,10 @@ public:
 private:
 	RPCService();
 	RPCService(const RPCService&) {}
+	~RPCService();
 
-	NoteInfoClient* m_pClient;
-	//TTransport* socket2;
+	ThriftClient* m_pClient;
+
 	std::string _userid;
 	std::wstring userid;
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;

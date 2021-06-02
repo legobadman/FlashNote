@@ -19,6 +19,8 @@ ADD_LIBRARY(rpcservice STATIC
 	../server/gen-cpp/notestructure_types.cpp
 	rpcservice.cpp
 	rpcservice.h
+	thriftclient.cpp
+	thriftclient.h
 	)
 
 target_link_libraries(rpcservice Qt5::Widgets thrift libboost_thread-vc120-mt-gd-1_55.lib)

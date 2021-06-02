@@ -260,7 +260,7 @@ public:
 		}
 
 		//名字不能过长或空。
-		if (name.empty() || name.length() > 20)
+		if (name.empty() || name.length() > 60)
 		{
 			apilogger.append_err("the name of notebook should not be empty or too long.");
 			return;

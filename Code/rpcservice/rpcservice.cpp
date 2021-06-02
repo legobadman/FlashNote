@@ -1,10 +1,10 @@
-#include <boost/shared_ptr.hpp>
 #include <thrift/transport/TSocket.h>
 #include <thrift/protocol/TBinaryProtocol.h>
 #include <thrift/server/TSimpleServer.h>
 #include <thrift/transport/TServerSocket.h>
 #include <thrift/transport/TBufferTransports.h>
 #include <thrift/transport/TTransportUtils.h>
+
 #include "notecore.h"
 #include "com_sptr.h"
 #include "hello_types.h"
@@ -15,17 +15,7 @@
 #include "notecore.h"
 #include "../guimain/guihelper.h"
 #include "notecoreinit.h"
-
-
-using namespace apache::thrift;
-using namespace apache::thrift::protocol;
-using namespace apache::thrift::transport;
-
-using boost::shared_ptr;
-
-boost::shared_ptr<TTransport> thrift_socket;
-boost::shared_ptr<TTransport> thrift_transport;
-boost::shared_ptr<TProtocol> thrift_protocol;
+#include "thriftclient.h"
 
 
 RPCService& RPCService::GetInstance()
@@ -40,12 +30,13 @@ RPCService::RPCService()
 	userid = L"609638963d8ba27ccea4e20d";
 	_userid = "609638963d8ba27ccea4e20d";
 
-	thrift_socket.reset(new TSocket("120.78.150.174", 82));
-	thrift_transport.reset(new TBufferedTransport(thrift_socket));
-	thrift_protocol.reset(new TBinaryProtocol(thrift_transport));
+	m_pClient = new ThriftClient;
+}
 
-	m_pClient = new NoteInfoClient(thrift_protocol);
-	thrift_transport->open();
+RPCService::~RPCService()
+{
+	delete m_pClient;
+	m_pClient = NULL;
 }
 
 bool RPCService::SynchronizeNotebook(INotebook* pNotebook)
@@ -96,27 +87,27 @@ void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 	std::wstring title(bstrTitle, SysStringLen(bstrTitle));
 	std::wstring content(bstrContent, SysStringLen(bstrContent));
 
-	bool ret = m_pClient->UpdateNote(converter.to_bytes(id), converter.to_bytes(title), converter.to_bytes(content));
+	bool ret = m_pClient->client()->UpdateNote(converter.to_bytes(id), converter.to_bytes(title), converter.to_bytes(content));
 }
 
 std::wstring RPCService::NewNote(std::wstring bookid, std::wstring title)
 {
 	std::string newnoteid;
-	m_pClient->NewNote(newnoteid, _userid, converter.to_bytes(bookid), converter.to_bytes(title));
+	m_pClient->client()->NewNote(newnoteid, _userid, converter.to_bytes(bookid), converter.to_bytes(title));
 	return converter.from_bytes(newnoteid);
 }
 
 std::wstring RPCService::NewNotebook(std::wstring name)
 {
 	std::string bookid;
-	m_pClient->NewNotebook(bookid, _userid, converter.to_bytes(name));
+	m_pClient->client()->NewNotebook(bookid, _userid, converter.to_bytes(name));
 	return converter.from_bytes(bookid);
 }
 
 bool RPCService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, INote* pNote)
 {
 	com_sptr<INotebook> pNotebook = pNoteColl;
-	bool bRet = m_pClient->TrashNote(_userid,
+	bool bRet = m_pClient->client()->TrashNote(_userid,
 		converter.to_bytes(AppHelper::GetNotebookId(pNotebook).toStdWString()),
 		converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString())
 		);
@@ -135,7 +126,7 @@ bool RPCService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, 
 
 bool RPCService::DeleteNote(ITrash* pTrash, INote* pNote)
 {
-	bool bRet = m_pClient->DeleteNote(_userid, converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString()));
+	bool bRet = m_pClient->client()->DeleteNote(_userid, converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString()));
 	if (bRet)
 	{
 		HRESULT hr = pTrash->RemoveNote(pNote);
@@ -147,7 +138,7 @@ bool RPCService::DeleteNote(ITrash* pTrash, INote* pNote)
 bool RPCService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 {
 	std::string bookid = converter.to_bytes(AppHelper::GetNotebookId(pNotebook).toStdWString());
-	bool bRet = m_pClient->DeleteNotebook(_userid, bookid);
+	bool bRet = m_pClient->client()->DeleteNotebook(_userid, bookid);
 	if (bRet)
 	{
 		// 移除notebook下所有note至FreeNotes
@@ -179,7 +170,7 @@ bool RPCService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 bool RPCService::RecoverNote(INoteApplication* pApp, ITrash* pTrash, INote* pNote)
 {
 	std::string noteid = converter.to_bytes(AppHelper::GetNoteId(pNote).toStdWString());
-	bool bRet = m_pClient->RecoverNote(_userid, noteid);
+	bool bRet = m_pClient->client()->RecoverNote(_userid, noteid);
 	if (bRet)
 	{
 		com_sptr<INotebook> spNotebook;
@@ -258,7 +249,7 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 void RPCService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
 {
 	std::vector<Notebook> _vecBooks;
-	m_pClient->GetNotebooks(_vecBooks, _userid);
+	m_pClient->client()->GetNotebooks(_vecBooks, _userid);
 	for (int i = 0; i < _vecBooks.size(); i++)
 	{
 		NOTEBOOK notebook;
@@ -293,7 +284,7 @@ void RPCService::inittrashes(INoteApplication* pApp)
 	CreateTrash(&spTrash);
 
 	std::vector<Trash> trashes;
-	m_pClient->GetTrashes(trashes, _userid);
+	m_pClient->client()->GetTrashes(trashes, _userid);
 	for (int i = 0; i < trashes.size(); i++)
 	{
 		QString trash_id = QString::fromUtf8(trashes[i].trash_id.c_str());

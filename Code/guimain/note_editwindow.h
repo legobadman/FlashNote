@@ -70,6 +70,7 @@ protected:
 	void list(bool checked, QTextListFormat::Style style);
 	void indent(int delta);
 	void focusInEvent(QFocusEvent* event);
+	void mousePressEvent(QMouseEvent* event);
 
 private:
 	void initSlots();

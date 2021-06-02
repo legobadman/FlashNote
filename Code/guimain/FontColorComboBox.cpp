@@ -111,7 +111,6 @@ void FontColorComboBox::updateIcon()
 	p.drawLine(4, 21, 23, 21);
 	p.end();
 
-	newIcon.save("wtfwtf.png");
 	m_icon = QIcon(newIcon);
 	m_bUpdated = true;
 }
