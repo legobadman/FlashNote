@@ -62,7 +62,7 @@ void BookViewModel::GetShowContent(INote* pNote, QString& noteid, QString& title
 
 	QTextDocument html;
 	html.setHtml(content);
-	text_abbre = html.toPlainText().trimmed();
+	text_abbre = html.toPlainText().replace('\n', ' ');
 	text_abbre = text_abbre.mid(0, nContentLimit);
 }
 

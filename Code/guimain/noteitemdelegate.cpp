@@ -46,13 +46,25 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	painter->save();
 	painter->setClipRect(opt.rect);
 
+	const QWidget* widget = option.widget;
+
 	// draw the background
 	if (opt.backgroundBrush.style() != Qt::NoBrush)
 	{
+		QRect rcBg(opt.rect);
 		const QPointF oldBrushOrigin = painter->brushOrigin();
-		painter->setBrushOrigin(opt.rect.topLeft());
-		painter->fillRect(opt.rect, opt.backgroundBrush);
-		painter->setBrushOrigin(oldBrushOrigin);
+		painter->fillRect(rcBg, opt.backgroundBrush);
+
+		painter->setPen(QColor(217, 220, 221));
+		painter->drawLine(opt.rect.bottomLeft(), opt.rect.bottomRight());
+
+		//border
+		if (opt.state & (QStyle::State_Selected | QStyle::State_MouseOver))
+		{
+			painter->setPen(QColor(139, 203, 232));
+			rcBg.adjust(0, 0, 0, -1);
+			painter->drawRect(rcBg);
+		}
 	}
 
 	// draw the text
@@ -66,16 +78,18 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		QTextLayout textLayout2(title, fontTitle);
 		const int maxLineWidth = 8388607; //²ÎÕÕQCommonStylePrivate::viewItemSize
 		QSizeF szText = AppHelper::viewItemTextLayout(textLayout2, maxLineWidth, 15);
+		QFontMetrics fontMetrics(fontTitle);
 
-		int text_xoffset = 9, text_yoffset = 17;
-		QRect textRect(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset, szText.width(), szText.height());
+		int text_xoffset = 9, text_yoffset = 7;
+		int w = opt.rect.width() - 2 * text_xoffset;
+		int h = fontMetrics.height();
+		QRect textRect(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset, w, h);
 
 		painter->setPen(QColor(0, 0, 0));
 
 		painter->setFont(fontTitle);
-		//textLayout.draw(painter, paintPosition);
 		QPointF pp(textRect.topLeft());
-		painter->drawText(pp, title);
+		painter->drawText(textRect, Qt::TextWordWrap, title);
 	}
 
 	//2. draw content
@@ -84,13 +98,17 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		QTextLayout textLayout2(content, fontContent);
 		const int maxLineWidth = 8388607; //²ÎÕÕQCommonStylePrivate::viewItemSize
 		QSizeF szText = AppHelper::viewItemTextLayout(textLayout2, maxLineWidth);
+		QFontMetrics fontMetrics(fontContent);
 
-		int text_xoffset = 9, text_yoffset = 40;
-		QRect textRect(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset, szText.width(), szText.height());
+		int text_xoffset = 9, text_yoffset = 30;
+		int w = opt.rect.width() - 2 * text_xoffset;
+		int h = fontMetrics.height() * 2;
+		QRect textRect(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset, w, h);
 
 		painter->setPen(QColor(102, 102, 102));
 		painter->setFont(fontContent);
-		painter->drawText(textRect.topLeft(), content);
+		QRect wtf;
+		painter->drawText(textRect, Qt::TextWordWrap, content, &wtf);
 	}
 	painter->restore();
 }
