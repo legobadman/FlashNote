@@ -3,6 +3,7 @@
 #include "moc_LeftSideItemDelegate.cpp"
 #include "MyStyle.h"
 #include "listpane.h"
+#include "guihelper.h"
 
 
 LeftSideItemDelegate::LeftSideItemDelegate(QWidget* parent)
@@ -54,34 +55,6 @@ void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
 		option->backgroundBrush.setColor(backgroundClr);
 	}
 	option->font.setPointSize(12);
-}
-
-static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight = -1, int* lastVisibleLine = nullptr)
-{
-	if (lastVisibleLine)
-		*lastVisibleLine = -1;
-	qreal height = 0;
-	qreal widthUsed = 0;
-	textLayout.beginLayout();
-	int i = 0;
-	while (true) {
-		QTextLine line = textLayout.createLine();
-		if (!line.isValid())
-			break;
-		line.setLineWidth(lineWidth);
-		line.setPosition(QPointF(0, height));
-		height += line.height();
-		widthUsed = qMax(widthUsed, line.naturalTextWidth());
-		// we assume that the height of the next line is the same as the current one
-		if (maxHeight > 0 && lastVisibleLine && height + line.height() > maxHeight) {
-			const QTextLine nextLine = textLayout.createLine();
-			*lastVisibleLine = nextLine.isValid() ? i : -1;
-			break;
-		}
-		++i;
-	}
-	textLayout.endLayout();
-	return QSizeF(widthUsed, height);
 }
 
 void LeftSideItemDelegate::drawExpandArrow(QPainter* painter, const QStyleOptionViewItem& option) const
@@ -194,7 +167,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	int textMargin = 5;
 	QTextLayout textLayout2(opt.text, opt.font);
 	const int maxLineWidth = 8388607; //参照QCommonStylePrivate::viewItemSize
-	QSizeF szText = viewItemTextLayout(textLayout2, maxLineWidth);
+	QSizeF szText = AppHelper::viewItemTextLayout(textLayout2, maxLineWidth);
 
 	int icon_xoffset = icon_center_xoffset - iconSize / 2;
 	int icon_yoffset = (opt.rect.height() - iconSize) / 2;
@@ -273,7 +246,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 
 		QTextLayout textLayout(opt.text, opt.font);
 		textLayout.setTextOption(textOption);
-		viewItemTextLayout(textLayout, textRect.width());
+		AppHelper::viewItemTextLayout(textLayout, textRect.width());
 		textLayout.draw(painter, paintPosition);
 	}
 	painter->restore();

@@ -92,6 +92,8 @@ add_executable(guimain
     ./note_editwindow.cpp
     ./note_editwindow.h
     ./note_editwindow.ui
+    ./noteitemdelegate.cpp
+    ./noteitemdelegate.h
     ./noteseditview.cpp
     ./noteseditview.h
     ./notetrayicon.cpp
@@ -110,6 +112,8 @@ add_executable(guimain
     ./richeditor/richtexteditor.h
     ./SeperateLine.cpp
     ./SeperateLine.h
+    ./searcheditor.cpp
+    ./searcheditor.h
     ./stdafx.cpp
     ./stdafx.h
     ./style/MyStyle.cpp

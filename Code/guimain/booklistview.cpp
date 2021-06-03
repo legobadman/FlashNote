@@ -5,6 +5,7 @@
 #include "guihelper.h"
 #include "rpcservice.h"
 #include "LeftSideItemDelegate.h"
+#include "noteitemdelegate.h"
 
 static const int nContentLimit = 74;
 
@@ -40,6 +41,11 @@ void BookListView::init()
 	m_ui->more->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
 
 	m_ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_ui->listView->setFrameShape(QFrame::NoFrame);
+
+	QPalette pal;
+	pal.setColor(QPalette::Foreground, QColor(161, 161, 161));
+	m_ui->lblNumberNotes->setPalette(pal);
 
 	connect(m_ui->listView, SIGNAL(clicked(const QModelIndex&)),
 		this, SIGNAL(noteitemselected(const QModelIndex&)));
@@ -49,6 +55,8 @@ void BookListView::init()
 
 	connect(this, SIGNAL(noteitemselected(const QModelIndex&)), 
 		m_pNotesView, SLOT(onNoteItemSelected(const QModelIndex&)));
+
+	m_ui->listView->setItemDelegate(new NoteItemDelegate(m_ui->listView));
 }
 
 BookListView::~BookListView()

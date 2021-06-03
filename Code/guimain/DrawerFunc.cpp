@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "DrawerFunc.h"
 #include "FramelessLineEdit.h"
+#include "searcheditor.h"
 #include "note_editwindow.h"
 
 
 QColor DrawerFunc::getColorFromWidget(const QWidget* w, QStyle::State state, QString propName)
 {
-	const FramelessLineEdit* pEdit = qobject_cast<const FramelessLineEdit*>(w);
-	if (pEdit)
+	if (qobject_cast<const FramelessLineEdit*>(w))
 	{
 		if (state & QStyle::State_MouseOver || state & QStyle::State_HasFocus)
 		{
@@ -28,6 +28,14 @@ QColor DrawerFunc::getColorFromWidget(const QWidget* w, QStyle::State state, QSt
 
 			}
 		}
+	}
+	else if (qobject_cast<const SearchEditor*>(w))
+	{
+		if (propName == "border")
+		{
+			return QColor(204, 204, 204);
+		}
+		return QColor(255, 255, 255);
 	}
 	return QColor(255, 255, 255);
 }

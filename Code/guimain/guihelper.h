@@ -1,6 +1,8 @@
 #ifndef __GUI_HELPER_H__
 #define __GUI_HELPER_H__
 
+#include <QtGui/QTextLayout>
+
 class AppHelper
 {
 public:
@@ -17,6 +19,7 @@ public:
 	static QString GetNoteId(INote* pNote);
 
 	static int GetNoteCounts(INoteCollection* pNotebook);
+	static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight = -1, int* lastVisibleLine = nullptr);
 };
 
 #endif

@@ -62,7 +62,7 @@ void BookViewModel::GetShowContent(INote* pNote, QString& noteid, QString& title
 
 	QTextDocument html;
 	html.setHtml(content);
-	text_abbre = html.toPlainText();
+	text_abbre = html.toPlainText().trimmed();
 	text_abbre = text_abbre.mid(0, nContentLimit);
 }
 
@@ -298,6 +298,11 @@ QVariant BookViewModel::data(const QModelIndex& index, int role) const
 	{
 		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
 		return QVariant::fromValue<com_sptr<INote>>(pItem->m_spNote);
+	}
+	else if (role == ItemNoteShowContent)
+	{
+		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+		return QVariant(pItem->m_textAbbre);
 	}
 	else
 	{

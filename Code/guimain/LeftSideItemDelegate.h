@@ -30,6 +30,7 @@ enum LEFT_SIDE_ROLE
 	ItemContentTypeRole,
 	ItemCoreObjIdRole,
 	ItemCoreObjRole,
+	ItemNoteShowContent,
 };
 
 enum CONTENT_MAIN_VIEW
