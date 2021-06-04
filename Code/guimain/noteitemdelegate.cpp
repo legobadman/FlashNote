@@ -4,6 +4,7 @@
 #include "LeftSideItemDelegate.h"
 #include "guihelper.h"
 #include "common_types.h"
+#include "notelistview.h"
 
 
 NoteItemDelegate::NoteItemDelegate(QWidget* parent)
@@ -46,7 +47,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	painter->save();
 	painter->setClipRect(opt.rect);
 
-	const QWidget* widget = option.widget;
+	const NotesListView* noteslist = qobject_cast<const NotesListView*>(option.widget);
 
 	// draw the background
 	if (opt.backgroundBrush.style() != Qt::NoBrush)
@@ -55,13 +56,19 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		const QPointF oldBrushOrigin = painter->brushOrigin();
 		painter->fillRect(rcBg, opt.backgroundBrush);
 
-		painter->setPen(QColor(217, 220, 221));
-		painter->drawLine(opt.rect.bottomLeft(), opt.rect.bottomRight());
-
 		//border
 		if (opt.state & (QStyle::State_Selected | QStyle::State_MouseOver))
 		{
-			painter->setPen(QColor(139, 203, 232));
+			QColor borderClr;
+			if (opt.state & QStyle::State_Selected)
+			{
+				borderClr = QColor(139, 203, 232);
+			}
+			else if (opt.state & QStyle::State_MouseOver)
+			{
+				borderClr = QColor(195, 229, 245);
+			}
+			painter->setPen(borderClr);
 			rcBg.adjust(0, 0, 0, -1);
 			painter->drawRect(rcBg);
 		}

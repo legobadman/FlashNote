@@ -92,6 +92,8 @@ add_executable(guimain
     ./note_editwindow.cpp
     ./note_editwindow.h
     ./note_editwindow.ui
+    ./notelistview.cpp
+    ./notelistview.h
     ./noteitemdelegate.cpp
     ./noteitemdelegate.h
     ./noteseditview.cpp

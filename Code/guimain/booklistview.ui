@@ -260,7 +260,7 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="QListView" name="listView"/>
+      <widget class="NotesListView" name="listView"/>
      </item>
     </layout>
    </item>
@@ -276,6 +276,11 @@
    <class>SearchEditor</class>
    <extends>QLineEdit</extends>
    <header>searcheditor.h</header>
+  </customwidget>
+  <customwidget>
+   <class>NotesListView</class>
+   <extends>QListView</extends>
+   <header>notelistview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
