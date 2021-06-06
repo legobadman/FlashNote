@@ -45,6 +45,7 @@ protected slots:
 	void textBold();
 	void textUnderline();
 	void textStrikeout();
+	void addCodeBlock();
 	void textItalic();
 	void textSize(const QString& p);
 	void onFontChanged(const QString& font);

@@ -141,6 +141,7 @@ void NoteEditWindow::initSlots()
 	connect(m_ui->italic, SIGNAL(clicked()), this, SLOT(textItalic()));
 	connect(m_ui->underline, SIGNAL(clicked()), this, SLOT(textUnderline()));
 	connect(m_ui->strikeout, SIGNAL(clicked()), this, SLOT(textStrikeout()));
+	connect(m_ui->codeblock, SIGNAL(clicked()), this, SLOT(addCodeBlock()));
 
 	//m_ui->item_symbol->setShortcut(Qt::CTRL + Qt::Key_Minus);
 	//m_ui->item_id->setShortcut(Qt::CTRL + Qt::Key_Equal);
@@ -294,6 +295,32 @@ void NoteEditWindow::textStrikeout() {
 	QTextCharFormat fmt;
 	fmt.setFontStrikeOut(m_ui->strikeout->isChecked());
 	mergeFormatOnWordOrSelection(fmt);
+}
+
+void NoteEditWindow::addCodeBlock()
+{
+	QTextFrameFormat frameFormat;
+	frameFormat.setBackground(QColor(30, 30, 30));
+	frameFormat.setPadding(10);
+	frameFormat.setMargin(10);
+	frameFormat.setBorder(1);
+	frameFormat.setBorderBrush(QBrush(QColor(149, 140, 121)));
+
+	QTextCursor cursor = m_ui->textEdit->textCursor();
+	QTextFrame* pTextFrame = cursor.insertFrame(frameFormat);
+	QTextFrame::Iterator it = pTextFrame->begin();
+	QTextBlock block = it.currentBlock();
+
+	QTextBlockFormat format = block.blockFormat();
+	format.setLeftMargin(20);
+	format.setRightMargin(20);
+	format.setTopMargin(10);
+	format.setBottomMargin(10);
+	cursor.setBlockFormat(format);
+
+	QTextCharFormat charFormat = block.charFormat();
+	charFormat.setForeground(QColor(213, 221, 227));
+	cursor.setBlockCharFormat(charFormat);
 }
 
 void NoteEditWindow::textSize(const QString& p) {
@@ -662,6 +689,36 @@ void NoteEditWindow::setText(const QString& text)
 void NoteEditWindow::checkDocument()
 {
 	QTextDocument* p = document();
+
+	QTextFrame::iterator it;
+	QTextFrame* rootFrame = p->rootFrame();
+	for (it = rootFrame->begin(); !(it.atEnd()); ++it)
+	{
+		QTextFrame* childFrame = it.currentFrame();
+		QTextBlock childBlock = it.currentBlock();
+		if (childFrame)
+		{
+			QTextFrame::iterator it2;
+			for (it2 = childFrame->begin(); !(it2.atEnd()); ++it2)
+			{
+				QTextFrame* childFrame2 = it2.currentFrame();
+				QTextBlock block2 = it2.currentBlock();
+				if (childFrame2)
+				{
+
+				}
+				else if (block2.isValid())
+				{
+
+				}
+			}
+		}
+		else if (childBlock.isValid())
+		{
+
+		}
+	}
+
     QString html = p->toHtml();
     QFile f("wtf.html");
     f.open(QIODevice::WriteOnly);
