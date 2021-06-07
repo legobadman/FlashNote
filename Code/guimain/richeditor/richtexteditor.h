@@ -1,7 +1,7 @@
 #ifndef __RICHTEXTEDITOR_H__
 #define __RICHTEXTEDITOR_H__
 
-#include <QPointer>
+#include "highlighter/cppsyntaxhighlighter.h"
 
 class RichTextEditor : public QTextEdit
 {
@@ -15,6 +15,9 @@ protected:
 	bool canInsertFromMimeData(const QMimeData* source) const;
 	void insertFromMimeData(const QMimeData* source);
 	QMimeData* createMimeDataFromSelection() const;
+
+private:
+	CppSyntaxHighlighter* highlighter;
 };
 
 #endif

@@ -79,6 +79,8 @@ add_executable(guimain
     ./font_combobox.h
     ./FramelessLineEdit.cpp
     ./FramelessLineEdit.h
+    ./highlighter/cppsyntaxhighlighter.cpp
+    ./highlighter/cppsyntaxhighlighter.h
     ./LeftSideItemDelegate.cpp
     ./LeftSideItemDelegate.h
     ./listpane.cpp

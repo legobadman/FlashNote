@@ -62,6 +62,7 @@ protected slots:
 	void decreaseIndentation();
 	void insertImage();
 	void textSource();
+	void setHtmlFile();
 
 protected:
 	void mergeFormatOnWordOrSelection(const QTextCharFormat& format);

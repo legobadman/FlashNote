@@ -12,6 +12,7 @@
 
 RichTextEditor::RichTextEditor(QWidget* parent)
 	: QTextEdit(parent)
+	, highlighter(NULL)
 {
 	QString fontFamily = QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ");
 	QFont font(fontFamily, 10);
@@ -19,6 +20,8 @@ RichTextEditor::RichTextEditor(QWidget* parent)
 	document()->setDocumentMargin(20);
 	setFrameShape(QFrame::NoFrame);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	highlighter = new CppSyntaxHighlighter(document());
 }
 
 void RichTextEditor::dropImage(const QUrl& url, const QImage& image)

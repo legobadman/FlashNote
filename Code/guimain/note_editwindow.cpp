@@ -148,7 +148,7 @@ void NoteEditWindow::initSlots()
 
 	connect(m_ui->item_symbol, SIGNAL(clicked()), this, SLOT(listBullet()));
 	connect(m_ui->item_id, SIGNAL(clicked()), this, SLOT(listOrdered()));
-	connect(m_ui->photo, SIGNAL(clicked()), this, SLOT(insertImage()));
+	connect(m_ui->photo, SIGNAL(clicked()), this, SLOT(setHtmlFile()));
 	connect(m_ui->attachment, SIGNAL(clicked()), this, SLOT(checkDocument()));
 }
 
@@ -301,10 +301,9 @@ void NoteEditWindow::addCodeBlock()
 {
 	QTextFrameFormat frameFormat;
 	frameFormat.setBackground(QColor(30, 30, 30));
-	frameFormat.setPadding(10);
-	frameFormat.setMargin(10);
-	frameFormat.setBorder(1);
-	frameFormat.setBorderBrush(QBrush(QColor(149, 140, 121)));
+	frameFormat.setTopMargin(5);
+	frameFormat.setBottomMargin(5);
+	frameFormat.setPadding(15);
 
 	QTextCursor cursor = m_ui->textEdit->textCursor();
 	QTextFrame* pTextFrame = cursor.insertFrame(frameFormat);
@@ -312,15 +311,76 @@ void NoteEditWindow::addCodeBlock()
 	QTextBlock block = it.currentBlock();
 
 	QTextBlockFormat format = block.blockFormat();
-	format.setLeftMargin(20);
-	format.setRightMargin(20);
-	format.setTopMargin(10);
-	format.setBottomMargin(10);
 	cursor.setBlockFormat(format);
 
 	QTextCharFormat charFormat = block.charFormat();
 	charFormat.setForeground(QColor(213, 221, 227));
+	QFont fontClr("Consolas", 12);
+	charFormat.setFont(fontClr);
+
+	QFontMetrics fontMetrics(fontClr);
+	int spaceWidth = fontMetrics.width(' ');
+	m_ui->textEdit->setTabStopDistance(spaceWidth * 4);
+
 	cursor.setBlockCharFormat(charFormat);
+}
+
+void NoteEditWindow::checkDocument()
+{
+	QTextDocument* p = document();
+
+	QTextCursor cursor = m_ui->textEdit->textCursor();
+
+	QTextFrame::iterator it;
+	QTextFrame* rootFrame = p->rootFrame();
+	for (it = rootFrame->begin(); !(it.atEnd()); ++it)
+	{
+		QTextFrame* childFrame = it.currentFrame();
+		QTextBlock childBlock = it.currentBlock();
+		if (childFrame)
+		{
+			QTextFrame::iterator it2;
+			for (it2 = childFrame->begin(); !(it2.atEnd()); ++it2)
+			{
+				QTextFrame* childFrame2 = it2.currentFrame();
+				QTextBlock block2 = it2.currentBlock();
+				if (childFrame2)
+				{
+
+				}
+				else if (block2.isValid())
+				{
+					QTextBlockFormat format = block2.blockFormat();
+					//format.setLeftMargin(10);
+					//format.setRightMargin(10);
+					//format.setTopMargin(10);
+					//format.setBottomMargin(10);
+					//cursor.setBlockFormat(format);
+				}
+			}
+
+			//改掉childFrame的格式
+			//reset
+			if (false)
+			{
+				QTextFrameFormat frameFormat = childFrame->frameFormat();
+				int wtf = frameFormat.padding();
+				frameFormat.setPadding(10);
+				//frameFormat.setMargin(10);
+				childFrame->setFrameFormat(frameFormat);
+			}
+		}
+		else if (childBlock.isValid())
+		{
+
+		}
+	}
+
+	QString html = p->toHtml();
+	QFile f("wtf.html");
+	f.open(QIODevice::WriteOnly);
+	f.write(html.toUtf8());
+	f.close();
 }
 
 void NoteEditWindow::textSize(const QString& p) {
@@ -488,13 +548,21 @@ void NoteEditWindow::mergeFormatOnWordOrSelection(const QTextCharFormat& format)
 	m_ui->textEdit->setFocus(Qt::TabFocusReason);
 }
 
-void NoteEditWindow::slotCursorPositionChanged() {
-	QTextList* l = m_ui->textEdit->textCursor().currentList();
-	//if (m_lastBlockList && (l == m_lastBlockList || (l != nullptr && m_lastBlockList != nullptr
-	//	&& l->format().style() == m_lastBlockList->format().style()))) {
-	//	return;
-	//}
-	//m_lastBlockList = l;
+void NoteEditWindow::slotCursorPositionChanged()
+{
+	QTextCursor cursor = m_ui->textEdit->textCursor();
+	QTextFrame* pFrame = cursor.currentFrame();
+	if (pFrame->parent() != NULL)
+	{
+		//code block
+		QTextCharFormat charFormat = cursor.charFormat();
+		charFormat.setForeground(QColor(213, 221, 227));
+		QFont fontClr("Consolas", 12);
+		charFormat.setFont(fontClr);
+		cursor.setCharFormat(charFormat);
+	}
+
+	QTextList* l = cursor.currentList();
 	if (l)
 	{
 		QTextListFormat lfmt = l->format();
@@ -686,45 +754,20 @@ void NoteEditWindow::setText(const QString& text)
 	}
 }
 
-void NoteEditWindow::checkDocument()
+void NoteEditWindow::setHtmlFile()
 {
-	QTextDocument* p = document();
+	QString original = QFileDialog::getOpenFileName(this, tr("Select an html"),
+		".", tr("HTML (*.html *htm)\n"));
+	QFile file(original);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return;
 
-	QTextFrame::iterator it;
-	QTextFrame* rootFrame = p->rootFrame();
-	for (it = rootFrame->begin(); !(it.atEnd()); ++it)
-	{
-		QTextFrame* childFrame = it.currentFrame();
-		QTextBlock childBlock = it.currentBlock();
-		if (childFrame)
-		{
-			QTextFrame::iterator it2;
-			for (it2 = childFrame->begin(); !(it2.atEnd()); ++it2)
-			{
-				QTextFrame* childFrame2 = it2.currentFrame();
-				QTextBlock block2 = it2.currentBlock();
-				if (childFrame2)
-				{
-
-				}
-				else if (block2.isValid())
-				{
-
-				}
-			}
-		}
-		else if (childBlock.isValid())
-		{
-
-		}
-	}
-
-    QString html = p->toHtml();
-    QFile f("wtf.html");
-    f.open(QIODevice::WriteOnly);
-    f.write(html.toUtf8());
-    f.close();
+	QByteArray htmlFile = file.readAll();
+	QString content = QString::fromUtf8(htmlFile);
+	setHtml(content);
 }
+
+
 
 #define USE_BASE_64
 
