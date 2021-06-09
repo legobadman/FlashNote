@@ -1,6 +1,7 @@
 #ifndef __ALIGNMENT_COMBOBOX_H__
 #define __ALIGNMENT_COMBOBOX_H__
 
+#include "menubutton.h"
 
 class PopupWidget;
 

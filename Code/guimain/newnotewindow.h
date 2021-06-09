@@ -10,7 +10,7 @@ class NewNoteWindow : public QMainWindow
 {
 	Q_OBJECT
 public:
-	NewNoteWindow(QWidget* parent);
+	NewNoteWindow(QWidget* parent, NOTE_TYPE type);
 	~NewNoteWindow();
 	void init(QString bookid);
 
@@ -22,6 +22,7 @@ signals:
 
 private:
 	Ui::NewNoteWindow* m_ui;
+	NOTE_TYPE m_type;
 	com_sptr<INote> m_pNote;
 };
 

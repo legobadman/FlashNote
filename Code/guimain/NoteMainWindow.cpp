@@ -35,7 +35,7 @@ void NoteMainWindow::init()
 
 	connect(m_ui->listpane, SIGNAL(clicked(const QModelIndex&)),
 		this, SLOT(onLeftTreeClicked(const QModelIndex&)));
-	connect(m_ui->listpane, SIGNAL(newnote()), this, SLOT(onNewNote()));
+	connect(m_ui->listpane, SIGNAL(newnote(NOTE_TYPE)), this, SLOT(onNewNote(NOTE_TYPE)));
 	connect(m_ui->listpane, SIGNAL(addnotebook()), this, SLOT(onAddNotebook()));
 }
 
@@ -55,9 +55,9 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 	m_ui->notesview->setNotebook(VIEW_NOTEBOOK, spNotebook);
 }
 
-void NoteMainWindow::onNewNote()
+void NoteMainWindow::onNewNote(NOTE_TYPE noteType)
 {
-	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL);
+	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, noteType);
 	pNewNoteWindow->init(getActiveBookId());
 	pNewNoteWindow->showMaximized();
 }

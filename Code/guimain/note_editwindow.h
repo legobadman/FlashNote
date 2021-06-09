@@ -20,59 +20,13 @@ public:
 	void initContent();
 	void updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edittable);
 	INote* GetNote();
-
-	QString toPlainText() const { return m_ui->textEdit->toPlainText(); }
-	QString toHtml() const;
-	QTextDocument* document() { return m_ui->textEdit->document(); }
-	QTextCursor textCursor() const { return m_ui->textEdit->textCursor(); }
-	void setTextCursor(const QTextCursor& cursor) { m_ui->textEdit->setTextCursor(cursor); }
 	void setBookName(const QString& name);
 
 public slots:
-	void setText(const QString& text);
-	void clearSource();
-	void checkDocument();
 	void onTitleChanged();
 	void onTextChanged();
 	void saveNote();
 	void switchtobook(int bookidx);
-
-protected slots:
-	void setPlainText(const QString& text) { m_ui->textEdit->setPlainText(text); }
-	void setHtml(const QString& text) { m_ui->textEdit->setHtml(text); }
-	void textRemoveFormat();
-	void textRemoveAllFormat();
-	void textBold();
-	void textUnderline();
-	void textStrikeout();
-	void addCodeBlock();
-	void textItalic();
-	void textSize(const QString& p);
-	void onFontChanged(const QString& font);
-	void textLink(bool checked);
-	void textStyle(int index);
-	void textFgColor(const QColor& color);
-	void textBgColor();
-	void listBullet();
-	void listOrdered();
-	void slotCurrentCharFormatChanged(const QTextCharFormat& format);
-	void slotCursorPositionChanged();
-	void slotClipboardDataChanged();
-	void increaseIndentation();
-	void decreaseIndentation();
-	void insertImage();
-	void textSource();
-	void setHtmlFile();
-
-protected:
-	void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
-	void fontChanged(const QFont& f);
-	void fgColorChanged(const QColor& c);
-	void bgColorChanged(const QColor& c);
-	void list(bool checked, QTextListFormat::Style style);
-	void indent(int delta);
-	void focusInEvent(QFocusEvent* event);
-	void mousePressEvent(QMouseEvent* event);
 
 private:
 	void initSlots();
@@ -81,24 +35,7 @@ private:
 	Ui::NoteEditWindow* m_ui;
 	com_sptr<INote> m_pNote;
 	com_sptr<INotebook> m_pNotebook;
-
-	QStringList m_paragraphItems;
-	int m_fontsize_h1;
-	int m_fontsize_h2;
-	int m_fontsize_h3;
-	int m_fontsize_h4;
-
-	enum ParagraphItems {
-		ParagraphStandard = 0,
-		ParagraphHeading1,
-		ParagraphHeading2,
-		ParagraphHeading3,
-		ParagraphHeading4,
-		ParagraphMonospace
-	};
-
-	QPointer<QTextList> m_lastBlockList;
-	bool m_bEnableBase64;
+	NOTE_TYPE m_type;
 	bool m_bEdittable;
 };
 

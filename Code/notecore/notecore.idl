@@ -9,6 +9,7 @@ interface ITrash;
 typedef enum NOTE_TYPE
 {
 	NORMAL_NOTE = 0,
+	MINDMAP,
 	UNKNOWN_TYPE,
 }NOTE_TYPE;
 

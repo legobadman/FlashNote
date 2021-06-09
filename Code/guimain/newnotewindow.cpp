@@ -4,8 +4,9 @@
 #include "guihelper.h"
 
 
-NewNoteWindow::NewNoteWindow(QWidget* parent)
+NewNoteWindow::NewNoteWindow(QWidget* parent, NOTE_TYPE type)
 	: QMainWindow(parent)
+	, m_type(type)
 {
 	m_ui = new Ui::NewNoteWindow();
 	m_ui->setupUi(this);
@@ -22,7 +23,7 @@ void NewNoteWindow::init(QString bookid)
 
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebookById(bookid, &spNotebook);
-	HRESULT hr = CreateNote(NORMAL_NOTE, &m_pNote);
+	HRESULT hr = CreateNote(m_type, &m_pNote);
 	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
 }
 

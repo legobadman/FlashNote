@@ -120,7 +120,8 @@ typedef
 enum NOTE_TYPE
     {
         NORMAL_NOTE	= 0,
-        UNKNOWN_TYPE	= ( NORMAL_NOTE + 1 ) 
+        MINDMAP	= ( NORMAL_NOTE + 1 ) ,
+        UNKNOWN_TYPE	= ( MINDMAP + 1 ) 
     } 	NOTE_TYPE;
 
 typedef 

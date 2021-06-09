@@ -33,6 +33,8 @@
 	<file>icons/16x16/default_color.png</file>
 	<file>icons/16x16/add_normal.png</file>
 	<file>icons/16x16/strikeout.png</file>
+	<file>icons/16x16/newnotemenu.png</file>
+	<file>icons/16x16/newnotemenu_hover.png</file>
 	<file>icons/24x24/more.png</file>
 	<file>icons/24x24/sort_options.png</file>
 	<file>icons/24x24/listview.png</file>

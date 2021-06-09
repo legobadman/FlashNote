@@ -137,201 +137,10 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <property name="spacing">
-      <number>3</number>
-     </property>
-     <property name="leftMargin">
-      <number>8</number>
-     </property>
-     <property name="rightMargin">
-      <number>8</number>
-     </property>
-     <item>
-      <widget class="FontComboBox" name="font_comboBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>150</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>微软雅黑 Light</family>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-       <property name="editable">
-        <bool>true</bool>
-       </property>
-       <property name="maxVisibleItems">
-        <number>30</number>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>0</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="FontComboSizeBox" name="fontsize_comboBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>50</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>50</width>
-         <height>28</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>Calibri</family>
-         <pointsize>13</pointsize>
-         <kerning>false</kerning>
-        </font>
-       </property>
-       <property name="editable">
-        <bool>true</bool>
-       </property>
-       <property name="maxVisibleItems">
-        <number>30</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="FontColorComboBox" name="fontcolor" native="true"/>
-     </item>
-     <item>
-      <widget class="ToolButton" name="bold" native="true">
-       <property name="text" stdset="0">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ToolButton" name="italic" native="true">
-       <property name="text" stdset="0">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ToolButton" name="underline" native="true">
-       <property name="text" stdset="0">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ToolButton" name="strikeout" native="true"/>
-     </item>
-     <item>
-      <widget class="ToolButton" name="highlight" native="true">
-       <property name="text" stdset="0">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ToolButton" name="codeblock" native="true">
-       <property name="text" stdset="0">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="SeperateVLine" name="vline"/>
-     </item>
-     <item>
-      <widget class="ToolButton" name="item_symbol" native="true"/>
-     </item>
-     <item>
-      <widget class="ToolButton" name="item_id" native="true"/>
-     </item>
-     <item>
-      <widget class="AlignmentComboBox" name="alignment2" native="true"/>
-     </item>
-     <item>
-      <widget class="SeperateVLine" name="vline2"/>
-     </item>
-     <item>
-      <widget class="ToolButton" name="attachment" native="true"/>
-     </item>
-     <item>
-      <widget class="ToolButton" name="photo" native="true"/>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame2">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>10</width>
-       <height>1</height>
-      </size>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::HLine</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
-     </property>
-     <property name="lineWidth">
-      <number>1</number>
-     </property>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <widget class="NormalEditor" name="noramlEditor"/>
+     <widget class="MindMapWidget" name="mindmapEditor"/>
     </widget>
-   </item>
-   <item>
-    <widget class="RichTextEditor" name="textEdit"/>
    </item>
   </layout>
  </widget>
@@ -381,6 +190,16 @@
    <class>AlignmentComboBox</class>
    <extends>MenuButton</extends>
    <header>alignmentcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>NormalEditor</class>
+   <extends>QWidget</extends>
+   <header>normal_editor.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MindMapWidget</class>
+   <extends>QWidget</extends>
+   <header>mindmap/mindmapwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

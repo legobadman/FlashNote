@@ -7,17 +7,11 @@ HRESULT CreateNote(NOTE_TYPE type, INote** ppNote)
 	{
 		return E_POINTER;
 	}
-	if (NORMAL_NOTE == type)
-	{
-		INote* pNote = new NoteBase;
-		(*ppNote) = pNote;
-		(*ppNote)->AddRef();
-		return S_OK;
-	}
-	else
-	{
-		return E_NOTIMPL;
-	}
+	INote* pNote = new NoteBase;
+	pNote->SetType(type);
+	(*ppNote) = pNote;
+	(*ppNote)->AddRef();
+	return S_OK;
 }
 
 HRESULT CreateNotebook(INotebook** ppNotebook)

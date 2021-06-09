@@ -85,6 +85,16 @@ add_executable(guimain
     ./LeftSideItemDelegate.h
     ./listpane.cpp
     ./listpane.h
+    ./mindmap/mindlink.cpp
+    ./mindmap/mindlink.h
+    ./mindmap/mindmapview.cpp
+    ./mindmap/mindmapview.h
+    ./mindmap/mindmapwidget.cpp
+    ./mindmap/mindmapwidget.h
+    ./mindmap/mindnode.cpp
+    ./mindmap/mindnode.h
+    ./newitemdelegate.cpp
+    ./newitemdelegate.h
     ./newnotewindow.cpp
     ./newnotewindow.h
     ./newnotewindow.ui
@@ -104,6 +114,8 @@ add_executable(guimain
     ./notetrayicon.h
     ./notewinservice.cpp
     ./notewinservice.h
+    ./normal_editor.cpp
+    ./normal_editor.h
     ./popupwidget.cpp
     ./popupwidget.h
     ./res/icons.qrc
@@ -126,6 +138,10 @@ add_executable(guimain
     ./style/ToolButtonStyle.h
     ./style/toolbuttonstyleoption.cpp
     ./style/toolbuttonstyleoption.h
+    ./typography/customtextdocument.cpp
+    ./typography/customtextdocument.h
+    ./typography/codetextframe.cpp
+    ./typography/codetextframe.h
 
     #qt ‘—È¥˙¬Î
     ./qtexamples/MltpDlgs1.cpp
