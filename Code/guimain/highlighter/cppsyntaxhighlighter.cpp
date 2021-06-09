@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "cppsyntaxhighlighter.h"
+#include "common_types.h"
 
 
 CppSyntaxHighlighter::CppSyntaxHighlighter(QTextDocument* parent /* = 0 */)
@@ -19,7 +20,8 @@ CppSyntaxHighlighter::CppSyntaxHighlighter(QTextDocument* parent /* = 0 */)
 		QStringLiteral("\\bslots\\b"), QStringLiteral("\\bstatic\\b"), QStringLiteral("\\bstruct\\b"),
 		QStringLiteral("\\btemplate\\b"), QStringLiteral("\\btypedef\\b"), QStringLiteral("\\btypename\\b"),
 		QStringLiteral("\\bunion\\b"), QStringLiteral("\\bunsigned\\b"), QStringLiteral("\\bvirtual\\b"),
-		QStringLiteral("\\bvoid\\b"), QStringLiteral("\\bvolatile\\b"), QStringLiteral("\\bbool\\b")
+		QStringLiteral("\\bvoid\\b"), QStringLiteral("\\bvolatile\\b"), QStringLiteral("\\bbool\\b"),
+		QStringLiteral("\\bfor\\b"), QStringLiteral("\\bnew\\b"),
 	};
 	for (const QString& pattern : keywordPatterns) {
 		rule.pattern = QRegularExpression(pattern);
@@ -28,18 +30,17 @@ CppSyntaxHighlighter::CppSyntaxHighlighter(QTextDocument* parent /* = 0 */)
 	}
 
 	classFormat.setFontWeight(QFont::Bold);
-	classFormat.setForeground(Qt::darkMagenta);
+	classFormat.setForeground(QColor(255,215,0));
 	rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
 	rule.format = classFormat;
 	highlightingRules.append(rule);
 
-	quotationFormat.setForeground(Qt::darkGreen);
+	quotationFormat.setForeground(QColor(213,153,122));
 	rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
 	rule.format = quotationFormat;
 	highlightingRules.append(rule);
 
-	functionFormat.setFontItalic(true);
-	functionFormat.setForeground(Qt::blue);
+	functionFormat.setForeground(QColor(255,128,0));
 	rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
 	rule.format = functionFormat;
 	highlightingRules.append(rule);
