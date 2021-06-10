@@ -16,6 +16,7 @@ public:
 
 private slots:
 	void addNode();
+	void addNode2();
 	void addLink();
 	void bringToFront();
 	void sendToBack();
@@ -25,7 +26,7 @@ private:
 
 	void createActions();
 	void setZValue(int z);
-	void setupNode(MindNode* node);
+	void setupNode(QGraphicsItem* node);
 	MindNode* selectedNode() const;
 	MindLink* selectedLink() const;
 	NodePair selectedNodePair() const;

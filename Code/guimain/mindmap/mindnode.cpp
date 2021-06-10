@@ -4,15 +4,18 @@
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QInputDialog>
 #include <QLineEdit>
+#include <QTextFrame>
 
 
-MindNode::MindNode()
+MindNode::MindNode(const QString& text)
+	: m_level(0)
+	, myText(text)
 {
-	myTextColor = Qt::darkGreen;
-	myOutlineColor = Qt::darkBlue;
-	myBackgroundColor = Qt::white;
+	myTextColor = QColor(255, 255, 255);
+	myOutlineColor = QColor(0, 181, 72);
+	myBackgroundColor = QColor(0, 181, 72);
 
-	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable);
+	setFlags(ItemSendsGeometryChanges | ItemIsSelectable);
 }
 
 MindNode::~MindNode()
@@ -93,7 +96,7 @@ void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 {
 	QPen pen(myOutlineColor);
 	if (option->state & QStyle::State_Selected) {
-		pen.setStyle(Qt::DotLine);
+		pen.setStyle(Qt::SolidLine);
 		pen.setWidth(2);
 	}
 	painter->setPen(pen);
@@ -103,6 +106,8 @@ void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 	painter->drawRoundRect(rect, roundness(rect.width()), roundness(rect.height()));
 
 	painter->setPen(myTextColor);
+	QFont font(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), pointSize(m_level));
+	painter->setFont(font);
 	painter->drawText(rect, Qt::AlignCenter, myText);
 }
 
@@ -128,7 +133,8 @@ QVariant MindNode::itemChange(GraphicsItemChange change, const QVariant& value)
 QRectF MindNode::outlineRect() const
 {
 	const int Padding = 8;
-	QFontMetricsF metrics = QApplication::fontMetrics();
+	QFont font(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), pointSize(m_level));
+	QFontMetricsF metrics(font);
 	QRectF rect = metrics.boundingRect(myText);
 	rect.adjust(-Padding, -Padding, Padding, Padding);
 	rect.translate(-rect.center());
@@ -139,4 +145,94 @@ int MindNode::roundness(double size) const
 {
 	const int Diameter = 12;
 	return 100 * Diameter / int(size);
+}
+
+int MindNode::pointSize(int level) const
+{
+	switch (level)
+	{
+	case 0: return 15;
+	case 1: return 14;
+	case 2: return 12;
+	case 3: return 10;
+	default:
+		return 9;
+	}
+}
+
+
+/////////////////////////////////////////////////////////////
+MindTextNode::MindTextNode(const QString& text)
+	: m_level(0)
+	, myText(text)
+{
+	myTextColor = QColor(255, 255, 255);
+	myOutlineColor = QColor(0, 181, 72);
+	myBackgroundColor = QColor(0, 181, 72);
+
+	initDocFormat(myText);
+	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable);
+	setTextInteractionFlags(Qt::TextEditorInteraction);
+}
+
+MindTextNode::~MindTextNode()
+{
+
+}
+
+void MindTextNode::setText(const QString& text)
+{
+	setPlainText(text);
+}
+
+void MindTextNode::initDocFormat(const QString& text)
+{
+	QTextDocument* doc = document();
+
+	QTextCursor cursor = textCursor();
+	cursor.movePosition(QTextCursor::Start);
+
+	QTextFrame::iterator it;
+	QTextFrame* rootFrame = doc->rootFrame();
+	for (it = rootFrame->begin(); !(it.atEnd()); ++it)
+	{
+		QTextFrame* childFrame = it.currentFrame();
+		QTextBlock childBlock = it.currentBlock();
+		if (childBlock.isValid())
+		{
+			QTextBlockFormat format = childBlock.blockFormat();
+			format.setBackground(myBackgroundColor);
+			format.setLeftMargin(15);
+			format.setRightMargin(15);
+			cursor.setBlockFormat(format);
+
+			QTextCharFormat chrFormat = childBlock.charFormat();
+			chrFormat.setFont(QFont(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), pointSize(m_level)));
+			chrFormat.setForeground(myTextColor);
+			cursor.setBlockCharFormat(chrFormat);
+		}
+	}
+	cursor.insertText(text);
+
+	QTextFrameFormat frameFormat = rootFrame->frameFormat();
+	frameFormat.setBackground(myBackgroundColor);
+	frameFormat.setMargin(0);
+	frameFormat.setPadding(5);
+	frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+	frameFormat.setBorderBrush(QColor(23, 157, 235));
+	frameFormat.setBorder(1);
+	rootFrame->setFrameFormat(frameFormat);
+}
+
+int MindTextNode::pointSize(int level) const
+{
+	switch (level)
+	{
+	case 0: return 15;
+	case 1: return 14;
+	case 2: return 12;
+	case 3: return 10;
+	default:
+		return 9;
+	}
 }

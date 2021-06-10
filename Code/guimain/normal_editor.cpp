@@ -298,7 +298,6 @@ void NormalEditor::addCodeBlock()
 	frameFormat.setTopMargin(5);
 	frameFormat.setBottomMargin(5);
 	frameFormat.setPadding(15);
-	frameFormat.setObjectType(TextObjType::CodeFrameObject);
 
 	QTextCursor cursor = textEdit->textCursor();
 	QTextFrame* pTextFrame = cursor.insertFrame(frameFormat);
@@ -306,7 +305,6 @@ void NormalEditor::addCodeBlock()
 	QTextBlock block = it.currentBlock();
 
 	QTextBlockFormat format = block.blockFormat();
-	format.setObjectType(TextObjType::CodeBlockObject);
 	cursor.setBlockFormat(format);
 
 	QTextCharFormat charFormat = block.charFormat();

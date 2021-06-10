@@ -7,9 +7,10 @@ class MindLink;
 
 class MindNode : public QGraphicsItem
 {
+	typedef QGraphicsItem _base;
 	Q_DECLARE_TR_FUNCTIONS(MindNode)
 public:
-	MindNode();
+	MindNode(const QString& text);
 	~MindNode();
 	void setText(const QString& text);
 	QString text() const;
@@ -34,12 +35,35 @@ protected:
 private:
 	QRectF outlineRect() const;
 	int roundness(double size) const;
+	int pointSize(int level) const;
 
 	QSet<MindLink*> myLinks;
 	QString myText;
 	QColor myTextColor;
 	QColor myBackgroundColor;
 	QColor myOutlineColor;
+	int m_level;
+};
+
+class MindTextNode : public QGraphicsTextItem
+{
+	Q_DECLARE_TR_FUNCTIONS(MindTextNode)
+public:
+	MindTextNode(const QString& text);
+	~MindTextNode();
+
+	void setText(const QString& text);
+
+private:
+	void initDocFormat(const QString& text);
+	int pointSize(int level) const;
+
+private:
+	QString myText;
+	QColor myTextColor;
+	QColor myBackgroundColor;
+	QColor myOutlineColor;
+	int m_level;
 };
 
 #endif

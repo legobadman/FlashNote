@@ -36,7 +36,7 @@ void MindMapWidget::createActions()
 	connect(m_pAddLink, SIGNAL(triggered()), this, SLOT(addLink()));
 }
 
-void MindMapWidget::setupNode(MindNode* node)
+void MindMapWidget::setupNode(QGraphicsItem* node)
 {
 	node->setPos(QPoint(80 + (100 * (seqNumber % 5)),
 		80 + (50 * ((seqNumber / 5) % 7))));
@@ -82,8 +82,13 @@ MindNode* MindMapWidget::selectedNode() const
 
 void MindMapWidget::addNode()
 {
-	MindNode* node = new MindNode;
-	node->setText(tr("Node %1").arg(seqNumber));
+	MindNode* node = new MindNode(u8"思维导图笔记");
+	setupNode(node);
+}
+
+void MindMapWidget::addNode2()
+{
+	MindTextNode* node = new MindTextNode(u8"思维导图笔记");
 	setupNode(node);
 }
 
