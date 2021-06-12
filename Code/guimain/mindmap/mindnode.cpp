@@ -165,6 +165,18 @@ int MindNode::pointSize(int level) const
 MindTextNode::MindTextNode(const QString& text)
 	: m_level(0)
 	, myText(text)
+	, m_bHovered(false)
+	, m_borderWidth(2)
+{
+	init();
+}
+
+MindTextNode::~MindTextNode()
+{
+
+}
+
+void MindTextNode::init()
 {
 	myTextColor = QColor(255, 255, 255);
 	myOutlineColor = QColor(0, 181, 72);
@@ -173,16 +185,16 @@ MindTextNode::MindTextNode(const QString& text)
 	initDocFormat(myText);
 	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable);
 	setTextInteractionFlags(Qt::TextEditorInteraction);
-}
 
-MindTextNode::~MindTextNode()
-{
+	QPalette pal = palette();
+	//处理选中文本的情况。
+	pal.setBrush(QPalette::Active, QPalette::Highlight, QColor(0, 129, 218));
+	pal.setBrush(QPalette::Active, QPalette::HighlightedText, QColor(255, 255, 255));
+	pal.setBrush(QPalette::Inactive, QPalette::Highlight, myBackgroundColor);
+	pal.setBrush(QPalette::Inactive, QPalette::HighlightedText, myTextColor);
 
-}
-
-void MindTextNode::setText(const QString& text)
-{
-	setPlainText(text);
+	setPalette(pal);
+	setCornerRadius(8);
 }
 
 void MindTextNode::initDocFormat(const QString& text)
@@ -202,8 +214,6 @@ void MindTextNode::initDocFormat(const QString& text)
 		{
 			QTextBlockFormat format = childBlock.blockFormat();
 			format.setBackground(myBackgroundColor);
-			format.setLeftMargin(15);
-			format.setRightMargin(15);
 			cursor.setBlockFormat(format);
 
 			QTextCharFormat chrFormat = childBlock.charFormat();
@@ -217,11 +227,56 @@ void MindTextNode::initDocFormat(const QString& text)
 	QTextFrameFormat frameFormat = rootFrame->frameFormat();
 	frameFormat.setBackground(myBackgroundColor);
 	frameFormat.setMargin(0);
-	frameFormat.setPadding(5);
+	frameFormat.setPadding(15);
+
 	frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 	frameFormat.setBorderBrush(QColor(23, 157, 235));
-	frameFormat.setBorder(1);
+	frameFormat.setBorder(m_borderWidth);
 	rootFrame->setFrameFormat(frameFormat);
+}
+
+bool MindTextNode::sceneEvent(QEvent* event)
+{
+	switch (event->type())
+	{
+	case QEvent::GraphicsSceneHoverEnter: m_bHovered = true; break;
+	case QEvent::GraphicsSceneHoverLeave: m_bHovered = false; break;
+	default:
+		break;
+	}
+	return QGraphicsTextItem::sceneEvent(event);
+}
+
+void MindTextNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
+{
+	QTextFrame* rootFrame = document()->rootFrame();
+	QTextFrameFormat frameFormat = rootFrame->frameFormat();
+	if (option->state & (QStyle::State_Selected | QStyle::State_HasFocus))
+	{
+		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+		frameFormat.setBorderBrush(QColor(23, 157, 235));
+		frameFormat.setBorder(m_borderWidth);
+	}
+	else if (m_bHovered)
+	{
+		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+		frameFormat.setBorderBrush(QColor(23, 157, 235));
+		frameFormat.setBorder(m_borderWidth);
+	}
+	else
+	{
+		//由于边框是画在背景边缘，因此为了隐藏边框需要设成背景的颜色。
+		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+		frameFormat.setBorderBrush(myBackgroundColor);
+		frameFormat.setBorder(m_borderWidth);
+	}
+	rootFrame->setFrameFormat(frameFormat);
+}
+
+void MindTextNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+	udpateBorderFormat(option);
+	QGraphicsTextItem::paint(painter, option, widget);
 }
 
 int MindTextNode::pointSize(int level) const

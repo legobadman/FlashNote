@@ -51,12 +51,16 @@ class MindTextNode : public QGraphicsTextItem
 public:
 	MindTextNode(const QString& text);
 	~MindTextNode();
+	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 
-	void setText(const QString& text);
+protected:
+	bool sceneEvent(QEvent* event) override;
 
 private:
+	void init();
 	void initDocFormat(const QString& text);
 	int pointSize(int level) const;
+	void udpateBorderFormat(const QStyleOptionGraphicsItem* option);
 
 private:
 	QString myText;
@@ -64,6 +68,8 @@ private:
 	QColor myBackgroundColor;
 	QColor myOutlineColor;
 	int m_level;
+	int m_borderWidth;
+	bool m_bHovered;
 };
 
 #endif

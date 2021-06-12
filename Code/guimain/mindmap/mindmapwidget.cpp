@@ -20,7 +20,7 @@ MindMapWidget::MindMapWidget(QWidget* parent /* = NULL */)
 	pMainLayout->addWidget(m_view);
 	setLayout(pMainLayout);
 
-	addNode();
+	addNode2();
 }
 
 MindMapWidget::~MindMapWidget()
