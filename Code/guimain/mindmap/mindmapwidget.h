@@ -16,7 +16,8 @@ public:
 
 private slots:
 	void addNode();
-	void addNode2();
+	MindTextNode* newNode(const QString& text);
+	void addNode(MindTextNode* pParent, MindTextNode* pChild);
 	void addLink();
 	void bringToFront();
 	void sendToBack();
@@ -30,6 +31,7 @@ private:
 	MindNode* selectedNode() const;
 	MindLink* selectedLink() const;
 	NodePair selectedNodePair() const;
+	QRectF arrangeItemPosition(QPoint rootLT, MindTextNode* pItem);
 
 private:
 	QGraphicsScene* m_scene;

@@ -52,6 +52,8 @@ public:
 	MindTextNode(const QString& text);
 	~MindTextNode();
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
+	const QList<MindTextNode*>& children() const { return m_children; }
+	void insert(int i, MindTextNode* pNode) { m_children.insert(i, pNode); }
 
 protected:
 	bool sceneEvent(QEvent* event) override;
@@ -69,7 +71,9 @@ private:
 	QColor myOutlineColor;
 	int m_level;
 	int m_borderWidth;
+	int m_cornerRadius;
 	bool m_bHovered;
+	QList<MindTextNode*> m_children;
 };
 
 #endif

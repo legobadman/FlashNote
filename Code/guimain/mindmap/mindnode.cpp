@@ -166,7 +166,8 @@ MindTextNode::MindTextNode(const QString& text)
 	: m_level(0)
 	, myText(text)
 	, m_bHovered(false)
-	, m_borderWidth(2)
+	, m_borderWidth(1)
+	, m_cornerRadius(10)
 {
 	init();
 }
@@ -194,7 +195,7 @@ void MindTextNode::init()
 	pal.setBrush(QPalette::Inactive, QPalette::HighlightedText, myTextColor);
 
 	setPalette(pal);
-	setCornerRadius(8);
+	setCornerRadius(m_cornerRadius);
 }
 
 void MindTextNode::initDocFormat(const QString& text)

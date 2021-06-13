@@ -6,7 +6,7 @@ endif()
 
 SET(BUILD_ROOT ../)
 
-list(APPEND CMAKE_PREFIX_PATH "C:/Qt/Qt-5.15.0/lib/cmake")
+list(APPEND CMAKE_PREFIX_PATH "E:/Qt/qtbase/lib/cmake")
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_ROOT}/bin)
 

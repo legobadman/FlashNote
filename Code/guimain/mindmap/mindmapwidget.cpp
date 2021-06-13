@@ -9,18 +9,37 @@ MindMapWidget::MindMapWidget(QWidget* parent /* = NULL */)
 	, m_view(NULL)
 	, seqNumber(0)
 {
-	m_scene = new QGraphicsScene(0, 0, 600, 500);
+	//m_scene = new QGraphicsScene(0, 0, 400, 600);
+	m_scene = new QGraphicsScene;
+	//m_scene->setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
 	m_view = new MindMapView;
+	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	m_view->setScene(m_scene);
 	m_view->setDragMode(QGraphicsView::RubberBandDrag);
 	m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 	m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
+	//m_view->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+	//m_view->setAlignment(Qt::AlignCenter);
+	//m_view->setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
 
 	QVBoxLayout* pMainLayout = new QVBoxLayout;
 	pMainLayout->addWidget(m_view);
 	setLayout(pMainLayout);
 
-	addNode2();
+	MindTextNode* pRoot = newNode(u8"思维导图笔记");
+	MindTextNode* pChild = newNode(u8"新增节点");
+	MindTextNode* pChild2 = newNode(u8"新增节点");
+	pChild->insert(0, newNode(u8"新增子节点"));
+	pChild->insert(0, newNode(u8"新增子节点"));
+	pRoot->insert(0, pChild);
+	pRoot->insert(0, pChild2);
+	pChild2->insert(0, newNode(u8"新增子节点"));
+	pChild2->insert(0, newNode(u8"新增子节点"));
+	pRoot->insert(0, newNode(u8"新增节点"));
+	pRoot->insert(0, newNode(u8"新增节点"));
+
+	arrangeItemPosition(QPoint(0, 0), pRoot);
 }
 
 MindMapWidget::~MindMapWidget()
@@ -38,13 +57,12 @@ void MindMapWidget::createActions()
 
 void MindMapWidget::setupNode(QGraphicsItem* node)
 {
-	node->setPos(QPoint(80 + (100 * (seqNumber % 5)),
-		80 + (50 * ((seqNumber / 5) % 7))));
 	m_scene->addItem(node);
 	++seqNumber;
 
 	m_scene->clearSelection();
 	node->setSelected(true);
+
 	bringToFront();
 }
 
@@ -86,10 +104,16 @@ void MindMapWidget::addNode()
 	setupNode(node);
 }
 
-void MindMapWidget::addNode2()
+void MindMapWidget::addNode(MindTextNode* pParent, MindTextNode* pChild)
 {
-	MindTextNode* node = new MindTextNode(u8"思维导图笔记");
+	pParent->insert(0, pChild);
+}
+
+MindTextNode* MindMapWidget::newNode(const QString& text)
+{
+	MindTextNode* node = new MindTextNode(text);
 	setupNode(node);
+	return node;
 }
 
 void MindMapWidget::addLink()
@@ -115,4 +139,90 @@ MindMapWidget::NodePair MindMapWidget::selectedNodePair() const
 		}
 	}
 	return NodePair();
+}
+
+QPoint leftConnectPoint(QRectF boundingRect)
+{
+	return QPoint(boundingRect.left(), boundingRect.top() + boundingRect.height() / 2);
+}
+
+
+QRectF MindMapWidget::arrangeItemPosition(QPoint rootLT, MindTextNode* pRoot)
+{
+	//假设不能换行
+	static int HMargin = 60;
+	static int VMargin = 28;
+	
+	const QList<MindTextNode*>& children = pRoot->children();
+	int n = children.size();
+
+	//目前暂时不考虑子级的高度变化。
+	QRectF rootRect = pRoot->boundingRect(); //目前还没指定位置，只能取宽高。
+	qreal itemH = pRoot->boundingRect().height();
+	qreal itemW = pRoot->boundingRect().width();
+
+	float nn = n;
+	
+	QPoint childLT;
+	if (n > 0)
+	{
+		//从children根节点形成的boundingRect中
+		qreal H = 0;
+		for (auto it = children.begin(); it != children.end(); it++)
+		{
+			H += (*it)->boundingRect().height();
+			H += VMargin;
+		}
+		H -= VMargin;
+		
+		//int childTop = qMax<int>(rootLT.y() + VMargin, (rootLT.y() + itemH / 2.0) - H / 2.0);
+		int childTop = rootLT.y();
+		childLT = QPoint(rootLT.x() + itemW + HMargin, childTop);
+	}
+
+	QRectF boundingRect;
+	if (!children.empty())
+	{
+		QVector<QPoint> vecConnectors;
+		for (auto it = children.begin(); it != children.end(); it++)
+		{
+			QRectF rr = arrangeItemPosition(childLT, *it);
+			vecConnectors.push_back(QPoint(rr.left(), rr.top() + rr.height() / 2));
+			boundingRect = boundingRect | rr;
+			boundingRect.adjust(0, 0, 0, VMargin);
+			childLT.setY(boundingRect.bottom());
+		}
+		boundingRect.adjust(0, 0, 0, -VMargin);
+
+		//获得子树形成的区域rExtend，然后向左扩展，得到整棵树的boundingrect
+		boundingRect.adjust(-HMargin - itemW, 0, 0, 0);
+		//取boundRect的左中间
+		QPointF basePos(boundingRect.left(), (boundingRect.top() + boundingRect.bottom() - itemH) / 2.0);
+		pRoot->setPos(basePos);
+
+		QRectF rRoot = pRoot->boundingRect();
+		QPointF rootConnector = basePos + QPointF(itemW, itemH / 2.0F);
+		//锁定了当前节点及子节点的位置，可以画线了。
+		for (int i = 0; i < vecConnectors.size(); i++)
+		{
+			QPoint childConnector = vecConnectors[i];
+			QPainterPath path;
+			path.moveTo(rootConnector);
+
+			QPointF c1((rootConnector.x() + childConnector.x()) / 2.0, rootConnector.y());
+			QPointF c2((rootConnector.x() + childConnector.x()) / 2.0, childConnector.y());
+
+			path.cubicTo(c1, c2, childConnector);
+			QGraphicsPathItem* pathItem = new QGraphicsPathItem(path);
+			pathItem->setPen(QPen(QColor(0, 181, 72), 3));
+			m_scene->addItem(pathItem);
+		}
+		return boundingRect;
+	}
+	else
+	{
+		pRoot->setPos(rootLT);
+		boundingRect = QRectF(rootLT.x(), rootLT.y(), pRoot->boundingRect().width(), pRoot->boundingRect().height());
+	}
+	return boundingRect;
 }
