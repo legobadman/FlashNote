@@ -27,17 +27,28 @@ MindMapWidget::MindMapWidget(QWidget* parent /* = NULL */)
 	pMainLayout->addWidget(m_view);
 	setLayout(pMainLayout);
 
-	MindTextNode* pRoot = newNode(u8"思维导图笔记");
-	MindTextNode* pChild = newNode(u8"新增节点");
-	MindTextNode* pChild2 = newNode(u8"新增节点");
-	pChild->insert(0, newNode(u8"新增子节点"));
-	pChild->insert(0, newNode(u8"新增子节点"));
+	MindTextNode* pRoot = newNode(NULL, u8"思维导图笔记");
+	MindTextNode* pChild = newNode(pRoot, u8"新增节点");
+	MindTextNode* pChild2 = newNode(pRoot, u8"新增节点");
+	MindTextNode* pChild3 = newNode(pRoot, u8"新增节点");
+	MindTextNode* pChild4 = newNode(pRoot, u8"新增节点");
+
 	pRoot->insert(0, pChild);
 	pRoot->insert(0, pChild2);
-	pChild2->insert(0, newNode(u8"新增子节点"));
-	pChild2->insert(0, newNode(u8"新增子节点"));
-	pRoot->insert(0, newNode(u8"新增节点"));
-	pRoot->insert(0, newNode(u8"新增节点"));
+	pRoot->insert(0, pChild3);
+	pRoot->insert(0, pChild4);
+
+	pChild->insert(0, newNode(pChild, u8"新增子节点"));
+	pChild->insert(0, newNode(pChild, u8"新增子节点"));
+
+	pChild2->insert(0, newNode(pChild2, u8"新增子节点"));
+	pChild2->insert(0, newNode(pChild2, u8"新增子节点"));
+
+	//pChild3->insert(0, newNode(pChild3, u8"新增子节点"));
+	//pChild3->insert(0, newNode(pChild3, u8"新增子节点"));
+
+	pChild4->insert(0, newNode(pChild4, u8"新增子节点"));
+	pChild4->insert(0, newNode(pChild4, u8"新增子节点"));
 
 	arrangeItemPosition(QPoint(0, 0), pRoot);
 }
@@ -109,9 +120,9 @@ void MindMapWidget::addNode(MindTextNode* pParent, MindTextNode* pChild)
 	pParent->insert(0, pChild);
 }
 
-MindTextNode* MindMapWidget::newNode(const QString& text)
+MindTextNode* MindMapWidget::newNode(MindTextNode* pRoot, const QString& text)
 {
-	MindTextNode* node = new MindTextNode(text);
+	MindTextNode* node = new MindTextNode(text, pRoot);
 	setupNode(node);
 	return node;
 }

@@ -16,7 +16,7 @@ public:
 
 private slots:
 	void addNode();
-	MindTextNode* newNode(const QString& text);
+	MindTextNode* newNode(MindTextNode* pRoot, const QString& text);
 	void addNode(MindTextNode* pParent, MindTextNode* pChild);
 	void addLink();
 	void bringToFront();

@@ -162,27 +162,51 @@ int MindNode::pointSize(int level) const
 
 
 /////////////////////////////////////////////////////////////
-MindTextNode::MindTextNode(const QString& text)
+MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 	: m_level(0)
 	, myText(text)
 	, m_bHovered(false)
-	, m_borderWidth(1)
-	, m_cornerRadius(10)
+	, m_borderWidth(3)
+	, m_cornerRadius(6)
+	, m_parent(parent)
 {
+	MindTextNode* p = parent;
+	while (p) {
+		p = p->m_parent;
+		m_level++;
+	}
+
+	if (m_level == 0) {
+		myTextColor = QColor(255, 255, 255);
+		m_highlightedBorder = QColor(136, 203, 242);
+		m_selectedBorder = QColor(23, 157, 235);
+		myBackgroundColor = QColor(0, 181, 72);
+		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
+	}
+	else if (m_level == 1) {
+		myTextColor = QColor(0, 0, 0);
+		m_highlightedBorder = QColor(136, 203, 242);
+		m_selectedBorder = QColor(23, 157, 235);
+		myBackgroundColor = QColor(242, 242, 242);
+		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
+	}
+	else if (m_level == 2) {
+		myTextColor = QColor(0, 0, 0);
+		m_highlightedBorder = QColor(136, 203, 242);
+		m_selectedBorder = QColor(23, 157, 235);
+		myBackgroundColor = QColor(255, 255, 255);
+		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
+	}
+
 	init();
 }
 
 MindTextNode::~MindTextNode()
 {
-
 }
 
 void MindTextNode::init()
 {
-	myTextColor = QColor(255, 255, 255);
-	myOutlineColor = QColor(0, 181, 72);
-	myBackgroundColor = QColor(0, 181, 72);
-
 	initDocFormat(myText);
 	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable);
 	setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -215,6 +239,8 @@ void MindTextNode::initDocFormat(const QString& text)
 		{
 			QTextBlockFormat format = childBlock.blockFormat();
 			format.setBackground(myBackgroundColor);
+			format.setLeftMargin(10);
+			format.setRightMargin(10);
 			cursor.setBlockFormat(format);
 
 			QTextCharFormat chrFormat = childBlock.charFormat();
@@ -228,7 +254,7 @@ void MindTextNode::initDocFormat(const QString& text)
 	QTextFrameFormat frameFormat = rootFrame->frameFormat();
 	frameFormat.setBackground(myBackgroundColor);
 	frameFormat.setMargin(0);
-	frameFormat.setPadding(15);
+	frameFormat.setPadding(10);
 
 	frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 	frameFormat.setBorderBrush(QColor(23, 157, 235));
@@ -255,20 +281,20 @@ void MindTextNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
 	if (option->state & (QStyle::State_Selected | QStyle::State_HasFocus))
 	{
 		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
-		frameFormat.setBorderBrush(QColor(23, 157, 235));
+		frameFormat.setBorderBrush(m_selectedBorder);
 		frameFormat.setBorder(m_borderWidth);
 	}
 	else if (m_bHovered)
 	{
 		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
-		frameFormat.setBorderBrush(QColor(23, 157, 235));
+		frameFormat.setBorderBrush(m_highlightedBorder);
 		frameFormat.setBorder(m_borderWidth);
 	}
 	else
 	{
 		//由于边框是画在背景边缘，因此为了隐藏边框需要设成背景的颜色。
 		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
-		frameFormat.setBorderBrush(myBackgroundColor);
+		frameFormat.setBorderBrush(m_borderFocusout);
 		frameFormat.setBorder(m_borderWidth);
 	}
 	rootFrame->setFrameFormat(frameFormat);
@@ -285,10 +311,10 @@ int MindTextNode::pointSize(int level) const
 	switch (level)
 	{
 	case 0: return 15;
-	case 1: return 14;
-	case 2: return 12;
+	case 1: return 12;
+	case 2: return 10;
 	case 3: return 10;
 	default:
-		return 9;
+		return 10;
 	}
 }

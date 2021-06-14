@@ -49,11 +49,16 @@ class MindTextNode : public QGraphicsTextItem
 {
 	Q_DECLARE_TR_FUNCTIONS(MindTextNode)
 public:
-	MindTextNode(const QString& text);
+	MindTextNode(const QString& text, MindTextNode* parent = NULL);
 	~MindTextNode();
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 	const QList<MindTextNode*>& children() const { return m_children; }
 	void insert(int i, MindTextNode* pNode) { m_children.insert(i, pNode); }
+	void setLevel(int nLevel) { m_level = nLevel; }
+	void setBackground(QColor color) { myBackgroundColor = color; }
+	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
+	void setHighlightedBorder(QColor color) { m_highlightedBorder = color; }
+	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
 
 protected:
 	bool sceneEvent(QEvent* event) override;
@@ -68,11 +73,14 @@ private:
 	QString myText;
 	QColor myTextColor;
 	QColor myBackgroundColor;
-	QColor myOutlineColor;
+	QColor m_highlightedBorder;
+	QColor m_selectedBorder;
+	QColor m_borderFocusout;
 	int m_level;
 	int m_borderWidth;
 	int m_cornerRadius;
 	bool m_bHovered;
+	MindTextNode* m_parent;
 	QList<MindTextNode*> m_children;
 };
 
