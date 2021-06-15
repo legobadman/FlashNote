@@ -166,8 +166,8 @@ MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 	: m_level(0)
 	, myText(text)
 	, m_bHovered(false)
-	, m_borderWidth(3)
-	, m_cornerRadius(6)
+	, m_borderWidth(2)
+	, m_cornerRadius(7)
 	, m_parent(parent)
 {
 	MindTextNode* p = parent;
@@ -178,7 +178,8 @@ MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 
 	if (m_level == 0) {
 		myTextColor = QColor(255, 255, 255);
-		m_highlightedBorder = QColor(136, 203, 242);
+		myTextColor = QColor(0, 0, 0);
+		m_highlightedBorder = QColor(23, 157, 235);
 		m_selectedBorder = QColor(23, 157, 235);
 		myBackgroundColor = QColor(0, 181, 72);
 		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
@@ -222,6 +223,12 @@ void MindTextNode::init()
 	setCornerRadius(m_cornerRadius);
 }
 
+void MindTextNode::setProgress(float progress)
+{
+	QGraphicsTextItem::setProgress(progress);
+	//m_borderFocusout = QColor(255, 255, 255);	//未选中时不显示边框。
+}
+
 void MindTextNode::initDocFormat(const QString& text)
 {
 	QTextDocument* doc = document();
@@ -260,6 +267,12 @@ void MindTextNode::initDocFormat(const QString& text)
 	frameFormat.setBorderBrush(QColor(23, 157, 235));
 	frameFormat.setBorder(m_borderWidth);
 	rootFrame->setFrameFormat(frameFormat);
+}
+
+void MindTextNode::focusOutEvent(QFocusEvent* event)
+{
+	QGraphicsTextItem::focusOutEvent(event);
+	clearSelection();
 }
 
 bool MindTextNode::sceneEvent(QEvent* event)

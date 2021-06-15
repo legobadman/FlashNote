@@ -53,6 +53,7 @@ public:
 	~MindTextNode();
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 	const QList<MindTextNode*>& children() const { return m_children; }
+	void setProgress(float progress);
 	void insert(int i, MindTextNode* pNode) { m_children.insert(i, pNode); }
 	void setLevel(int nLevel) { m_level = nLevel; }
 	void setBackground(QColor color) { myBackgroundColor = color; }
@@ -62,6 +63,7 @@ public:
 
 protected:
 	bool sceneEvent(QEvent* event) override;
+	void focusOutEvent(QFocusEvent* event) override;
 
 private:
 	void init();

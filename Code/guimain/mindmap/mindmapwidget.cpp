@@ -27,28 +27,27 @@ MindMapWidget::MindMapWidget(QWidget* parent /* = NULL */)
 	pMainLayout->addWidget(m_view);
 	setLayout(pMainLayout);
 
-	MindTextNode* pRoot = newNode(NULL, u8"思维导图笔记");
-	MindTextNode* pChild = newNode(pRoot, u8"新增节点");
-	MindTextNode* pChild2 = newNode(pRoot, u8"新增节点");
-	MindTextNode* pChild3 = newNode(pRoot, u8"新增节点");
-	MindTextNode* pChild4 = newNode(pRoot, u8"新增节点");
+	MindTextNode* pRoot = newProgressNode(NULL, u8"大米学习计划", 0.1);
+	
+	MindTextNode* pChild = newProgressNode(pRoot, u8"工作回顾", 0.3);
+	MindTextNode* pChild2 = newProgressNode(pRoot, u8"多线程知识", 0.01);
+	MindTextNode* pChild3 = newProgressNode(pRoot, u8"Windows基础", 0.9);
+	MindTextNode* pChild4 = newProgressNode(pRoot, u8"C++基础知识", 0.5);
 
 	pRoot->insert(0, pChild);
 	pRoot->insert(0, pChild2);
 	pRoot->insert(0, pChild3);
 	pRoot->insert(0, pChild4);
 
-	pChild->insert(0, newNode(pChild, u8"新增子节点"));
-	pChild->insert(0, newNode(pChild, u8"新增子节点"));
+	pChild->insert(0, newProgressNode(pChild, u8"bug总结", 0.4));
+	pChild->insert(0, newProgressNode(pChild, u8"开发功能总结", 0.2));
 
-	pChild2->insert(0, newNode(pChild2, u8"新增子节点"));
-	pChild2->insert(0, newNode(pChild2, u8"新增子节点"));
+	pChild2->insert(0, newProgressNode(pChild2, u8"信号量", 0));
+	pChild2->insert(0, newProgressNode(pChild2, u8"mutable", 0));
 
-	//pChild3->insert(0, newNode(pChild3, u8"新增子节点"));
-	//pChild3->insert(0, newNode(pChild3, u8"新增子节点"));
-
-	pChild4->insert(0, newNode(pChild4, u8"新增子节点"));
-	pChild4->insert(0, newNode(pChild4, u8"新增子节点"));
+	pChild4->insert(0, newProgressNode(pChild4, u8"COM组件", 0.3));
+	pChild4->insert(0, newProgressNode(pChild4, u8"虚函数机制", 0.6));
+	pChild4->insert(0, newProgressNode(pChild4, u8"智能指针", 0.2));
 
 	arrangeItemPosition(QPoint(0, 0), pRoot);
 }
@@ -72,7 +71,6 @@ void MindMapWidget::setupNode(QGraphicsItem* node)
 	++seqNumber;
 
 	m_scene->clearSelection();
-	node->setSelected(true);
 
 	bringToFront();
 }
@@ -123,6 +121,14 @@ void MindMapWidget::addNode(MindTextNode* pParent, MindTextNode* pChild)
 MindTextNode* MindMapWidget::newNode(MindTextNode* pRoot, const QString& text)
 {
 	MindTextNode* node = new MindTextNode(text, pRoot);
+	setupNode(node);
+	return node;
+}
+
+MindTextNode* MindMapWidget::newProgressNode(MindTextNode* pRoot, const QString& text, float progress)
+{
+	MindTextNode* node = new MindTextNode(text, pRoot);
+	node->setProgress(progress);
 	setupNode(node);
 	return node;
 }
