@@ -5,7 +5,9 @@
 #include "mindmapview.h"
 #include "mindnode.h"
 #include "mindlink.h"
+#include "rapidxml.hpp"
 
+using namespace rapidxml;
 
 class MindMapWidget : public QWidget
 {
@@ -28,11 +30,14 @@ private:
 
 	void createActions();
 	void setZValue(int z);
-	void setupNode(QGraphicsItem* node);
+	void setupNode(MindTextNode* node);
 	MindNode* selectedNode() const;
 	MindLink* selectedLink() const;
 	NodePair selectedNodePair() const;
 	QRectF arrangeItemPosition(QPoint rootLT, MindTextNode* pItem);
+	MindTextNode* _initExample();
+	MindTextNode* parseXML(const std::wstring& content);
+	MindTextNode* _parse(xml_node<WCHAR>* root, int level);
 
 private:
 	QGraphicsScene* m_scene;

@@ -36,6 +36,7 @@ include_directories(
     ../include
     ../3rdparty
 	../3rdparty/boost_1_55_0
+    ../3rdparty/rapidxml
     )
 
 # Find the QtWidgets library

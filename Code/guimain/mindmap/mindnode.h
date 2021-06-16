@@ -5,7 +5,7 @@
 
 class MindLink;
 
-class MindNode : public QGraphicsItem
+class MindNode : public QGraphicsItem	   
 {
 	typedef QGraphicsItem _base;
 	Q_DECLARE_TR_FUNCTIONS(MindNode)
@@ -51,15 +51,25 @@ class MindTextNode : public QGraphicsTextItem
 public:
 	MindTextNode(const QString& text, MindTextNode* parent = NULL);
 	~MindTextNode();
+	void setup();
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 	const QList<MindTextNode*>& children() const { return m_children; }
-	void setProgress(float progress);
+	void setParent(MindTextNode* pNode) { m_parent = pNode; }
+	void setLevel(float level) { m_level = level; }
 	void insert(int i, MindTextNode* pNode) { m_children.insert(i, pNode); }
 	void setLevel(int nLevel) { m_level = nLevel; }
 	void setBackground(QColor color) { myBackgroundColor = color; }
 	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
 	void setHighlightedBorder(QColor color) { m_highlightedBorder = color; }
 	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
+
+public:
+	void SetContent(const std::wstring& content) ;
+	std::wstring GetContent() const ;
+	void SetProgress(float progress) ;
+	float GetProgress() const ;
+	bool IsProgress() const ;
+	void append(MindTextNode* pNode) ;
 
 protected:
 	bool sceneEvent(QEvent* event) override;
@@ -81,7 +91,9 @@ private:
 	int m_level;
 	int m_borderWidth;
 	int m_cornerRadius;
+	float m_progress;
 	bool m_bHovered;
+	bool m_bProgress;
 	MindTextNode* m_parent;
 	QList<MindTextNode*> m_children;
 };

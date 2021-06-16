@@ -27,8 +27,25 @@ MindMapWidget::MindMapWidget(QWidget* parent /* = NULL */)
 	pMainLayout->addWidget(m_view);
 	setLayout(pMainLayout);
 
+	QFile fn("E:\\FlashNote\\Code\\io\\node.xml");
+	if (!fn.open(QIODevice::ReadOnly | QIODevice::Text))
+		return;
+
+	QByteArray htmlFile = fn.readAll();
+	QString content = QString::fromUtf8(htmlFile);
+	std::wstring wstr = content.toStdWString();
+	MindTextNode* pRoot = parseXML(wstr);
+	arrangeItemPosition(QPoint(0, 0), pRoot);
+}
+
+MindMapWidget::~MindMapWidget()
+{
+}
+
+MindTextNode* MindMapWidget::_initExample()
+{
 	MindTextNode* pRoot = newProgressNode(NULL, u8"大米学习计划", 0.1);
-	
+
 	MindTextNode* pChild = newProgressNode(pRoot, u8"工作回顾", 0.3);
 	MindTextNode* pChild2 = newProgressNode(pRoot, u8"多线程知识", 0.01);
 	MindTextNode* pChild3 = newProgressNode(pRoot, u8"Windows基础", 0.9);
@@ -49,11 +66,49 @@ MindMapWidget::MindMapWidget(QWidget* parent /* = NULL */)
 	pChild4->insert(0, newProgressNode(pChild4, u8"虚函数机制", 0.6));
 	pChild4->insert(0, newProgressNode(pChild4, u8"智能指针", 0.2));
 
-	arrangeItemPosition(QPoint(0, 0), pRoot);
+	return pRoot;
 }
 
-MindMapWidget::~MindMapWidget()
+MindTextNode* MindMapWidget::parseXML(const std::wstring& content)
 {
+	xml_document<WCHAR> doc;
+	doc.parse<0>((LPWSTR)content.c_str());
+	xml_node<WCHAR>* root = doc.first_node();
+	MindTextNode* pRoot = _parse(root, 0);
+	return pRoot;
+}
+
+MindTextNode* MindMapWidget::_parse(xml_node<WCHAR>* root, int level)
+{
+	MindTextNode* pRoot = new MindTextNode("");
+	pRoot->setLevel(level);
+	for (xml_attribute<WCHAR>* attr = root->first_attribute();
+		attr;
+		attr = attr->next_attribute())
+	{
+		std::wstring attr_name = attr->name();
+		std::wstring value = attr->value();
+		if (attr_name == L"progress_value")
+		{
+			float progress = _wtof(value.c_str());
+			pRoot->SetProgress(progress);
+		}
+		if (attr_name == L"text")
+		{
+			pRoot->SetContent(value);
+		}
+	}
+
+	setupNode(pRoot);
+
+	for (xml_node<WCHAR>* child = root->first_node();
+		child != NULL;
+		child = child->next_sibling())
+	{
+		MindTextNode* pChild = _parse(child, level + 1);
+		pRoot->append(pChild);
+	}
+	return pRoot;
 }
 
 void MindMapWidget::createActions()
@@ -65,13 +120,14 @@ void MindMapWidget::createActions()
 	connect(m_pAddLink, SIGNAL(triggered()), this, SLOT(addLink()));
 }
 
-void MindMapWidget::setupNode(QGraphicsItem* node)
+void MindMapWidget::setupNode(MindTextNode* node)
 {
+	node->setup();
+
 	m_scene->addItem(node);
 	++seqNumber;
 
 	m_scene->clearSelection();
-
 	bringToFront();
 }
 
@@ -110,7 +166,7 @@ MindNode* MindMapWidget::selectedNode() const
 void MindMapWidget::addNode()
 {
 	MindNode* node = new MindNode(u8"思维导图笔记");
-	setupNode(node);
+	//setupNode(node);
 }
 
 void MindMapWidget::addNode(MindTextNode* pParent, MindTextNode* pChild)
@@ -121,14 +177,14 @@ void MindMapWidget::addNode(MindTextNode* pParent, MindTextNode* pChild)
 MindTextNode* MindMapWidget::newNode(MindTextNode* pRoot, const QString& text)
 {
 	MindTextNode* node = new MindTextNode(text, pRoot);
-	setupNode(node);
+	//setupNode(node);
 	return node;
 }
 
 MindTextNode* MindMapWidget::newProgressNode(MindTextNode* pRoot, const QString& text, float progress)
 {
 	MindTextNode* node = new MindTextNode(text, pRoot);
-	node->setProgress(progress);
+	node->SetProgress(progress);
 	setupNode(node);
 	return node;
 }

@@ -169,13 +169,17 @@ MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 	, m_borderWidth(2)
 	, m_cornerRadius(7)
 	, m_parent(parent)
+	, m_progress(0)
+	, m_bProgress(false)
 {
-	MindTextNode* p = parent;
-	while (p) {
-		p = p->m_parent;
-		m_level++;
-	}
+}
 
+MindTextNode::~MindTextNode()
+{
+}
+
+void MindTextNode::setup()
+{
 	if (m_level == 0) {
 		myTextColor = QColor(255, 255, 255);
 		myTextColor = QColor(0, 0, 0);
@@ -200,10 +204,9 @@ MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 	}
 
 	init();
-}
 
-MindTextNode::~MindTextNode()
-{
+	//须初始化文档结构后，才能写入control
+	QGraphicsTextItem::setProgress(m_progress);
 }
 
 void MindTextNode::init()
@@ -221,12 +224,6 @@ void MindTextNode::init()
 
 	setPalette(pal);
 	setCornerRadius(m_cornerRadius);
-}
-
-void MindTextNode::setProgress(float progress)
-{
-	QGraphicsTextItem::setProgress(progress);
-	//m_borderFocusout = QColor(255, 255, 255);	//未选中时不显示边框。
 }
 
 void MindTextNode::initDocFormat(const QString& text)
@@ -285,6 +282,38 @@ bool MindTextNode::sceneEvent(QEvent* event)
 		break;
 	}
 	return QGraphicsTextItem::sceneEvent(event);
+}
+
+void MindTextNode::SetContent(const std::wstring& content)
+{
+	myText = QString::fromStdWString(content);
+}
+
+std::wstring MindTextNode::GetContent() const
+{
+	return myText.toStdWString();
+}
+
+void MindTextNode::SetProgress(float progress)
+{
+	m_progress = progress;
+	m_bProgress = true;
+}
+
+float MindTextNode::GetProgress() const
+{
+	return m_progress;
+}
+
+bool MindTextNode::IsProgress() const
+{
+	return m_bProgress;
+}
+
+void MindTextNode::append(MindTextNode* pNode)
+{
+	pNode->setParent(this);
+	m_children.append(pNode);
 }
 
 void MindTextNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
