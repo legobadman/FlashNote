@@ -63,7 +63,6 @@ void MindTextNode::init()
 {
 	initDocFormat(myText);
 	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable);
-	setTextInteractionFlags(Qt::TextEditorInteraction);
 
 	QPalette pal = palette();
 	//处理选中文本的情况。
@@ -131,6 +130,22 @@ void MindTextNode::focusOutEvent(QFocusEvent* event)
 {
 	QGraphicsTextItem::focusOutEvent(event);
 	clearSelection();
+	setTextInteractionFlags(Qt::NoTextInteraction);
+}
+
+void MindTextNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+	QGraphicsTextItem::mousePressEvent(event);
+}
+
+void MindTextNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
+{
+	QGraphicsTextItem::mouseDoubleClickEvent(event);
+}
+
+void MindTextNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+	QGraphicsTextItem::mouseReleaseEvent(event);
 }
 
 bool MindTextNode::sceneEvent(QEvent* event)
@@ -144,6 +159,14 @@ bool MindTextNode::sceneEvent(QEvent* event)
 	case QEvent::GraphicsSceneHoverLeave:
 		m_bHovered = false;
 		update();
+		break;
+	case QEvent::GraphicsSceneMouseDoubleClick:
+		{
+			setTextInteractionFlags(Qt::TextEditorInteraction);
+			bool ret = QGraphicsTextItem::sceneEvent(event);
+			setFocus(Qt::MouseFocusReason);
+			return ret;
+		}
 		break;
 	default:
 		break;

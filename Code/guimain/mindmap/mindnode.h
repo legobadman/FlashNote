@@ -45,16 +45,19 @@ public slots:
 	void onDocumentContentsChanged(int, int, int);
 
 public:
-	void SetContent(const std::wstring& content) ;
-	std::wstring GetContent() const ;
-	void SetProgress(float progress) ;
-	float GetProgress() const ;
-	bool IsProgress() const ;
-	void append(MindTextNode* pNode) ;
+	void SetContent(const std::wstring& content);
+	std::wstring GetContent() const;
+	void SetProgress(float progress);
+	float GetProgress() const;
+	bool IsProgress() const;
+	void append(MindTextNode* pNode);
 
 protected:
 	bool sceneEvent(QEvent* event) override;
 	void focusOutEvent(QFocusEvent* event) override;
+	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
+	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
 	void init();
