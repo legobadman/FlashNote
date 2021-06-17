@@ -5,49 +5,24 @@
 
 class MindLink;
 
-class MindNode : public QGraphicsItem	   
-{
-	typedef QGraphicsItem _base;
-	Q_DECLARE_TR_FUNCTIONS(MindNode)
-public:
-	MindNode(const QString& text);
-	~MindNode();
-	void setText(const QString& text);
-	QString text() const;
-	void setTextColor(const QColor& color);
-	QColor textColor() const;
-	void setOutlineColor(const QColor& color);
-	QColor outlineColor() const;
-	void setBackgroundColor(const QColor& color);
-	QColor backgroundColor() const;
-
-	void addLink(MindLink* link);
-	void removeLink(MindLink* link);
-
-	QRectF boundingRect() const;
-	QPainterPath shape() const;
-	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
-
-protected:
-	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event);
-	QVariant itemChange(GraphicsItemChange change, const QVariant& value);
-
-private:
-	QRectF outlineRect() const;
-	int roundness(double size) const;
-	int pointSize(int level) const;
-
-	QSet<MindLink*> myLinks;
-	QString myText;
-	QColor myTextColor;
-	QColor myBackgroundColor;
-	QColor myOutlineColor;
-	int m_level;
-};
-
 class MindTextNode : public QGraphicsTextItem
 {
-	Q_DECLARE_TR_FUNCTIONS(MindTextNode)
+	Q_OBJECT
+	enum MOUSE_STATE
+	{
+		MS_FOCUSOUT,
+		MS_SELECTED,
+		MS_HOVERED,
+	};
+
+	struct UpdateBatch
+	{
+		UpdateBatch(int* m_count) : pCounter(m_count) { (*pCounter)++; }
+		~UpdateBatch() { (*pCounter)--; }
+
+		int* pCounter;
+	};
+
 public:
 	MindTextNode(const QString& text, MindTextNode* parent = NULL);
 	~MindTextNode();
@@ -62,6 +37,12 @@ public:
 	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
 	void setHighlightedBorder(QColor color) { m_highlightedBorder = color; }
 	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
+
+signals:
+	void contentsChange();
+
+public slots:
+	void onDocumentContentsChanged(int, int, int);
 
 public:
 	void SetContent(const std::wstring& content) ;
@@ -91,7 +72,9 @@ private:
 	int m_level;
 	int m_borderWidth;
 	int m_cornerRadius;
+	int m_counter;	//∑¿÷πªÊ÷∆÷ÿ»Î°£
 	float m_progress;
+	MOUSE_STATE m_mouseState;
 	bool m_bHovered;
 	bool m_bProgress;
 	MindTextNode* m_parent;

@@ -1,6 +1,24 @@
 #include "notecore.h"
 #include "notebase.h"
 
+BSTR _default_content(NOTE_TYPE type)
+{
+	if (type == MINDMAP)
+	{
+		return L"<node text=\"思维导图笔记\"></node>";
+	}
+	return L"";
+}
+
+BSTR _default_title(NOTE_TYPE type)
+{
+	if (type == MINDMAP)
+	{
+		return SysAllocString(L"思维导图笔记");
+	}
+	return NULL;
+}
+
 HRESULT CreateNote(NOTE_TYPE type, INote** ppNote)
 {
 	if (ppNote == NULL)
@@ -9,6 +27,8 @@ HRESULT CreateNote(NOTE_TYPE type, INote** ppNote)
 	}
 	INote* pNote = new NoteBase;
 	pNote->SetType(type);
+	pNote->SetContent(_default_content(type));
+	pNote->SetTitle(_default_title(type));
 	(*ppNote) = pNote;
 	(*ppNote)->AddRef();
 	return S_OK;

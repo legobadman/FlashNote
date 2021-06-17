@@ -71,6 +71,7 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 	}
 	else if (m_type == MINDMAP)
 	{
+		m_ui->mindmapEditor->initContent(content);
 		m_ui->stackedWidget->setCurrentIndex(1);
 	}
 	else
@@ -105,6 +106,7 @@ void NoteEditWindow::initSlots()
 {
 	connect(m_ui->editTitle, SIGNAL(textChanged(const QString&)), this, SLOT(onTitleChanged()));
 	connect(m_ui->noramlEditor, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+	connect(m_ui->mindmapEditor, SIGNAL(itemContentChanged()), this, SLOT(onMindMapChanged()));
 }
 
 void NoteEditWindow::initCustomWidget()
@@ -131,6 +133,21 @@ void NoteEditWindow::saveNote()
 	m_pNote->SetContent(bstrContent);
 	BSTR bstrPlainText = SysAllocString(plainText.toStdWString().c_str());
 	m_pNote->SetPlainText(bstrPlainText);
+
+	com_sptr<INotebook> spNotebook = m_pNotebook;
+	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+}
+
+void NoteEditWindow::saveMindMap()
+{
+	QString title = m_ui->editTitle->text();
+
+	BSTR bstrTitle = SysAllocString(title.toStdWString().c_str());
+	m_pNote->SetTitle(bstrTitle);
+
+	QString wtf = m_ui->mindmapEditor->mindmapXML();
+	BSTR bstrMap = SysAllocString(wtf.toStdWString().c_str());
+	m_pNote->SetContent(bstrMap);
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
@@ -168,4 +185,9 @@ void NoteEditWindow::onTitleChanged()
 void NoteEditWindow::onTextChanged()
 {
 	QTimer::singleShot(2000, this, SLOT(saveNote()));
+}
+
+void NoteEditWindow::onMindMapChanged()
+{
+	QTimer::singleShot(3000, this, SLOT(saveMindMap()));
 }

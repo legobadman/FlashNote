@@ -4,10 +4,11 @@
 #include <QtWidgets/QGraphicsScene>
 #include "mindmapview.h"
 #include "mindnode.h"
-#include "mindlink.h"
 #include "rapidxml.hpp"
 
 using namespace rapidxml;
+
+typedef xml_node<WCHAR> XML_NODE;
 
 class MindMapWidget : public QWidget
 {
@@ -15,40 +16,35 @@ class MindMapWidget : public QWidget
 public:
 	MindMapWidget(QWidget* parent = NULL);
 	~MindMapWidget();
+	void initContent(QString content);
+	QString mindmapXML();
+
+signals:
+	void itemContentChanged();
 
 private slots:
-	void addNode();
 	MindTextNode* newNode(MindTextNode* pRoot, const QString& text);
 	MindTextNode* newProgressNode(MindTextNode* pRoot, const QString& text, float progress);
 	void addNode(MindTextNode* pParent, MindTextNode* pChild);
-	void addLink();
-	void bringToFront();
-	void sendToBack();
+	void onItemContentChanged();
 
 private:
-	typedef QPair<MindNode*, MindNode*> NodePair;
-
 	void createActions();
-	void setZValue(int z);
 	void setupNode(MindTextNode* node);
-	MindNode* selectedNode() const;
-	MindLink* selectedLink() const;
-	NodePair selectedNodePair() const;
 	QRectF arrangeItemPosition(QPoint rootLT, MindTextNode* pItem);
 	MindTextNode* _initExample();
+	MindTextNode* _initFromFile();
 	MindTextNode* parseXML(const std::wstring& content);
+	XML_NODE* _export(MindTextNode* root, xml_document<WCHAR>& doc);
 	MindTextNode* _parse(xml_node<WCHAR>* root, int level);
 
 private:
 	QGraphicsScene* m_scene;
 	MindMapView* m_view;
+	MindTextNode* m_pRoot;
 
 	QAction* m_pAddNode;
 	QAction* m_pAddLink;
-
-	int minZ;
-	int maxZ;
-	int seqNumber;
 };
 
 

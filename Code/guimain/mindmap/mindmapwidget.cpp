@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "mindmapwidget.h"
+#include "rapidxml_print.hpp"
 #include <QAction>
 
 
@@ -7,7 +8,7 @@ MindMapWidget::MindMapWidget(QWidget* parent /* = NULL */)
 	: QWidget(parent)
 	, m_scene(NULL)
 	, m_view(NULL)
-	, seqNumber(0)
+	, m_pRoot(NULL)
 {
 	//m_scene = new QGraphicsScene(0, 0, 400, 600);
 	m_scene = new QGraphicsScene;
@@ -26,20 +27,69 @@ MindMapWidget::MindMapWidget(QWidget* parent /* = NULL */)
 	QVBoxLayout* pMainLayout = new QVBoxLayout;
 	pMainLayout->addWidget(m_view);
 	setLayout(pMainLayout);
-
-	QFile fn("E:\\FlashNote\\Code\\io\\node.xml");
-	if (!fn.open(QIODevice::ReadOnly | QIODevice::Text))
-		return;
-
-	QByteArray htmlFile = fn.readAll();
-	QString content = QString::fromUtf8(htmlFile);
-	std::wstring wstr = content.toStdWString();
-	MindTextNode* pRoot = parseXML(wstr);
-	arrangeItemPosition(QPoint(0, 0), pRoot);
 }
 
 MindMapWidget::~MindMapWidget()
 {
+}
+
+void MindMapWidget::initContent(QString content)
+{
+	std::wstring wstr = content.toStdWString();
+	m_pRoot = parseXML(wstr);
+	arrangeItemPosition(QPoint(0, 0), m_pRoot);
+}
+
+QString MindMapWidget::mindmapXML()
+{
+	xml_document<WCHAR> doc;
+	XML_NODE* root = _export(m_pRoot, doc);
+	doc.append_node(root);
+
+	WCHAR buffer[4096];                      // You are responsible for making the buffer large enough!
+	WCHAR* end = print(buffer, doc, 0);
+	*end = L'\0';
+	return QString::fromUtf16((char16_t*)buffer);
+}
+
+XML_NODE* MindMapWidget::_export(MindTextNode* pRoot, xml_document<WCHAR>& doc)
+{
+	std::wstring value = pRoot->GetContent();
+
+	XML_NODE* root = doc.allocate_node(node_element, L"node");
+
+	xml_attribute<WCHAR>* attr = doc.allocate_attribute(L"text", 
+		doc.allocate_string(value.c_str()));
+	root->append_attribute(attr);
+
+	if (pRoot->IsProgress())
+	{
+		attr = doc.allocate_attribute(L"progress_value",
+			doc.allocate_string(QString::number(pRoot->GetProgress()).toStdWString().c_str()));
+		root->append_attribute(attr);
+	}
+
+	const QList<MindTextNode*>& children = pRoot->children();
+	for (auto it = children.begin(); it != children.end(); it++)
+	{
+		XML_NODE* pChild = _export(*it, doc);
+		root->append_node(pChild);
+	}
+
+	return root;
+}
+
+MindTextNode* MindMapWidget::_initFromFile()
+{
+	QFile fn("E:\\FlashNote\\Code\\io\\node.xml");
+	if (!fn.open(QIODevice::ReadOnly | QIODevice::Text))
+		return NULL;
+
+	QByteArray htmlFile = fn.readAll();
+	QString content = QString::fromUtf8(htmlFile);
+	std::wstring wstr = content.toStdWString();
+	m_pRoot = parseXML(wstr);
+	arrangeItemPosition(QPoint(0, 0), m_pRoot);
 }
 
 MindTextNode* MindMapWidget::_initExample()
@@ -75,6 +125,8 @@ MindTextNode* MindMapWidget::parseXML(const std::wstring& content)
 	doc.parse<0>((LPWSTR)content.c_str());
 	xml_node<WCHAR>* root = doc.first_node();
 	MindTextNode* pRoot = _parse(root, 0);
+	setupNode(pRoot);
+	m_scene->clearSelection();
 	return pRoot;
 }
 
@@ -99,8 +151,6 @@ MindTextNode* MindMapWidget::_parse(xml_node<WCHAR>* root, int level)
 		}
 	}
 
-	setupNode(pRoot);
-
 	for (xml_node<WCHAR>* child = root->first_node();
 		child != NULL;
 		child = child->next_sibling())
@@ -114,59 +164,22 @@ MindTextNode* MindMapWidget::_parse(xml_node<WCHAR>* root, int level)
 void MindMapWidget::createActions()
 {
 	m_pAddNode = new QAction(tr("Add &Node"), this);
-	connect(m_pAddNode, SIGNAL(triggered()), this, SLOT(addNode()));
+	//connect(m_pAddNode, SIGNAL(triggered()), this, SLOT(addNode()));
 
 	m_pAddLink = new QAction(tr("Add &Link"), this);
-	connect(m_pAddLink, SIGNAL(triggered()), this, SLOT(addLink()));
+	//connect(m_pAddLink, SIGNAL(triggered()), this, SLOT(addLink()));
 }
 
 void MindMapWidget::setupNode(MindTextNode* node)
 {
 	node->setup();
-
+	connect(node, SIGNAL(contentsChange()), this, SIGNAL(itemContentChanged()));
 	m_scene->addItem(node);
-	++seqNumber;
-
-	m_scene->clearSelection();
-	bringToFront();
-}
-
-void MindMapWidget::bringToFront()
-{
-	++maxZ;
-	setZValue(maxZ);
-}
-
-void MindMapWidget::sendToBack()
-{
-	--minZ;
-	setZValue(minZ);
-}
-
-void MindMapWidget::setZValue(int z)
-{
-	MindNode* node = selectedNode();
-	if (node)
+	const QList<MindTextNode*>& children = node->children();
+	for (auto it = children.begin(); it != children.end(); it++)
 	{
-		node->setZValue(z);
+		setupNode(*it);
 	}
-}
-
-MindNode* MindMapWidget::selectedNode() const
-{
-	QList<QGraphicsItem*> items = m_scene->selectedItems();
-	if (items.count() == 1) {
-		return dynamic_cast<MindNode*>(items.first());
-	}
-	else {
-		return 0;
-	}
-}
-
-void MindMapWidget::addNode()
-{
-	MindNode* node = new MindNode(u8"Ë¼Î¬µ¼Í¼±Ê¼Ç");
-	//setupNode(node);
 }
 
 void MindMapWidget::addNode(MindTextNode* pParent, MindTextNode* pChild)
@@ -174,10 +187,14 @@ void MindMapWidget::addNode(MindTextNode* pParent, MindTextNode* pChild)
 	pParent->insert(0, pChild);
 }
 
+void MindMapWidget::onItemContentChanged()
+{
+	//QTimer::singleShot(3000, this, SLOT(saveNote()));
+}
+
 MindTextNode* MindMapWidget::newNode(MindTextNode* pRoot, const QString& text)
 {
 	MindTextNode* node = new MindTextNode(text, pRoot);
-	//setupNode(node);
 	return node;
 }
 
@@ -189,36 +206,10 @@ MindTextNode* MindMapWidget::newProgressNode(MindTextNode* pRoot, const QString&
 	return node;
 }
 
-void MindMapWidget::addLink()
-{
-	NodePair nodes = selectedNodePair();
-	if (nodes == NodePair())
-		return;
-
-	MindLink* link = new MindLink(nodes.first, nodes.second);
-	m_scene->addItem(link);
-}
-
-MindMapWidget::NodePair MindMapWidget::selectedNodePair() const
-{
-	QList<QGraphicsItem*> items = m_scene->selectedItems();
-	if (items.count() == 2)
-	{
-		MindNode* first = dynamic_cast<MindNode*>(items.first());
-		MindNode* second = dynamic_cast<MindNode*>(items.last());
-		if (first && second)
-		{
-			return NodePair(first, second);
-		}
-	}
-	return NodePair();
-}
-
 QPoint leftConnectPoint(QRectF boundingRect)
 {
 	return QPoint(boundingRect.left(), boundingRect.top() + boundingRect.height() / 2);
 }
-
 
 QRectF MindMapWidget::arrangeItemPosition(QPoint rootLT, MindTextNode* pRoot)
 {

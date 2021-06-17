@@ -1,175 +1,22 @@
 #include "stdafx.h"
 #include "mindnode.h"
-#include "mindlink.h"
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QInputDialog>
 #include <QLineEdit>
 #include <QTextFrame>
 
 
-MindNode::MindNode(const QString& text)
-	: m_level(0)
-	, myText(text)
-{
-	myTextColor = QColor(255, 255, 255);
-	myOutlineColor = QColor(0, 181, 72);
-	myBackgroundColor = QColor(0, 181, 72);
-
-	setFlags(ItemSendsGeometryChanges | ItemIsSelectable);
-}
-
-MindNode::~MindNode()
-{
-	foreach(MindLink * link, myLinks)
-		delete link;
-}
-
-void MindNode::setText(const QString& text)
-{
-	prepareGeometryChange();
-	myText = text;
-	update();
-}
-
-QString MindNode::text() const
-{
-	return myText;
-}
-
-void MindNode::setTextColor(const QColor& color)
-{
-	myTextColor = color;
-	update();
-}
-
-QColor MindNode::textColor() const
-{
-	return myTextColor;
-}
-
-void MindNode::setOutlineColor(const QColor& color)
-{
-	myOutlineColor = color;
-	update();
-}
-
-QColor MindNode::outlineColor() const
-{
-	return myOutlineColor;
-}
-
-void MindNode::setBackgroundColor(const QColor& color)
-{
-	myBackgroundColor = color;
-}
-
-QColor MindNode::backgroundColor() const
-{
-	return myBackgroundColor;
-}
-
-void MindNode::addLink(MindLink* link)
-{
-	myLinks.insert(link);
-}
-
-void MindNode::removeLink(MindLink* link)
-{
-	myLinks.remove(link);
-}
-
-QRectF MindNode::boundingRect() const
-{
-	const int Margin = 1;
-	return outlineRect().adjusted(-Margin, -Margin, Margin, Margin);
-}
-
-QPainterPath MindNode::shape() const
-{
-	QRectF rect = outlineRect();
-	QPainterPath path;
-	path.addRoundRect(rect, roundness(rect.width()), roundness(rect.height()));
-	return path;
-}
-
-void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-	QPen pen(myOutlineColor);
-	if (option->state & QStyle::State_Selected) {
-		pen.setStyle(Qt::SolidLine);
-		pen.setWidth(2);
-	}
-	painter->setPen(pen);
-	painter->setBrush(myBackgroundColor);
-
-	QRectF rect = outlineRect();
-	painter->drawRoundRect(rect, roundness(rect.width()), roundness(rect.height()));
-
-	painter->setPen(myTextColor);
-	QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), pointSize(m_level));
-	painter->setFont(font);
-	painter->drawText(rect, Qt::AlignCenter, myText);
-}
-
-void MindNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
-{
-	QString text = QInputDialog::getText(event->widget(),
-					tr("Edit Text"), tr("Enter new text:"),
-					QLineEdit::Normal, myText);
-	if (!text.isEmpty())
-		setText(text);
-}
-
-QVariant MindNode::itemChange(GraphicsItemChange change, const QVariant& value)
-{
-	if (change == ItemPositionHasChanged)
-	{
-		foreach(MindLink * link, myLinks)
-			link->trackNodes();
-	}
-	return QGraphicsItem::itemChange(change, value);
-}
-
-QRectF MindNode::outlineRect() const
-{
-	const int Padding = 8;
-	QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), pointSize(m_level));
-	QFontMetricsF metrics(font);
-	QRectF rect = metrics.boundingRect(myText);
-	rect.adjust(-Padding, -Padding, Padding, Padding);
-	rect.translate(-rect.center());
-	return rect;
-}
-
-int MindNode::roundness(double size) const
-{
-	const int Diameter = 12;
-	return 100 * Diameter / int(size);
-}
-
-int MindNode::pointSize(int level) const
-{
-	switch (level)
-	{
-	case 0: return 15;
-	case 1: return 14;
-	case 2: return 12;
-	case 3: return 10;
-	default:
-		return 9;
-	}
-}
-
-
 /////////////////////////////////////////////////////////////
 MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 	: m_level(0)
 	, myText(text)
+	, m_mouseState(MS_FOCUSOUT)
 	, m_bHovered(false)
 	, m_borderWidth(2)
 	, m_cornerRadius(7)
 	, m_parent(parent)
 	, m_progress(0)
+	, m_counter(0)
 	, m_bProgress(false)
 {
 }
@@ -182,7 +29,6 @@ void MindTextNode::setup()
 {
 	if (m_level == 0) {
 		myTextColor = QColor(255, 255, 255);
-		myTextColor = QColor(0, 0, 0);
 		m_highlightedBorder = QColor(23, 157, 235);
 		m_selectedBorder = QColor(23, 157, 235);
 		myBackgroundColor = QColor(0, 181, 72);
@@ -206,7 +52,11 @@ void MindTextNode::setup()
 	init();
 
 	//须初始化文档结构后，才能写入control
-	QGraphicsTextItem::setProgress(m_progress);
+	if (m_bProgress)
+	{
+		myTextColor = QColor(0, 0, 0);	//由于有绿白色，需要将文本设置为黑色。
+		QGraphicsTextItem::setProgress(m_progress);
+	}
 }
 
 void MindTextNode::init()
@@ -224,6 +74,15 @@ void MindTextNode::init()
 
 	setPalette(pal);
 	setCornerRadius(m_cornerRadius);
+}
+
+void MindTextNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAdded)
+{
+	if (m_counter == 0)
+	{
+		QGraphicsScene* pScene = scene();
+		emit contentsChange();
+	}
 }
 
 void MindTextNode::initDocFormat(const QString& text)
@@ -264,6 +123,8 @@ void MindTextNode::initDocFormat(const QString& text)
 	frameFormat.setBorderBrush(QColor(23, 157, 235));
 	frameFormat.setBorder(m_borderWidth);
 	rootFrame->setFrameFormat(frameFormat);
+
+	connect(doc, SIGNAL(contentsChange(int,int,int)), this, SLOT(onDocumentContentsChanged(int, int, int)));
 }
 
 void MindTextNode::focusOutEvent(QFocusEvent* event)
@@ -276,8 +137,14 @@ bool MindTextNode::sceneEvent(QEvent* event)
 {
 	switch (event->type())
 	{
-	case QEvent::GraphicsSceneHoverEnter: m_bHovered = true; break;
-	case QEvent::GraphicsSceneHoverLeave: m_bHovered = false; break;
+	case QEvent::GraphicsSceneHoverEnter:
+		m_bHovered = true;
+		update();
+		break;
+	case QEvent::GraphicsSceneHoverLeave:
+		m_bHovered = false;
+		update();
+		break;
 	default:
 		break;
 	}
@@ -318,26 +185,36 @@ void MindTextNode::append(MindTextNode* pNode)
 
 void MindTextNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
 {
+	UpdateBatch batch(&m_counter);
 	QTextFrame* rootFrame = document()->rootFrame();
 	QTextFrameFormat frameFormat = rootFrame->frameFormat();
 	if (option->state & (QStyle::State_Selected | QStyle::State_HasFocus))
 	{
+		if (m_mouseState == MS_SELECTED)
+			return;
 		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 		frameFormat.setBorderBrush(m_selectedBorder);
 		frameFormat.setBorder(m_borderWidth);
+		m_mouseState = MS_SELECTED;
 	}
 	else if (m_bHovered)
 	{
+		if (m_mouseState == MS_HOVERED)
+			return;
 		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 		frameFormat.setBorderBrush(m_highlightedBorder);
 		frameFormat.setBorder(m_borderWidth);
+		m_mouseState = MS_HOVERED;
 	}
 	else
 	{
 		//由于边框是画在背景边缘，因此为了隐藏边框需要设成背景的颜色。
+		if (m_mouseState == MS_FOCUSOUT)
+			return;
 		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 		frameFormat.setBorderBrush(m_borderFocusout);
 		frameFormat.setBorder(m_borderWidth);
+		m_mouseState = MS_FOCUSOUT;
 	}
 	rootFrame->setFrameFormat(frameFormat);
 }

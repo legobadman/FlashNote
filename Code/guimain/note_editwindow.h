@@ -25,7 +25,9 @@ public:
 public slots:
 	void onTitleChanged();
 	void onTextChanged();
+	void onMindMapChanged();
 	void saveNote();
+	void saveMindMap();
 	void switchtobook(int bookidx);
 
 private:

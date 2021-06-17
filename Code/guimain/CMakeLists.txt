@@ -86,8 +86,6 @@ add_executable(guimain
     ./LeftSideItemDelegate.h
     ./listpane.cpp
     ./listpane.h
-    ./mindmap/mindlink.cpp
-    ./mindmap/mindlink.h
     ./mindmap/mindmapview.cpp
     ./mindmap/mindmapview.h
     ./mindmap/mindmapwidget.cpp

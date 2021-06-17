@@ -44,7 +44,9 @@ HRESULT NoteBase::GetTitle(OUT BSTR* pbstrName)
 
 HRESULT NoteBase::SetTitle(IN BSTR title)
 {
-	m_bstrTitle.Attach(title);
+	//m_bstrTitle.Detach();
+	int n = SysStringByteLen(title);
+	m_bstrTitle.AssignBSTR(title);
 	NotifyThisObj(NotifyOperator::Update);
 	return S_OK;
 }
