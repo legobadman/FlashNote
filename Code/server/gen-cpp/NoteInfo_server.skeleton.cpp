@@ -40,7 +40,7 @@ class NoteInfoHandler : virtual public NoteInfoIf {
     printf("DeleteNotebook\n");
   }
 
-  void NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title) {
+  void NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title, const NoteType::type type) {
     // Your implementation goes here
     printf("NewNote\n");
   }

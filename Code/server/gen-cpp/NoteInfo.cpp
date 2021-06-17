@@ -101,14 +101,14 @@ uint32_t NoteInfo_GetNotebooks_result::read(::apache::thrift::protocol::TProtoco
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->success.clear();
-            uint32_t _size6;
-            ::apache::thrift::protocol::TType _etype9;
-            xfer += iprot->readListBegin(_etype9, _size6);
-            this->success.resize(_size6);
-            uint32_t _i10;
-            for (_i10 = 0; _i10 < _size6; ++_i10)
+            uint32_t _size7;
+            ::apache::thrift::protocol::TType _etype10;
+            xfer += iprot->readListBegin(_etype10, _size7);
+            this->success.resize(_size7);
+            uint32_t _i11;
+            for (_i11 = 0; _i11 < _size7; ++_i11)
             {
-              xfer += this->success[_i10].read(iprot);
+              xfer += this->success[_i11].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -139,10 +139,10 @@ uint32_t NoteInfo_GetNotebooks_result::write(::apache::thrift::protocol::TProtoc
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
-      std::vector<Notebook> ::const_iterator _iter11;
-      for (_iter11 = this->success.begin(); _iter11 != this->success.end(); ++_iter11)
+      std::vector<Notebook> ::const_iterator _iter12;
+      for (_iter12 = this->success.begin(); _iter12 != this->success.end(); ++_iter12)
       {
-        xfer += (*_iter11).write(oprot);
+        xfer += (*_iter12).write(oprot);
       }
       xfer += oprot->writeListEnd();
     }
@@ -177,14 +177,14 @@ uint32_t NoteInfo_GetNotebooks_presult::read(::apache::thrift::protocol::TProtoc
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             (*(this->success)).clear();
-            uint32_t _size12;
-            ::apache::thrift::protocol::TType _etype15;
-            xfer += iprot->readListBegin(_etype15, _size12);
-            (*(this->success)).resize(_size12);
-            uint32_t _i16;
-            for (_i16 = 0; _i16 < _size12; ++_i16)
+            uint32_t _size13;
+            ::apache::thrift::protocol::TType _etype16;
+            xfer += iprot->readListBegin(_etype16, _size13);
+            (*(this->success)).resize(_size13);
+            uint32_t _i17;
+            for (_i17 = 0; _i17 < _size13; ++_i17)
             {
-              xfer += (*(this->success))[_i16].read(iprot);
+              xfer += (*(this->success))[_i17].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -298,14 +298,14 @@ uint32_t NoteInfo_GetFreeNotes_result::read(::apache::thrift::protocol::TProtoco
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->success.clear();
-            uint32_t _size17;
-            ::apache::thrift::protocol::TType _etype20;
-            xfer += iprot->readListBegin(_etype20, _size17);
-            this->success.resize(_size17);
-            uint32_t _i21;
-            for (_i21 = 0; _i21 < _size17; ++_i21)
+            uint32_t _size18;
+            ::apache::thrift::protocol::TType _etype21;
+            xfer += iprot->readListBegin(_etype21, _size18);
+            this->success.resize(_size18);
+            uint32_t _i22;
+            for (_i22 = 0; _i22 < _size18; ++_i22)
             {
-              xfer += this->success[_i21].read(iprot);
+              xfer += this->success[_i22].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -336,10 +336,10 @@ uint32_t NoteInfo_GetFreeNotes_result::write(::apache::thrift::protocol::TProtoc
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
-      std::vector<Note> ::const_iterator _iter22;
-      for (_iter22 = this->success.begin(); _iter22 != this->success.end(); ++_iter22)
+      std::vector<Note> ::const_iterator _iter23;
+      for (_iter23 = this->success.begin(); _iter23 != this->success.end(); ++_iter23)
       {
-        xfer += (*_iter22).write(oprot);
+        xfer += (*_iter23).write(oprot);
       }
       xfer += oprot->writeListEnd();
     }
@@ -374,14 +374,14 @@ uint32_t NoteInfo_GetFreeNotes_presult::read(::apache::thrift::protocol::TProtoc
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             (*(this->success)).clear();
-            uint32_t _size23;
-            ::apache::thrift::protocol::TType _etype26;
-            xfer += iprot->readListBegin(_etype26, _size23);
-            (*(this->success)).resize(_size23);
-            uint32_t _i27;
-            for (_i27 = 0; _i27 < _size23; ++_i27)
+            uint32_t _size24;
+            ::apache::thrift::protocol::TType _etype27;
+            xfer += iprot->readListBegin(_etype27, _size24);
+            (*(this->success)).resize(_size24);
+            uint32_t _i28;
+            for (_i28 = 0; _i28 < _size24; ++_i28)
             {
-              xfer += (*(this->success))[_i27].read(iprot);
+              xfer += (*(this->success))[_i28].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -784,6 +784,7 @@ uint32_t NoteInfo_NewNote_args::read(::apache::thrift::protocol::TProtocol* ipro
   bool isset_userid = false;
   bool isset_bookid = false;
   bool isset_title = false;
+  bool isset_type = false;
 
   while (true)
   {
@@ -817,6 +818,16 @@ uint32_t NoteInfo_NewNote_args::read(::apache::thrift::protocol::TProtocol* ipro
           xfer += iprot->skip(ftype);
         }
         break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          int32_t ecast29;
+          xfer += iprot->readI32(ecast29);
+          this->type = (NoteType::type)ecast29;
+          isset_type = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -831,6 +842,8 @@ uint32_t NoteInfo_NewNote_args::read(::apache::thrift::protocol::TProtocol* ipro
   if (!isset_bookid)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_title)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_type)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -849,6 +862,10 @@ uint32_t NoteInfo_NewNote_args::write(::apache::thrift::protocol::TProtocol* opr
 
   xfer += oprot->writeFieldBegin("title", ::apache::thrift::protocol::T_STRING, 3);
   xfer += oprot->writeString(this->title);
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("type", ::apache::thrift::protocol::T_I32, 4);
+  xfer += oprot->writeI32((int32_t)this->type);
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -870,6 +887,10 @@ uint32_t NoteInfo_NewNote_pargs::write(::apache::thrift::protocol::TProtocol* op
 
   xfer += oprot->writeFieldBegin("title", ::apache::thrift::protocol::T_STRING, 3);
   xfer += oprot->writeString((*(this->title)));
+  xfer += oprot->writeFieldEnd();
+
+  xfer += oprot->writeFieldBegin("type", ::apache::thrift::protocol::T_I32, 4);
+  xfer += oprot->writeI32((int32_t)(*(this->type)));
   xfer += oprot->writeFieldEnd();
 
   xfer += oprot->writeFieldStop();
@@ -1840,14 +1861,14 @@ uint32_t NoteInfo_GetTrashes_result::read(::apache::thrift::protocol::TProtocol*
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->success.clear();
-            uint32_t _size28;
-            ::apache::thrift::protocol::TType _etype31;
-            xfer += iprot->readListBegin(_etype31, _size28);
-            this->success.resize(_size28);
-            uint32_t _i32;
-            for (_i32 = 0; _i32 < _size28; ++_i32)
+            uint32_t _size30;
+            ::apache::thrift::protocol::TType _etype33;
+            xfer += iprot->readListBegin(_etype33, _size30);
+            this->success.resize(_size30);
+            uint32_t _i34;
+            for (_i34 = 0; _i34 < _size30; ++_i34)
             {
-              xfer += this->success[_i32].read(iprot);
+              xfer += this->success[_i34].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -1878,10 +1899,10 @@ uint32_t NoteInfo_GetTrashes_result::write(::apache::thrift::protocol::TProtocol
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
     {
       xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->success.size()));
-      std::vector<Trash> ::const_iterator _iter33;
-      for (_iter33 = this->success.begin(); _iter33 != this->success.end(); ++_iter33)
+      std::vector<Trash> ::const_iterator _iter35;
+      for (_iter35 = this->success.begin(); _iter35 != this->success.end(); ++_iter35)
       {
-        xfer += (*_iter33).write(oprot);
+        xfer += (*_iter35).write(oprot);
       }
       xfer += oprot->writeListEnd();
     }
@@ -1916,14 +1937,14 @@ uint32_t NoteInfo_GetTrashes_presult::read(::apache::thrift::protocol::TProtocol
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             (*(this->success)).clear();
-            uint32_t _size34;
-            ::apache::thrift::protocol::TType _etype37;
-            xfer += iprot->readListBegin(_etype37, _size34);
-            (*(this->success)).resize(_size34);
-            uint32_t _i38;
-            for (_i38 = 0; _i38 < _size34; ++_i38)
+            uint32_t _size36;
+            ::apache::thrift::protocol::TType _etype39;
+            xfer += iprot->readListBegin(_etype39, _size36);
+            (*(this->success)).resize(_size36);
+            uint32_t _i40;
+            for (_i40 = 0; _i40 < _size36; ++_i40)
             {
-              xfer += (*(this->success))[_i38].read(iprot);
+              xfer += (*(this->success))[_i40].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -2546,13 +2567,13 @@ bool NoteInfoClient::recv_DeleteNotebook()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "DeleteNotebook failed: unknown result");
 }
 
-void NoteInfoClient::NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title)
+void NoteInfoClient::NewNote(std::string& _return, const std::string& userid, const std::string& bookid, const std::string& title, const NoteType::type type)
 {
-  send_NewNote(userid, bookid, title);
+  send_NewNote(userid, bookid, title, type);
   recv_NewNote(_return);
 }
 
-void NoteInfoClient::send_NewNote(const std::string& userid, const std::string& bookid, const std::string& title)
+void NoteInfoClient::send_NewNote(const std::string& userid, const std::string& bookid, const std::string& title, const NoteType::type type)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("NewNote", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -2561,6 +2582,7 @@ void NoteInfoClient::send_NewNote(const std::string& userid, const std::string& 
   args.userid = &userid;
   args.bookid = &bookid;
   args.title = &title;
+  args.type = &type;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -3278,7 +3300,7 @@ void NoteInfoProcessor::process_NewNote(int32_t seqid, ::apache::thrift::protoco
 
   NoteInfo_NewNote_result result;
   try {
-    iface_->NewNote(result.success, args.userid, args.bookid, args.title);
+    iface_->NewNote(result.success, args.userid, args.bookid, args.title, args.type);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     if (this->eventHandler_.get() != NULL) {

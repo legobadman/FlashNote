@@ -17,16 +17,26 @@
 
 
 
+struct NoteType {
+  enum type {
+    NORMAL_NOTE = 1,
+    MINDMAP = 2,
+    SCHEDULE = 3
+  };
+};
+
+extern const std::map<int, const char*> _NoteType_VALUES_TO_NAMES;
+
 typedef int64_t Timestamp;
 
 
 class Note {
  public:
 
-  static const char* ascii_fingerprint; // = "0FE07E98F8DCAA5C4CAAD9CDCED5F067";
-  static const uint8_t binary_fingerprint[16]; // = {0x0F,0xE0,0x7E,0x98,0xF8,0xDC,0xAA,0x5C,0x4C,0xAA,0xD9,0xCD,0xCE,0xD5,0xF0,0x67};
+  static const char* ascii_fingerprint; // = "C387CCC76D2831588B2463277030137C";
+  static const uint8_t binary_fingerprint[16]; // = {0xC3,0x87,0xCC,0xC7,0x6D,0x28,0x31,0x58,0x8B,0x24,0x63,0x27,0x70,0x30,0x13,0x7C};
 
-  Note() : id(), title(), text_abbre(), creater_id(), create_time(0), modify_time(0), share(0) {
+  Note() : id(), title(), text_abbre(), creater_id(), create_time(0), modify_time(0), share(0), type((NoteType::type)0) {
   }
 
   virtual ~Note() throw() {}
@@ -38,6 +48,7 @@ class Note {
   Timestamp create_time;
   Timestamp modify_time;
   bool share;
+  NoteType::type type;
 
   void __set_id(const std::string& val) {
     id = val;
@@ -67,6 +78,10 @@ class Note {
     share = val;
   }
 
+  void __set_type(const NoteType::type val) {
+    type = val;
+  }
+
   bool operator == (const Note & rhs) const
   {
     if (!(id == rhs.id))
@@ -82,6 +97,8 @@ class Note {
     if (!(modify_time == rhs.modify_time))
       return false;
     if (!(share == rhs.share))
+      return false;
+    if (!(type == rhs.type))
       return false;
     return true;
   }
@@ -102,8 +119,8 @@ void swap(Note &a, Note &b);
 class Notebook {
  public:
 
-  static const char* ascii_fingerprint; // = "422405715F4FD702966E81371B63B490";
-  static const uint8_t binary_fingerprint[16]; // = {0x42,0x24,0x05,0x71,0x5F,0x4F,0xD7,0x02,0x96,0x6E,0x81,0x37,0x1B,0x63,0xB4,0x90};
+  static const char* ascii_fingerprint; // = "E0B4830E36A5B2EC32BDD86D326FDA6B";
+  static const uint8_t binary_fingerprint[16]; // = {0xE0,0xB4,0x83,0x0E,0x36,0xA5,0xB2,0xEC,0x32,0xBD,0xD8,0x6D,0x32,0x6F,0xDA,0x6B};
 
   Notebook() : id(), name(), create_time(0), modify_time(0), creater_id(), share(0) {
   }
@@ -181,8 +198,8 @@ void swap(Notebook &a, Notebook &b);
 class Trash {
  public:
 
-  static const char* ascii_fingerprint; // = "49F40AF7F6EF2525B146C3AFC11BA377";
-  static const uint8_t binary_fingerprint[16]; // = {0x49,0xF4,0x0A,0xF7,0xF6,0xEF,0x25,0x25,0xB1,0x46,0xC3,0xAF,0xC1,0x1B,0xA3,0x77};
+  static const char* ascii_fingerprint; // = "50B6F1640F2F0B6201D7A728922DA7B7";
+  static const uint8_t binary_fingerprint[16]; // = {0x50,0xB6,0xF1,0x64,0x0F,0x2F,0x0B,0x62,0x01,0xD7,0xA7,0x28,0x92,0x2D,0xA7,0xB7};
 
   Trash() : trash_id(), trash_time(0) {
   }

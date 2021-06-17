@@ -425,7 +425,7 @@ public:
 		return true;
 	}
 
-	void NewNote(std::string& newnoteid, const std::string& userid, const std::string& bookid, const std::string& title)
+	void NewNote(std::string& newnoteid, const std::string& userid, const std::string& bookid, const std::string& title, const NoteType::type type)
 	{
 		ApiLogger apilogger("NewNote");
 

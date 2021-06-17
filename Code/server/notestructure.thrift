@@ -1,5 +1,11 @@
 typedef i64 Timestamp
 
+enum NoteType {
+	NORMAL_NOTE = 1,
+	MINDMAP = 2,
+	SCHEDULE = 3
+}
+
 struct Note {
 	1:required string id;
 	2:required string title;
@@ -8,6 +14,7 @@ struct Note {
 	5:required Timestamp create_time;
 	6:required Timestamp modify_time;
 	7:required bool share;	//共享属性
+	8:required NoteType type;
 }
 
 struct Notebook {
@@ -47,7 +54,7 @@ service NoteInfo {
 	/*创建笔记
 	 指定bookid，创建标题为title的（非共享）笔记。
 	 */
-	string NewNote(1:required string userid, 2:required string bookid, 3:required string title);		//返回note-id
+	string NewNote(1:required string userid, 2:required string bookid, 3:required string title, 4:required NoteType type);		//返回note-id
 	
 	/* 更新笔记内容 */
 	bool UpdateNote(1:required string noteid, 2:required string title, 3:required string note);	//更新笔记内容。

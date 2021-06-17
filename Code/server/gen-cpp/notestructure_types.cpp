@@ -10,8 +10,20 @@
 
 
 
-const char* Note::ascii_fingerprint = "0FE07E98F8DCAA5C4CAAD9CDCED5F067";
-const uint8_t Note::binary_fingerprint[16] = {0x0F,0xE0,0x7E,0x98,0xF8,0xDC,0xAA,0x5C,0x4C,0xAA,0xD9,0xCD,0xCE,0xD5,0xF0,0x67};
+int _kNoteTypeValues[] = {
+  NoteType::NORMAL_NOTE,
+  NoteType::MINDMAP,
+  NoteType::SCHEDULE
+};
+const char* _kNoteTypeNames[] = {
+  "NORMAL_NOTE",
+  "MINDMAP",
+  "SCHEDULE"
+};
+const std::map<int, const char*> _NoteType_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(3, _kNoteTypeValues, _kNoteTypeNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+
+const char* Note::ascii_fingerprint = "C387CCC76D2831588B2463277030137C";
+const uint8_t Note::binary_fingerprint[16] = {0xC3,0x87,0xCC,0xC7,0x6D,0x28,0x31,0x58,0x8B,0x24,0x63,0x27,0x70,0x30,0x13,0x7C};
 
 uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
 
@@ -31,6 +43,7 @@ uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
   bool isset_create_time = false;
   bool isset_modify_time = false;
   bool isset_share = false;
+  bool isset_type = false;
 
   while (true)
   {
@@ -96,6 +109,16 @@ uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 8:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          int32_t ecast0;
+          xfer += iprot->readI32(ecast0);
+          this->type = (NoteType::type)ecast0;
+          isset_type = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -118,6 +141,8 @@ uint32_t Note::read(::apache::thrift::protocol::TProtocol* iprot) {
   if (!isset_modify_time)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   if (!isset_share)
+    throw TProtocolException(TProtocolException::INVALID_DATA);
+  if (!isset_type)
     throw TProtocolException(TProtocolException::INVALID_DATA);
   return xfer;
 }
@@ -154,6 +179,10 @@ uint32_t Note::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeBool(this->share);
   xfer += oprot->writeFieldEnd();
 
+  xfer += oprot->writeFieldBegin("type", ::apache::thrift::protocol::T_I32, 8);
+  xfer += oprot->writeI32((int32_t)this->type);
+  xfer += oprot->writeFieldEnd();
+
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -168,10 +197,11 @@ void swap(Note &a, Note &b) {
   swap(a.create_time, b.create_time);
   swap(a.modify_time, b.modify_time);
   swap(a.share, b.share);
+  swap(a.type, b.type);
 }
 
-const char* Notebook::ascii_fingerprint = "422405715F4FD702966E81371B63B490";
-const uint8_t Notebook::binary_fingerprint[16] = {0x42,0x24,0x05,0x71,0x5F,0x4F,0xD7,0x02,0x96,0x6E,0x81,0x37,0x1B,0x63,0xB4,0x90};
+const char* Notebook::ascii_fingerprint = "E0B4830E36A5B2EC32BDD86D326FDA6B";
+const uint8_t Notebook::binary_fingerprint[16] = {0xE0,0xB4,0x83,0x0E,0x36,0xA5,0xB2,0xEC,0x32,0xBD,0xD8,0x6D,0x32,0x6F,0xDA,0x6B};
 
 uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
 
@@ -212,14 +242,14 @@ uint32_t Notebook::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->notes.clear();
-            uint32_t _size0;
-            ::apache::thrift::protocol::TType _etype3;
-            xfer += iprot->readListBegin(_etype3, _size0);
-            this->notes.resize(_size0);
-            uint32_t _i4;
-            for (_i4 = 0; _i4 < _size0; ++_i4)
+            uint32_t _size1;
+            ::apache::thrift::protocol::TType _etype4;
+            xfer += iprot->readListBegin(_etype4, _size1);
+            this->notes.resize(_size1);
+            uint32_t _i5;
+            for (_i5 = 0; _i5 < _size1; ++_i5)
             {
-              xfer += this->notes[_i4].read(iprot);
+              xfer += this->notes[_i5].read(iprot);
             }
             xfer += iprot->readListEnd();
           }
@@ -305,10 +335,10 @@ uint32_t Notebook::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeFieldBegin("notes", ::apache::thrift::protocol::T_LIST, 2);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, static_cast<uint32_t>(this->notes.size()));
-    std::vector<Note> ::const_iterator _iter5;
-    for (_iter5 = this->notes.begin(); _iter5 != this->notes.end(); ++_iter5)
+    std::vector<Note> ::const_iterator _iter6;
+    for (_iter6 = this->notes.begin(); _iter6 != this->notes.end(); ++_iter6)
     {
-      xfer += (*_iter5).write(oprot);
+      xfer += (*_iter6).write(oprot);
     }
     xfer += oprot->writeListEnd();
   }
@@ -350,8 +380,8 @@ void swap(Notebook &a, Notebook &b) {
   swap(a.share, b.share);
 }
 
-const char* Trash::ascii_fingerprint = "49F40AF7F6EF2525B146C3AFC11BA377";
-const uint8_t Trash::binary_fingerprint[16] = {0x49,0xF4,0x0A,0xF7,0xF6,0xEF,0x25,0x25,0xB1,0x46,0xC3,0xAF,0xC1,0x1B,0xA3,0x77};
+const char* Trash::ascii_fingerprint = "50B6F1640F2F0B6201D7A728922DA7B7";
+const uint8_t Trash::binary_fingerprint[16] = {0x50,0xB6,0xF1,0x64,0x0F,0x2F,0x0B,0x62,0x01,0xD7,0xA7,0x28,0x92,0x2D,0xA7,0xB7};
 
 uint32_t Trash::read(::apache::thrift::protocol::TProtocol* iprot) {
 
