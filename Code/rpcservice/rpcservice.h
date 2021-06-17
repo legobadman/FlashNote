@@ -22,7 +22,7 @@ public:
 	bool DeleteNote(ITrash* pTrash, INote* pNote);
 	bool RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook);
 	bool RecoverNote(INoteApplication* pApp, ITrash* pSrcNoteColl, INote* pNote);
-	std::wstring NewNote(std::wstring bookid, std::wstring title);
+	std::wstring NewNote(std::wstring bookid, std::wstring title, NOTE_TYPE type);
 	std::wstring NewNotebook(std::wstring name);
 
 private:

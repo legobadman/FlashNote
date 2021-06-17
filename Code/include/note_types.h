@@ -16,6 +16,7 @@ struct NOTE
 	QString id;
 	QDateTime create_time;
 	QDateTime modify_time;
+	NOTE_TYPE type;
 	bool share;
 };
 

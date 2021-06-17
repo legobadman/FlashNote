@@ -69,8 +69,10 @@ void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 	std::wstring bookid = AppHelper::GetNotebookId(pNotebook).toStdWString();
 	if (id.empty())
 	{
+		NOTE_TYPE type = NORMAL_NOTE;
+		pNote->GetType(&type);
 		//新建的note，需要先向服务端申请id
-		id = RPCService::GetInstance().NewNote(bookid, L"");
+		id = RPCService::GetInstance().NewNote(bookid, L"", type);
 		pNote->SetId(SysAllocString(id.c_str()));
 		pNote->SetBookId(SysAllocString(bookid.c_str()));
 		pNotebook->AddNote(pNote);
@@ -90,10 +92,16 @@ void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 	bool ret = m_pClient->client()->UpdateNote(converter.to_bytes(id), converter.to_bytes(title), converter.to_bytes(content));
 }
 
-std::wstring RPCService::NewNote(std::wstring bookid, std::wstring title)
+std::wstring RPCService::NewNote(std::wstring bookid, std::wstring title, NOTE_TYPE type)
 {
+	NoteType::type _type = NoteType::NORMAL_NOTE;
+	if (type == NORMAL_NOTE)
+		_type = NoteType::NORMAL_NOTE;
+	else if (type == MINDMAP)
+		_type = NoteType::MINDMAP;
+
 	std::string newnoteid;
-	m_pClient->client()->NewNote(newnoteid, _userid, converter.to_bytes(bookid), converter.to_bytes(title));
+	m_pClient->client()->NewNote(newnoteid, _userid, converter.to_bytes(bookid), converter.to_bytes(title), _type);
 	return converter.from_bytes(newnoteid);
 }
 
@@ -216,7 +224,7 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 				NOTE note(notebook.notes[j]);
 
 				com_sptr<INote> spNote;
-				CreateNote(NORMAL_NOTE, &spNote);
+				CreateNote(note.type, &spNote);
 
 				std::wstring title = note.title.toStdWString();
 				BSTR bstrTitle = SysAllocString(title.c_str());
@@ -270,6 +278,17 @@ void RPCService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
 			note.create_time = QDateTime::fromMSecsSinceEpoch(_note.create_time, Qt::UTC);
 			note.modify_time = QDateTime::fromMSecsSinceEpoch(_note.modify_time, Qt::UTC);
 			note.id = QString::fromUtf8(_note.id.c_str());
+			switch (_note.type)
+			{
+			case NoteType::NORMAL_NOTE:
+				note.type = NOTE_TYPE::NORMAL_NOTE;
+				break;
+			case NoteType::MINDMAP:
+				note.type = NOTE_TYPE::MINDMAP;
+				break;
+			case NoteType::SCHEDULE:
+				break;
+			}
 
 			notebook.notes.append(note);
 		}

@@ -184,6 +184,23 @@ public:
 					note.modify_time = note_view["modify_time"].get_date().to_int64();
 					note.creater_id = note_view["creater"].get_oid().value.to_string();
 
+					auto types_view = note_view.find("type");
+					if (types_view != note_view.end())
+					{
+						int val = note_view["type"].get_int32();
+						if (val >= 1 && val <= 3)
+						{
+							note.type = (NoteType::type)val;
+						}
+						else
+						{
+							apilogger.append_err("unknown note type: " + noteid);
+						}
+					}
+					else
+					{
+						note.type = NoteType::NORMAL_NOTE;
+					}
 					notebook.notes.push_back(note);
 				}
 				_return.push_back(notebook);
@@ -442,6 +459,12 @@ public:
 			return;
 		}
 
+		if (type < NoteType::NORMAL_NOTE || type > NoteType::SCHEDULE)
+		{
+			apilogger.append_err("type value is invalid");
+			return;
+		}
+
 		//空bookid表示游离的note
 		bool bFreeNote = bookid.empty();
 		
@@ -463,6 +486,7 @@ public:
 			kvp("create_time", BSON_NOW()),
 			kvp("modify_time", BSON_NOW()),
 			kvp("title", title),
+			kvp("type", type),
 			kvp("content", ""));
 
 		auto retVal = notes.insert_one(note.view());
