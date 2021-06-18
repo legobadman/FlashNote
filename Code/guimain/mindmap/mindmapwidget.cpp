@@ -30,9 +30,9 @@ MindMapWidget::~MindMapWidget()
 {
 }
 
-void MindMapWidget::initContent(QString content)
+void MindMapWidget::initContent(QString content, bool bSchedule)
 {
-	m_scene->initContent(content);
+	m_scene->initContent(content, bSchedule);
 }
 
 QString MindMapWidget::mindmapXML()

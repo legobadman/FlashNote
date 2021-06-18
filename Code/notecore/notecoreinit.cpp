@@ -7,6 +7,10 @@ BSTR _default_content(NOTE_TYPE type)
 	{
 		return L"<node text=\"思维导图笔记\"></node>";
 	}
+	else if (type == SCHEDULE)
+	{
+		return L"<node text=\"进度图\"></node>";
+	}
 	return L"";
 }
 
@@ -15,6 +19,10 @@ BSTR _default_title(NOTE_TYPE type)
 	if (type == MINDMAP)
 	{
 		return SysAllocString(L"思维导图笔记");
+	}
+	else if (type == SCHEDULE)
+	{
+		return SysAllocString(L"进度图");
 	}
 	return NULL;
 }
@@ -75,5 +83,15 @@ HRESULT CreateTrash(ITrash** ppTrash)
 
 	*ppTrash = new TrashBase;
 	(*ppTrash)->AddRef();
+	return S_OK;
+}
+
+HRESULT CreateSchedules(ISchedules** ppSchedules)
+{
+	if (!ppSchedules)
+		return E_POINTER;
+
+	*ppSchedules = new SchedulesBase;
+	(*ppSchedules)->AddRef();
 	return S_OK;
 }

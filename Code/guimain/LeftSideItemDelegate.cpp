@@ -189,7 +189,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	//TODO: 展开项在收缩时也能呈现被选中的状态。
 
 	//展开收缩箭头。
-	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
+	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK || type == ITEM_CONTENT_TYPE::ITEM_SCHEDULE)
 	{
 		drawExpandArrow(painter, opt);
 	}

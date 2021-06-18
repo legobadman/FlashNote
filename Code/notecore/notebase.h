@@ -141,6 +141,32 @@ public:
 		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
 };
 
+class SchedulesBase : public NoteCollection<ISchedules>
+{
+public:
+	SchedulesBase();
+	~SchedulesBase();
+
+	HRESULT STDMETHODCALLTYPE GetName(BSTR* pbstrName);
+	HRESULT STDMETHODCALLTYPE SetName(IN BSTR bstrName) { return E_NOTIMPL; }
+	HRESULT STDMETHODCALLTYPE GetId(BSTR* pbstrId);
+	HRESULT STDMETHODCALLTYPE SetId(BSTR bstrId);
+	
+	HRESULT STDMETHODCALLTYPE GetCreateTime(long* pTime) { return E_NOTIMPL; }
+	HRESULT STDMETHODCALLTYPE SetCreateTime(long create_time) { return E_NOTIMPL; }
+	HRESULT STDMETHODCALLTYPE GetModifyTime(long* pTime) { return E_NOTIMPL; }
+	HRESULT STDMETHODCALLTYPE SetModifyTime(long time) { return E_NOTIMPL; }
+
+	HRESULT STDMETHODCALLTYPE GetNoteIdx(INote* pNote, int* pIndex) { return E_NOTIMPL; }
+public:
+	HRESULT STDMETHODCALLTYPE QueryInterface(
+		/* [in] */ REFIID riid,
+		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
+
+private:
+	CComBSTR m_id;
+};
+
 class NoteApplication : public INoteApplication
 {
 public:
@@ -154,6 +180,8 @@ public:
 	HRESULT STDMETHODCALLTYPE SetUserId(IN BSTR bstrId);
 	HRESULT STDMETHODCALLTYPE GetTrash(ITrash** ppTrash);
 	HRESULT STDMETHODCALLTYPE SetTrash(ITrash* pTrash);
+	HRESULT STDMETHODCALLTYPE GetSchedules(ISchedules** ppSchedules);
+	HRESULT STDMETHODCALLTYPE SetSchedules(ISchedules* pSchedules);
 
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(
@@ -167,7 +195,7 @@ private:
 
 	com_sptr<INotebooks> m_spNotebooks;
 	com_sptr<ITrash> m_spTrash;
-
+	com_sptr<ISchedules> m_spSchedules;
 	std::unordered_set<ICoreNotify*> m_notifies;
 	int m_ref;
 };

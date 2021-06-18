@@ -5,11 +5,13 @@ import "ocidl.idl";
 interface ICoreNotify;
 interface INoteCoreObj;
 interface ITrash;
+interface ISchedules;
 
 typedef enum NOTE_TYPE
 {
 	NORMAL_NOTE = 0,
 	MINDMAP,
+	SCHEDULE,
 	UNKNOWN_TYPE,
 }NOTE_TYPE;
 
@@ -102,8 +104,15 @@ interface INoteApplication : INoteCoreObj {
 	HRESULT SetNotebooks([in]INotebooks* pNotebooks);
 	HRESULT GetTrash([out]ITrash** ppTrash);
 	HRESULT SetTrash([in]ITrash* pTrash);
+	HRESULT GetSchedules([out]ISchedules** ppSchedules);
+	HRESULT SetSchedules([in]ISchedules* pSchedules);
 	HRESULT GetUserId([out]BSTR* pbstrId);
 	HRESULT SetUserId([in]BSTR bstrId);
+};
+
+
+[object, uuid(F4E165D8-C698-4A5A-B0AE-D80CCBF1CBC0)]
+interface ISchedules : INotebook {
 };
 
 

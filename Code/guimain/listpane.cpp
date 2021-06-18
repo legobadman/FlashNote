@@ -283,9 +283,12 @@ NewNoteMenu::NewNoteMenu(QWidget* parent)
 	QStandardItem* pMindMap = new QStandardItem(u8"思维导图");
 	pModel->appendRow(pMindMap);
 
+	QStandardItem* pSchedule = new QStandardItem(u8"进度图");
+	pModel->appendRow(pSchedule);
+
 	setModel(pModel);
 	setItemDelegate(new NewItemDelegate(this));
-	setFixedSize(MyStyle::dpiScaledSize(QSize(NEW_NOTE_MENU_ITEM_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 2)));
+	setFixedSize(MyStyle::dpiScaledSize(QSize(NEW_NOTE_MENU_ITEM_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 3)));
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
@@ -303,6 +306,10 @@ void NewNoteMenu::onIndexClicked(const QModelIndex& index)
 	else if (index.row() == 1)
 	{
 		emit newnote(MINDMAP);
+	}
+	else if (index.row() == 2)
+	{
+		emit newnote(SCHEDULE);
 	}
 }
 
@@ -430,7 +437,7 @@ void NavigationPanel::initModel()
 	m_model->appendRow(pMaterialItem);
 	m_model->appendRow(pFragmentItem);
 	m_model->appendRow(pDiaryItem);
-	m_model->appendRow(pScheduleItem);
+	initSchedule();
 	m_model->appendRow(pDraftItem);
 	m_model->appendRow(pTrashItem);
 
@@ -596,4 +603,49 @@ void NavigationPanel::initNotebookItem()
 		pNoteBookItem->appendRow(pItem);
 	}
 	m_model->appendRow(pNoteBookItem);
+}
+
+void NavigationPanel::initSchedule()
+{
+	QStandardItem* pScheduleItem = new QStandardItem(
+		QIcon(":/icons/schedules.png"),
+		u8"进度表"
+	);
+	pScheduleItem->setEditable(false);
+	pScheduleItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
+		ITEM_CONTENT_TYPE::ITEM_SCHEDULE), ItemContentTypeRole);
+	pScheduleItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
+		ITEM_WIDGET_TYPE::ITEM_TOPLEVEL), ItemWidgetTypeRole);
+
+	com_sptr<INoteApplication> spApp = coreApp;
+	com_sptr<ISchedules> spSchedules;
+	spApp->GetSchedules(&spSchedules);
+
+	spSchedules->addWatcher(this);
+
+	int count = 0;
+	spSchedules->GetCount(&count);
+	for (int i = 0; i < count; i++)
+	{
+		VARIANT index;
+		V_VT(&index) = VT_I4;
+		V_I4(&index) = i;
+
+		com_sptr<INote> spNote;
+		spSchedules->Item(index, &spNote);
+
+		QString title = AppHelper::GetNoteTitle(spNote);
+		QString id = AppHelper::GetNoteId(spNote);
+
+		QStandardItem* pItem = new QStandardItem(title);
+		pItem->setEditable(false);
+		pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
+			ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM), ItemContentTypeRole);
+		pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
+			ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
+		pItem->setData(QVariant(id), ItemCoreObjIdRole);
+
+		pScheduleItem->appendRow(pItem);
+	}
+	m_model->appendRow(pScheduleItem);
 }

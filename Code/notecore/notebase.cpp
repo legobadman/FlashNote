@@ -488,6 +488,67 @@ HRESULT TrashBase::GetName(BSTR* pbstrName)
 
 
 //////////////////////////////////////////////////
+SchedulesBase::SchedulesBase()
+{
+
+}
+
+SchedulesBase::~SchedulesBase()
+{
+
+}
+
+HRESULT SchedulesBase::GetName(BSTR* pbstrName)
+{
+	if (!pbstrName)
+		return E_POINTER;
+
+	*pbstrName = SysAllocString(L"½ø¶È±í");
+	return S_OK;
+}
+
+HRESULT SchedulesBase::GetId(BSTR* pbstrId)
+{
+	return m_id.CopyTo(pbstrId);
+}
+
+HRESULT SchedulesBase::SetId(BSTR bstrId)
+{
+	m_id.Attach(bstrId);
+	return S_OK;
+}
+
+HRESULT SchedulesBase::QueryInterface(
+	/* [in] */ REFIID riid,
+	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+{
+	if (!ppvObject)
+		return E_FAIL;
+
+	if (riid == IID_INoteCoreObj)
+	{
+		*ppvObject = static_cast<INoteCoreObj*>(this);
+	}
+	else if (riid == IID_INoteCollection)
+	{
+		*ppvObject = static_cast<INoteCollection*>(this);
+	}
+	else if (riid == IID_INotebook)
+	{
+		*ppvObject = static_cast<INotebook*>(this);
+	}
+	else if (riid == IID_ISchedules)
+	{
+		*ppvObject = static_cast<ISchedules*>(this);
+	}
+	else
+	{
+		return E_FAIL;
+	}
+	return S_OK;
+}
+
+//////////////////////////////////////////////////
 NoteApplication::NoteApplication()
 	: m_ref(0)
 {
@@ -529,6 +590,24 @@ HRESULT NoteApplication::SetTrash(ITrash* pTrash)
 		return E_POINTER;
 
 	m_spTrash = pTrash;
+	return S_OK;
+}
+
+HRESULT NoteApplication::GetSchedules(ISchedules** ppSchedules)
+{
+	if (!ppSchedules)
+		return E_POINTER;
+
+	*ppSchedules = m_spSchedules;
+	(*ppSchedules)->AddRef();
+	return S_OK;
+}
+
+HRESULT NoteApplication::SetSchedules(ISchedules* pSchedules)
+{
+	if (!pSchedules)
+		return E_POINTER;
+	m_spSchedules = pSchedules;
 	return S_OK;
 }
 

@@ -17,7 +17,7 @@ class MindMapWidget : public QWidget
 public:
 	MindMapWidget(QWidget* parent = NULL);
 	~MindMapWidget();
-	void initContent(QString content);
+	void initContent(QString content, bool bSchedule);
 	QString mindmapXML();
 
 signals:

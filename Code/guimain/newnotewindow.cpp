@@ -27,6 +27,15 @@ void NewNoteWindow::init(QString bookid)
 	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
 }
 
+void NewNoteWindow::initSchedule()
+{
+	com_sptr<ISchedules> spSchedules;
+	coreApp->GetSchedules(&spSchedules);
+	HRESULT hr = CreateNote(m_type, &m_pNote);
+	com_sptr<INotebook> spNotebook = spSchedules;
+	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
+}
+
 void NewNoteWindow::closeEvent(QCloseEvent* event)
 {
 	event->ignore();

@@ -117,6 +117,7 @@ protected:
 
 private:
 	void initNotebookItem();
+	void initSchedule();
 	void initModel();
 
 signals:

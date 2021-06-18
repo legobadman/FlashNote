@@ -71,7 +71,12 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 	}
 	else if (m_type == MINDMAP)
 	{
-		m_ui->mindmapEditor->initContent(content);
+		m_ui->mindmapEditor->initContent(content, false);
+		m_ui->stackedWidget->setCurrentIndex(1);
+	}
+	else if (m_type == SCHEDULE)
+	{
+		m_ui->mindmapEditor->initContent(content, true);
 		m_ui->stackedWidget->setCurrentIndex(1);
 	}
 	else
@@ -181,7 +186,7 @@ void NoteEditWindow::onTitleChanged()
 {
 	if (m_type == NORMAL_NOTE)
 		onTextChanged();
-	else if (m_type == MINDMAP)
+	else if (m_type == MINDMAP || m_type == SCHEDULE)
 		onMindMapChanged();
 }
 

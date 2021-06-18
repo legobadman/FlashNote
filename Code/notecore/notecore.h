@@ -94,6 +94,13 @@ typedef interface INoteApplication INoteApplication;
 #endif 	/* __INoteApplication_FWD_DEFINED__ */
 
 
+#ifndef __ISchedules_FWD_DEFINED__
+#define __ISchedules_FWD_DEFINED__
+typedef interface ISchedules ISchedules;
+
+#endif 	/* __ISchedules_FWD_DEFINED__ */
+
+
 #ifndef __ITrash_FWD_DEFINED__
 #define __ITrash_FWD_DEFINED__
 typedef interface ITrash ITrash;
@@ -116,12 +123,14 @@ extern "C"{
 
 
 
+
 typedef 
 enum NOTE_TYPE
     {
         NORMAL_NOTE	= 0,
         MINDMAP	= ( NORMAL_NOTE + 1 ) ,
-        UNKNOWN_TYPE	= ( MINDMAP + 1 ) 
+        SCHEDULE	= ( MINDMAP + 1 ) ,
+        UNKNOWN_TYPE	= ( SCHEDULE + 1 ) 
     } 	NOTE_TYPE;
 
 typedef 
@@ -1034,6 +1043,12 @@ EXTERN_C const IID IID_INoteApplication;
         virtual HRESULT STDMETHODCALLTYPE SetTrash( 
             /* [in] */ ITrash *pTrash) = 0;
         
+        virtual HRESULT STDMETHODCALLTYPE GetSchedules( 
+            /* [out] */ ISchedules **ppSchedules) = 0;
+        
+        virtual HRESULT STDMETHODCALLTYPE SetSchedules( 
+            /* [in] */ ISchedules *pSchedules) = 0;
+        
         virtual HRESULT STDMETHODCALLTYPE GetUserId( 
             /* [out] */ BSTR *pbstrId) = 0;
         
@@ -1080,6 +1095,14 @@ EXTERN_C const IID IID_INoteApplication;
         HRESULT ( STDMETHODCALLTYPE *SetTrash )( 
             INoteApplication * This,
             /* [in] */ ITrash *pTrash);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetSchedules )( 
+            INoteApplication * This,
+            /* [out] */ ISchedules **ppSchedules);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetSchedules )( 
+            INoteApplication * This,
+            /* [in] */ ISchedules *pSchedules);
         
         HRESULT ( STDMETHODCALLTYPE *GetUserId )( 
             INoteApplication * This,
@@ -1128,6 +1151,12 @@ EXTERN_C const IID IID_INoteApplication;
 #define INoteApplication_SetTrash(This,pTrash)	\
     ( (This)->lpVtbl -> SetTrash(This,pTrash) ) 
 
+#define INoteApplication_GetSchedules(This,ppSchedules)	\
+    ( (This)->lpVtbl -> GetSchedules(This,ppSchedules) ) 
+
+#define INoteApplication_SetSchedules(This,pSchedules)	\
+    ( (This)->lpVtbl -> SetSchedules(This,pSchedules) ) 
+
 #define INoteApplication_GetUserId(This,pbstrId)	\
     ( (This)->lpVtbl -> GetUserId(This,pbstrId) ) 
 
@@ -1143,6 +1172,185 @@ EXTERN_C const IID IID_INoteApplication;
 
 
 #endif 	/* __INoteApplication_INTERFACE_DEFINED__ */
+
+
+#ifndef __ISchedules_INTERFACE_DEFINED__
+#define __ISchedules_INTERFACE_DEFINED__
+
+/* interface ISchedules */
+/* [uuid][object] */ 
+
+
+EXTERN_C const IID IID_ISchedules;
+
+#if defined(__cplusplus) && !defined(CINTERFACE)
+    
+    MIDL_INTERFACE("F4E165D8-C698-4A5A-B0AE-D80CCBF1CBC0")
+    ISchedules : public INotebook
+    {
+    public:
+    };
+    
+    
+#else 	/* C style interface */
+
+    typedef struct ISchedulesVtbl
+    {
+        BEGIN_INTERFACE
+        
+        HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
+            ISchedules * This,
+            /* [in] */ REFIID riid,
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
+        
+        ULONG ( STDMETHODCALLTYPE *AddRef )( 
+            ISchedules * This);
+        
+        ULONG ( STDMETHODCALLTYPE *Release )( 
+            ISchedules * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *addWatcher )( 
+            ISchedules * This,
+            ICoreNotify *pNotify);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetName )( 
+            ISchedules * This,
+            /* [out] */ BSTR *pbstrName);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetCount )( 
+            ISchedules * This,
+            /* [out] */ int *pCount);
+        
+        HRESULT ( STDMETHODCALLTYPE *Item )( 
+            ISchedules * This,
+            /* [in] */ VARIANT index,
+            /* [out] */ INote **ppNote);
+        
+        HRESULT ( STDMETHODCALLTYPE *AddNote )( 
+            ISchedules * This,
+            /* [in] */ INote *pNote);
+        
+        HRESULT ( STDMETHODCALLTYPE *RemoveNote )( 
+            ISchedules * This,
+            /* [in] */ INote *pNote);
+        
+        HRESULT ( STDMETHODCALLTYPE *Clear )( 
+            ISchedules * This);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetId )( 
+            ISchedules * This,
+            /* [retval][out] */ BSTR *pbstrId);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetId )( 
+            ISchedules * This,
+            /* [in] */ BSTR bstrId);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetName )( 
+            ISchedules * This,
+            /* [in] */ BSTR bstrName);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetCreateTime )( 
+            ISchedules * This,
+            /* [out] */ long *pTime);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetCreateTime )( 
+            ISchedules * This,
+            /* [in] */ long time);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetModifyTime )( 
+            ISchedules * This,
+            /* [out] */ long *pTime);
+        
+        HRESULT ( STDMETHODCALLTYPE *SetModifyTime )( 
+            ISchedules * This,
+            /* [in] */ long time);
+        
+        HRESULT ( STDMETHODCALLTYPE *GetNoteIdx )( 
+            ISchedules * This,
+            /* [in] */ INote *pNote,
+            /* [out] */ int *pIndex);
+        
+        END_INTERFACE
+    } ISchedulesVtbl;
+
+    interface ISchedules
+    {
+        CONST_VTBL struct ISchedulesVtbl *lpVtbl;
+    };
+
+    
+
+#ifdef COBJMACROS
+
+
+#define ISchedules_QueryInterface(This,riid,ppvObject)	\
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
+
+#define ISchedules_AddRef(This)	\
+    ( (This)->lpVtbl -> AddRef(This) ) 
+
+#define ISchedules_Release(This)	\
+    ( (This)->lpVtbl -> Release(This) ) 
+
+
+#define ISchedules_addWatcher(This,pNotify)	\
+    ( (This)->lpVtbl -> addWatcher(This,pNotify) ) 
+
+
+#define ISchedules_GetName(This,pbstrName)	\
+    ( (This)->lpVtbl -> GetName(This,pbstrName) ) 
+
+#define ISchedules_GetCount(This,pCount)	\
+    ( (This)->lpVtbl -> GetCount(This,pCount) ) 
+
+#define ISchedules_Item(This,index,ppNote)	\
+    ( (This)->lpVtbl -> Item(This,index,ppNote) ) 
+
+#define ISchedules_AddNote(This,pNote)	\
+    ( (This)->lpVtbl -> AddNote(This,pNote) ) 
+
+#define ISchedules_RemoveNote(This,pNote)	\
+    ( (This)->lpVtbl -> RemoveNote(This,pNote) ) 
+
+#define ISchedules_Clear(This)	\
+    ( (This)->lpVtbl -> Clear(This) ) 
+
+
+#define ISchedules_GetId(This,pbstrId)	\
+    ( (This)->lpVtbl -> GetId(This,pbstrId) ) 
+
+#define ISchedules_SetId(This,bstrId)	\
+    ( (This)->lpVtbl -> SetId(This,bstrId) ) 
+
+#define ISchedules_SetName(This,bstrName)	\
+    ( (This)->lpVtbl -> SetName(This,bstrName) ) 
+
+#define ISchedules_GetCreateTime(This,pTime)	\
+    ( (This)->lpVtbl -> GetCreateTime(This,pTime) ) 
+
+#define ISchedules_SetCreateTime(This,time)	\
+    ( (This)->lpVtbl -> SetCreateTime(This,time) ) 
+
+#define ISchedules_GetModifyTime(This,pTime)	\
+    ( (This)->lpVtbl -> GetModifyTime(This,pTime) ) 
+
+#define ISchedules_SetModifyTime(This,time)	\
+    ( (This)->lpVtbl -> SetModifyTime(This,time) ) 
+
+#define ISchedules_GetNoteIdx(This,pNote,pIndex)	\
+    ( (This)->lpVtbl -> GetNoteIdx(This,pNote,pIndex) ) 
+
+
+#endif /* COBJMACROS */
+
+
+#endif 	/* C style interface */
+
+
+
+
+#endif 	/* __ISchedules_INTERFACE_DEFINED__ */
 
 
 #ifndef __ITrash_INTERFACE_DEFINED__

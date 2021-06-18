@@ -15,7 +15,7 @@ class MindMapScene : public QGraphicsScene
 public:
 	MindMapScene(QObject* parent = nullptr);
 	~MindMapScene();
-	void initContent(QString content);
+	void initContent(QString content, bool bSchedule);
 	QString mindmapXML();
 
 signals:
@@ -39,6 +39,7 @@ private:
 private:
 	MindTextNode* m_pRoot;
 	QList<QGraphicsPathItem*> m_pathItems;
+	bool m_bSchedule;
 };
 
 #endif

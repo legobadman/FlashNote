@@ -58,7 +58,10 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 void NoteMainWindow::onNewNote(NOTE_TYPE noteType)
 {
 	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, noteType);
-	pNewNoteWindow->init(getActiveBookId());
+	if (noteType == SCHEDULE)
+		pNewNoteWindow->initSchedule();
+	else
+		pNewNoteWindow->init(getActiveBookId());
 	pNewNoteWindow->showMaximized();
 }
 
@@ -124,6 +127,23 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	{
 		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
 		m_ui->notesview->setNotebook(VIEW_ALLNOTES, NULL);
+	}
+	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM)
+	{
+		com_sptr<ISchedules> spSchedules;
+		coreApp->GetSchedules(&spSchedules);
+		com_sptr<INotebook> spNotebook = spSchedules;
+
+		QString noteid = index.data(ItemCoreObjIdRole).toString();
+		VARIANT varIndex;
+		V_VT(&varIndex) = VT_BSTR;
+		V_BSTR(&varIndex) = SysAllocString(noteid.toStdWString().data());
+
+		com_sptr<INote> spNote;
+		spNotebook->Item(varIndex, &spNote);
+
+		m_ui->scheduleeditor->updateNoteInfo(spNotebook, spNote, true);
+		m_ui->stackedWidget2->setCurrentWidget(m_ui->scheduleeditor);
 	}
 }
 

@@ -6,6 +6,7 @@
 
 MindMapScene::MindMapScene(QObject* parent)
 	: QGraphicsScene(parent)
+	, m_bSchedule(false)
 {
 
 }
@@ -14,8 +15,9 @@ MindMapScene::~MindMapScene()
 {
 }
 
-void MindMapScene::initContent(QString content)
+void MindMapScene::initContent(QString content, bool bSchedule)
 {
+	m_bSchedule = bSchedule;
 	clear();
 	m_pathItems.clear();
 	std::wstring wstr = content.toStdWString();
@@ -46,6 +48,8 @@ MindTextNode* MindMapScene::newProgressNode(MindTextNode* pRoot, const QString& 
 void MindMapScene::onCreateChildNode(MindTextNode* pRoot)
 {
 	MindTextNode* pChild = new MindTextNode(u8"新增节点", pRoot);
+	if (m_bSchedule)
+		pChild->SetProgress(0.);
 	pRoot->append(pChild);
 	pChild->setLevel(pRoot->level() + 1);
 	setupNode(pChild);
@@ -57,6 +61,8 @@ void MindMapScene::onCreateSlibingNode(MindTextNode* pNode)
 {
 	MindTextNode* parent = pNode->Parent();
 	MindTextNode* pChild = new MindTextNode(u8"新增节点", parent);
+	if (m_bSchedule)
+		pChild->SetProgress(0.);
 	pChild->setLevel(pNode->level());
 	parent->append(pChild);
 	setupNode(pChild);
@@ -258,6 +264,9 @@ XML_NODE* MindMapScene::_export(MindTextNode* pRoot, xml_document<WCHAR>& doc)
 MindTextNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
 {
 	MindTextNode* pRoot = new MindTextNode("");
+	if (m_bSchedule)
+		pRoot->SetProgress(0.);
+
 	pRoot->setLevel(level);
 	for (xml_attribute<WCHAR>* attr = root->first_attribute();
 		attr;

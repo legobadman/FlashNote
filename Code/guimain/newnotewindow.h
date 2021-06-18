@@ -13,6 +13,7 @@ public:
 	NewNoteWindow(QWidget* parent, NOTE_TYPE type);
 	~NewNoteWindow();
 	void init(QString bookid);
+	void initSchedule();
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

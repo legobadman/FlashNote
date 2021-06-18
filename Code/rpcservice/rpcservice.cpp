@@ -202,9 +202,16 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 	std::vector<NOTEBOOK> vecBooks;
 	RPCService::GetInstance().getnotebooks(vecBooks);
 	pApp->SetUserId(SysAllocString(userid.c_str()));
+
 	for (int i = 0; i < vecBooks.size(); i++)
 	{
 		NOTEBOOK notebook(vecBooks[i]);
+		if (notebook.name == QString::fromUtf8(u8"luzh的进度表"))
+		{
+			initschedules(pApp, notebook);
+			continue;
+		}
+
 		com_sptr<INotebook> spNotebook;
 		CreateNotebook(&spNotebook);
 		if (spNotebook)
@@ -294,6 +301,43 @@ void RPCService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
 		}
 		vecBooks.push_back(notebook);
 	}
+}
+
+void RPCService::initschedules(INoteApplication* pApp, const NOTEBOOK& schedules)
+{
+	com_sptr<ISchedules> spSchedules;
+	CreateSchedules(&spSchedules);
+
+	BSTR bstrId = SysAllocString(schedules.id.toStdWString().c_str());
+	spSchedules->SetId(bstrId);
+
+	for (int j = 0; j < schedules.notes.size(); j++)
+	{
+		NOTE note(schedules.notes[j]);
+
+		com_sptr<INote> spNote;
+		CreateNote(SCHEDULE, &spNote);
+
+		std::wstring title = note.title.toStdWString();
+		BSTR bstrTitle = SysAllocString(title.c_str());
+		spNote->SetTitle(bstrTitle);
+
+		std::wstring content = note.content.toStdWString();
+		BSTR bstrContent = SysAllocString(content.c_str());
+		spNote->SetContent(bstrContent);
+
+		spNote->SetCreateTime(note.create_time.toMSecsSinceEpoch());
+		spNote->SetModifyTime(note.modify_time.toMSecsSinceEpoch());
+
+		bstrId = SysAllocString(note.id.toStdWString().c_str());
+		spNote->SetId(bstrId);
+
+		bstrId = SysAllocString(schedules.id.toStdWString().c_str());
+		spNote->SetBookId(bstrId);
+
+		spSchedules->AddNote(spNote);
+	}
+	pApp->SetSchedules(spSchedules);
 }
 
 void RPCService::inittrashes(INoteApplication* pApp)

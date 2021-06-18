@@ -15,6 +15,7 @@ public:
 	static RPCService& GetInstance();
 	void getnotebooks(std::vector<NOTEBOOK>& vecBooks);
 	void inittrashes(INoteApplication* pApp);
+	void initschedules(INoteApplication* pApp, const NOTEBOOK& schedules);
 	void InitcoreFromRPC(INoteApplication* pApp);
 	void SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote);
 	bool SynchronizeNotebook(INotebook* pNotebook);
