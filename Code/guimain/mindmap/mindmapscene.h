@@ -25,6 +25,7 @@ private slots:
 	MindTextNode* newProgressNode(MindTextNode* pRoot, const QString& text, float progress);
 	void onCreateChildNode(MindTextNode* pRoot);
 	void onCreateSlibingNode(MindTextNode* pNode);
+	void onItemContentChanged();
 
 private:
 	void onRedrawItems();

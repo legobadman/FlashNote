@@ -9,6 +9,7 @@ class MindTextNode : public QGraphicsTextItem
 	Q_OBJECT
 	enum MOUSE_STATE
 	{
+		MS_UNKNOWN,
 		MS_FOCUSOUT,
 		MS_SELECTED,
 		MS_HOVERED,

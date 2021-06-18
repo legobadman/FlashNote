@@ -12,7 +12,7 @@
 MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 	: m_level(0)
 	, myText(text)
-	, m_mouseState(MS_FOCUSOUT)
+	, m_mouseState(MS_UNKNOWN)
 	, m_bHovered(false)
 	, m_borderWidth(2)
 	, m_cornerRadius(7)
@@ -30,11 +30,21 @@ MindTextNode::~MindTextNode()
 
 void MindTextNode::setup()
 {
-	if (m_level == 0) {
-		myTextColor = QColor(255, 255, 255);
+	// setup需要在最后一步做，才能获取真正的level以及是否包含进度条。
+	if (m_level == 0)
+	{
+		if (m_bProgress)
+		{
+			myTextColor = QColor(0, 0, 0);
+			myBackgroundColor = QColor(242, 242, 242);
+		}
+		else
+		{
+			myTextColor = QColor(255, 255, 255);
+			myBackgroundColor = QColor(0, 181, 72);
+		}
 		m_highlightedBorder = QColor(23, 157, 235);
 		m_selectedBorder = QColor(23, 157, 235);
-		myBackgroundColor = QColor(0, 181, 72);
 		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
 	}
 	else if (m_level == 1) {
@@ -44,7 +54,7 @@ void MindTextNode::setup()
 		myBackgroundColor = QColor(242, 242, 242);
 		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
 	}
-	else if (m_level == 2) {
+	else if (m_level >= 2) {
 		myTextColor = QColor(0, 0, 0);
 		m_highlightedBorder = QColor(136, 203, 242);
 		m_selectedBorder = QColor(23, 157, 235);

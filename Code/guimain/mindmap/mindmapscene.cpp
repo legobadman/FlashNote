@@ -70,6 +70,12 @@ void MindMapScene::onCreateSlibingNode(MindTextNode* pNode)
 	onRedrawItems();
 }
 
+void MindMapScene::onItemContentChanged()
+{
+	onRedrawItems();
+	emit itemContentChanged();
+}
+
 void MindMapScene::onRedrawItems()
 {
 	for (auto it = m_pathItems.begin(); it != m_pathItems.end(); it++)
@@ -85,7 +91,7 @@ void MindMapScene::onRedrawItems()
 void MindMapScene::setupNode(MindTextNode* node)
 {
 	node->setup();
-	connect(node, SIGNAL(contentsChange()), this, SIGNAL(itemContentChanged()));
+	connect(node, SIGNAL(contentsChange()), this, SLOT(onItemContentChanged()));
 	connect(node, SIGNAL(childNodeCreate(MindTextNode*)), this, SLOT(onCreateChildNode(MindTextNode*)));
 	connect(node, SIGNAL(silibingNodeCreate(MindTextNode*)), this, SLOT(onCreateSlibingNode(MindTextNode*)));
 	addItem(node);
