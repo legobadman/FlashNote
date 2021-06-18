@@ -9,7 +9,7 @@
 
 
 /////////////////////////////////////////////////////////////
-MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
+MindNode::MindNode(const QString& text, MindNode* parent)
 	: m_level(0)
 	, myText(text)
 	, m_mouseState(MS_UNKNOWN)
@@ -24,11 +24,11 @@ MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 {
 }
 
-MindTextNode::~MindTextNode()
+MindNode::~MindNode()
 {
 }
 
-void MindTextNode::setup()
+void MindNode::setup()
 {
 	// setup需要在最后一步做，才能获取真正的level以及是否包含进度条。
 	if (m_level == 0)
@@ -72,7 +72,7 @@ void MindTextNode::setup()
 	}
 }
 
-void MindTextNode::init()
+void MindNode::init()
 {
 	initDocFormat(myText);
 	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable);
@@ -88,7 +88,7 @@ void MindTextNode::init()
 	setCornerRadius(m_cornerRadius);
 }
 
-void MindTextNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAdded)
+void MindNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAdded)
 {
 	if (m_counter == 0)
 	{
@@ -97,7 +97,7 @@ void MindTextNode::onDocumentContentsChanged(int from, int charsRemoved, int cha
 	}
 }
 
-void MindTextNode::initDocFormat(const QString& text)
+void MindNode::initDocFormat(const QString& text)
 {
 	QTextDocument* doc = document();
 
@@ -139,34 +139,34 @@ void MindTextNode::initDocFormat(const QString& text)
 	connect(doc, SIGNAL(contentsChange(int,int,int)), this, SLOT(onDocumentContentsChanged(int, int, int)));
 }
 
-void MindTextNode::focusOutEvent(QFocusEvent* event)
+void MindNode::focusOutEvent(QFocusEvent* event)
 {
 	QGraphicsTextItem::focusOutEvent(event);
 	clearSelection();
 	setTextInteractionFlags(Qt::NoTextInteraction);
 }
 
-void MindTextNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
+void MindNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	QGraphicsTextItem::mousePressEvent(event);
 }
 
-void MindTextNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
+void MindNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
 	QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
-void MindTextNode::onCreateChildNode()
+void MindNode::onCreateChildNode()
 {
 	emit childNodeCreate(this);
 }
 
-void MindTextNode::onCreateSliblingNode()
+void MindNode::onCreateSliblingNode()
 {
 	emit silibingNodeCreate(this);
 }
 
-void MindTextNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	if (event->button() == Qt::RightButton)
 	{
@@ -184,7 +184,7 @@ void MindTextNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	QGraphicsTextItem::mouseReleaseEvent(event);
 }
 
-bool MindTextNode::sceneEvent(QEvent* event)
+bool MindNode::sceneEvent(QEvent* event)
 {
 	switch (event->type())
 	{
@@ -215,39 +215,39 @@ bool MindTextNode::sceneEvent(QEvent* event)
 	return QGraphicsTextItem::sceneEvent(event);
 }
 
-void MindTextNode::SetContent(const std::wstring& content)
+void MindNode::SetContent(const std::wstring& content)
 {
 	myText = QString::fromStdWString(content);
 }
 
-std::wstring MindTextNode::GetContent() const
+std::wstring MindNode::GetContent() const
 {
 	return myText.toStdWString();
 }
 
-void MindTextNode::SetProgress(float progress)
+void MindNode::SetProgress(float progress)
 {
 	m_progress = progress;
 	m_bProgress = true;
 }
 
-float MindTextNode::GetProgress() const
+float MindNode::GetProgress() const
 {
 	return m_progress;
 }
 
-bool MindTextNode::IsProgress() const
+bool MindNode::IsProgress() const
 {
 	return m_bProgress;
 }
 
-void MindTextNode::append(MindTextNode* pNode)
+void MindNode::append(MindNode* pNode)
 {
 	pNode->setParent(this);
 	m_children.append(pNode);
 }
 
-void MindTextNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
+void MindNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
 {
 	UpdateBatch batch(&m_counter);
 	QTextFrame* rootFrame = document()->rootFrame();
@@ -283,13 +283,13 @@ void MindTextNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
 	rootFrame->setFrameFormat(frameFormat);
 }
 
-void MindTextNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	udpateBorderFormat(option);
 	QGraphicsTextItem::paint(painter, option, widget);
 }
 
-int MindTextNode::pointSize(int level) const
+int MindNode::pointSize(int level) const
 {
 	switch (level)
 	{

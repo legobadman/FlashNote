@@ -26,7 +26,7 @@ signals:
 private:
 	MindMapScene* m_scene;
 	MindMapView* m_view;
-	MindTextNode* m_pRoot;
+	MindNode* m_pRoot;
 
 	QAction* m_pAddNode;
 	QAction* m_pAddLink;

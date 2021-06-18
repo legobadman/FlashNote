@@ -22,23 +22,23 @@ signals:
 	void itemContentChanged();
 
 private slots:
-	MindTextNode* newProgressNode(MindTextNode* pRoot, const QString& text, float progress);
-	void onCreateChildNode(MindTextNode* pRoot);
-	void onCreateSlibingNode(MindTextNode* pNode);
+	MindNode* newProgressNode(MindNode* pRoot, const QString& text, float progress);
+	void onCreateChildNode(MindNode* pRoot);
+	void onCreateSlibingNode(MindNode* pNode);
 	void onItemContentChanged();
 
 private:
 	void onRedrawItems();
-	void setupNode(MindTextNode* node);
-	QRectF arrangeItemPosition(QPoint rootLT, MindTextNode* pItem);
-	MindTextNode* _initExample();
-	MindTextNode* _initFromFile();
-	MindTextNode* parseXML(const std::wstring& content);
-	XML_NODE* _export(MindTextNode* root, xml_document<WCHAR>& doc);
-	MindTextNode* _parse(xml_node<WCHAR>* root, int level);
+	void setupNode(MindNode* node);
+	QRectF arrangeItemPosition(QPoint rootLT, MindNode* pItem);
+	MindNode* _initExample();
+	MindNode* _initFromFile();
+	MindNode* parseXML(const std::wstring& content);
+	XML_NODE* _export(MindNode* root, xml_document<WCHAR>& doc);
+	MindNode* _parse(xml_node<WCHAR>* root, int level);
 
 private:
-	MindTextNode* m_pRoot;
+	MindNode* m_pRoot;
 	QList<QGraphicsPathItem*> m_pathItems;
 	bool m_bSchedule;
 };

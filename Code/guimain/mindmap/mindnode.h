@@ -4,7 +4,7 @@
 #include <QGraphicsItem>
 #include "mindnodebutton.h"
 
-class MindTextNode : public QGraphicsTextItem
+class MindNode : public QGraphicsTextItem
 {
 	Q_OBJECT
 	enum MOUSE_STATE
@@ -24,18 +24,18 @@ class MindTextNode : public QGraphicsTextItem
 	};
 
 public:
-	MindTextNode(const QString& text, MindTextNode* parent = NULL);
-	~MindTextNode();
+	MindNode(const QString& text, MindNode* parent = NULL);
+	~MindNode();
 	void setup();
 	void setHintButton(MindNodeButton* pBtn) {
 		m_pBtn = pBtn; m_pBtn->setVisible(false);
 	}
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
-	const QList<MindTextNode*>& children() const { return m_children; }
-	void setParent(MindTextNode* pNode) { m_parent = pNode; }
-	MindTextNode* Parent() const { return m_parent; }
+	const QList<MindNode*>& children() const { return m_children; }
+	void setParent(MindNode* pNode) { m_parent = pNode; }
+	MindNode* Parent() const { return m_parent; }
 	void setLevel(float level) { m_level = level; }
-	void insert(int i, MindTextNode* pNode) { m_children.insert(i, pNode); }
+	void insert(int i, MindNode* pNode) { m_children.insert(i, pNode); }
 	void setLevel(int nLevel) { m_level = nLevel; }
 	int level() const { return m_level; }
 	void setBackground(QColor color) { myBackgroundColor = color; }
@@ -45,8 +45,8 @@ public:
 
 signals:
 	void contentsChange();
-	void childNodeCreate(MindTextNode* parent);
-	void silibingNodeCreate(MindTextNode* pNode);
+	void childNodeCreate(MindNode* parent);
+	void silibingNodeCreate(MindNode* pNode);
 
 public slots:
 	void onDocumentContentsChanged(int, int, int);
@@ -59,7 +59,7 @@ public:
 	void SetProgress(float progress);
 	float GetProgress() const;
 	bool IsProgress() const;
-	void append(MindTextNode* pNode);
+	void append(MindNode* pNode);
 
 protected:
 	bool sceneEvent(QEvent* event) override;
@@ -89,9 +89,9 @@ private:
 	MOUSE_STATE m_mouseState;
 	bool m_bHovered;
 	bool m_bProgress;
-	MindTextNode* m_parent;
+	MindNode* m_parent;
 	MindNodeButton* m_pBtn;
-	QList<MindTextNode*> m_children;
+	QList<MindNode*> m_children;
 };
 
 #endif

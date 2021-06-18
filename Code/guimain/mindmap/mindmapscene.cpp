@@ -37,17 +37,17 @@ QString MindMapScene::mindmapXML()
 	return QString::fromUtf16((char16_t*)buffer);
 }
 
-MindTextNode* MindMapScene::newProgressNode(MindTextNode* pRoot, const QString& text, float progress)
+MindNode* MindMapScene::newProgressNode(MindNode* pRoot, const QString& text, float progress)
 {
-	MindTextNode* node = new MindTextNode(text, pRoot);
+	MindNode* node = new MindNode(text, pRoot);
 	node->SetProgress(progress);
 	setupNode(node);
 	return node;
 }
 
-void MindMapScene::onCreateChildNode(MindTextNode* pRoot)
+void MindMapScene::onCreateChildNode(MindNode* pRoot)
 {
-	MindTextNode* pChild = new MindTextNode(u8"新增节点", pRoot);
+	MindNode* pChild = new MindNode(u8"新增节点", pRoot);
 	if (m_bSchedule)
 		pChild->SetProgress(0.);
 	pRoot->append(pChild);
@@ -57,10 +57,10 @@ void MindMapScene::onCreateChildNode(MindTextNode* pRoot)
 	onRedrawItems();
 }
 
-void MindMapScene::onCreateSlibingNode(MindTextNode* pNode)
+void MindMapScene::onCreateSlibingNode(MindNode* pNode)
 {
-	MindTextNode* parent = pNode->Parent();
-	MindTextNode* pChild = new MindTextNode(u8"新增节点", parent);
+	MindNode* parent = pNode->Parent();
+	MindNode* pChild = new MindNode(u8"新增节点", parent);
 	if (m_bSchedule)
 		pChild->SetProgress(0.);
 	pChild->setLevel(pNode->level());
@@ -88,27 +88,27 @@ void MindMapScene::onRedrawItems()
 	emit itemContentChanged();
 }
 
-void MindMapScene::setupNode(MindTextNode* node)
+void MindMapScene::setupNode(MindNode* node)
 {
 	node->setup();
 	connect(node, SIGNAL(contentsChange()), this, SLOT(onItemContentChanged()));
-	connect(node, SIGNAL(childNodeCreate(MindTextNode*)), this, SLOT(onCreateChildNode(MindTextNode*)));
-	connect(node, SIGNAL(silibingNodeCreate(MindTextNode*)), this, SLOT(onCreateSlibingNode(MindTextNode*)));
+	connect(node, SIGNAL(childNodeCreate(MindNode*)), this, SLOT(onCreateChildNode(MindNode*)));
+	connect(node, SIGNAL(silibingNodeCreate(MindNode*)), this, SLOT(onCreateSlibingNode(MindNode*)));
 	addItem(node);
-	const QList<MindTextNode*>& children = node->children();
+	const QList<MindNode*>& children = node->children();
 	for (auto it = children.begin(); it != children.end(); it++)
 	{
 		setupNode(*it);
 	}
 }
 
-QRectF MindMapScene::arrangeItemPosition(QPoint rootLT, MindTextNode* pRoot)
+QRectF MindMapScene::arrangeItemPosition(QPoint rootLT, MindNode* pRoot)
 {
 	//假设不能换行
 	static int HMargin = 60;
 	static int VMargin = 28;
 
-	const QList<MindTextNode*>& children = pRoot->children();
+	const QList<MindNode*>& children = pRoot->children();
 	int n = children.size();
 
 	//目前暂时不考虑子级的高度变化。
@@ -189,14 +189,14 @@ QRectF MindMapScene::arrangeItemPosition(QPoint rootLT, MindTextNode* pRoot)
 	return boundingRect;
 }
 
-MindTextNode* MindMapScene::_initExample()
+MindNode* MindMapScene::_initExample()
 {
-	MindTextNode* pRoot = newProgressNode(NULL, u8"大米学习计划", 0.1);
+	MindNode* pRoot = newProgressNode(NULL, u8"大米学习计划", 0.1);
 
-	MindTextNode* pChild = newProgressNode(pRoot, u8"工作回顾", 0.3);
-	MindTextNode* pChild2 = newProgressNode(pRoot, u8"多线程知识", 0.01);
-	MindTextNode* pChild3 = newProgressNode(pRoot, u8"Windows基础", 0.9);
-	MindTextNode* pChild4 = newProgressNode(pRoot, u8"C++基础知识", 0.5);
+	MindNode* pChild = newProgressNode(pRoot, u8"工作回顾", 0.3);
+	MindNode* pChild2 = newProgressNode(pRoot, u8"多线程知识", 0.01);
+	MindNode* pChild3 = newProgressNode(pRoot, u8"Windows基础", 0.9);
+	MindNode* pChild4 = newProgressNode(pRoot, u8"C++基础知识", 0.5);
 
 	pRoot->insert(0, pChild);
 	pRoot->insert(0, pChild2);
@@ -216,7 +216,7 @@ MindTextNode* MindMapScene::_initExample()
 	return pRoot;
 }
 
-MindTextNode* MindMapScene::_initFromFile()
+MindNode* MindMapScene::_initFromFile()
 {
 	QFile fn("E:\\FlashNote\\Code\\io\\node.xml");
 	if (!fn.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -229,18 +229,18 @@ MindTextNode* MindMapScene::_initFromFile()
 	arrangeItemPosition(QPoint(0, 0), m_pRoot);
 }
 
-MindTextNode* MindMapScene::parseXML(const std::wstring& content)
+MindNode* MindMapScene::parseXML(const std::wstring& content)
 {
 	xml_document<WCHAR> doc;
 	doc.parse<0>((LPWSTR)content.c_str());
 	xml_node<WCHAR>* root = doc.first_node();
-	MindTextNode* pRoot = _parse(root, 0);
+	MindNode* pRoot = _parse(root, 0);
 	setupNode(pRoot);
 	clearSelection();
 	return pRoot;
 }
 
-XML_NODE* MindMapScene::_export(MindTextNode* pRoot, xml_document<WCHAR>& doc)
+XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<WCHAR>& doc)
 {
 	std::wstring value = pRoot->GetContent();
 
@@ -257,7 +257,7 @@ XML_NODE* MindMapScene::_export(MindTextNode* pRoot, xml_document<WCHAR>& doc)
 		root->append_attribute(attr);
 	}
 
-	const QList<MindTextNode*>& children = pRoot->children();
+	const QList<MindNode*>& children = pRoot->children();
 	for (auto it = children.begin(); it != children.end(); it++)
 	{
 		XML_NODE* pChild = _export(*it, doc);
@@ -267,9 +267,9 @@ XML_NODE* MindMapScene::_export(MindTextNode* pRoot, xml_document<WCHAR>& doc)
 	return root;
 }
 
-MindTextNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
+MindNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
 {
-	MindTextNode* pRoot = new MindTextNode("");
+	MindNode* pRoot = new MindNode("");
 	if (m_bSchedule)
 		pRoot->SetProgress(0.);
 
@@ -295,7 +295,7 @@ MindTextNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
 		child != NULL;
 		child = child->next_sibling())
 	{
-		MindTextNode* pChild = _parse(child, level + 1);
+		MindNode* pChild = _parse(child, level + 1);
 		pRoot->append(pChild);
 	}
 	return pRoot;
