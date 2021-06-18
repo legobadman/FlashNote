@@ -82,7 +82,7 @@ void MindTextNode::onDocumentContentsChanged(int from, int charsRemoved, int cha
 {
 	if (m_counter == 0)
 	{
-		QGraphicsScene* pScene = scene();
+		myText = document()->toPlainText();
 		emit contentsChange();
 	}
 }

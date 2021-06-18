@@ -16,6 +16,8 @@ MindMapScene::~MindMapScene()
 
 void MindMapScene::initContent(QString content)
 {
+	clear();
+	m_pathItems.clear();
 	std::wstring wstr = content.toStdWString();
 	m_pRoot = parseXML(wstr);
 	arrangeItemPosition(QPoint(0, 0), m_pRoot);
@@ -71,6 +73,7 @@ void MindMapScene::onRedrawItems()
 	m_pathItems.clear();
 	arrangeItemPosition(QPoint(0, 0), m_pRoot);
 	clearSelection();
+	emit itemContentChanged();
 }
 
 void MindMapScene::setupNode(MindTextNode* node)

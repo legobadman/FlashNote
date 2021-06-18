@@ -179,7 +179,10 @@ void NoteEditWindow::switchtobook(int bookidx)
 
 void NoteEditWindow::onTitleChanged()
 {
-	QTimer::singleShot(2000, this, SLOT(saveNote()));
+	if (m_type == NORMAL_NOTE)
+		onTextChanged();
+	else if (m_type == MINDMAP)
+		onMindMapChanged();
 }
 
 void NoteEditWindow::onTextChanged()
