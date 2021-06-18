@@ -2,6 +2,8 @@
 #include "mindnode.h"
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QInputDialog>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QMenu>
 #include <QLineEdit>
 #include <QTextFrame>
 
@@ -18,6 +20,7 @@ MindTextNode::MindTextNode(const QString& text, MindTextNode* parent)
 	, m_progress(0)
 	, m_counter(0)
 	, m_bProgress(false)
+	, m_pBtn(NULL)
 {
 }
 
@@ -143,8 +146,31 @@ void MindTextNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 	QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
+void MindTextNode::onCreateChildNode()
+{
+	emit childNodeCreate(this);
+}
+
+void MindTextNode::onCreateSliblingNode()
+{
+	emit silibingNodeCreate(this);
+}
+
 void MindTextNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
+	if (event->button() == Qt::RightButton)
+	{
+		QMenu* menu = new QMenu(NULL);
+		menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNode()));
+		if (m_parent != NULL)
+			menu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
+
+		QGraphicsView* v = scene()->views().first();
+		QPointF sceneP = mapToScene(event->pos());
+		QPoint viewP = v->mapFromScene(sceneP);
+		QPoint sendMenuEventPos = v->viewport()->mapToGlobal(viewP);
+		menu->popup(sendMenuEventPos);
+	}
 	QGraphicsTextItem::mouseReleaseEvent(event);
 }
 
@@ -153,11 +179,16 @@ bool MindTextNode::sceneEvent(QEvent* event)
 	switch (event->type())
 	{
 	case QEvent::GraphicsSceneHoverEnter:
+		//按钮部分已经在矩形以外了，还需要一些判断。
 		m_bHovered = true;
+		if (m_pBtn)
+			m_pBtn->setVisible(true);
 		update();
 		break;
 	case QEvent::GraphicsSceneHoverLeave:
 		m_bHovered = false;
+		if (m_pBtn)
+			m_pBtn->setVisible(false);
 		update();
 		break;
 	case QEvent::GraphicsSceneMouseDoubleClick:

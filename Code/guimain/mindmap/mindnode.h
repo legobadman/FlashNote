@@ -2,8 +2,7 @@
 #define __MIND_NODE_H__
 
 #include <QGraphicsItem>
-
-class MindLink;
+#include "mindnodebutton.h"
 
 class MindTextNode : public QGraphicsTextItem
 {
@@ -27,12 +26,17 @@ public:
 	MindTextNode(const QString& text, MindTextNode* parent = NULL);
 	~MindTextNode();
 	void setup();
+	void setHintButton(MindNodeButton* pBtn) {
+		m_pBtn = pBtn; m_pBtn->setVisible(false);
+	}
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 	const QList<MindTextNode*>& children() const { return m_children; }
 	void setParent(MindTextNode* pNode) { m_parent = pNode; }
+	MindTextNode* Parent() const { return m_parent; }
 	void setLevel(float level) { m_level = level; }
 	void insert(int i, MindTextNode* pNode) { m_children.insert(i, pNode); }
 	void setLevel(int nLevel) { m_level = nLevel; }
+	int level() const { return m_level; }
 	void setBackground(QColor color) { myBackgroundColor = color; }
 	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
 	void setHighlightedBorder(QColor color) { m_highlightedBorder = color; }
@@ -40,9 +44,13 @@ public:
 
 signals:
 	void contentsChange();
+	void childNodeCreate(MindTextNode* parent);
+	void silibingNodeCreate(MindTextNode* pNode);
 
 public slots:
 	void onDocumentContentsChanged(int, int, int);
+	void onCreateChildNode();
+	void onCreateSliblingNode();
 
 public:
 	void SetContent(const std::wstring& content);
@@ -81,6 +89,7 @@ private:
 	bool m_bHovered;
 	bool m_bProgress;
 	MindTextNode* m_parent;
+	MindNodeButton* m_pBtn;
 	QList<MindTextNode*> m_children;
 };
 
