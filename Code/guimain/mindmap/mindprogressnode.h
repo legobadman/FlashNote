@@ -17,6 +17,7 @@ public:
 	float workHours();
 	void setWorkhours(float hours);
 	void updateStatus();
+	void updateToParent();
 
 public slots:
 	void setWorkingHourDlg();
@@ -26,7 +27,6 @@ public slots:
 private:
 	void _setProgress(float progress);
 	void _setWorkhours(float hours);
-	void updateToParent();
 
 protected:
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);

@@ -26,11 +26,13 @@ private slots:
 	MindProgressNode* newProgressNode(MindProgressNode* pRoot, const QString& text, float progress);
 	void onCreateChildNode(MindNode* pRoot);
 	void onCreateSlibingNode(MindNode* pNode);
+	void onDeleteNode(MindNode* pNode);
 	void onItemTextChanged();
 
 private:
 	void onRedrawItems();
 	void setupNode(MindNode* node);
+	void unsetupNode(MindNode* node);
 	QRectF arrangeItemPosition(QPoint rootLT, MindNode* pItem);
 	MindNode* _initExample();
 	MindNode* _initFromFile();

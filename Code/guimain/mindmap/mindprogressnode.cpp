@@ -151,8 +151,10 @@ void MindProgressNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 		QMenu* menu = new QMenu(NULL);
 		menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNode()));
 		if (m_parent != NULL)
+		{
 			menu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
-
+			menu->addAction(QString(u8"删除节点"), this, SLOT(onDeleteNode()));
+		}
 		if (children().empty())
 		{
 			menu->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));

@@ -36,6 +36,7 @@ public:
 	MindNode* Parent() const { return m_parent; }
 	void setLevel(float level) { m_level = level; }
 	void insert(int i, MindNode* pNode) { m_children.insert(i, pNode); }
+	void removeNode(MindNode* pNode);
 	void setLevel(int nLevel) { m_level = nLevel; }
 	int level() const { return m_level; }
 	void setBackground(QColor color) { m_backgroudColor = color; }
@@ -48,11 +49,13 @@ signals:
 	void dataChanged();
 	void childNodeCreate(MindNode* parent);
 	void silibingNodeCreate(MindNode* pNode);
+	void deleteNode(MindNode* pNode);
 
 public slots:
 	void onDocumentContentsChanged(int, int, int);
 	void onCreateChildNode();
 	void onCreateSliblingNode();
+	void onDeleteNode();
 
 public:
 	void SetContent(const std::wstring& content);

@@ -26,6 +26,7 @@ void MindMapScene::initContent(QString content, bool bSchedule)
 	std::wstring wstr = content.toStdWString();
 	m_pRoot = parseXML(wstr);
 	arrangeItemPosition(QPoint(0, 0), m_pRoot);
+	update();
 }
 
 QString MindMapScene::mindmapXML()
@@ -90,6 +91,18 @@ void MindMapScene::onCreateSlibingNode(MindNode* pNode)
 	onRedrawItems();
 }
 
+void MindMapScene::onDeleteNode(MindNode* pNode)
+{
+	pNode->Parent()->removeNode(pNode);
+	MindProgressNode* progressNode = qobject_cast<MindProgressNode*>(pNode->Parent());
+	if (progressNode)
+	{
+		progressNode->updateStatus();
+	}
+	unsetupNode(pNode);
+	onRedrawItems();
+}
+
 void MindMapScene::onItemTextChanged()
 {
 	onRedrawItems();
@@ -105,6 +118,7 @@ void MindMapScene::onRedrawItems()
 	m_pathItems.clear();
 	arrangeItemPosition(QPoint(0, 0), m_pRoot);
 	clearSelection();
+	update();
 	emit itemContentChanged();
 }
 
@@ -114,6 +128,7 @@ void MindMapScene::setupNode(MindNode* node)
 	connect(node, SIGNAL(dataChanged()), this, SIGNAL(itemContentChanged()));
 	connect(node, SIGNAL(childNodeCreate(MindNode*)), this, SLOT(onCreateChildNode(MindNode*)));
 	connect(node, SIGNAL(silibingNodeCreate(MindNode*)), this, SLOT(onCreateSlibingNode(MindNode*)));
+	connect(node, SIGNAL(deleteNode(MindNode*)), this, SLOT(onDeleteNode(MindNode*)));
 	addItem(node);
 	const QList<MindNode*>& children = node->children();
 	for (auto it = children.begin(); it != children.end(); it++)
@@ -121,6 +136,16 @@ void MindMapScene::setupNode(MindNode* node)
 		setupNode(*it);
 	}
 	node->setup();
+}
+
+void MindMapScene::unsetupNode(MindNode* node)
+{
+	const QList<MindNode*>& children = node->children();
+	for (auto it = children.begin(); it != children.end(); it++)
+	{
+		unsetupNode(*it);
+	}
+	removeItem(node);
 }
 
 QRectF MindMapScene::arrangeItemPosition(QPoint rootLT, MindNode* pRoot)

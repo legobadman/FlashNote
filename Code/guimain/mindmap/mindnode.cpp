@@ -149,6 +149,16 @@ void MindNode::onCreateSliblingNode()
 	emit silibingNodeCreate(this);
 }
 
+void MindNode::onDeleteNode()
+{
+	emit deleteNode(this);
+}
+
+void MindNode::removeNode(MindNode* pNode)
+{
+	m_children.removeAll(pNode);
+}
+
 void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	if (event->button() == Qt::RightButton)
@@ -156,7 +166,10 @@ void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 		QMenu* menu = new QMenu(NULL);
 		menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNode()));
 		if (m_parent != NULL)
+		{
 			menu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
+			menu->addAction(QString(u8"删除节点"), this, SLOT(onDeleteNode()));
+		}
 
 		QGraphicsView* v = scene()->views().first();
 		QPointF sceneP = mapToScene(event->pos());
