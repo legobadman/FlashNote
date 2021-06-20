@@ -11,15 +11,13 @@
 /////////////////////////////////////////////////////////////
 MindNode::MindNode(const QString& text, MindNode* parent)
 	: m_level(0)
-	, myText(text)
+	, m_content(text)
 	, m_mouseState(MS_UNKNOWN)
 	, m_bHovered(false)
 	, m_borderWidth(2)
 	, m_cornerRadius(7)
 	, m_parent(parent)
-	, m_progress(0)
 	, m_counter(0)
-	, m_bProgress(false)
 	, m_pBtn(NULL)
 {
 }
@@ -33,56 +31,41 @@ void MindNode::setup()
 	// setup需要在最后一步做，才能获取真正的level以及是否包含进度条。
 	if (m_level == 0)
 	{
-		if (m_bProgress)
-		{
-			myTextColor = QColor(0, 0, 0);
-			myBackgroundColor = QColor(242, 242, 242);
-		}
-		else
-		{
-			myTextColor = QColor(255, 255, 255);
-			myBackgroundColor = QColor(0, 181, 72);
-		}
+		m_textColor = QColor(255, 255, 255);
+		m_backgroudColor = QColor(0, 181, 72);
 		m_highlightedBorder = QColor(23, 157, 235);
 		m_selectedBorder = QColor(23, 157, 235);
-		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
+		m_borderFocusout = QColor(m_backgroudColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
 	}
 	else if (m_level == 1) {
-		myTextColor = QColor(0, 0, 0);
+		m_textColor = QColor(0, 0, 0);
 		m_highlightedBorder = QColor(136, 203, 242);
 		m_selectedBorder = QColor(23, 157, 235);
-		myBackgroundColor = QColor(242, 242, 242);
-		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
+		m_backgroudColor = QColor(242, 242, 242);
+		m_borderFocusout = QColor(m_backgroudColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
 	}
 	else if (m_level >= 2) {
-		myTextColor = QColor(0, 0, 0);
+		m_textColor = QColor(0, 0, 0);
 		m_highlightedBorder = QColor(136, 203, 242);
 		m_selectedBorder = QColor(23, 157, 235);
-		myBackgroundColor = QColor(255, 255, 255);
-		m_borderFocusout = QColor(myBackgroundColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
+		m_backgroudColor = QColor(255, 255, 255);
+		m_borderFocusout = QColor(m_backgroudColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
 	}
 
 	init();
-
-	//须初始化文档结构后，才能写入control
-	if (m_bProgress)
-	{
-		myTextColor = QColor(0, 0, 0);	//由于有绿白色，需要将文本设置为黑色。
-		QGraphicsTextItem::setProgress(m_progress);
-	}
 }
 
 void MindNode::init()
 {
-	initDocFormat(myText);
+	initDocFormat(m_content);
 	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable);
 
 	QPalette pal = palette();
 	//处理选中文本的情况。
 	pal.setBrush(QPalette::Active, QPalette::Highlight, QColor(0, 129, 218));
 	pal.setBrush(QPalette::Active, QPalette::HighlightedText, QColor(255, 255, 255));
-	pal.setBrush(QPalette::Inactive, QPalette::Highlight, myBackgroundColor);
-	pal.setBrush(QPalette::Inactive, QPalette::HighlightedText, myTextColor);
+	pal.setBrush(QPalette::Inactive, QPalette::Highlight, m_backgroudColor);
+	pal.setBrush(QPalette::Inactive, QPalette::HighlightedText, m_textColor);
 
 	setPalette(pal);
 	setCornerRadius(m_cornerRadius);
@@ -92,8 +75,8 @@ void MindNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAd
 {
 	if (m_counter == 0)
 	{
-		myText = document()->toPlainText();
-		emit contentsChange();
+		m_content = document()->toPlainText();
+		emit textChange();
 	}
 }
 
@@ -113,21 +96,21 @@ void MindNode::initDocFormat(const QString& text)
 		if (childBlock.isValid())
 		{
 			QTextBlockFormat format = childBlock.blockFormat();
-			format.setBackground(myBackgroundColor);
+			format.setBackground(m_backgroudColor);
 			format.setLeftMargin(10);
 			format.setRightMargin(10);
 			cursor.setBlockFormat(format);
 
 			QTextCharFormat chrFormat = childBlock.charFormat();
 			chrFormat.setFont(QFont(QString::fromUtf16((char16_t*)L"微软雅黑"), pointSize(m_level)));
-			chrFormat.setForeground(myTextColor);
+			chrFormat.setForeground(m_textColor);
 			cursor.setBlockCharFormat(chrFormat);
 		}
 	}
 	cursor.insertText(text);
 
 	QTextFrameFormat frameFormat = rootFrame->frameFormat();
-	frameFormat.setBackground(myBackgroundColor);
+	frameFormat.setBackground(m_backgroudColor);
 	frameFormat.setMargin(0);
 	frameFormat.setPadding(10);
 
@@ -217,28 +200,12 @@ bool MindNode::sceneEvent(QEvent* event)
 
 void MindNode::SetContent(const std::wstring& content)
 {
-	myText = QString::fromStdWString(content);
+	m_content = QString::fromStdWString(content);
 }
 
 std::wstring MindNode::GetContent() const
 {
-	return myText.toStdWString();
-}
-
-void MindNode::SetProgress(float progress)
-{
-	m_progress = progress;
-	m_bProgress = true;
-}
-
-float MindNode::GetProgress() const
-{
-	return m_progress;
-}
-
-bool MindNode::IsProgress() const
-{
-	return m_bProgress;
+	return m_content.toStdWString();
 }
 
 void MindNode::append(MindNode* pNode)

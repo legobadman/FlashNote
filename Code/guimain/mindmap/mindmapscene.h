@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QGraphicsScene>
 #include "mindnode.h"
+#include "mindprogressnode.h"
 #include "rapidxml.hpp"
 
 using namespace rapidxml;
@@ -22,10 +23,10 @@ signals:
 	void itemContentChanged();
 
 private slots:
-	MindNode* newProgressNode(MindNode* pRoot, const QString& text, float progress);
+	MindProgressNode* newProgressNode(MindProgressNode* pRoot, const QString& text, float progress);
 	void onCreateChildNode(MindNode* pRoot);
 	void onCreateSlibingNode(MindNode* pNode);
-	void onItemContentChanged();
+	void onItemTextChanged();
 
 private:
 	void onRedrawItems();

@@ -2,11 +2,13 @@
 #include "mindmapscene.h"
 #include "rapidxml_print.hpp"
 #include "mindnodebutton.h"
+#include "mindprogressnode.h"
 
 
 MindMapScene::MindMapScene(QObject* parent)
 	: QGraphicsScene(parent)
 	, m_bSchedule(false)
+	, m_pRoot(NULL)
 {
 
 }
@@ -19,6 +21,7 @@ void MindMapScene::initContent(QString content, bool bSchedule)
 {
 	m_bSchedule = bSchedule;
 	clear();
+	m_pRoot = NULL;		//TODO: 有没有更好的写法？比如gardpointer
 	m_pathItems.clear();
 	std::wstring wstr = content.toStdWString();
 	m_pRoot = parseXML(wstr);
@@ -37,19 +40,27 @@ QString MindMapScene::mindmapXML()
 	return QString::fromUtf16((char16_t*)buffer);
 }
 
-MindNode* MindMapScene::newProgressNode(MindNode* pRoot, const QString& text, float progress)
+MindProgressNode* MindMapScene::newProgressNode(MindProgressNode* pRoot, const QString& text, float progress)
 {
-	MindNode* node = new MindNode(text, pRoot);
-	node->SetProgress(progress);
+	MindProgressNode* node = new MindProgressNode(text, pRoot);
+	node->setProgress(progress);
 	setupNode(node);
 	return node;
 }
 
 void MindMapScene::onCreateChildNode(MindNode* pRoot)
 {
-	MindNode* pChild = new MindNode(u8"新增节点", pRoot);
+	MindNode* pChild = NULL;
 	if (m_bSchedule)
-		pChild->SetProgress(0.);
+	{
+		MindProgressNode* pRoot_ = qobject_cast<MindProgressNode*>(pRoot);
+		Q_ASSERT(pRoot_);
+		pChild = new MindProgressNode(u8"进度节点", pRoot_);
+	}
+	else
+	{
+		pChild = new MindNode(u8"新增节点", pRoot);
+	}
 	pRoot->append(pChild);
 	pChild->setLevel(pRoot->level() + 1);
 	setupNode(pChild);
@@ -60,9 +71,18 @@ void MindMapScene::onCreateChildNode(MindNode* pRoot)
 void MindMapScene::onCreateSlibingNode(MindNode* pNode)
 {
 	MindNode* parent = pNode->Parent();
-	MindNode* pChild = new MindNode(u8"新增节点", parent);
+	MindNode* pChild = NULL;
 	if (m_bSchedule)
-		pChild->SetProgress(0.);
+	{
+		MindProgressNode* pRoot_ = qobject_cast<MindProgressNode*>(parent);
+		Q_ASSERT(pRoot_);
+		pChild = new MindProgressNode(u8"进度节点", pRoot_);
+	}
+	else
+	{
+		pChild = new MindNode(u8"新增节点", parent);
+	}
+
 	pChild->setLevel(pNode->level());
 	parent->append(pChild);
 	setupNode(pChild);
@@ -70,7 +90,7 @@ void MindMapScene::onCreateSlibingNode(MindNode* pNode)
 	onRedrawItems();
 }
 
-void MindMapScene::onItemContentChanged()
+void MindMapScene::onItemTextChanged()
 {
 	onRedrawItems();
 	emit itemContentChanged();
@@ -90,8 +110,8 @@ void MindMapScene::onRedrawItems()
 
 void MindMapScene::setupNode(MindNode* node)
 {
-	node->setup();
-	connect(node, SIGNAL(contentsChange()), this, SLOT(onItemContentChanged()));
+	connect(node, SIGNAL(textChange()), this, SLOT(onItemTextChanged()));
+	connect(node, SIGNAL(dataChanged()), this, SIGNAL(itemContentChanged()));
 	connect(node, SIGNAL(childNodeCreate(MindNode*)), this, SLOT(onCreateChildNode(MindNode*)));
 	connect(node, SIGNAL(silibingNodeCreate(MindNode*)), this, SLOT(onCreateSlibingNode(MindNode*)));
 	addItem(node);
@@ -100,10 +120,14 @@ void MindMapScene::setupNode(MindNode* node)
 	{
 		setupNode(*it);
 	}
+	node->setup();
 }
 
 QRectF MindMapScene::arrangeItemPosition(QPoint rootLT, MindNode* pRoot)
 {
+	if (pRoot == NULL)
+		return QRectF();
+
 	//假设不能换行
 	static int HMargin = 60;
 	static int VMargin = 28;
@@ -191,12 +215,12 @@ QRectF MindMapScene::arrangeItemPosition(QPoint rootLT, MindNode* pRoot)
 
 MindNode* MindMapScene::_initExample()
 {
-	MindNode* pRoot = newProgressNode(NULL, u8"大米学习计划", 0.1);
+	MindProgressNode* pRoot = newProgressNode(NULL, u8"大米学习计划", 0.1);
 
-	MindNode* pChild = newProgressNode(pRoot, u8"工作回顾", 0.3);
-	MindNode* pChild2 = newProgressNode(pRoot, u8"多线程知识", 0.01);
-	MindNode* pChild3 = newProgressNode(pRoot, u8"Windows基础", 0.9);
-	MindNode* pChild4 = newProgressNode(pRoot, u8"C++基础知识", 0.5);
+	MindProgressNode* pChild = newProgressNode(pRoot, u8"工作回顾", 0.3);
+	MindProgressNode* pChild2 = newProgressNode(pRoot, u8"多线程知识", 0.01);
+	MindProgressNode* pChild3 = newProgressNode(pRoot, u8"Windows基础", 0.9);
+	MindProgressNode* pChild4 = newProgressNode(pRoot, u8"C++基础知识", 0.5);
 
 	pRoot->insert(0, pChild);
 	pRoot->insert(0, pChild2);
@@ -250,14 +274,28 @@ XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<WCHAR>& doc)
 		doc.allocate_string(value.c_str()));
 	root->append_attribute(attr);
 
-	if (pRoot->IsProgress())
-	{
-		attr = doc.allocate_attribute(L"progress_value",
-			doc.allocate_string(QString::number(pRoot->GetProgress()).toStdWString().c_str()));
-		root->append_attribute(attr);
-	}
-
 	const QList<MindNode*>& children = pRoot->children();
+
+	MindProgressNode* pProgress = qobject_cast<MindProgressNode*>(pRoot);
+	if (pProgress)
+	{
+		attr = doc.allocate_attribute(L"is_progress", L"1");
+		root->append_attribute(attr);
+
+		if (children.isEmpty())
+		{
+			float progress = pProgress->progress();
+			attr = doc.allocate_attribute(L"progress_value",
+				doc.allocate_string(QString::number(progress).toStdWString().c_str()));
+			root->append_attribute(attr);
+
+			float hours = pProgress->workHours();
+			attr = doc.allocate_attribute(L"working_hours",
+				doc.allocate_string(QString::number(hours).toStdWString().c_str()));
+			root->append_attribute(attr);
+		}
+	}
+	
 	for (auto it = children.begin(); it != children.end(); it++)
 	{
 		XML_NODE* pChild = _export(*it, doc);
@@ -269,9 +307,17 @@ XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<WCHAR>& doc)
 
 MindNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
 {
-	MindNode* pRoot = new MindNode("");
+	MindNode* pRoot = NULL;
+	MindProgressNode* pProgress = NULL;
 	if (m_bSchedule)
-		pRoot->SetProgress(0.);
+	{
+		pProgress = new MindProgressNode("");
+		pRoot = pProgress;
+	}
+	else
+	{
+		pRoot = new MindNode("");
+	}
 
 	pRoot->setLevel(level);
 	for (xml_attribute<WCHAR>* attr = root->first_attribute();
@@ -280,14 +326,24 @@ MindNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
 	{
 		std::wstring attr_name = attr->name();
 		std::wstring value = attr->value();
-		if (attr_name == L"progress_value")
-		{
-			float progress = _wtof(value.c_str());
-			pRoot->SetProgress(progress);
-		}
+
 		if (attr_name == L"text")
 		{
 			pRoot->SetContent(value);
+		}
+
+		if (pProgress)
+		{
+			if (attr_name == L"progress_value")
+			{
+				float progress = _wtof(value.c_str());
+				pProgress->setProgress(progress);
+			}
+			if (attr_name == L"working_hours")
+			{
+				float hours = _wtof(value.c_str());
+				pProgress->setWorkhours(hours);
+			}
 		}
 	}
 

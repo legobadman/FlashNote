@@ -96,6 +96,8 @@ add_executable(guimain
     ./mindmap/mindmapscene.h
     ./mindmap/mindnodebutton.cpp
     ./mindmap/mindnodebutton.h
+    ./mindmap/mindprogressnode.cpp
+    ./mindmap/mindprogressnode.h
     ./newitemdelegate.cpp
     ./newitemdelegate.h
     ./newnotewindow.cpp

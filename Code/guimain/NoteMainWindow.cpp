@@ -45,6 +45,9 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 	QModelIndex idx = m_ui->listpane->treeview()->model()->index(1, 0);
 	m_ui->listpane->treeview()->expand(idx);
 
+	idx = m_ui->listpane->treeview()->model()->index(5, 0);
+	m_ui->listpane->treeview()->expand(idx);
+
 	//最左边项的选择。
 	QModelIndex book_idx = idx.child(idxNotebook, 0);
 	m_ui->listpane->treeview()->selectionModel()->select(book_idx, QItemSelectionModel::Select);
