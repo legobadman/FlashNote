@@ -54,6 +54,7 @@ void MindNode::setup()
 	}
 
 	init();
+	initDirection();
 }
 
 void MindNode::init()
@@ -70,6 +71,18 @@ void MindNode::init()
 
 	setPalette(pal);
 	setCornerRadius(m_cornerRadius);
+}
+
+void MindNode::initDirection()
+{
+	if (m_level > 1)
+	{
+		MindNode* p = m_parent;
+		while (p->level() != 1)
+			p = p->Parent();
+		Q_ASSERT(p);
+		setToRight(p->isToRight());
+	}
 }
 
 void MindNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAdded)

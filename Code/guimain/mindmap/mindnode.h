@@ -67,6 +67,7 @@ public:
 
 protected:
 	void init();
+	void initDirection();
 	bool sceneEvent(QEvent* event) override;
 	void focusOutEvent(QFocusEvent* event) override;
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

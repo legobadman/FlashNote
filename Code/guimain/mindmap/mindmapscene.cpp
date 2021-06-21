@@ -185,7 +185,7 @@ void MindMapScene::arrangeAllItems()
 		QPointF offset = newPos - oldPos;
 		xoffset = offset.x();
 		yoffset = offset.y();
-		
+
 		//对右边所有节点进行移动
 		adjustRightSidePos(m_pRoot, xoffset, yoffset);
 		//对右边所有连接边进行移动
@@ -471,10 +471,6 @@ MindNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
 		{
 			bool toRight = _wtoi(value.c_str());
 			pRoot->setToRight(toRight);
-		}
-		else if (pRoot->Parent())
-		{
-			pRoot->setToRight(pRoot->Parent()->isToRight());
 		}
 
 		if (pProgress)
