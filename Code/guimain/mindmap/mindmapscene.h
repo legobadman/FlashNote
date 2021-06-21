@@ -24,7 +24,7 @@ signals:
 
 private slots:
 	MindProgressNode* newProgressNode(MindProgressNode* pRoot, const QString& text, float progress);
-	void onCreateChildNode(MindNode* pRoot);
+	void onCreateChildNode(MindNode* pRoot, bool);
 	void onCreateSlibingNode(MindNode* pNode);
 	void onDeleteNode(MindNode* pNode);
 	void onItemTextChanged();
@@ -33,7 +33,9 @@ private:
 	void onRedrawItems();
 	void setupNode(MindNode* node);
 	void unsetupNode(MindNode* node);
-	QRectF arrangeItemPosition(QPoint rootLT, MindNode* pItem);
+	void arrangeAllItems();
+	QRectF arrangeItemPosition(QPoint rootLT, MindNode* pItem, bool toRight);
+	void adjustRightSidePos(MindNode* pRoot, int xoffset, int yoffset);
 	MindNode* _initExample();
 	MindNode* _initFromFile();
 	MindNode* parseXML(const std::wstring& content);
@@ -42,6 +44,7 @@ private:
 
 private:
 	MindNode* m_pRoot;
+	QList<QGraphicsPathItem*> m_rightPathItems;	//存起来用于调整位置
 	QList<QGraphicsPathItem*> m_pathItems;
 	bool m_bSchedule;
 };

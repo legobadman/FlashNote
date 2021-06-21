@@ -14,6 +14,7 @@ MindNode::MindNode(const QString& text, MindNode* parent)
 	, m_content(text)
 	, m_mouseState(MS_UNKNOWN)
 	, m_bHovered(false)
+	, m_bToRight(true)
 	, m_borderWidth(2)
 	, m_cornerRadius(7)
 	, m_parent(parent)
@@ -139,9 +140,14 @@ void MindNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 	QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
-void MindNode::onCreateChildNode()
+void MindNode::onCreateChildNodeRight()
 {
-	emit childNodeCreate(this);
+	emit childNodeCreate(this, true);
+}
+
+void MindNode::onCreateChildNodeLeft()
+{
+	emit childNodeCreate(this, false);
 }
 
 void MindNode::onCreateSliblingNode()
@@ -164,7 +170,20 @@ void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	if (event->button() == Qt::RightButton)
 	{
 		QMenu* menu = new QMenu(NULL);
-		menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNode()));
+
+		if (m_level == 0)
+		{
+			menu->addAction(QString(u8"增加子级节点(右)"), this, SLOT(onCreateChildNodeRight()));
+			menu->addAction(QString(u8"增加子级节点(左)"), this, SLOT(onCreateChildNodeLeft()));
+		}
+		else
+		{
+			if (isToRight())
+				menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeRight()));
+			else
+				menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeLeft()));
+		}
+
 		if (m_parent != NULL)
 		{
 			menu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));

@@ -38,6 +38,8 @@ public:
 	void insert(int i, MindNode* pNode) { m_children.insert(i, pNode); }
 	void removeNode(MindNode* pNode);
 	void setLevel(int nLevel) { m_level = nLevel; }
+	bool isToRight() { return m_bToRight; }
+	void setToRight(bool toRight) { m_bToRight = toRight; }
 	int level() const { return m_level; }
 	void setBackground(QColor color) { m_backgroudColor = color; }
 	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
@@ -47,13 +49,14 @@ public:
 signals:
 	void textChange();
 	void dataChanged();
-	void childNodeCreate(MindNode* parent);
+	void childNodeCreate(MindNode* parent, bool bRight);
 	void silibingNodeCreate(MindNode* pNode);
 	void deleteNode(MindNode* pNode);
 
 public slots:
 	void onDocumentContentsChanged(int, int, int);
-	void onCreateChildNode();
+	void onCreateChildNodeRight();
+	void onCreateChildNodeLeft();
 	void onCreateSliblingNode();
 	void onDeleteNode();
 
@@ -88,6 +91,7 @@ protected:
 	int m_counter;	//防止绘制重入。
 	MOUSE_STATE m_mouseState;
 	bool m_bHovered;
+	bool m_bToRight;	//子节点向右扩展。
 	MindNode* m_parent;
 	MindNodeButton* m_pBtn;
 	QList<MindNode*> m_children;

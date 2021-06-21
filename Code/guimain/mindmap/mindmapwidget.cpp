@@ -18,6 +18,8 @@ MindMapWidget::MindMapWidget(QWidget* parent)
 	m_view->setDragMode(QGraphicsView::RubberBandDrag);
 	m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 	m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
+	m_view->setFrameShape(QFrame::HLine);
+	m_view->setFrameShadow(QFrame::Sunken);
 
 	QVBoxLayout* pMainLayout = new QVBoxLayout;
 	pMainLayout->addWidget(m_view);

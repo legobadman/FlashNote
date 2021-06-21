@@ -149,7 +149,7 @@ void MindProgressNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	if (event->button() == Qt::RightButton)
 	{
 		QMenu* menu = new QMenu(NULL);
-		menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNode()));
+		menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeRight()));
 		if (m_parent != NULL)
 		{
 			menu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
