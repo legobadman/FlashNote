@@ -35,7 +35,6 @@ public:
 	void setParent(MindNode* pNode) { m_parent = pNode; }
 	MindNode* Parent() const { return m_parent; }
 	void setLevel(float level) { m_level = level; }
-	void insert(int i, MindNode* pNode) { m_children.insert(i, pNode); }
 	void removeNode(MindNode* pNode);
 	void setLevel(int nLevel) { m_level = nLevel; }
 	bool isToRight() { return m_bToRight; }
@@ -45,6 +44,7 @@ public:
 	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
 	void setHighlightedBorder(QColor color) { m_highlightedBorder = color; }
 	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
+	void append(MindNode* pNode);
 
 signals:
 	void textChange();
@@ -63,7 +63,6 @@ public slots:
 public:
 	void SetContent(const std::wstring& content);
 	std::wstring GetContent() const;
-	void append(MindNode* pNode);
 
 protected:
 	void init();
@@ -96,7 +95,7 @@ protected:
 	bool m_bToRight;	//子节点向右扩展。
 	MindNode* m_parent;
 	MindNodeButton* m_pBtn;
-	QMenu* m_pMenu;
+	QPointer<QMenu> m_pMenu;
 	QList<MindNode*> m_children;
 };
 

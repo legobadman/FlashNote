@@ -163,6 +163,16 @@ void MindMapScene::adjustRightSidePos(MindNode* pRoot, int xoffset, int yoffset)
 	}
 }
 
+void MindMapScene::adjustAllItemPos(MindNode* pRoot, int xoffset, int yoffset)
+{
+	pRoot->setPos(pRoot->pos() + QPointF(xoffset, yoffset));
+	const QList<MindNode*>& children = pRoot->children();
+	for (auto it = children.begin(); it != children.end(); it++)
+	{
+		adjustAllItemPos(*it, xoffset, yoffset);
+	}
+}
+
 void MindMapScene::arrangeAllItems()
 {
 	qreal itemH = m_pRoot->boundingRect().height();
@@ -174,17 +184,18 @@ void MindMapScene::arrangeAllItems()
 	QRectF rLeft;
 	rLeft = arrangeItemPosition(QPoint(0, 0), m_pRoot, false);
 
+	QRectF boundingRect;
 	if (rRight.isValid() && rLeft.isValid())
 	{
-		//移动策略：保左移右。
-		//割掉左边的boundingRect关于root节点的部分。
-		rLeft.adjust(0, 0, itemW, 0);
+		//移动策略：定左移右。
 		//计算出右边所有节点的偏移量。
 		int xoffset = 0, yoffset = 0;
 		QPointF newPos = m_pRoot->pos();
 		QPointF offset = newPos - oldPos;
 		xoffset = offset.x();
 		yoffset = offset.y();
+
+		rRight.moveTo(rRight.left() + xoffset, rRight.top() + yoffset);
 
 		//对右边所有节点进行移动
 		adjustRightSidePos(m_pRoot, xoffset, yoffset);
@@ -194,21 +205,35 @@ void MindMapScene::arrangeAllItems()
 			QPointF pos = (*it)->pos();
 			(*it)->setPos(pos + QPointF(xoffset, yoffset));
 		}
+
+		//先用rLeft和rRight拼接成一个整体的boundingbox
+		int left = rLeft.left();
+		int right = rRight.right();
+		int top = min(rLeft.top(), rRight.top());
+		int bottom = max(rLeft.bottom(), rRight.bottom());
+		boundingRect = QRectF(QPointF(left, top), QPointF(right, bottom));
 	}
 	else if (rRight.isValid())
 	{
-		QPointF basePos = QPointF(rRight.left(), (rRight.top() + rRight.bottom() - itemH) / 2.0);
-		m_pRoot->setPos(basePos);
+		boundingRect = rRight;
 	}
 	else if (rLeft.isValid())
 	{
-		QPointF basePos = QPointF(rLeft.right() - itemW, (rLeft.top() + rLeft.bottom() - itemH) / 2.0);
-		m_pRoot->setPos(basePos);
+		boundingRect = rLeft;
 	}
 	else
 	{
 		Q_ASSERT(false);
-	}	
+	}
+
+	int xoffset = 0 - boundingRect.center().x();
+	int yoffset = 0 - boundingRect.center().y();
+	adjustAllItemPos(m_pRoot, xoffset, yoffset);
+	for (auto it = m_pathItems.begin(); it != m_pathItems.end(); it++)
+	{
+		QPointF pos = (*it)->pos();
+		(*it)->setPos(pos + QPointF(xoffset, yoffset));
+	}
 }
 
 QRectF MindMapScene::arrangeItemPosition(QPoint rootLTorRT, MindNode* pRoot, bool toRight)
@@ -276,7 +301,6 @@ QRectF MindMapScene::arrangeItemPosition(QPoint rootLTorRT, MindNode* pRoot, boo
 			boundingRect.adjust(-HMargin - itemW, 0, 0, 0);
 			//取boundRect的左中间
 			basePos = QPointF(boundingRect.left(), (boundingRect.top() + boundingRect.bottom() - itemH) / 2.0);
-			
 		}
 		else
 		{
@@ -339,46 +363,6 @@ QRectF MindMapScene::arrangeItemPosition(QPoint rootLTorRT, MindNode* pRoot, boo
 		}
 	}
 	return boundingRect;
-}
-
-MindNode* MindMapScene::_initExample()
-{
-	MindProgressNode* pRoot = newProgressNode(NULL, u8"大米学习计划", 0.1);
-
-	MindProgressNode* pChild = newProgressNode(pRoot, u8"工作回顾", 0.3);
-	MindProgressNode* pChild2 = newProgressNode(pRoot, u8"多线程知识", 0.01);
-	MindProgressNode* pChild3 = newProgressNode(pRoot, u8"Windows基础", 0.9);
-	MindProgressNode* pChild4 = newProgressNode(pRoot, u8"C++基础知识", 0.5);
-
-	pRoot->insert(0, pChild);
-	pRoot->insert(0, pChild2);
-	pRoot->insert(0, pChild3);
-	pRoot->insert(0, pChild4);
-
-	pChild->insert(0, newProgressNode(pChild, u8"bug总结", 0.4));
-	pChild->insert(0, newProgressNode(pChild, u8"开发功能总结", 0.2));
-
-	pChild2->insert(0, newProgressNode(pChild2, u8"信号量", 0));
-	pChild2->insert(0, newProgressNode(pChild2, u8"mutable", 0));
-
-	pChild4->insert(0, newProgressNode(pChild4, u8"COM组件", 0.3));
-	pChild4->insert(0, newProgressNode(pChild4, u8"虚函数机制", 0.6));
-	pChild4->insert(0, newProgressNode(pChild4, u8"智能指针", 0.2));
-
-	return pRoot;
-}
-
-MindNode* MindMapScene::_initFromFile()
-{
-	QFile fn("E:\\FlashNote\\Code\\io\\node.xml");
-	if (!fn.open(QIODevice::ReadOnly | QIODevice::Text))
-		return NULL;
-
-	QByteArray htmlFile = fn.readAll();
-	QString content = QString::fromUtf8(htmlFile);
-	std::wstring wstr = content.toStdWString();
-	m_pRoot = parseXML(wstr);
-	arrangeAllItems();
 }
 
 MindNode* MindMapScene::parseXML(const std::wstring& content)

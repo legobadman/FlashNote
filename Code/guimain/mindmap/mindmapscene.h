@@ -36,8 +36,7 @@ private:
 	void arrangeAllItems();
 	QRectF arrangeItemPosition(QPoint rootLT, MindNode* pItem, bool toRight);
 	void adjustRightSidePos(MindNode* pRoot, int xoffset, int yoffset);
-	MindNode* _initExample();
-	MindNode* _initFromFile();
+	void adjustAllItemPos(MindNode* pRoot, int xoffset, int yoffset);
 	MindNode* parseXML(const std::wstring& content);
 	XML_NODE* _export(MindNode* root, xml_document<WCHAR>& doc);
 	MindNode* _parse(xml_node<WCHAR>* root, int level);

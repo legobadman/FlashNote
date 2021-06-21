@@ -55,7 +55,6 @@ void MindNode::setup()
 	}
 
 	init();
-	initDirection();
 }
 
 void MindNode::init()
@@ -73,6 +72,7 @@ void MindNode::init()
 	setPalette(pal);
 	setCornerRadius(m_cornerRadius);
 
+	initDirection();
 	initMenu();
 }
 
@@ -203,6 +203,7 @@ void MindNode::onDeleteNode()
 void MindNode::removeNode(MindNode* pNode)
 {
 	m_children.removeAll(pNode);
+	initMenu();
 }
 
 void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
@@ -264,6 +265,7 @@ void MindNode::append(MindNode* pNode)
 {
 	pNode->setParent(this);
 	m_children.append(pNode);
+	initMenu();
 }
 
 void MindNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
