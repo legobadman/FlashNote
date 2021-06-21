@@ -29,7 +29,7 @@ private:
 	void _setWorkhours(float hours);
 
 protected:
-	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
+	void initMenu() override;
 
 private:
 	float m_progress;

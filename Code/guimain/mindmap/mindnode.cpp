@@ -20,6 +20,7 @@ MindNode::MindNode(const QString& text, MindNode* parent)
 	, m_parent(parent)
 	, m_counter(0)
 	, m_pBtn(NULL)
+	, m_pMenu(NULL)
 {
 }
 
@@ -71,6 +72,8 @@ void MindNode::init()
 
 	setPalette(pal);
 	setCornerRadius(m_cornerRadius);
+
+	initMenu();
 }
 
 void MindNode::initDirection()
@@ -82,6 +85,30 @@ void MindNode::initDirection()
 			p = p->Parent();
 		Q_ASSERT(p);
 		setToRight(p->isToRight());
+	}
+}
+
+void MindNode::initMenu()
+{
+	m_pMenu = new QMenu(NULL);
+
+	if (m_level == 0)
+	{
+		m_pMenu->addAction(QString(u8"增加子级节点(右)"), this, SLOT(onCreateChildNodeRight()));
+		m_pMenu->addAction(QString(u8"增加子级节点(左)"), this, SLOT(onCreateChildNodeLeft()));
+	}
+	else
+	{
+		if (isToRight())
+			m_pMenu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeRight()));
+		else
+			m_pMenu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeLeft()));
+	}
+
+	if (m_parent != NULL)
+	{
+		m_pMenu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
+		m_pMenu->addAction(QString(u8"删除节点"), this, SLOT(onDeleteNode()));
 	}
 }
 
@@ -182,32 +209,12 @@ void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	if (event->button() == Qt::RightButton)
 	{
-		QMenu* menu = new QMenu(NULL);
-
-		if (m_level == 0)
-		{
-			menu->addAction(QString(u8"增加子级节点(右)"), this, SLOT(onCreateChildNodeRight()));
-			menu->addAction(QString(u8"增加子级节点(左)"), this, SLOT(onCreateChildNodeLeft()));
-		}
-		else
-		{
-			if (isToRight())
-				menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeRight()));
-			else
-				menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeLeft()));
-		}
-
-		if (m_parent != NULL)
-		{
-			menu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
-			menu->addAction(QString(u8"删除节点"), this, SLOT(onDeleteNode()));
-		}
-
+		Q_ASSERT(m_pMenu);
 		QGraphicsView* v = scene()->views().first();
 		QPointF sceneP = mapToScene(event->pos());
 		QPoint viewP = v->mapFromScene(sceneP);
 		QPoint sendMenuEventPos = v->viewport()->mapToGlobal(viewP);
-		menu->popup(sendMenuEventPos);
+		m_pMenu->popup(sendMenuEventPos);
 	}
 	QGraphicsTextItem::mouseReleaseEvent(event);
 }

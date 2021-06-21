@@ -51,6 +51,23 @@ void MindProgressNode::setup()
 	QGraphicsTextItem::setProgress(m_progress);
 }
 
+void MindProgressNode::initMenu()
+{
+	m_pMenu = new QMenu(NULL);
+	m_pMenu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeRight()));
+	if (m_parent != NULL)
+	{
+		m_pMenu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
+		m_pMenu->addAction(QString(u8"删除节点"), this, SLOT(onDeleteNode()));
+	}
+	if (children().empty())
+	{
+		m_pMenu->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
+		m_pMenu->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
+		m_pMenu->addAction(QString(u8"清空进度"), this, SLOT(zeroSchedule()));
+	}
+}
+
 void MindProgressNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	MindNode::paint(painter, option, widget);
@@ -142,33 +159,6 @@ void MindProgressNode::updateToParent()
 	MindProgressNode* parent = qobject_cast<MindProgressNode*>(m_parent);
 	Q_ASSERT(parent);
 	parent->updateStatus();
-}
-
-void MindProgressNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-{
-	if (event->button() == Qt::RightButton)
-	{
-		QMenu* menu = new QMenu(NULL);
-		menu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeRight()));
-		if (m_parent != NULL)
-		{
-			menu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
-			menu->addAction(QString(u8"删除节点"), this, SLOT(onDeleteNode()));
-		}
-		if (children().empty())
-		{
-			menu->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
-			menu->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
-			menu->addAction(QString(u8"清空进度"), this, SLOT(zeroSchedule()));
-		}
-
-		QGraphicsView* v = scene()->views().first();
-		QPointF sceneP = mapToScene(event->pos());
-		QPoint viewP = v->mapFromScene(sceneP);
-		QPoint sendMenuEventPos = v->viewport()->mapToGlobal(viewP);
-		menu->popup(sendMenuEventPos);
-	}
-	QGraphicsTextItem::mouseReleaseEvent(event);
 }
 
 void MindProgressNode::setWorkingHourDlg()

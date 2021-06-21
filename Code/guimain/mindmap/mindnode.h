@@ -68,6 +68,7 @@ public:
 protected:
 	void init();
 	void initDirection();
+	virtual void initMenu();
 	bool sceneEvent(QEvent* event) override;
 	void focusOutEvent(QFocusEvent* event) override;
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
@@ -95,6 +96,7 @@ protected:
 	bool m_bToRight;	//子节点向右扩展。
 	MindNode* m_parent;
 	MindNodeButton* m_pBtn;
+	QMenu* m_pMenu;
 	QList<MindNode*> m_children;
 };
 
