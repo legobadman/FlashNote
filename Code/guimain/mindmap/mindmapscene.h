@@ -35,15 +35,14 @@ private:
 	void unsetupNode(MindNode* node);
 	void arrangeAllItems();
 	QRectF arrangeItemPosition(QPoint rootLT, MindNode* pItem, bool toRight);
-	void adjustRightSidePos(MindNode* pRoot, int xoffset, int yoffset);
-	void adjustAllItemPos(MindNode* pRoot, int xoffset, int yoffset);
+	void adjustAllItemPos(MindNode* pRoot, int xoffset, int yoffset, bool bOnlyRightside);
+	void appendPaths(MindNode* pRoot);
 	MindNode* parseXML(const std::wstring& content);
 	XML_NODE* _export(MindNode* root, xml_document<WCHAR>& doc);
 	MindNode* _parse(xml_node<WCHAR>* root, int level);
 
 private:
 	MindNode* m_pRoot;
-	QList<QGraphicsPathItem*> m_rightPathItems;	//存起来用于调整位置
 	QList<QGraphicsPathItem*> m_pathItems;
 	bool m_bSchedule;
 };
