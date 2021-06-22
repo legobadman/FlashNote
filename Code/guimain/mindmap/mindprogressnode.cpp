@@ -4,6 +4,7 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QMenu>
+#include <QTooltip>
 
 
 MindProgressNode::MindProgressNode(const QString& text, MindProgressNode* parent)
@@ -49,23 +50,31 @@ void MindProgressNode::setup()
 	}
 
 	QGraphicsTextItem::setProgress(m_progress);
+
+	updateToolTip();
 }
 
 void MindProgressNode::initMenu()
 {
-	m_pMenu = new QMenu(NULL);
-	m_pMenu->addAction(QString(u8"增加子级节点"), this, SLOT(onCreateChildNodeRight()));
-	if (m_parent != NULL)
-	{
-		m_pMenu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
-		m_pMenu->addAction(QString(u8"删除节点"), this, SLOT(onDeleteNode()));
-	}
+	MindNode::initMenu();
+
 	if (children().empty())
 	{
 		m_pMenu->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
 		m_pMenu->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
 		m_pMenu->addAction(QString(u8"清空进度"), this, SLOT(zeroSchedule()));
 	}
+}
+
+bool MindProgressNode::sceneEvent(QEvent* event)
+{
+	switch (event->type())
+	{
+	case QEvent::GraphicsSceneHoverEnter:
+		updateToolTip();
+		break;
+	}
+	return MindNode::sceneEvent(event);
 }
 
 void MindProgressNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -80,6 +89,20 @@ void MindProgressNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
 		pt.setY(pt.y() - 22);
 		painter->drawPixmap(pt, icon.pixmap(28, 28));
 	}
+}
+
+void MindProgressNode::updateToolTip()
+{
+	QString toolTipText;
+	if (m_workinghours <= 0)
+	{
+		toolTipText = QString(u8"当前进度或者子进度还没设置工时。");
+	}
+	else
+	{
+		toolTipText = QString(u8"总工时为%1个小时，当前进度为%2%。").arg(QString::number(m_workinghours)).arg(QString::number(m_progress * 100));
+	}
+	setToolTip(toolTipText);
 }
 
 float MindProgressNode::progress()

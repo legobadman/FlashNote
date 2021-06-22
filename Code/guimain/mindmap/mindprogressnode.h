@@ -27,9 +27,11 @@ public slots:
 private:
 	void _setProgress(float progress);
 	void _setWorkhours(float hours);
+	void updateToolTip();
 
 protected:
 	void initMenu() override;
+	bool sceneEvent(QEvent* event) override;
 
 private:
 	float m_progress;
