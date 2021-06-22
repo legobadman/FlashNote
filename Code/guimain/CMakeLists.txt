@@ -135,6 +135,9 @@ add_executable(guimain
     ./SeperateLine.h
     ./searcheditor.cpp
     ./searcheditor.h
+    ./selectnotebookdlg.cpp
+    ./selectnotebookdlg.h
+    ./selectnotebookdlg.ui
     ./stdafx.cpp
     ./stdafx.h
     ./style/MyStyle.cpp

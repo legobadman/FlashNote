@@ -403,6 +403,13 @@ XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<WCHAR>& doc)
 		root->append_attribute(attr);
 	}
 
+	if (!pRoot->noteid().isEmpty())
+	{
+		xml_attribute<WCHAR>* attr = doc.allocate_attribute(L"noteid",
+			doc.allocate_string(pRoot->noteid().toStdWString().c_str()));
+		root->append_attribute(attr);
+	}
+
 	const QList<MindNode*>& children = pRoot->children();
 
 	MindProgressNode* pProgress = qobject_cast<MindProgressNode*>(pRoot);
@@ -464,6 +471,10 @@ MindNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
 		{
 			bool toRight = _wtoi(value.c_str());
 			pRoot->setToRight(toRight);
+		}
+		if (attr_name == L"noteid")
+		{
+			pRoot->setNoteId(QString::fromStdWString(value.c_str()));
 		}
 
 		if (pProgress)

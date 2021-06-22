@@ -140,7 +140,12 @@ void NoteEditWindow::saveNote()
 	m_pNote->SetPlainText(bstrPlainText);
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
-	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+	bool ret = RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+	if (ret)
+	{
+		QString noteid = AppHelper::GetNoteId(m_pNote);
+		emit noteCommited(noteid);
+	}
 }
 
 void NoteEditWindow::saveMindMap()

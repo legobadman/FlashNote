@@ -61,7 +61,7 @@ bool RPCService::SynchronizeNotebook(INotebook* pNotebook)
 	return true;
 }
 
-void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote)
+bool RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote)
 {
 	BSTR bstrId, bstrTitle, bstrContent;
 	pNote->GetId(&bstrId);
@@ -80,6 +80,7 @@ void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 		if (id.empty())
 		{
 			Q_ASSERT(FALSE);
+			return false;
 		}
 	}
 
@@ -90,6 +91,7 @@ void RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 	std::wstring content(bstrContent, SysStringLen(bstrContent));
 
 	bool ret = m_pClient->client()->UpdateNote(converter.to_bytes(id), converter.to_bytes(title), converter.to_bytes(content));
+	return ret;
 }
 
 std::wstring RPCService::NewNote(std::wstring bookid, std::wstring title, NOTE_TYPE type)

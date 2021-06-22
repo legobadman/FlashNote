@@ -14,12 +14,15 @@ public:
 	~NewNoteWindow();
 	void init(QString bookid);
 	void initSchedule();
+	void open(QString bookid, QString noteid);
+	void getNote(INote** ppNote);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
 
 signals:
 	void closeWin();
+	void noteCommited(const QString&);
 
 private:
 	Ui::NewNoteWindow* m_ui;

@@ -17,7 +17,7 @@ public:
 	void inittrashes(INoteApplication* pApp);
 	void initschedules(INoteApplication* pApp, const NOTEBOOK& schedules);
 	void InitcoreFromRPC(INoteApplication* pApp);
-	void SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote);
+	bool SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote);
 	bool SynchronizeNotebook(INotebook* pNotebook);
 	bool RemoveNote(INoteApplication* pApp, INoteCollection* pNotebook, INote* pNote);
 	bool DeleteNote(ITrash* pTrash, INote* pNote);

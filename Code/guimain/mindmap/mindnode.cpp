@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "mindnode.h"
+#include "guihelper.h"
+#include "newnotewindow.h"
+#include "selectnotebookdlg.h"
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QGraphicsView>
@@ -110,6 +113,60 @@ void MindNode::initMenu()
 		m_pMenu->addAction(QString(u8"增加同级节点"), this, SLOT(onCreateSliblingNode()));
 		m_pMenu->addAction(QString(u8"删除节点"), this, SLOT(onDeleteNode()));
 	}
+
+	if (m_noteid.isEmpty())
+	{
+		m_pMenu->addAction(QString(u8"新建关联笔记"), this, SLOT(onCreateAssociateNote()));
+	}
+	else
+	{
+		com_sptr<INote> spNote;
+		com_sptr<INotebook> spNotebook;
+		AppHelper::GetNoteAndBookById(m_noteid, &spNotebook, &spNote);
+		if (!spNote || !spNotebook)
+		{
+			m_noteid = "";
+			m_pMenu->addAction(QString(u8"新建关联笔记"), this, SLOT(onCreateAssociateNote()));
+		}
+		else
+		{
+			m_pMenu->addAction(QString(u8"编辑关联笔记"), this, SLOT(onEditAssociateNote()));
+		}
+	}
+}
+
+void MindNode::onCreateAssociateNote()
+{
+	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, NORMAL_NOTE);
+	connect(pNewNoteWindow, SIGNAL(noteCommited(const QString&)), this, SLOT(onNewNote(const QString&)));
+
+	SelectNotebookDlg dlg;
+	if (QDialog::Accepted == dlg.exec())
+	{
+		QString bookId = dlg.getBookId();
+		pNewNoteWindow->init(bookId);
+		pNewNoteWindow->showMaximized();
+	}
+}
+
+void MindNode::onNewNote(const QString& noteid)
+{
+	Q_ASSERT(!noteid.isEmpty());
+	m_noteid = noteid;
+	initMenu();
+	emit dataChanged();
+}
+
+void MindNode::onEditAssociateNote()
+{
+	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, NORMAL_NOTE);
+
+	com_sptr<INote> spNote;
+	com_sptr<INotebook> spNotebook;
+	AppHelper::GetNoteAndBookById(m_noteid, &spNotebook, &spNote);
+	QString bookid = AppHelper::GetNotebookId(spNotebook);
+	pNewNoteWindow->open(bookid, m_noteid);
+	pNewNoteWindow->showMaximized();
 }
 
 void MindNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAdded)

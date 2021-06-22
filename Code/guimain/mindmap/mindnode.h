@@ -39,6 +39,8 @@ public:
 	void setLevel(int nLevel) { m_level = nLevel; }
 	bool isToRight() { return m_bToRight; }
 	void setToRight(bool toRight) { m_bToRight = toRight; }
+	QString noteid() const { return m_noteid; }
+	void setNoteId(const QString& noteid) { m_noteid = noteid; }
 	int level() const { return m_level; }
 	void setBackground(QColor color) { m_backgroudColor = color; }
 	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
@@ -59,6 +61,9 @@ public slots:
 	void onCreateChildNodeLeft();
 	void onCreateSliblingNode();
 	void onDeleteNode();
+	void onCreateAssociateNote();
+	void onEditAssociateNote();
+	void onNewNote(const QString&);
 
 public:
 	void SetContent(const std::wstring& content);
@@ -97,6 +102,7 @@ protected:
 	MindNodeButton* m_pBtn;
 	QPointer<QMenu> m_pMenu;
 	QList<MindNode*> m_children;
+	QString m_noteid;
 };
 
 #endif

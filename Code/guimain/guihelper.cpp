@@ -28,8 +28,67 @@ void AppHelper::GetNote(INoteCollection* pNotebook, int idxNote, INote** ppNote)
 	{
 		return;
 	}
-
 	HRESULT hr = pNotebook->Item(varNote, ppNote);
+}
+
+void AppHelper::GetNote(INoteCollection* pNotebook, QString noteid, INote** ppNote)
+{
+	VARIANT varNote;
+	V_VT(&varNote) = VT_BSTR;
+	V_BSTR(&varNote) = SysAllocString(noteid.toStdWString().data());
+
+	com_sptr<INote> spNote;
+	HRESULT hr = pNotebook->Item(varNote, &spNote);
+	if (FAILED(hr))
+	{
+		VariantClear(&varNote);
+		return;
+	}
+
+	*ppNote = spNote;
+	(*ppNote)->AddRef();
+
+	VariantClear(&varNote);
+}
+
+void AppHelper::GetNoteAndBookById(QString noteid, INotebook** ppNotebook, INote** ppNote)
+{
+	if (!ppNotebook || !ppNote)
+		return;
+
+	VARIANT varNote;
+	V_VT(&varNote) = VT_BSTR;
+	V_BSTR(&varNote) = SysAllocString(noteid.toStdWString().data());
+
+	com_sptr<INotebooks> spNotebooks;
+	coreApp->GetNotebooks(&spNotebooks);
+	int nCount = 0;
+	spNotebooks->GetCount(&nCount);
+
+	for (int i = 0; i < nCount; i++)
+	{
+		com_sptr<INotebook> spNotebook;
+
+		VARIANT varIndex;
+		V_VT(&varIndex) = VT_I4;
+		V_I4(&varIndex) = i;
+
+		spNotebooks->Item(varIndex, &spNotebook);
+
+		com_sptr<INote> spNote;
+		HRESULT hr = spNotebook->Item(varNote, &spNote);
+		if (FAILED(hr))
+		{
+			continue;
+		}
+
+		*ppNotebook = spNotebook;
+		(*ppNotebook)->AddRef();
+		*ppNote = spNote;
+		(*ppNote)->AddRef();
+	}
+
+	VariantClear(&varNote);
 }
 
 QString AppHelper::GetNotebookName(INoteCollection* pNotebook)
@@ -64,6 +123,8 @@ void AppHelper::GetNotebookById(const QString& bookid, INotebook** ppNotebook)
 	V_BSTR(&varIndex) = SysAllocString(bookid.toStdWString().data());
 
 	HRESULT hr = spNotebooks->Item(varIndex, ppNotebook);
+
+	VariantClear(&varIndex);
 }
 
 void AppHelper::GetNotebookByNote(INote* pNote, INotebook** ppNotebook)

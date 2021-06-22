@@ -33,6 +33,9 @@ public slots:
 private:
 	void initSlots();
 
+signals:
+	void noteCommited(const QString&);
+
 private:
 	Ui::NoteEditWindow* m_ui;
 	com_sptr<INote> m_pNote;
