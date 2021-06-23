@@ -68,11 +68,14 @@ public slots:
 public:
 	void SetContent(const std::wstring& content);
 	std::wstring GetContent() const;
+	QRectF boundingRect() const override;
 
 protected:
 	void init();
 	void initDirection();
 	virtual void initMenu();
+	virtual void initDecoration();
+	bool needShowDecoration() const;
 	bool sceneEvent(QEvent* event) override;
 	void focusOutEvent(QFocusEvent* event) override;
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
@@ -82,7 +85,7 @@ protected:
 private:
 	void initDocFormat(const QString& text);
 	int pointSize(int level) const;
-	void udpateBorderFormat(const QStyleOptionGraphicsItem* option);
+	void udpateBorderFormat(const QStyleOptionGraphicsItem* option);	
 
 protected:
 	QString m_content;
@@ -103,6 +106,8 @@ protected:
 	QPointer<QMenu> m_pMenu;
 	QList<MindNode*> m_children;
 	QString m_noteid;
+
+	const int iconSize = 24;
 };
 
 #endif

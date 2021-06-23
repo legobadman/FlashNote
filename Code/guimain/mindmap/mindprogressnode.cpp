@@ -41,8 +41,7 @@ void MindProgressNode::setup()
 	}
 
 	init();
-
-	m_textColor = QColor(0, 0, 0);	//由于有绿白色，需要将文本设置为黑色。
+	updateNodeColor();
 
 	if (m_children.isEmpty() && m_parent)
 	{
@@ -54,6 +53,21 @@ void MindProgressNode::setup()
 	updateToolTip();
 }
 
+void MindProgressNode::updateNodeColor()
+{
+	m_textColor = QColor(0, 0, 0);
+	if (m_level >= 2)
+	{
+		QGraphicsTextItem::setProgressColor(QColor(255, 255, 255), QColor(0, 181, 72));
+	}
+	//if (m_progress == 0) {
+	//	m_textColor = QColor(0, 0, 0);
+	//}
+	//else if (m_progress == 1) {
+	//	m_textColor = QColor(255, 255, 255);
+	//}
+}
+
 void MindProgressNode::initMenu()
 {
 	MindNode::initMenu();
@@ -63,6 +77,17 @@ void MindProgressNode::initMenu()
 		m_pMenu->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
 		m_pMenu->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
 		m_pMenu->addAction(QString(u8"清空进度"), this, SLOT(zeroSchedule()));
+	}
+}
+
+void MindProgressNode::initDecoration()
+{
+	if (needShowDecoration())
+	{
+		//if (m_progress > 0.9)
+		//	setDecoration(2, QIcon(":/icons/16x16/link_note_white.png"));
+		//else
+			setDecoration(2, QIcon(":/icons/16x16/link_note_black.png"));
 	}
 }
 
@@ -123,6 +148,7 @@ void MindProgressNode::_setProgress(float progress)
 	}
 	m_progress = progress;
 	QGraphicsTextItem::setProgress(m_progress);
+	updateNodeColor();
 	update();
 
 	emit dataChanged();

@@ -28,9 +28,11 @@ private:
 	void _setProgress(float progress);
 	void _setWorkhours(float hours);
 	void updateToolTip();
+	void updateNodeColor();
 
 protected:
 	void initMenu() override;
+	void initDecoration() override;
 	bool sceneEvent(QEvent* event) override;
 
 private:

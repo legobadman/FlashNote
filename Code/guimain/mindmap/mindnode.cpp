@@ -75,6 +75,7 @@ void MindNode::init()
 	setPalette(pal);
 	setCornerRadius(m_cornerRadius);
 
+	initDecoration();
 	initDirection();
 	initMenu();
 }
@@ -88,6 +89,17 @@ void MindNode::initDirection()
 			p = p->Parent();
 		Q_ASSERT(p);
 		setToRight(p->isToRight());
+	}
+}
+
+void MindNode::initDecoration()
+{
+	if (needShowDecoration())
+	{
+		if (m_level == 0)
+			setDecoration(2, QIcon(":/icons/16x16/link_note_white.png"));
+		else
+			setDecoration(2, QIcon(":/icons/16x16/link_note_black.png"));
 	}
 }
 
@@ -155,6 +167,11 @@ void MindNode::onNewNote(const QString& noteid)
 	m_noteid = noteid;
 	initMenu();
 	emit dataChanged();
+}
+
+bool MindNode::needShowDecoration() const
+{
+	return !m_noteid.isEmpty();
 }
 
 void MindNode::onEditAssociateNote()
@@ -359,6 +376,15 @@ void MindNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
 		m_mouseState = MS_FOCUSOUT;
 	}
 	rootFrame->setFrameFormat(frameFormat);
+}
+
+QRectF MindNode::boundingRect() const
+{
+	QRectF br = QGraphicsTextItem::boundingRect();
+	if (needShowDecoration())
+		return br.adjusted(0, 0, iconSize, 0);
+	else
+		return br;
 }
 
 void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
