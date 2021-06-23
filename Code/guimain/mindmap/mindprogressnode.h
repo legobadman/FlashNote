@@ -35,7 +35,7 @@ private:
 
 protected:
 	void initMenu() override;
-	void initDecoration() override;
+	void resetDecoration() override;
 	bool sceneEvent(QEvent* event) override;
 
 private:

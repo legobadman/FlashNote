@@ -75,7 +75,7 @@ protected:
 	void init();
 	void initDirection();
 	virtual void initMenu();
-	virtual void initDecoration();
+	virtual void resetDecoration();
 	bool needShowDecoration() const;
 	bool sceneEvent(QEvent* event) override;
 	void focusOutEvent(QFocusEvent* event) override;

@@ -81,7 +81,7 @@ void MindProgressNode::initMenu()
 	}
 }
 
-void MindProgressNode::initDecoration()
+void MindProgressNode::resetDecoration()
 {
 	if (needShowDecoration())
 	{

@@ -75,7 +75,7 @@ void MindNode::init()
 	setPalette(pal);
 	setCornerRadius(m_cornerRadius);
 
-	initDecoration();
+	resetDecoration();
 	initDirection();
 	initMenu();
 }
@@ -92,7 +92,7 @@ void MindNode::initDirection()
 	}
 }
 
-void MindNode::initDecoration()
+void MindNode::resetDecoration()
 {
 	if (needShowDecoration())
 	{
@@ -166,7 +166,9 @@ void MindNode::onNewNote(const QString& noteid)
 	Q_ASSERT(!noteid.isEmpty());
 	m_noteid = noteid;
 	initMenu();
+	resetDecoration();
 	emit dataChanged();
+	emit textChange();
 }
 
 bool MindNode::needShowDecoration() const
@@ -291,6 +293,13 @@ void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 		QPoint sendMenuEventPos = v->viewport()->mapToGlobal(viewP);
 		m_pMenu->popup(sendMenuEventPos);
 	}
+	else if (event->button() == Qt::LeftButton)
+	{
+		if (cursor().shape() == Qt::PointingHandCursor)
+		{
+			onEditAssociateNote();
+		}
+	}
 	QGraphicsTextItem::mouseReleaseEvent(event);
 }
 
@@ -310,6 +319,21 @@ bool MindNode::sceneEvent(QEvent* event)
 		if (m_pBtn)
 			m_pBtn->setVisible(false);
 		update();
+		break;
+	case QEvent::GraphicsSceneHoverMove:
+		{
+			QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
+			QPointF pos = e->pos();
+			QRectF br = boundingRect();
+			if (QRectF(br.width() - 30, br.top() + 16, 32, 16).contains(pos))
+			{
+				setCursor(QCursor(Qt::PointingHandCursor));
+			}
+			else
+			{
+				setCursor(QCursor(Qt::ArrowCursor));
+			}
+		}
 		break;
 	case QEvent::GraphicsSceneMouseDoubleClick:
 		{
