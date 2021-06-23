@@ -157,7 +157,7 @@ void MindNode::onCreateAssociateNote()
 	{
 		QString bookId = dlg.getBookId();
 		pNewNoteWindow->init(bookId);
-		pNewNoteWindow->showMaximized();
+		pNewNoteWindow->show();
 	}
 }
 
@@ -185,7 +185,7 @@ void MindNode::onEditAssociateNote()
 	AppHelper::GetNoteAndBookById(m_noteid, &spNotebook, &spNote);
 	QString bookid = AppHelper::GetNotebookId(spNotebook);
 	pNewNoteWindow->open(bookid, m_noteid);
-	pNewNoteWindow->showMaximized();
+	pNewNoteWindow->show();
 }
 
 void MindNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAdded)
@@ -295,7 +295,7 @@ void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	}
 	else if (event->button() == Qt::LeftButton)
 	{
-		if (cursor().shape() == Qt::PointingHandCursor)
+		if (cursor().shape() == Qt::PointingHandCursor && !m_noteid.isEmpty())
 		{
 			onEditAssociateNote();
 		}
@@ -325,7 +325,7 @@ bool MindNode::sceneEvent(QEvent* event)
 			QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
 			QPointF pos = e->pos();
 			QRectF br = boundingRect();
-			if (QRectF(br.width() - 30, br.top() + 16, 32, 16).contains(pos))
+			if (!m_noteid.isEmpty() && QRectF(br.width() - 30, br.top() + 16, 16, 16).contains(pos))
 			{
 				setCursor(QCursor(Qt::PointingHandCursor));
 			}
@@ -364,6 +364,13 @@ void MindNode::append(MindNode* pNode)
 	pNode->setParent(this);
 	m_children.append(pNode);
 	initMenu();
+}
+
+QPainterPath MindNode::shape() const
+{
+	QPainterPath path;
+	path.addRect(boundingRect());
+	return path;
 }
 
 void MindNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)

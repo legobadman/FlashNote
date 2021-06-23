@@ -48,6 +48,7 @@ public:
 	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
 	virtual void setPosition(QPointF pos);
 	void append(MindNode* pNode);
+	QPainterPath shape() const override;
 
 signals:
 	void textChange();
