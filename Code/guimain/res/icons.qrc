@@ -6,6 +6,7 @@
 	<file>icons/flash233.png</file>
 	<file>icons/bluewhite.png</file>
 	<file>icons/btn_addnote.png</file>
+	<file>icons/checked.png</file>
 	<file>icons/allnotes.png</file>
 	<file>icons/notebooks.png</file>
 	<file>icons/material.png</file>
@@ -15,6 +16,7 @@
 	<file>icons/draft.png</file>
 	<file>icons/trash.png</file>
 	<file>icons/conflict.png</file>
+	<file>icons/warning.png</file>
 	<file>icons/16x16/Bold.png</file>
 	<file>icons/16x16/Italic.png</file>
 	<file>icons/16x16/Underline.png</file>

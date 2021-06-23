@@ -155,11 +155,11 @@ void MindMapScene::adjustAllItemPos(MindNode* pRoot, int xoffset, int yoffset, b
 	{
 		// 只调右边的点，不需要动根节点。
 		if (pRoot != m_pRoot)
-			pRoot->setPos(pRoot->pos() + QPointF(xoffset, yoffset));
+			pRoot->setPosition(pRoot->pos() + QPointF(xoffset, yoffset));
 	}
 	else
 	{
-		pRoot->setPos(pRoot->pos() + QPointF(xoffset, yoffset));
+		pRoot->setPosition(pRoot->pos() + QPointF(xoffset, yoffset));
 	}
 	const QList<MindNode*>& children = pRoot->children();
 	for (auto it = children.begin(); it != children.end(); it++)
@@ -294,7 +294,7 @@ QRectF MindMapScene::arrangeItemPosition(QPoint rootLTorRT, MindNode* pRoot, boo
 			basePos = QPointF(boundingRect.right() - itemW, (boundingRect.top() + boundingRect.bottom() - itemH) / 2.0);
 		}
 
-		pRoot->setPos(basePos);
+		pRoot->setPosition(basePos);
 
 		//绘制添加按钮。
 		float r = 28. / 2;
@@ -319,7 +319,7 @@ QRectF MindMapScene::arrangeItemPosition(QPoint rootLTorRT, MindNode* pRoot, boo
 		}
 		if (pRoot != m_pRoot)
 		{
-			pRoot->setPos(basePos);
+			pRoot->setPosition(basePos);
 		}
 	}
 	return boundingRect;

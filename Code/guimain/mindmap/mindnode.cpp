@@ -393,6 +393,11 @@ void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 	QGraphicsTextItem::paint(painter, option, widget);
 }
 
+void MindNode::setPosition(QPointF pos)
+{
+	QGraphicsTextItem::setPos(pos);
+}
+
 int MindNode::pointSize(int level) const
 {
 	switch (level)

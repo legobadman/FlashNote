@@ -11,11 +11,17 @@ MindProgressNode::MindProgressNode(const QString& text, MindProgressNode* parent
 	: MindNode(text, parent)
 	, m_progress(0.0)
 	, m_workinghours(0.0)
+	, m_tipItem(new QGraphicsPixmapItem)
 {
 }
 
 MindProgressNode::~MindProgressNode()
 {
+	if (m_tipItem != NULL)
+	{
+		scene()->removeItem(m_tipItem);
+		m_tipItem = NULL;
+	}
 }
 
 void MindProgressNode::setup()
@@ -42,6 +48,7 @@ void MindProgressNode::setup()
 
 	init();
 	updateNodeColor();
+	scene()->addItem(m_tipItem);
 
 	if (m_children.isEmpty() && m_parent)
 	{
@@ -58,14 +65,8 @@ void MindProgressNode::updateNodeColor()
 	m_textColor = QColor(0, 0, 0);
 	if (m_level >= 2)
 	{
-		QGraphicsTextItem::setProgressColor(QColor(255, 255, 255), QColor(0, 181, 72));
+		QGraphicsTextItem::setProgressColor(QColor(255, 255, 255), QColor(255, 255, 255));
 	}
-	//if (m_progress == 0) {
-	//	m_textColor = QColor(0, 0, 0);
-	//}
-	//else if (m_progress == 1) {
-	//	m_textColor = QColor(255, 255, 255);
-	//}
 }
 
 void MindProgressNode::initMenu()
@@ -84,10 +85,7 @@ void MindProgressNode::initDecoration()
 {
 	if (needShowDecoration())
 	{
-		//if (m_progress > 0.9)
-		//	setDecoration(2, QIcon(":/icons/16x16/link_note_white.png"));
-		//else
-			setDecoration(2, QIcon(":/icons/16x16/link_note_black.png"));
+		setDecoration(2, QIcon(":/icons/16x16/link_note_black.png"));
 	}
 }
 
@@ -105,15 +103,6 @@ bool MindProgressNode::sceneEvent(QEvent* event)
 void MindProgressNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	MindNode::paint(painter, option, widget);
-
-	if (m_workinghours <= 0)
-	{
-		QIcon icon(":/icons/conflict.png");
-		QPointF pt = boundingRect().bottomRight();
-		pt.setX(pt.x() - 9);
-		pt.setY(pt.y() - 22);
-		painter->drawPixmap(pt, icon.pixmap(28, 28));
-	}
 }
 
 void MindProgressNode::updateToolTip()
@@ -138,6 +127,7 @@ float MindProgressNode::progress()
 void MindProgressNode::setProgress(float progress)
 {
 	m_progress = progress;
+	updateTipIcon();
 }
 
 void MindProgressNode::_setProgress(float progress)
@@ -146,12 +136,52 @@ void MindProgressNode::_setProgress(float progress)
 	{
 		progress = 0;
 	}
-	m_progress = progress;
+
+	setProgress(progress);
+
 	QGraphicsTextItem::setProgress(m_progress);
 	updateNodeColor();
 	update();
 
 	emit dataChanged();
+}
+
+void MindProgressNode::setPosition(QPointF pos)
+{
+	MindNode::setPosition(pos);
+	adjustIndicator();
+}
+
+void MindProgressNode::updateTipIcon()
+{
+	if (m_tipItem)
+	{
+		if (m_workinghours == 0)
+		{
+			QIcon icon(":/icons/warning.png");
+			m_tipItem->setPixmap(icon.pixmap(16, 16));
+			m_tipItem->show();
+		}
+		else if (m_progress == 1 && m_level >= 2)
+		{
+			QIcon icon(":/icons/checked.png");
+			m_tipItem->setPixmap(icon.pixmap(16, 16));
+			m_tipItem->show();
+		}
+		else
+		{
+			m_tipItem->hide();
+		}
+	}
+}
+
+void MindProgressNode::adjustIndicator()
+{
+	if (m_tipItem)
+	{
+		m_tipItem->setZValue(zValue() + 1);
+		m_tipItem->setPos(pos() + boundingRect().bottomRight() - QPointF(12, 12));
+	}
 }
 
 float MindProgressNode::workHours()
@@ -162,15 +192,16 @@ float MindProgressNode::workHours()
 void MindProgressNode::setWorkhours(float hours)
 {
 	m_workinghours = hours;
+	updateTipIcon();
 }
 
 void MindProgressNode::_setWorkhours(float hours)
 {
-	m_workinghours = hours;
 	if (m_children.isEmpty())
 	{
 		_setProgress(0.0);
 	}
+	setWorkhours(hours);
 	emit dataChanged();
 }
 

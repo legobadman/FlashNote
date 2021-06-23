@@ -18,6 +18,7 @@ public:
 	void setWorkhours(float hours);
 	void updateStatus();
 	void updateToParent();
+	void setPosition(QPointF pos) override;
 
 public slots:
 	void setWorkingHourDlg();
@@ -29,6 +30,8 @@ private:
 	void _setWorkhours(float hours);
 	void updateToolTip();
 	void updateNodeColor();
+	void adjustIndicator();
+	void updateTipIcon();
 
 protected:
 	void initMenu() override;
@@ -38,6 +41,7 @@ protected:
 private:
 	float m_progress;
 	float m_workinghours;
+	QGraphicsPixmapItem* m_tipItem;
 };
 
 

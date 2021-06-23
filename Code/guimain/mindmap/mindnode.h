@@ -46,6 +46,7 @@ public:
 	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
 	void setHighlightedBorder(QColor color) { m_highlightedBorder = color; }
 	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
+	virtual void setPosition(QPointF pos);
 	void append(MindNode* pNode);
 
 signals:
