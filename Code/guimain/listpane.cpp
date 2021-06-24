@@ -434,11 +434,13 @@ void NavigationPanel::initModel()
 
 	m_model->appendRow(pAllNotesItem);
 	initNotebookItem();
+	/*
 	m_model->appendRow(pMaterialItem);
 	m_model->appendRow(pFragmentItem);
 	m_model->appendRow(pDiaryItem);
-	initSchedule();
 	m_model->appendRow(pDraftItem);
+	*/
+	initSchedule();
 	m_model->appendRow(pTrashItem);
 
 	m_treeview->setModel(m_model);

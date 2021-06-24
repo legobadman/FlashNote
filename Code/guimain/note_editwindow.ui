@@ -60,6 +60,70 @@
          <height>30</height>
         </size>
        </property>
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="Text">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>102</green>
+             <blue>204</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="PlaceholderText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>109</red>
+             <green>109</green>
+             <blue>109</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="Text">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>0</red>
+             <green>102</green>
+             <blue>204</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="PlaceholderText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>109</red>
+             <green>109</green>
+             <blue>109</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="Text">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>120</red>
+             <green>120</green>
+             <blue>120</blue>
+            </color>
+           </brush>
+          </colorrole>
+          <colorrole role="PlaceholderText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>109</red>
+             <green>109</green>
+             <blue>109</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
        <property name="font">
         <font>
          <family>微软雅黑</family>
@@ -67,25 +131,25 @@
         </font>
        </property>
       </widget>
-	 </item>
+     </item>
     </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_233">
+     <property name="spacing">
+      <number>3</number>
+     </property>
      <property name="leftMargin">
       <number>8</number>
      </property>
      <property name="topMargin">
       <number>0</number>
-	 </property>
+     </property>
      <property name="rightMargin">
       <number>8</number>
      </property>
      <property name="bottomMargin">
       <number>0</number>
-     </property>
-     <property name="spacing">
-      <number>3</number>
      </property>
      <item>
       <widget class="MenuButton" name="bookmenu" native="true"/>
@@ -151,45 +215,9 @@
    <header>FramelessLineEdit.h</header>
   </customwidget>
   <customwidget>
-   <class>FontComboSizeBox</class>
-   <extends>QComboBox</extends>
-   <header>fontsize_combobox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>FontComboBox</class>
-   <extends>QFontComboBox</extends>
-   <header>font_combobox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>ToolButton</class>
-   <extends>QWidget</extends>
-   <header>comctrl/toolbutton.h</header>
-  </customwidget>
-  <customwidget>
    <class>MenuButton</class>
    <extends>QWidget</extends>
    <header>comctrl/menubutton.h</header>
-  </customwidget>
-  <customwidget>
-   <class>SeperateVLine</class>
-   <extends>QFrame</extends>
-   <header>SeperateLine.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>FontColorComboBox</class>
-   <extends>MenuButton</extends>
-   <header>FontColorComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>RichTextEditor</class>
-   <extends>QTextEdit</extends>
-   <header>richeditor/richtexteditor.h</header>
-  </customwidget>
-  <customwidget>
-   <class>AlignmentComboBox</class>
-   <extends>MenuButton</extends>
-   <header>alignmentcombobox.h</header>
   </customwidget>
   <customwidget>
    <class>NormalEditor</class>

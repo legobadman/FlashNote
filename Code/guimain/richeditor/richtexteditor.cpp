@@ -17,11 +17,22 @@ RichTextEditor::RichTextEditor(QWidget* parent)
 	QString fontFamily = QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ");
 	QFont font(fontFamily, 10);
 	setFont(font);
-	document()->setDocumentMargin(20);
+
 	setFrameShape(QFrame::NoFrame);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	highlighter = new CppSyntaxHighlighter(document());
+}
+
+void RichTextEditor::updateFrameFormat()
+{
+	QTextFrame* rootFrame = document()->rootFrame();
+	QTextFrameFormat format = rootFrame->frameFormat();
+	format.setLeftMargin(45);
+	format.setRightMargin(45);
+	format.setTopMargin(10);
+	format.setBottomMargin(10);
+	rootFrame->setFrameFormat(format);
 }
 
 void RichTextEditor::dropImage(const QUrl& url, const QImage& image)

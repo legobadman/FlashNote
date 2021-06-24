@@ -10,6 +10,7 @@ public:
 	RichTextEditor(QWidget* parent = nullptr);
 	void dropImage(const QUrl& url, const QImage& image);
 	void dropTextFile(const QUrl& url);
+	void updateFrameFormat();
 
 protected:
 	bool canInsertFromMimeData(const QMimeData* source) const;

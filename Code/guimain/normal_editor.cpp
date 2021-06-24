@@ -33,12 +33,14 @@ void NormalEditor::initContent(QString content, bool readOnly)
 	textEdit->blockSignals(true);
 	textEdit->setText(content);
 	textEdit->setReadOnly(readOnly);
+	textEdit->updateFrameFormat();
 	textEdit->blockSignals(false);
 }
 
 void NormalEditor::init()
 {
 	QVBoxLayout* pMainLayout = new QVBoxLayout;
+	pMainLayout->setContentsMargins(0, 0, 0, 0);
 
 	QHBoxLayout* pToolLayout = initToolButtons();
 	pMainLayout->addLayout(pToolLayout);
@@ -61,6 +63,7 @@ void NormalEditor::init()
 QHBoxLayout* NormalEditor::initToolButtons()
 {
 	QHBoxLayout* pLayout = new QHBoxLayout;
+	pLayout->setContentsMargins(8, 0, 8, 0);
 	
 	font_comboBox = new FontComboBox;
 	QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

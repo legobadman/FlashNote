@@ -33,6 +33,7 @@ void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
 	QStyledItemDelegate::initStyleOption(option, index);
 
 	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
+	ITEM_WIDGET_TYPE widgetType = index.data(ItemWidgetTypeRole).value<ITEM_WIDGET_TYPE>();
 	QColor backgroundClr(42, 51, 60);
 	QColor selectedClr(QColor(74, 93, 107));
 
@@ -54,7 +55,10 @@ void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
 	{
 		option->backgroundBrush.setColor(backgroundClr);
 	}
-	option->font.setPointSize(12);
+	if (widgetType == ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL)
+		option->font.setPointSize(10);
+	else
+		option->font.setPointSize(12);
 }
 
 void LeftSideItemDelegate::drawExpandArrow(QPainter* painter, const QStyleOptionViewItem& option) const
@@ -146,6 +150,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	initStyleOption(&opt, index);
 
 	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
+	ITEM_WIDGET_TYPE widgetType = index.data(ItemWidgetTypeRole).value<ITEM_WIDGET_TYPE>();
 
 	NoteItemTreeView* pTreeview = qobject_cast<NoteItemTreeView*>(parent());
 
@@ -161,7 +166,11 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	palette.setColor(QPalette::All, QPalette::HighlightedText, palette.color(QPalette::Active, QPalette::Text));
 	opt.palette = palette;
 
-	const int icon_center_xoffset = 32;
+	int icon_center_xoffset = 32;
+	if (ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL == widgetType)
+	{
+		icon_center_xoffset += 5;
+	}
 
 	int iconSize = opt.decorationSize.height();
 	int textMargin = 5;
