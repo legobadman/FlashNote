@@ -15,7 +15,7 @@ if (WIN32)
 
 	add_subdirectory(guimain)
 	add_subdirectory(notecore)
-	add_subdirectory(client)
+	#add_subdirectory(client)
 	add_subdirectory(rpcservice)
 	add_subdirectory(3rdparty)
 	add_subdirectory(facility)

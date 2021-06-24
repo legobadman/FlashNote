@@ -170,3 +170,7 @@ target_precompile_headers(guimain PRIVATE ./stdafx.h)
 target_link_libraries(guimain notecore Qt5::Widgets rpcservice)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")
+
+file(MAKE_DIRECTORY ${ASSETS})
+add_custom_target(build-time-make-directory ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${ASSETS})
