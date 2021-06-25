@@ -77,7 +77,7 @@ void MyStyle::drawControl(ControlElement element, const QStyleOption* opt, QPain
 	switch (element)
 	{
 	case CE_ComboBoxLabel:
-		return;
+		break;
 	}
 	return base::drawControl(element, opt, p, w);
 }

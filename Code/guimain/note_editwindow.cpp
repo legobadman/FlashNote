@@ -51,10 +51,7 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 
 	m_bEdittable = edittable;
 
-	QString bookName = AppHelper::GetNotebookName(m_pNotebook);
-	m_ui->bookmenu->blockSignals(true);
-	m_ui->bookmenu->setText(bookName);
-	m_ui->bookmenu->blockSignals(false);
+	initBookMenu();
 
 	QString title = AppHelper::GetNoteTitle(m_pNote);
 	QString content = AppHelper::GetNoteContent(m_pNote);
@@ -87,6 +84,26 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 	update();
 }
 
+void NoteEditWindow::initBookMenu()
+{
+	QString bookName = AppHelper::GetNotebookName(m_pNotebook);
+	m_ui->bookmenu->blockSignals(true);
+	m_ui->bookmenu->font();
+	QFont font(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), 9);
+	m_ui->bookmenu->setFont(font);
+	QFontMetrics fm(font);
+	int width = fm.horizontalAdvance(bookName);
+	m_ui->bookmenu->setText(bookName);
+	m_ui->bookmenu->blockSignals(false);
+
+	const int iconSize = 16;
+	m_ui->bookmenu->setIcon(QIcon(":/icons/16x16/notebookmenu.png"));
+	m_ui->bookmenu->setIconSize(MyStyle::dpiScaledSize(QSize(iconSize, iconSize)));
+
+	int w = iconSize + 10 + 4 + width + 20;
+	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(w, 22)));
+}
+
 void NoteEditWindow::init()
 {
     m_ui = new Ui::NoteEditWindow;
@@ -116,7 +133,25 @@ void NoteEditWindow::initSlots()
 
 void NoteEditWindow::initCustomWidget()
 {
+	m_ui->bookmenu->setIcon(QIcon(":/icons/16x16/notebookmenu.png"));
+	m_ui->bookmenu->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(50, 22)));
+	
+	m_ui->infoBtn->setIcon(QIcon(":/icons/16x16/info.png"));
+	m_ui->infoBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	m_ui->infoBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
+
+	m_ui->alarm->setIcon(QIcon(":/icons/16x16/alarm.png"));
+	m_ui->alarm->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	m_ui->alarm->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
+
+	m_ui->moreBtn->setIcon(QIcon(":/icons/16x16/more.png"));
+	m_ui->moreBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	m_ui->moreBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
+
+	m_ui->socialmediashare->setIcon(QIcon(":/icons/16x16/socialmediashare.png"));
+	m_ui->socialmediashare->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	m_ui->socialmediashare->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
 }
 
 void NoteEditWindow::initContent()

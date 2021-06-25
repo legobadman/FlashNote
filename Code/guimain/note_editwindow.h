@@ -32,6 +32,7 @@ public slots:
 
 private:
 	void initSlots();
+	void initBookMenu();
 
 signals:
 	void noteCommited(const QString&);

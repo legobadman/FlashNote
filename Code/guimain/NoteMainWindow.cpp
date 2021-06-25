@@ -65,7 +65,7 @@ void NoteMainWindow::onNewNote(NOTE_TYPE noteType)
 		pNewNoteWindow->initSchedule();
 	else
 		pNewNoteWindow->init(getActiveBookId());
-	pNewNoteWindow->showMaximized();
+	pNewNoteWindow->show();
 }
 
 void NoteMainWindow::onAddNotebook()

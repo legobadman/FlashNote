@@ -72,6 +72,8 @@ add_executable(guimain
     ./guimain.cpp
     ./guihelper.cpp
     ./guihelper.h
+    ./fontitemdelegate.cpp
+    ./fontitemdelegate.h
     ./FontColorComboBox.cpp
     ./FontColorComboBox.h
     ./fontsize_combobox.cpp
@@ -171,6 +173,7 @@ target_link_libraries(guimain notecore Qt5::Widgets rpcservice)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")
 
+SET(ASSETS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/assets)
 file(MAKE_DIRECTORY ${ASSETS})
 add_custom_target(build-time-make-directory ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory ${ASSETS})

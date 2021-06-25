@@ -37,7 +37,7 @@ void BookListView::init()
 	m_ui->view->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
 
 	m_ui->more->setFixedSize(MyStyle::dpiScaledSize(QSize(24, 24)));
-	m_ui->more->setIcon(QIcon(":/icons/24x24/more.png"));
+	m_ui->more->setIcon(QIcon(":/icons/16x16/more.png"));
 	m_ui->more->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
 
 	m_ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);

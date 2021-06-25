@@ -41,23 +41,42 @@
       <number>0</number>
      </property>
      <item>
+      <widget class="MenuButton" name="bookmenu" native="true"/>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer233">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="FramelessLineEdit" name="editTitle">
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>30</height>
+         <height>27</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>30</height>
+         <height>27</height>
         </size>
        </property>
        <property name="baseSize">
         <size>
          <width>0</width>
-         <height>30</height>
+         <height>27</height>
         </size>
        </property>
        <property name="palette">
@@ -127,18 +146,63 @@
        <property name="font">
         <font>
          <family>微软雅黑</family>
-         <pointsize>10</pointsize>
+         <pointsize>9</pointsize>
         </font>
+       </property>
+       <property name="toolTip">
+        <string>编辑标题</string>
        </property>
       </widget>
      </item>
+	 <item>
+      <spacer name="horizontalSpacer234">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+	 <item>
+	  <widget class="ToolButton" name="alarm" native="true"/>
+	 </item>
+	 <item>
+      <widget class="ToolButton" name="infoBtn" native="true"/>
+     </item>
+	 <item>
+      <widget class="ToolButton" name="moreBtn" native="true"/>
+     </item>
+	 <item>
+      <widget class="ToolButton" name="socialmediashare" native="true"/>
+     </item>
+
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_233">
-     <property name="spacing">
-      <number>3</number>
+    <spacer name="verticalSpacer233">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>6</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <property name="leftMargin">
       <number>8</number>
      </property>
@@ -148,57 +212,38 @@
      <property name="rightMargin">
       <number>8</number>
      </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
      <item>
-      <widget class="MenuButton" name="bookmenu" native="true"/>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer233">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
+      <widget class="QFrame" name="frame">
+       <property name="minimumSize">
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>0</width>
+         <height>0</height>
         </size>
        </property>
-      </spacer>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>10</width>
+         <height>1</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::HLine</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="lineWidth">
+        <number>1</number>
+       </property>
+      </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>10</width>
-       <height>1</height>
-      </size>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::HLine</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
-     </property>
-     <property name="lineWidth">
-      <number>1</number>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
@@ -218,6 +263,11 @@
    <class>MenuButton</class>
    <extends>QWidget</extends>
    <header>comctrl/menubutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ToolButton</class>
+   <extends>QWidget</extends>
+   <header>comctrl/toolbutton.h</header>
   </customwidget>
   <customwidget>
    <class>NormalEditor</class>

@@ -64,6 +64,7 @@ QHBoxLayout* NormalEditor::initToolButtons()
 {
 	QHBoxLayout* pLayout = new QHBoxLayout;
 	pLayout->setContentsMargins(8, 0, 8, 0);
+	pLayout->setSpacing(1);
 	
 	font_comboBox = new FontComboBox;
 	QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

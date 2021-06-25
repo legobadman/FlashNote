@@ -7,6 +7,9 @@ class FontComboSizeBox : public QComboBox
 public:
 	FontComboSizeBox(QWidget* parent = nullptr);
 	~FontComboSizeBox();
+
+protected:
+	void paintEvent(QPaintEvent* e);
 };
 
 #endif

@@ -8,7 +8,7 @@
 MenuButton::MenuButton(QWidget* parent)
 	: ToolButton(parent)
 {
-	setButtonStyle(ButtonIcon | ButtonDownArrow);
+	setButtonStyle(ButtonText | ButtonIcon | ButtonDownArrow);
 	setMouseTracking(true);
 	connect(this, SIGNAL(popup()), this, SLOT(popupChildWidget()));
 }
