@@ -7,6 +7,7 @@
 #include "moc_note_editwindow.cpp"
 #include "MyStyle.h"
 #include "common_types.h"
+#include "selectnotebookpanel.h"
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentWriter>
 #include <QMimeData>
@@ -102,6 +103,11 @@ void NoteEditWindow::initBookMenu()
 
 	int w = iconSize + 10 + 4 + width + 20;
 	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(w, 22)));
+	m_ui->bookmenu->setCreateContentCallback([this] {
+		SelectNotebookPanel* panel = new SelectNotebookPanel;
+		connect(panel, SIGNAL(notebookMoved(INotebook*)), this, SLOT(onNotebookMoved(INotebook*)));
+		return panel;
+	});
 }
 
 void NoteEditWindow::init()
@@ -196,6 +202,11 @@ void NoteEditWindow::saveMindMap()
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+}
+
+void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
+{
+	//TODO:
 }
 
 void NoteEditWindow::switchtobook(int bookidx)

@@ -56,6 +56,8 @@ add_executable(guimain
     ./booklistview.ui
     ./bookviewmodel.cpp
     ./bookviewmodel.h
+    ./bookmenubutton.cpp
+    ./bookmenubutton.h
     ./colorgallery.cpp
     ./colorgallery.h
     ./coloritemdelegate.cpp
@@ -100,6 +102,8 @@ add_executable(guimain
     ./mindmap/mindnodebutton.h
     ./mindmap/mindprogressnode.cpp
     ./mindmap/mindprogressnode.h
+    ./model/notebookmodel.cpp
+    ./model/notebookmodel.h
     ./newitemdelegate.cpp
     ./newitemdelegate.h
     ./newnotewindow.cpp
@@ -140,6 +144,8 @@ add_executable(guimain
     ./selectnotebookdlg.cpp
     ./selectnotebookdlg.h
     ./selectnotebookdlg.ui
+    ./selectnotebookpanel.cpp
+    ./selectnotebookpanel.h
     ./stdafx.cpp
     ./stdafx.h
     ./style/MyStyle.cpp

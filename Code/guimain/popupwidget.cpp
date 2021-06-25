@@ -16,6 +16,7 @@ PopupWidget::PopupWidget(QWidget* parent)
 
 PopupWidget::~PopupWidget()
 {
+	m_layout->removeWidget(m_pContentWidget);
 }
 
 void PopupWidget::setContentWidget(QWidget* contentWidget)

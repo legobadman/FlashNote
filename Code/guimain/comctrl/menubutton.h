@@ -2,6 +2,7 @@
 #define __MENUBUTTON_H__
 
 #include "toolbutton.h"
+#include "popupwidget.h"
 
 class MenuButton : public ToolButton
 {
@@ -9,6 +10,7 @@ class MenuButton : public ToolButton
 public:
 	MenuButton(QWidget* parent = NULL);
 	~MenuButton();
+	void setCreateContentCallback(std::function<QWidget* ()> func);
 
 signals:
 	void trigger();
@@ -20,6 +22,9 @@ protected:
 	virtual bool event(QEvent* e);
 	void initStyleOption(StyleOptionToolButton* option) const;
 	void paintEvent(QPaintEvent* event) override;
+
+protected:
+	std::function<QWidget* ()> func_createContentWid;
 };
 
 #endif

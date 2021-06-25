@@ -29,6 +29,7 @@ public slots:
 	void saveNote();
 	void saveMindMap();
 	void switchtobook(int bookidx);
+	void onNotebookMoved(INotebook* pNewbook);
 
 private:
 	void initSlots();
