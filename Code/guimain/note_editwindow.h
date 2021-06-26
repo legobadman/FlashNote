@@ -33,7 +33,7 @@ public slots:
 
 private:
 	void initSlots();
-	void initBookMenu();
+	void updateBookMenu(INotebook* pNotebook);
 
 signals:
 	void noteCommited(const QString&);

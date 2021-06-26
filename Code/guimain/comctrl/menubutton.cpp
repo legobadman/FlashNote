@@ -30,6 +30,8 @@ void MenuButton::popupChildWidget()
 
 	PopupWidget popup(this);
 
+	connect(this, SIGNAL(popout()), &popup, SIGNAL(aboutToHide()));
+
 	QWidget* pContentWidget = func_createContentWid();
 	popup.setContentWidget(pContentWidget);
 

@@ -15,6 +15,7 @@ public:
 signals:
 	void trigger();
 	void popup();
+	void popout();
 protected slots:
 	virtual void popupChildWidget();
 

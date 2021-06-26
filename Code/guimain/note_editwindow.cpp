@@ -52,7 +52,7 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 
 	m_bEdittable = edittable;
 
-	initBookMenu();
+	updateBookMenu(m_pNotebook);
 
 	QString title = AppHelper::GetNoteTitle(m_pNote);
 	QString content = AppHelper::GetNoteContent(m_pNote);
@@ -85,9 +85,9 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 	update();
 }
 
-void NoteEditWindow::initBookMenu()
+void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
 {
-	QString bookName = AppHelper::GetNotebookName(m_pNotebook);
+	QString bookName = AppHelper::GetNotebookName(pNotebook);
 	m_ui->bookmenu->blockSignals(true);
 	m_ui->bookmenu->font();
 	QFont font(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), 9);
@@ -105,6 +105,7 @@ void NoteEditWindow::initBookMenu()
 	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(w, 22)));
 	m_ui->bookmenu->setCreateContentCallback([this] {
 		SelectNotebookPanel* panel = new SelectNotebookPanel;
+		connect(panel, SIGNAL(notebookMoved(INotebook*)), m_ui->bookmenu, SIGNAL(popout()));
 		connect(panel, SIGNAL(notebookMoved(INotebook*)), this, SLOT(onNotebookMoved(INotebook*)));
 		return panel;
 	});
@@ -206,7 +207,10 @@ void NoteEditWindow::saveMindMap()
 
 void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
 {
-	//TODO:
+	if (m_pNotebook == pNewbook)
+		return;
+
+	updateBookMenu(pNewbook);
 }
 
 void NoteEditWindow::switchtobook(int bookidx)
