@@ -142,6 +142,7 @@ void DbService::CreateNoteByNOTE(NOTE note, INote** ppNote)
 {
 	if (!ppNote)
 		return;
+
 	com_sptr<INote> spNote;
 	CreateNote(note.type, &spNote);
 
@@ -180,7 +181,6 @@ void DbService::inittrashes(INoteApplication* pApp)
 
 		com_sptr<INote> spNote;
 		CreateNoteByNOTE(note, &spNote);
-		CreateNote(NORMAL_NOTE, &spNote);
 
 		BSTR bstrBookId = SysAllocString(srcbook_id.toStdWString().c_str());
 		spNote->SetBookId(bstrBookId);
@@ -281,7 +281,7 @@ bool DbService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, IN
 
 		QString sql = "INSERT INTO NOTE (ID, create_time, modify_time, type) VALUES (?,?,?,?);";
 		CppSQLite3Statement stmt = m_db.compileStatement(sql.toUtf8());
-		
+
 		stmt.bind(1, noteid.toStdString().c_str());	
 		stmt.bind(2, localtime.toStdString().c_str());
 		stmt.bind(3, localtime.toStdString().c_str());
@@ -304,6 +304,52 @@ bool DbService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, IN
 		pNote->SetId(SysAllocString(noteid.toStdWString().c_str()));
 		pNote->SetBookId(SysAllocString(bookid.toStdWString().c_str()));
 		pNotebook->AddNote(pNote);
+	}
+
+	QString sql = QString("UPDATE NOTE SET title=?, content=?, modify_time=? WHERE ID='%1';").arg(noteid);
+	CppSQLite3Statement stmt = m_db.compileStatement(sql.toUtf8());
+	stmt.bind(1, title.toUtf8().constData());
+	stmt.bind(2, content.toUtf8().constData());
+	stmt.bind(3, localtime.toStdString().c_str());
+
+	int nRowsChanged = stmt.execDML();
+	return nRowsChanged == 1;
+}
+
+bool DbService::SynchronizeSchedule(INoteApplication* pApp, INote* pNote)
+{
+	QString title = AppHelper::GetNoteTitle(pNote);
+	QString content = AppHelper::GetNoteContent(pNote);
+	QString noteid = AppHelper::GetNoteId(pNote);
+	QString localtime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+	if (noteid.isEmpty())
+	{
+		NOTE_TYPE type = NORMAL_NOTE;
+		pNote->GetType(&type);
+		int _type = (int)type;
+		noteid = AppHelper::GenerateGUID();
+
+		QString sql = "INSERT INTO NOTE (ID, create_time, modify_time, type) VALUES (?,?,?,?);";
+		CppSQLite3Statement stmt = m_db.compileStatement(sql.toUtf8());
+
+		stmt.bind(1, noteid.toStdString().c_str());
+		stmt.bind(2, localtime.toStdString().c_str());
+		stmt.bind(3, localtime.toStdString().c_str());
+		stmt.bind(4, _type);
+
+		int nRowsChanged = stmt.execDML();
+		Q_ASSERT(nRowsChanged == 1);
+
+		sql = "INSERT INTO SCHEDULES (note_id) VALUES (?);";
+		stmt = m_db.compileStatement(sql.toUtf8());
+		stmt.bind(1, noteid.toStdString().c_str());
+
+		nRowsChanged = stmt.execDML();
+		Q_ASSERT(nRowsChanged == 1);
+
+		com_sptr<ISchedules> spSchedules;
+		pApp->GetSchedules(&spSchedules);
+		spSchedules->AddNote(pNote);
 	}
 
 	QString sql = QString("UPDATE NOTE SET title=?, content=?, modify_time=? WHERE ID='%1';").arg(noteid);
@@ -390,9 +436,9 @@ bool DbService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, I
 bool DbService::DeleteNote(ITrash* pTrash, INote* pNote)
 {
 	QString noteid = AppHelper::GetNoteId(pNote);
-	QString sql = QString("DELETE FROM TRASH WHERE ID='%1';").arg(noteid);
+	QString sql = QString("DELETE FROM TRASH WHERE note_id='%1';").arg(noteid);
 	int ret = m_db.execDML(sql.toUtf8());
-	Q_ASSERT(ret == SQLITE_OK);
+	Q_ASSERT(ret == 1);
 
 	HRESULT hr = pTrash->RemoveNote(pNote);
 	Q_ASSERT(hr == S_OK);
@@ -401,12 +447,71 @@ bool DbService::DeleteNote(ITrash* pTrash, INote* pNote)
 
 bool DbService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 {
-	//TODO
-	return false;
+	com_sptr<ITrash> spTrash;
+	pApp->GetTrash(&spTrash);
+
+	QString bookid = AppHelper::GetNotebookId(pNotebook);
+	int nCount = 0;
+	pNotebook->GetCount(&nCount);
+	for (int i = 0; i < nCount; i++)
+	{
+		VARIANT varIndex;
+		V_VT(&varIndex) = VT_I4;
+		V_I4(&varIndex) = i;
+
+		com_sptr<INote> spNote;
+		pNotebook->Item(varIndex, &spNote);
+
+		RemoveNote(pApp, pNotebook, spNote);
+		spNote->SetBookId(NULL);
+	}
+
+	int rowsChanged = m_db.execDML(QString("DELETE FROM NOTEBOOK WHERE ID = '%1';").arg(bookid).toUtf8());
+	Q_ASSERT(rowsChanged == 1);
+
+	com_sptr<INotebooks> spNotebooks;
+	pApp->GetNotebooks(&spNotebooks);
+	HRESULT hr = spNotebooks->DeleteNotebook(pNotebook);
+	return (hr == S_OK);
 }
 
 bool DbService::RecoverNote(INoteApplication* pApp, ITrash* pSrcNoteColl, INote* pNote)
 {
-	//TODO
-	return false;
+	QString localtime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+	QString noteid = AppHelper::GetNoteId(pNote);
+
+	QString sql = QString("SELECT * FROM TRASH WHERE note_id = '%1'").arg(noteid);
+	CppSQLite3Query query = m_db.execQuery(sql.toUtf8());
+	Q_ASSERT(!query.eof());
+
+	QString trashId = query.getStringField("ID");
+	QString bookid = query.getStringField("srcbook_id");
+
+	com_sptr<INotebook> spNotebook;
+	AppHelper::GetNotebookById(bookid, &spNotebook);
+	if (!spNotebook)
+	{
+		return false;
+	}
+
+	sql = QString("SELECT * FROM NOTEBOOK WHERE ID = '%1'").arg(bookid);
+	query = m_db.execQuery(sql.toUtf8());
+	Q_ASSERT(!query.eof());
+
+	QStringList list = AppHelper::GetNotes(spNotebook);
+	list.append(noteid);
+
+	sql = QString("UPDATE NOTEBOOK SET notes = ? WHERE ID = '%1'").arg(bookid);
+	CppSQLite3Statement stmt = m_db.compileStatement(sql.toUtf8());
+
+	QString notes = list.join('|');
+	stmt.bind(1, notes.toUtf8().constData());
+
+	int nRowsChanged = stmt.execDML();
+	Q_ASSERT(nRowsChanged == 1);
+
+	spNotebook->AddNote(pNote);
+	pSrcNoteColl->RemoveNote(pNote);
+
+	return true;
 }

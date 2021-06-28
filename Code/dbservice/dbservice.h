@@ -20,6 +20,7 @@ public:
 	void InitcoreFromRPC(INoteApplication* pApp);
 	bool SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote);
 	bool SynchronizeNotebook(INotebook* pNotebook);
+	bool SynchronizeSchedule(INoteApplication* pApp, INote* pNote);
 	bool RemoveNote(INoteApplication* pApp, INoteCollection* pNotebook, INote* pNote);
 	bool DeleteNote(ITrash* pTrash, INote* pNote);
 	bool RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook);

@@ -19,6 +19,7 @@ public:
 	static QString GetNoteAbbre(INote* pNote);
 	static QString GetNoteTitle(INote* pNote);
 	static QString GetNoteId(INote* pNote);
+	static NOTE_TYPE GetNoteType(INote* pNote);
 	static QStringList GetNotes(INoteCollection* pNoteColl);
 
 	static QString GetProgDataPath();

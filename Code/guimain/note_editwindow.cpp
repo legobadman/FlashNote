@@ -214,6 +214,21 @@ void NoteEditWindow::saveMindMap()
 #endif
 }
 
+void NoteEditWindow::saveSchedule()
+{
+	QString title = m_ui->editTitle->text();
+
+	BSTR bstrTitle = SysAllocString(title.toStdWString().c_str());
+	m_pNote->SetTitle(bstrTitle);
+
+	QString wtf = m_ui->mindmapEditor->mindmapXML();
+	BSTR bstrMap = SysAllocString(wtf.toStdWString().c_str());
+	m_pNote->SetContent(bstrMap);
+	com_sptr<INotebook> spNotebook = m_pNotebook;
+
+	DbService::GetInstance(AppHelper::GetDbPath()).SynchronizeSchedule(coreApp, m_pNote);
+}
+
 void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
 {
 	if (m_pNotebook == pNewbook)
@@ -261,5 +276,12 @@ void NoteEditWindow::onTextChanged()
 
 void NoteEditWindow::onMindMapChanged()
 {
-	QTimer::singleShot(3000, this, SLOT(saveMindMap()));
+	if (AppHelper::GetNoteType(m_pNote) == MINDMAP)
+	{
+		QTimer::singleShot(2000, this, SLOT(saveMindMap()));
+	}
+	else if (AppHelper::GetNoteType(m_pNote) == SCHEDULE)
+	{
+		QTimer::singleShot(2000, this, SLOT(saveSchedule()));
+	}
 }

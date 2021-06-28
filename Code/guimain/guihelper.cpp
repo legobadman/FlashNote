@@ -159,6 +159,16 @@ QString AppHelper::GetNoteId(INote* pNote)
 	return noteId;
 }
 
+NOTE_TYPE AppHelper::GetNoteType(INote* pNote)
+{
+	if (!pNote)
+		return UNKNOWN_TYPE;
+
+	NOTE_TYPE type = UNKNOWN_TYPE;
+	pNote->GetType(&type);
+	return type;
+}
+
 QStringList AppHelper::GetNotes(INoteCollection* pNoteColl)
 {
 	QStringList list;

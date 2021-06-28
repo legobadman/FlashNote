@@ -28,6 +28,7 @@ public slots:
 	void onMindMapChanged();
 	void saveNote();
 	void saveMindMap();
+	void saveSchedule();
 	void switchtobook(int bookidx);
 	void onNotebookMoved(INotebook* pNewbook);
 
