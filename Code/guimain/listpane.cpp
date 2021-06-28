@@ -470,6 +470,16 @@ void NavigationPanel::onCustomContextMenu(const QPoint& point)
 
 		m_pCustomMenu->popup(QCursor::pos());
 	}
+	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM)
+	{
+		m_pCustomMenu->clear();
+
+		QAction* pDelete = new QAction(u8"É¾³ý½ø¶È±í", m_pCustomMenu);
+		pDelete->setData((int)NavigationPanel::DELETE_SCHEDULE);
+		m_pCustomMenu->addAction(pDelete);
+
+		m_pCustomMenu->popup(QCursor::pos());
+	}
 }
 
 void NavigationPanel::MenuActionSlot(QAction* action)
@@ -491,6 +501,19 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 #else
 		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).RemoveNotebook(coreApp, spNotebook);
 #endif
+	}
+	else if (nIndex == DELETE_SCHEDULE)
+	{
+		QModelIndex index = m_treeview->currentIndex();
+		QString noteid = index.data(ItemCoreObjIdRole).toString();
+
+		com_sptr<ISchedules> spSchedules;
+		coreApp->GetSchedules(&spSchedules);
+
+		com_sptr<INote> spNote;
+		AppHelper::GetNote(spSchedules, noteid, &spNote);
+
+		DbService::GetInstance(AppHelper::GetDbPath()).RemoveSchedule(coreApp, spNote);
 	}
 }
 

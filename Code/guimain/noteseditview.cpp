@@ -138,9 +138,17 @@ void NotesEditView::onShowNotesView(INote* pNote)
 	else
 	{
 		m_pStackedEdit->setCurrentIndex(PAGE_EDITVIEW);
-
 		com_sptr<INotebook> spNotebook;
-		AppHelper::GetNotebookByNote(pNote, &spNotebook);
+		if (AppHelper::GetNoteType(pNote) == SCHEDULE)
+		{
+			com_sptr<ISchedules> spSchedules;
+			coreApp->GetSchedules(&spSchedules);
+			spNotebook = spSchedules;
+		}
+		else
+		{
+			AppHelper::GetNotebookByNote(pNote, &spNotebook);
+		}
 		m_pEditView->updateNoteInfo(spNotebook, pNote, VIEW_TRASH != m_type);
 	}
 }

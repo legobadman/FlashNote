@@ -98,6 +98,7 @@ class NavigationPanel : public QWidget
 	enum MENU_ITEM
 	{
 		DELETE_NOTEBOOK = 0,
+		DELETE_SCHEDULE,
 	};
 
 public:

@@ -392,7 +392,7 @@ bool DbService::SynchronizeNotebook(INotebook* pNotebook)
 	return true;
 }
 
-bool DbService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, INote* pNote)
+bool DbService::TrashNote(INoteApplication* pApp, INoteCollection* pNoteColl, INote* pNote)
 {
 	com_sptr<INotebook> pNotebook = pNoteColl;
 	QString noteid = AppHelper::GetNoteId(pNote);
@@ -410,26 +410,51 @@ bool DbService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, I
 	int rowsChanged = stmt.execDML();
 	Q_ASSERT(rowsChanged == 1);
 
+	com_sptr<ITrash> pTrash;
+	pApp->GetTrash(&pTrash);
+	pTrash->AddNote(pNote);
+
+	return true;
+}
+
+bool DbService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, INote* pNote)
+{
+	com_sptr<INotebook> pNotebook = pNoteColl;
+	QString noteid = AppHelper::GetNoteId(pNote);
+	QString bookid = AppHelper::GetNotebookId(pNotebook);
+
+	TrashNote(pApp, pNoteColl, pNote);
+
 	QStringList list = AppHelper::GetNotes(pNotebook);
 	Q_ASSERT(list.contains(noteid));
 	list.removeAll(noteid);
 	QString notes = list.join("|");
 
-	sql = QString("UPDATE NOTEBOOK SET notes = ? WHERE ID = '%1'").arg(bookid);
-	stmt = m_db.compileStatement(sql.toUtf8());	
+	QString sql = QString("UPDATE NOTEBOOK SET notes = ? WHERE ID = '%1'").arg(bookid);
+	CppSQLite3Statement stmt = m_db.compileStatement(sql.toUtf8());	
 	stmt.bind(1, notes.toUtf8().constData());
 
-	rowsChanged = stmt.execDML();
+	int rowsChanged = stmt.execDML();
 	Q_ASSERT(rowsChanged == 1);
 
-	com_sptr<ITrash> pTrash;
-	pApp->GetTrash(&pTrash);
-	pTrash->AddNote(pNote);
 	HRESULT hr = pNotebook->RemoveNote(pNote);
 	if (FAILED(hr))
 	{
 		Q_ASSERT(false);
 	}
+	return true;
+}
+
+bool DbService::RemoveSchedule(INoteApplication* pApp, INote* pNote)
+{
+	com_sptr<ISchedules> spSchedules;
+	pApp->GetSchedules(&spSchedules);
+	TrashNote(pApp, spSchedules, pNote);
+
+	QString noteid = AppHelper::GetNoteId(pNote);
+	QString sql = QString("DELETE FROM SCHEDULES WHERE note_id = '%1'").arg(noteid);
+	int ret = m_db.execDML(sql.toUtf8());
+	Q_ASSERT(ret == 1);
 	return true;
 }
 

@@ -22,6 +22,7 @@ public:
 	bool SynchronizeNotebook(INotebook* pNotebook);
 	bool SynchronizeSchedule(INoteApplication* pApp, INote* pNote);
 	bool RemoveNote(INoteApplication* pApp, INoteCollection* pNotebook, INote* pNote);
+	bool RemoveSchedule(INoteApplication* pApp, INote* pNote);
 	bool DeleteNote(ITrash* pTrash, INote* pNote);
 	bool RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook);
 	bool RecoverNote(INoteApplication* pApp, ITrash* pSrcNoteColl, INote* pNote);
@@ -29,6 +30,7 @@ public:
 public:
 	void ensureDbCreated();
 	void reconstruct();
+	bool TrashNote(INoteApplication* pApp, INoteCollection* pNoteColl, INote* pNote);
 
 private:
 	DbService(QString dbPath);
