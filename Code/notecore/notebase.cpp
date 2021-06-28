@@ -219,6 +219,26 @@ HRESULT NotebookBase::SetModifyTime(long modify_time)
 	return E_NOTIMPL;
 }
 
+HRESULT NotebookBase::AddNote(INote* pNote)
+{
+	HRESULT hr = _base::AddNote(pNote);
+	if (SUCCEEDED(hr))
+	{
+		pNote->SetBookId(m_id.Copy());
+	}
+	return hr;
+}
+
+HRESULT NotebookBase::RemoveNote(INote* pNote)
+{
+	HRESULT hr = _base::RemoveNote(pNote);
+	if (SUCCEEDED(hr))
+	{
+		pNote->SetBookId(CComBSTR());
+	}
+	return hr;
+}
+
 HRESULT NotebookBase::GetNoteIdx(INote* pNote, int* pIndex)
 {
 	return E_NOTIMPL;

@@ -56,6 +56,7 @@ private:
 
 class NotebookBase : public NoteCollection<INotebook>
 {
+	typedef NoteCollection<INotebook> _base;
 public:
 	NotebookBase();
 	~NotebookBase();
@@ -68,7 +69,8 @@ public:
 	HRESULT STDMETHODCALLTYPE SetCreateTime(long create_time);
 	HRESULT STDMETHODCALLTYPE GetModifyTime(long* pTime);
 	HRESULT STDMETHODCALLTYPE SetModifyTime(long time);
-
+	HRESULT STDMETHODCALLTYPE AddNote(INote* pNote);
+	HRESULT STDMETHODCALLTYPE RemoveNote(INote* pNote);
 	HRESULT STDMETHODCALLTYPE GetNoteIdx(INote* pNote, int* pIndex);
 
 public:

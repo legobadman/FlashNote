@@ -234,7 +234,11 @@ void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
 	if (m_pNotebook == pNewbook)
 		return;
 
-	updateBookMenu(pNewbook);
+	bool ret = DbService::GetInstance(AppHelper::GetDbPath()).MoveNotebook(m_pNotebook, pNewbook, m_pNote);
+	if (ret)
+	{
+		updateBookMenu(pNewbook);
+	}
 }
 
 void NoteEditWindow::switchtobook(int bookidx)

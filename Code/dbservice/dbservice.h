@@ -26,6 +26,7 @@ public:
 	bool DeleteNote(ITrash* pTrash, INote* pNote);
 	bool RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook);
 	bool RecoverNote(INoteApplication* pApp, ITrash* pSrcNoteColl, INote* pNote);
+	bool MoveNotebook(INotebook* pSrcbook, INotebook* pDestbook, INote* pNote);
 
 public:
 	void ensureDbCreated();
