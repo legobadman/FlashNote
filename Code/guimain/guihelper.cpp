@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "guihelper.h"
+#include <QtCore/QStandardPaths>
 
 
 void AppHelper::GetNotebook(int idx, INotebook** ppNotebook)
@@ -12,10 +13,6 @@ void AppHelper::GetNotebook(int idx, INotebook** ppNotebook)
 	coreApp->GetNotebooks(&spNotebooks);
 
 	HRESULT hr = spNotebooks->Item(varBook, ppNotebook);
-	if (FAILED(hr) || *ppNotebook == NULL)
-	{
-		Q_ASSERT(FALSE);
-	}
 }
 
 void AppHelper::GetNote(INoteCollection* pNotebook, int idxNote, INote** ppNote)
@@ -162,6 +159,27 @@ QString AppHelper::GetNoteId(INote* pNote)
 	return noteId;
 }
 
+QStringList AppHelper::GetNotes(INoteCollection* pNoteColl)
+{
+	QStringList list;
+	if (!pNoteColl)
+		return list;
+
+	int nCount = 0;
+	pNoteColl->GetCount(&nCount);
+	for (int i = 0; i < nCount; i++)
+	{
+		VARIANT varIndex;
+		V_VT(&varIndex) = VT_I4;
+		V_I4(&varIndex) = i;
+		com_sptr<INote> spNote;
+		pNoteColl->Item(varIndex, &spNote);
+		QString noteid = AppHelper::GetNoteId(spNote);
+		list.append(noteid);
+	}
+	return list;
+}
+
 QString AppHelper::GetNoteContent(INote* pNote)
 {
 	if (!pNote)
@@ -204,6 +222,38 @@ int AppHelper::GetNoteCounts(INoteCollection* pNotebook)
 	Q_ASSERT(pNotebook);
 	pNotebook->GetCount(&nCount);
 	return nCount;
+}
+
+QString AppHelper::GetProgDataPath()
+{
+	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+	locations.removeOne(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+	locations.removeOne(QCoreApplication::applicationDirPath());
+	locations.removeOne(QCoreApplication::applicationDirPath() + QLatin1String("/data"));
+	locations.removeOne(QCoreApplication::applicationDirPath() + QLatin1String("/bin/data"));
+
+	locations = locations.filter("ProgramData");
+	Q_ASSERT(locations.size() == 1);
+	QString appData = locations[0];
+	return appData;
+}
+
+QString AppHelper::GetDbPath()
+{
+	return GetProgDataPath() + "/" + "database";
+}
+
+QString AppHelper::GenerateGUID()
+{
+	GUID gidReference;
+	HRESULT hCreateGuid = CoCreateGuid(&gidReference);
+
+	WCHAR* guidString;
+	StringFromCLSID(gidReference, &guidString);
+	QString guid = QString::fromUtf16((char16_t*)guidString);
+	::CoTaskMemFree(guidString);
+	guid = guid.remove(QRegExp("[\\{\\}\\-]")).toLower();
+	return guid;
 }
 
 QSizeF AppHelper::viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight, int* lastVisibleLine)

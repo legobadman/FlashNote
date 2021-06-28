@@ -3,6 +3,7 @@
 #include "LeftSideItemDelegate.h"
 #include "newitemdelegate.h"
 #include "rpcservice.h"
+#include "dbservice.h"
 #include "note_types.h"
 #include "notewinservice.h"
 #include "MyStyle.h"
@@ -485,7 +486,11 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebookById(bookid, &spNotebook);
 
+#ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().RemoveNotebook(coreApp, spNotebook);
+#else
+		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).RemoveNotebook(coreApp, spNotebook);
+#endif
 	}
 }
 
@@ -495,6 +500,7 @@ HRESULT NavigationPanel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	{
 		com_sptr<INotebooks> spNotebooks = pCoreObj;
 		QModelIndex booksIdx = m_model->index((int)ITEM_CONTENT_TYPE::ITEM_NOTEBOOK, 0);
+		QStandardItem* pNoteBookItem = m_model->item((int)ITEM_CONTENT_TYPE::ITEM_NOTEBOOK);
 		
 		switch (arg.ope)
 		{
@@ -506,12 +512,8 @@ HRESULT NavigationPanel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 				QString bookName = AppHelper::GetNotebookName(spNotebook);
 				QString bookId = AppHelper::GetNotebookId(spNotebook);
 
-				int insertIdx = 0;
-				bool bRet = m_model->insertRow(insertIdx, booksIdx);
-				Q_ASSERT(bRet);
-
-				QModelIndex newItem = booksIdx.child(insertIdx, 0);
-				QStandardItem* pItem = m_model->itemFromIndex(newItem);
+				QStandardItem* pItem = new QStandardItem(bookName);
+				pNoteBookItem->appendRow(pItem);
 
 				QString showContent = bookName;
 				pItem->setText(showContent);

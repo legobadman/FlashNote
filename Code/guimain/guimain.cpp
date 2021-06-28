@@ -5,11 +5,16 @@
 #include "MyStyle.h"
 #include "richeditor/mrichtextedit.h"
 #include "note_types.h"
+#include "CppSQLite3.h"
+#include "dbservice.h"
+#include "guihelper.h"
+
 
 INoteApplication* coreApp = NULL;
 
-//#define TEXT_RICH_EDITOR
+//#define TEST_RICH_EDITOR
 //#define TEST_WIDGET_WINDOW_PARENT
+//#define TEST_SQLITE
 
 #ifdef TEST_WIDGET_WINDOW_PARENT
 #include "qtexamples/MltpDlgs1.h"
@@ -41,6 +46,21 @@ int WINAPI WinMain(__in HINSTANCE hInstance,
 	w.setMinimumSize(300, 100);
 	w.show();
 	return a.exec();
+
+#elif defined(TEST_SQLITE)
+	QApplication app(__argc, __argv);
+	QApplication::setStyle(new MyStyle);
+
+	QString guid = AppHelper::GenerateGUID();
+
+	CppSQLite3DB db2;
+	db2.open("wtf.db");
+	CppSQLite3Query query = db2.execQuery("select datetime('now', 'localtime');");
+	const char* field = query.fieldName(0);
+	const char* wtf = query.getStringField(field);
+
+	DbService& db = DbService::GetInstance(AppHelper::GetProgDataPath() + "/" + "database");
+	db.reconstruct();
 
 #else
 	QApplication::addLibraryPath("C:/Qt/Qt-5.15.0/plugins");

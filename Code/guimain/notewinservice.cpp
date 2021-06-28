@@ -2,6 +2,7 @@
 #include "notewinservice.h"
 #include "note_types.h"
 #include "rpcservice.h"
+#include "dbservice.h"
 #include "guihelper.h"
 
 
@@ -42,7 +43,11 @@ INoteApplication* NoteWinService::coreApplication()
 
 void NoteWinService::initCoreFromRPC()
 {
+#ifdef USE_RPC
 	RPCService::GetInstance().InitcoreFromRPC(m_spApp);
+#else
+	DbService::GetInstance(AppHelper::GetDbPath()).InitcoreFromRPC(m_spApp);
+#endif
 }
 
 void NoteWinService::startup()

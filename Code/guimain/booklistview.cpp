@@ -4,6 +4,7 @@
 #include "MyStyle.h"
 #include "guihelper.h"
 #include "rpcservice.h"
+#include "dbservice.h"
 #include "LeftSideItemDelegate.h"
 #include "noteitemdelegate.h"
 
@@ -114,19 +115,31 @@ void BookListView::MenuActionSlot(QAction* action)
 		QString bookid = QString::fromUtf16(reinterpret_cast<ushort*>(bookId));
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebookById(bookid, &spNotebook);
+#ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().RemoveNote(coreApp, spNotebook, spNote);
+#else
+		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).RemoveNote(coreApp, spNotebook, spNote);
+#endif
 	}
 	else if (nIndex == RECOVER_NOTE)
 	{
 		com_sptr<ITrash> pTrash;
 		coreApp->GetTrash(&pTrash);
+#ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().RecoverNote(coreApp, pTrash, spNote);
+#else
+		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).RecoverNote(coreApp, pTrash, spNote);
+#endif
 	}
 	else if (nIndex == DELETE_NOTE)
 	{
 		com_sptr<ITrash> pTrash;
 		coreApp->GetTrash(&pTrash);
+#ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().DeleteNote(pTrash, spNote);
+#else
+		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).DeleteNote(pTrash, spNote);
+#endif
 	}
 }
 

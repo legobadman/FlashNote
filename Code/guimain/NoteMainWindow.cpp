@@ -6,6 +6,7 @@
 #include "note_types.h"
 #include "guihelper.h"
 #include "rpcservice.h"
+#include "dbservice.h"
 #include "newnotewindow.h"
 #include "addbookdlg.h"
 #include "noteseditview.h"
@@ -54,8 +55,18 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebook(idxNotebook, &spNotebook);
+	if (!spNotebook)
+	{
+		idx = m_ui->listpane->treeview()->model()->index(0, 0);
+		m_ui->listpane->treeview()->selectionModel()->select(idx, QItemSelectionModel::Select);
 
-	m_ui->notesview->setNotebook(VIEW_NOTEBOOK, spNotebook);
+		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
+		m_ui->notesview->setNotebook(VIEW_ALLNOTES, NULL);
+	}
+	else
+	{
+		m_ui->notesview->setNotebook(VIEW_NOTEBOOK, spNotebook);
+	}
 }
 
 void NoteMainWindow::onNewNote(NOTE_TYPE noteType)
@@ -81,7 +92,11 @@ void NoteMainWindow::onAddNotebook()
 		{
 			BSTR bstrTitle = SysAllocString(bookName.toStdWString().c_str());
 			spNotebook->SetName(bstrTitle);
+#ifdef USE_RPC
 			bool ret = RPCService::GetInstance().SynchronizeNotebook(spNotebook);
+#else
+			bool ret = DbService::GetInstance(AppHelper::GetDbPath()).SynchronizeNotebook(spNotebook);
+#endif
 			Q_ASSERT(ret);
 		}
 	}

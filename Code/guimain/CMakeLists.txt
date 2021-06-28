@@ -37,6 +37,8 @@ include_directories(
     ../3rdparty
 	../3rdparty/boost_1_55_0
     ../3rdparty/rapidxml
+    ../3rdparty/sqlite
+    ../dbservice
     )
 
 # Find the QtWidgets library
@@ -175,11 +177,6 @@ add_executable(guimain
 target_precompile_headers(guimain PRIVATE ./stdafx.h)
 
 # Add the Qt5 Widgets for linking
-target_link_libraries(guimain notecore Qt5::Widgets rpcservice)
+target_link_libraries(guimain notecore Qt5::Widgets rpcservice dbservice sqlite)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")
-
-SET(ASSETS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG}/assets)
-file(MAKE_DIRECTORY ${ASSETS})
-add_custom_target(build-time-make-directory ALL
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${ASSETS})

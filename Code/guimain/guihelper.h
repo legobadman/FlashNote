@@ -19,6 +19,11 @@ public:
 	static QString GetNoteAbbre(INote* pNote);
 	static QString GetNoteTitle(INote* pNote);
 	static QString GetNoteId(INote* pNote);
+	static QStringList GetNotes(INoteCollection* pNoteColl);
+
+	static QString GetProgDataPath();
+	static QString GetDbPath();
+	static QString GenerateGUID();
 
 	static int GetNoteCounts(INoteCollection* pNotebook);
 	static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight = -1, int* lastVisibleLine = nullptr);

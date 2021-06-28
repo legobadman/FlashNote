@@ -2,6 +2,7 @@
 
 #include "note_editwindow.h"
 #include "rpcservice.h"
+#include "dbservice.h"
 #include "note_types.h"
 #include "guihelper.h"
 #include "moc_note_editwindow.cpp"
@@ -182,7 +183,11 @@ void NoteEditWindow::saveNote()
 	m_pNote->SetPlainText(bstrPlainText);
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
+#ifdef USE_RPC
 	bool ret = RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+#else
+	bool ret = DbService::GetInstance(AppHelper::GetDbPath()).SynchronizeNote(coreApp, spNotebook, m_pNote);
+#endif
 	if (ret)
 	{
 		QString noteid = AppHelper::GetNoteId(m_pNote);
@@ -202,7 +207,11 @@ void NoteEditWindow::saveMindMap()
 	m_pNote->SetContent(bstrMap);
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
+#ifdef USE_RPC
 	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+#else
+	DbService::GetInstance(AppHelper::GetDbPath()).SynchronizeNote(coreApp, spNotebook, m_pNote);
+#endif
 }
 
 void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
