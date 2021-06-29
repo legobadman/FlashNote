@@ -11,7 +11,7 @@
 class DbService
 {
 public:
-	static DbService& GetInstance(QString dbPath);
+	static DbService& GetInstance();
 	void getnotebooks(std::vector<NOTEBOOK>& vecBooks);
 	QVector<NOTE> getnotes(const QStringList&);
 	NOTE getnote(const QString& noteid);

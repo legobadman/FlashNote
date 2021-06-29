@@ -499,7 +499,7 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 #ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().RemoveNotebook(coreApp, spNotebook);
 #else
-		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).RemoveNotebook(coreApp, spNotebook);
+		bool bRet = DbService::GetInstance().RemoveNotebook(coreApp, spNotebook);
 #endif
 	}
 	else if (nIndex == DELETE_SCHEDULE)
@@ -513,7 +513,7 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 		com_sptr<INote> spNote;
 		AppHelper::GetNote(spSchedules, noteid, &spNote);
 
-		DbService::GetInstance(AppHelper::GetDbPath()).RemoveSchedule(coreApp, spNote);
+		DbService::GetInstance().RemoveSchedule(coreApp, spNote);
 	}
 }
 
@@ -572,6 +572,54 @@ HRESULT NavigationPanel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 			}
 		}
 	}
+	else if (com_sptr<ISchedules>(pCoreObj))
+	{
+		com_sptr<ISchedules> spSchedules = pCoreObj;
+		QStandardItem* pSchedulesItem = m_model->item((int)ITEM_CONTENT_TYPE::ITEM_SCHEDULE);
+
+		com_sptr<INote> spNote = arg.pObj;
+		Q_ASSERT(spNote);
+		QString title = AppHelper::GetNoteTitle(spNote);
+		QString noteid = AppHelper::GetNoteId(spNote);
+
+		switch (arg.ope)
+		{
+			case NotifyOperator::Add:
+			{
+				QStandardItem* pItem = new QStandardItem(title);
+				pSchedulesItem->appendRow(pItem);
+
+				QString showContent = title;
+				pItem->setText(showContent);
+				pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
+					ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM), ItemContentTypeRole);
+				pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
+					ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
+				pItem->setData(QVariant(noteid), ItemCoreObjIdRole);
+				pItem->setSelectable(true);
+				pItem->setEditable(false);
+				break;
+			}
+			case NotifyOperator::Delete:
+			{
+				QModelIndexList indexs = m_model->match(m_model->index(0, 0),
+					ItemCoreObjIdRole,
+					QVariant(noteid),
+					1,		//hits
+					Qt::MatchRecursive);
+				if (!indexs.isEmpty())
+				{
+					Q_ASSERT(indexs.size() == 1);
+					QModelIndex index = indexs.at(0);
+					pSchedulesItem->removeRow(index.row());
+					QItemSelectionModel* pModel = m_treeview->selectionModel();
+					QModelIndex newIndex = pModel->currentIndex();
+					emit clicked(newIndex);
+				}
+				break;
+			}
+		}
+	}
 	return E_NOTIMPL;
 }
 
@@ -584,6 +632,11 @@ void NavigationPanel::onObjClick(const QModelIndex& index, MOUSE_HINT hint)
 			emit addnotebook();
 		else if (hint == MOUSE_IN_EXPAND)
 			emit expand_changed(index);
+	}
+	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULE)
+	{
+		if (hint == MOUSE_IN_ADD)
+			emit newnote(SCHEDULE);
 	}
 }
 

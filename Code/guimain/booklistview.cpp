@@ -118,7 +118,7 @@ void BookListView::MenuActionSlot(QAction* action)
 #ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().RemoveNote(coreApp, spNotebook, spNote);
 #else
-		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).RemoveNote(coreApp, spNotebook, spNote);
+		bool bRet = DbService::GetInstance().RemoveNote(coreApp, spNotebook, spNote);
 #endif
 	}
 	else if (nIndex == RECOVER_NOTE)
@@ -128,7 +128,7 @@ void BookListView::MenuActionSlot(QAction* action)
 #ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().RecoverNote(coreApp, pTrash, spNote);
 #else
-		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).RecoverNote(coreApp, pTrash, spNote);
+		bool bRet = DbService::GetInstance().RecoverNote(coreApp, pTrash, spNote);
 #endif
 	}
 	else if (nIndex == DELETE_NOTE)
@@ -138,7 +138,7 @@ void BookListView::MenuActionSlot(QAction* action)
 #ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().DeleteNote(pTrash, spNote);
 #else
-		bool bRet = DbService::GetInstance(AppHelper::GetDbPath()).DeleteNote(pTrash, spNote);
+		bool bRet = DbService::GetInstance().DeleteNote(pTrash, spNote);
 #endif
 	}
 }

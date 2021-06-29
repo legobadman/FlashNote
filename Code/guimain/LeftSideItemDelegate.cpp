@@ -198,9 +198,11 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	//TODO: 展开项在收缩时也能呈现被选中的状态。
 
 	//展开收缩箭头。
-	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK || type == ITEM_CONTENT_TYPE::ITEM_SCHEDULE)
+	bool isExpandable = (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK || type == ITEM_CONTENT_TYPE::ITEM_SCHEDULE);
+	if (isExpandable)
 	{
-		drawExpandArrow(painter, opt);
+		if (index.model()->hasChildren(index))
+			drawExpandArrow(painter, opt);
 	}
 
 	// draw the icon
@@ -208,7 +210,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	opt.icon.paint(painter, iconRect, opt.decorationAlignment, QIcon::Normal, state);
 
 	// 添加按钮
-	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK && (opt.state & QStyle::State_MouseOver))
+	if (isExpandable && (opt.state & QStyle::State_MouseOver))
 	{
 		QIcon icon;
 

@@ -46,7 +46,7 @@ void NoteWinService::initCoreFromRPC()
 #ifdef USE_RPC
 	RPCService::GetInstance().InitcoreFromRPC(m_spApp);
 #else
-	DbService::GetInstance(AppHelper::GetDbPath()).InitcoreFromRPC(m_spApp);
+	DbService::GetInstance().InitcoreFromRPC(m_spApp);
 #endif
 }
 

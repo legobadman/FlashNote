@@ -74,6 +74,7 @@
        <widget class="NotesEditView" name="notesview"/>
        <widget class="QWidget" name="booksview"/>
        <widget class="NoteEditWindow" name="scheduleeditor"/>
+	   <widget class="QWidget" name="schedulesview"/>
       </widget>
      </widget>
     </item>

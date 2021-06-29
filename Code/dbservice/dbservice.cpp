@@ -9,9 +9,9 @@
 #include "../guimain/guihelper.h"
 
 
-DbService& DbService::GetInstance(QString dbPath)
+DbService& DbService::GetInstance()
 {
-	static DbService inst(dbPath);
+	static DbService inst(AppHelper::GetDbPath());
 	return inst;
 }
 
@@ -340,12 +340,19 @@ bool DbService::SynchronizeSchedule(INoteApplication* pApp, INote* pNote)
 		int nRowsChanged = stmt.execDML();
 		Q_ASSERT(nRowsChanged == 1);
 
-		sql = "INSERT INTO SCHEDULES (note_id) VALUES (?);";
-		stmt = m_db.compileStatement(sql.toUtf8());
-		stmt.bind(1, noteid.toStdString().c_str());
+		sql = QString("SELECT * FROM SCHEDULES WHERE note_id = '%1'").arg(noteid);
+		CppSQLite3Query query = m_db.execQuery(sql.toUtf8());
+		if (query.eof())
+		{
+			sql = "INSERT INTO SCHEDULES (note_id) VALUES (?);";
+			stmt = m_db.compileStatement(sql.toUtf8());
+			stmt.bind(1, noteid.toStdString().c_str());
 
-		nRowsChanged = stmt.execDML();
-		Q_ASSERT(nRowsChanged == 1);
+			nRowsChanged = stmt.execDML();
+			Q_ASSERT(nRowsChanged == 1);
+		}
+
+		pNote->SetId(SysAllocString(noteid.toStdWString().c_str()));
 
 		com_sptr<ISchedules> spSchedules;
 		pApp->GetSchedules(&spSchedules);
@@ -455,6 +462,12 @@ bool DbService::RemoveSchedule(INoteApplication* pApp, INote* pNote)
 	QString sql = QString("DELETE FROM SCHEDULES WHERE note_id = '%1'").arg(noteid);
 	int ret = m_db.execDML(sql.toUtf8());
 	Q_ASSERT(ret == 1);
+
+	HRESULT hr = spSchedules->RemoveNote(pNote);
+	if (FAILED(hr))
+	{
+		Q_ASSERT(false);
+	}
 	return true;
 }
 

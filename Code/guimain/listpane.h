@@ -125,6 +125,7 @@ signals:
 	void newnote(NOTE_TYPE);
 	void expand_changed(const QModelIndex&);
 	void addnotebook();
+	void addschedule();
 	void clicked(const QModelIndex&);
 
 private slots:

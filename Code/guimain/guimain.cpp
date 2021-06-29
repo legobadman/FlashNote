@@ -59,7 +59,7 @@ int WINAPI WinMain(__in HINSTANCE hInstance,
 	const char* field = query.fieldName(0);
 	const char* wtf = query.getStringField(field);
 
-	DbService& db = DbService::GetInstance(AppHelper::GetProgDataPath() + "/" + "database");
+	DbService& db = DbService::GetInstance();
 	db.reconstruct();
 
 #else

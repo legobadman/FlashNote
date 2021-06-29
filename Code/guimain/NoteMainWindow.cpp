@@ -95,7 +95,7 @@ void NoteMainWindow::onAddNotebook()
 #ifdef USE_RPC
 			bool ret = RPCService::GetInstance().SynchronizeNotebook(spNotebook);
 #else
-			bool ret = DbService::GetInstance(AppHelper::GetDbPath()).SynchronizeNotebook(spNotebook);
+			bool ret = DbService::GetInstance().SynchronizeNotebook(spNotebook);
 #endif
 			Q_ASSERT(ret);
 		}
@@ -114,7 +114,7 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
 	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM)
 	{
-		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
+		m_ui->stackedWidget2->setCurrentWidget(m_ui->notesview);
 		QString bookid = index.data(ItemCoreObjIdRole).toString();
 		com_sptr<INotebooks> spNotebooks;
 		coreApp->GetNotebooks(&spNotebooks);
@@ -132,19 +132,23 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
 	{
-		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTEBOOKS_VIEW);
+		m_ui->stackedWidget2->setCurrentWidget(m_ui->booksview);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_TRASH)
 	{
-		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
+		m_ui->stackedWidget2->setCurrentWidget(m_ui->notesview);
 		com_sptr<ITrash> spTrash;
 		coreApp->GetTrash(&spTrash);
 		m_ui->notesview->setNotebook(VIEW_TRASH, spTrash);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_ALLNOTE)
 	{
-		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
+		m_ui->stackedWidget2->setCurrentWidget(m_ui->notesview);
 		m_ui->notesview->setNotebook(VIEW_ALLNOTES, NULL);
+	}
+	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULE)
+	{
+		m_ui->stackedWidget2->setCurrentWidget(m_ui->schedulesview);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM)
 	{

@@ -186,7 +186,7 @@ void NoteEditWindow::saveNote()
 #ifdef USE_RPC
 	bool ret = RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
 #else
-	bool ret = DbService::GetInstance(AppHelper::GetDbPath()).SynchronizeNote(coreApp, spNotebook, m_pNote);
+	bool ret = DbService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
 #endif
 	if (ret)
 	{
@@ -210,7 +210,7 @@ void NoteEditWindow::saveMindMap()
 #ifdef USE_RPC
 	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
 #else
-	DbService::GetInstance(AppHelper::GetDbPath()).SynchronizeNote(coreApp, spNotebook, m_pNote);
+	DbService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
 #endif
 }
 
@@ -226,7 +226,7 @@ void NoteEditWindow::saveSchedule()
 	m_pNote->SetContent(bstrMap);
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 
-	DbService::GetInstance(AppHelper::GetDbPath()).SynchronizeSchedule(coreApp, m_pNote);
+	DbService::GetInstance().SynchronizeSchedule(coreApp, m_pNote);
 }
 
 void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
@@ -234,7 +234,7 @@ void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
 	if (m_pNotebook == pNewbook)
 		return;
 
-	bool ret = DbService::GetInstance(AppHelper::GetDbPath()).MoveNotebook(m_pNotebook, pNewbook, m_pNote);
+	bool ret = DbService::GetInstance().MoveNotebook(m_pNotebook, pNewbook, m_pNote);
 	if (ret)
 	{
 		updateBookMenu(pNewbook);
