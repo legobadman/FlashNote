@@ -60,6 +60,10 @@ public:
 
 	bool insertRow(INote* pNote);
 
+signals:
+	void rowRemoved(int);
+	void rowInserted(int);
+
 public:
 	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, _COM_Outptr_ void __RPC_FAR* __RPC_FAR*) { return E_NOTIMPL; }
 	ULONG STDMETHODCALLTYPE AddRef(void) { return 1; }

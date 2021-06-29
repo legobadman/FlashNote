@@ -143,9 +143,40 @@ void BookListView::MenuActionSlot(QAction* action)
 	}
 }
 
+void BookListView::onRowInserted(int row)
+{
+	QAbstractItemModel* pModel = m_ui->listView->model();
+	m_ui->lblNumberNotes->setText(QString(u8"%1条笔记").arg(QString::number(pModel->rowCount())));
+
+	QModelIndex idx = pModel->index(row, 0);
+	m_ui->listView->setCurrentIndex(idx);
+	emit noteitemselected(idx);
+}
+
+void BookListView::onRowRemoved(int row)
+{
+	QAbstractItemModel* pModel = m_ui->listView->model();
+	int n = pModel->rowCount();
+	m_ui->lblNumberNotes->setText(QString(u8"%1条笔记").arg(QString::number(n)));
+
+	if (n > 0 && row >= 0)
+	{
+		QModelIndex idx = pModel->index(row, 0);
+		m_ui->listView->setCurrentIndex(idx);
+		emit noteitemselected(idx);
+	}
+	else
+	{
+		emit noteitemselected(QModelIndex());
+	}
+}
+
 void BookListView::resetModel(BookViewModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
 {
 	m_ui->listView->setModel(pModel);
+	connect(pModel, SIGNAL(rowRemoved(int)), this, SLOT(onRowRemoved(int)));
+	connect(pModel, SIGNAL(rowInserted(int)), this, SLOT(onRowInserted(int)));
+
 	QModelIndex selectedIndex = pModel->index(0, 0);
 	m_ui->listView->setCurrentIndex(selectedIndex);
 

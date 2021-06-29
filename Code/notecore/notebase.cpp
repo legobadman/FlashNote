@@ -234,7 +234,7 @@ HRESULT NotebookBase::RemoveNote(INote* pNote)
 	HRESULT hr = _base::RemoveNote(pNote);
 	if (SUCCEEDED(hr))
 	{
-		pNote->SetBookId(CComBSTR());
+		pNote->SetBookId(CComBSTR(""));
 	}
 	return hr;
 }

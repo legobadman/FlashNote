@@ -465,6 +465,10 @@ bool DbService::DeleteNote(ITrash* pTrash, INote* pNote)
 	int ret = m_db.execDML(sql.toUtf8());
 	Q_ASSERT(ret == 1);
 
+	sql = QString("DELETE FROM NOTE WHERE ID = '%1';").arg(noteid);
+	ret = m_db.execDML(sql.toUtf8());
+	Q_ASSERT(ret == 1);
+
 	HRESULT hr = pTrash->RemoveNote(pNote);
 	Q_ASSERT(hr == S_OK);
 	return true;
@@ -546,6 +550,12 @@ bool DbService::RecoverNote(INoteApplication* pApp, ITrash* pSrcNoteColl, INote*
 	QString trashId = query.getStringField("ID");
 	QString bookid = query.getStringField("srcbook_id");
 
+	sql = QString("DELETE FROM TRASH WHERE note_id = '%1'").arg(noteid);
+	int rowsChanged = m_db.execDML(sql.toUtf8());
+	Q_ASSERT(rowsChanged == 1);
+
+	pSrcNoteColl->RemoveNote(pNote);
+
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebookById(bookid, &spNotebook);
 	if (!spNotebook)
@@ -570,7 +580,6 @@ bool DbService::RecoverNote(INoteApplication* pApp, ITrash* pSrcNoteColl, INote*
 	Q_ASSERT(nRowsChanged == 1);
 
 	spNotebook->AddNote(pNote);
-	pSrcNoteColl->RemoveNote(pNote);
 
 	return true;
 }

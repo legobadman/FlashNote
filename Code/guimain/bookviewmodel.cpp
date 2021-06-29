@@ -142,14 +142,17 @@ HRESULT BookViewModel::onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg
 		{
 			m_mapper.remove(noteid);
 			//暂时用遍历的方式去掉
+			int rowsRemoved = -1;
 			for (int i = 0; i < m_vec.size(); i++)
 			{
 				if (m_vec[i]->m_id == noteid)
 				{
+					rowsRemoved = i;
 					m_vec.removeAt(i);
 					break;
 				}
 			}
+			emit rowRemoved(rowsRemoved);
 			break;
 		}
 		case NotifyOperator::Update:
@@ -218,6 +221,7 @@ bool BookViewModel::insertRow(INote* pNote)
 	pItem->m_spNote = pNote;
 	m_vec.push_back(pItem);
 	m_mapper.insert(noteid, pItem);
+	emit rowInserted(m_vec.size() - 1);
 
 	endInsertRows();
 	return false;

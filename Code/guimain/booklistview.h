@@ -35,6 +35,8 @@ signals:
 public slots:
 	void onCustomContextMenu(const QPoint& point);
 	void MenuActionSlot(QAction *action);
+	void onRowRemoved(int);
+	void onRowInserted(int);
 
 private:
 	Ui::BookListView* m_ui;
