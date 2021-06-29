@@ -92,6 +92,16 @@ void MindNode::initDirection()
 	}
 }
 
+bool MindNode::hasLeftChildren()
+{
+	for (auto it = m_children.begin(); it != m_children.end(); it++)
+	{
+		if (!(*it)->isToRight())
+			return true;
+	}
+	return false;
+}
+
 void MindNode::resetDecoration()
 {
 	if (needShowDecoration())
@@ -349,14 +359,14 @@ bool MindNode::sceneEvent(QEvent* event)
 	return QGraphicsTextItem::sceneEvent(event);
 }
 
-void MindNode::SetContent(const std::wstring& content)
+void MindNode::SetContent(const std::string& content)
 {
-	m_content = QString::fromStdWString(content);
+	m_content = QString::fromStdString(content);
 }
 
-std::wstring MindNode::GetContent() const
+std::string MindNode::GetContent() const
 {
-	return m_content.toStdWString();
+	return m_content.toStdString();
 }
 
 void MindNode::append(MindNode* pNode)

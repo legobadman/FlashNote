@@ -8,7 +8,7 @@
 
 using namespace rapidxml;
 
-typedef xml_node<WCHAR> XML_NODE;
+typedef xml_node<> XML_NODE;
 
 class MindMapScene : public QGraphicsScene
 {
@@ -37,9 +37,9 @@ private:
 	QRectF arrangeItemPosition(QPoint rootLT, MindNode* pItem, bool toRight);
 	void adjustAllItemPos(MindNode* pRoot, int xoffset, int yoffset, bool bOnlyRightside);
 	void appendPaths(MindNode* pRoot);
-	MindNode* parseXML(const std::wstring& content);
-	XML_NODE* _export(MindNode* root, xml_document<WCHAR>& doc);
-	MindNode* _parse(xml_node<WCHAR>* root, int level);
+	MindNode* parseXML(const std::string& content);
+	XML_NODE* _export(MindNode* root, xml_document<>& doc);
+	MindNode* _parse(xml_node<>* root, int level);
 
 private:
 	MindNode* m_pRoot;

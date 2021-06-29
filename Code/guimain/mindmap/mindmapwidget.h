@@ -9,8 +9,6 @@
 
 using namespace rapidxml;
 
-typedef xml_node<WCHAR> XML_NODE;
-
 class MindMapWidget : public QWidget
 {
 	Q_OBJECT

@@ -23,20 +23,19 @@ void MindMapScene::initContent(QString content, bool bSchedule)
 	clear();
 	m_pRoot = NULL;		//TODO: 有没有更好的写法？比如gardpointer
 	m_pathItems.clear();
-	std::wstring wstr = content.toStdWString();
-	m_pRoot = parseXML(wstr);
+	m_pRoot = parseXML(content.toStdString());
 	arrangeAllItems();
 	update();
 }
 
 QString MindMapScene::mindmapXML()
 {
-	xml_document<WCHAR> doc;
+	xml_document<> doc;
 	XML_NODE* root = _export(m_pRoot, doc);
 	doc.append_node(root);
 
-	WCHAR buffer[4096];                      // You are responsible for making the buffer large enough!
-	WCHAR* end = print(buffer, doc, 0);
+	char buffer[4096];              // You are responsible for making the buffer large enough!
+	char* end = print(buffer, doc, 0);
 	*end = L'\0';
 	return QString::fromUtf16((char16_t*)buffer);
 }
@@ -221,10 +220,13 @@ void MindMapScene::arrangeAllItems()
 		Q_ASSERT(false);
 	}
 
-	//调整位置策略：1.根节点在(0,0)。2.boundingbox中心在(0,0)
-	int xoffset = 0 - boundingRect.center().x();
-	int yoffset = 0 - boundingRect.center().y();
-	adjustAllItemPos(m_pRoot, xoffset, yoffset, false);
+	if (!m_pRoot->children().isEmpty())
+	{
+		//调整位置策略：1.根节点在(0,0)。2.boundingbox中心在(0,0)
+		int xoffset = 0 - boundingRect.center().x();
+		int yoffset = 0 - boundingRect.center().y();
+		adjustAllItemPos(m_pRoot, xoffset, yoffset, false);
+	}
 
 	appendPaths(m_pRoot);
 }
@@ -374,39 +376,39 @@ void MindMapScene::appendPaths(MindNode* pRoot)
 	}
 }
 
-MindNode* MindMapScene::parseXML(const std::wstring& content)
+MindNode* MindMapScene::parseXML(const std::string& content)
 {
-	xml_document<WCHAR> doc;
-	doc.parse<0>((LPWSTR)content.c_str());
-	xml_node<WCHAR>* root = doc.first_node();
+	xml_document<> doc;
+	doc.parse<0>(const_cast<char*>(content.c_str()));
+	xml_node<>* root = doc.first_node();
 	MindNode* pRoot = _parse(root, 0);
 	setupNode(pRoot);
 	clearSelection();
 	return pRoot;
 }
 
-XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<WCHAR>& doc)
+XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<>& doc)
 {
-	std::wstring value = pRoot->GetContent();
+	std::string value = pRoot->GetContent();
 
-	XML_NODE* root = doc.allocate_node(node_element, L"node");
+	XML_NODE* root = doc.allocate_node(node_element, "node");
 
-	xml_attribute<WCHAR>* attr = doc.allocate_attribute(L"text",
+	xml_attribute<>* attr = doc.allocate_attribute("text",
 		doc.allocate_string(value.c_str()));
 	root->append_attribute(attr);
 
 	//level 1的节点需要记录方向。
 	if (pRoot->level() == 1)
 	{
-		attr = doc.allocate_attribute(L"to_right", 
-			doc.allocate_string(QString::number(pRoot->isToRight()).toStdWString().c_str()));
+		attr = doc.allocate_attribute("to_right", 
+			doc.allocate_string(QString::number(pRoot->isToRight()).toStdString().c_str()));
 		root->append_attribute(attr);
 	}
 
 	if (!pRoot->noteid().isEmpty())
 	{
-		xml_attribute<WCHAR>* attr = doc.allocate_attribute(L"noteid",
-			doc.allocate_string(pRoot->noteid().toStdWString().c_str()));
+		xml_attribute<>* attr = doc.allocate_attribute("noteid",
+			doc.allocate_string(pRoot->noteid().toStdString().c_str()));
 		root->append_attribute(attr);
 	}
 
@@ -415,19 +417,19 @@ XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<WCHAR>& doc)
 	MindProgressNode* pProgress = qobject_cast<MindProgressNode*>(pRoot);
 	if (pProgress)
 	{
-		attr = doc.allocate_attribute(L"is_progress", L"1");
+		attr = doc.allocate_attribute("is_progress", "1");
 		root->append_attribute(attr);
 
 		if (children.isEmpty())
 		{
 			float progress = pProgress->progress();
-			attr = doc.allocate_attribute(L"progress_value",
-				doc.allocate_string(QString::number(progress).toStdWString().c_str()));
+			attr = doc.allocate_attribute("progress_value",
+				doc.allocate_string(QString::number(progress).toStdString().c_str()));
 			root->append_attribute(attr);
 
 			float hours = pProgress->workHours();
-			attr = doc.allocate_attribute(L"working_hours",
-				doc.allocate_string(QString::number(hours).toStdWString().c_str()));
+			attr = doc.allocate_attribute("working_hours",
+				doc.allocate_string(QString::number(hours).toStdString().c_str()));
 			root->append_attribute(attr);
 		}
 	}
@@ -441,7 +443,7 @@ XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<WCHAR>& doc)
 	return root;
 }
 
-MindNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
+MindNode* MindMapScene::_parse(xml_node<>* root, int level)
 {
 	MindNode* pRoot = NULL;
 	MindProgressNode* pProgress = NULL;
@@ -456,43 +458,43 @@ MindNode* MindMapScene::_parse(xml_node<WCHAR>* root, int level)
 	}
 
 	pRoot->setLevel(level);
-	for (xml_attribute<WCHAR>* attr = root->first_attribute();
+	for (xml_attribute<>* attr = root->first_attribute();
 		attr;
 		attr = attr->next_attribute())
 	{
-		std::wstring attr_name = attr->name();
-		std::wstring value = attr->value();
+		std::string attr_name = attr->name();
+		std::string value = attr->value();
 
-		if (attr_name == L"text")
+		if (attr_name == "text")
 		{
 			pRoot->SetContent(value);
 		}
-		if (attr_name == L"to_right")
+		if (attr_name == "to_right")
 		{
-			bool toRight = _wtoi(value.c_str());
+			bool toRight = std::stoi(value.c_str());
 			pRoot->setToRight(toRight);
 		}
-		if (attr_name == L"noteid")
+		if (attr_name == "noteid")
 		{
-			pRoot->setNoteId(QString::fromStdWString(value.c_str()));
+			pRoot->setNoteId(QString::fromStdString(value.c_str()));
 		}
 
 		if (pProgress)
 		{
-			if (attr_name == L"progress_value")
+			if (attr_name == "progress_value")
 			{
-				float progress = _wtof(value.c_str());
+				float progress = std::stof(value.c_str());
 				pProgress->setProgress(progress);
 			}
-			if (attr_name == L"working_hours")
+			if (attr_name == "working_hours")
 			{
-				float hours = _wtof(value.c_str());
+				float hours = std::stof(value.c_str());
 				pProgress->setWorkhours(hours);
 			}
 		}
 	}
 
-	for (xml_node<WCHAR>* child = root->first_node();
+	for (xml_node<>* child = root->first_node();
 		child != NULL;
 		child = child->next_sibling())
 	{

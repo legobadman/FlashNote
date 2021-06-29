@@ -39,6 +39,7 @@ public:
 	void setLevel(int nLevel) { m_level = nLevel; }
 	bool isToRight() { return m_bToRight; }
 	void setToRight(bool toRight) { m_bToRight = toRight; }
+	bool hasLeftChildren();
 	QString noteid() const { return m_noteid; }
 	void setNoteId(const QString& noteid) { m_noteid = noteid; }
 	int level() const { return m_level; }
@@ -68,8 +69,8 @@ public slots:
 	void onNewNote(const QString&);
 
 public:
-	void SetContent(const std::wstring& content);
-	std::wstring GetContent() const;
+	void SetContent(const std::string& content);
+	std::string GetContent() const;
 	QRectF boundingRect() const override;
 
 protected:
