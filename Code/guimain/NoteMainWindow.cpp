@@ -46,7 +46,7 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 	QModelIndex idx = m_ui->listpane->treeview()->model()->index(1, 0);
 	m_ui->listpane->treeview()->expand(idx);
 
-	idx = m_ui->listpane->treeview()->model()->index(5, 0);
+	idx = m_ui->listpane->treeview()->model()->index(2, 0);
 	m_ui->listpane->treeview()->expand(idx);
 
 	//最左边项的选择。
@@ -73,9 +73,18 @@ void NoteMainWindow::onNewNote(NOTE_TYPE noteType)
 {
 	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, noteType);
 	if (noteType == SCHEDULE)
+	{
 		pNewNoteWindow->initSchedule();
+	}
 	else
-		pNewNoteWindow->init(getActiveBookId());
+	{
+		QString bookId = getActiveBookId();
+		if (bookId.isEmpty())
+		{
+			return;
+		}
+		pNewNoteWindow->init(bookId);
+	}
 	pNewNoteWindow->show();
 }
 

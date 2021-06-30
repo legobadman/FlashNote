@@ -37,7 +37,7 @@ QString MindMapScene::mindmapXML()
 	char buffer[4096];              // You are responsible for making the buffer large enough!
 	char* end = print(buffer, doc, 0);
 	*end = L'\0';
-	return QString::fromUtf16((char16_t*)buffer);
+	return QString::fromUtf8(buffer);
 }
 
 MindProgressNode* MindMapScene::newProgressNode(MindProgressNode* pRoot, const QString& text, float progress)
@@ -389,7 +389,7 @@ MindNode* MindMapScene::parseXML(const std::string& content)
 
 XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<>& doc)
 {
-	std::string value = pRoot->GetContent();
+	std::string value = pRoot->GetContent().toStdString();
 
 	XML_NODE* root = doc.allocate_node(node_element, "node");
 
@@ -467,7 +467,7 @@ MindNode* MindMapScene::_parse(xml_node<>* root, int level)
 
 		if (attr_name == "text")
 		{
-			pRoot->SetContent(value);
+			pRoot->SetContent(QString::fromUtf8(value.c_str()));
 		}
 		if (attr_name == "to_right")
 		{

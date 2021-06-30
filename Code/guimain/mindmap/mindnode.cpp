@@ -359,14 +359,14 @@ bool MindNode::sceneEvent(QEvent* event)
 	return QGraphicsTextItem::sceneEvent(event);
 }
 
-void MindNode::SetContent(const std::string& content)
+void MindNode::SetContent(const QString& content)
 {
-	m_content = QString::fromStdString(content);
+	m_content = content;
 }
 
-std::string MindNode::GetContent() const
+QString MindNode::GetContent() const
 {
-	return m_content.toStdString();
+	return m_content;
 }
 
 void MindNode::append(MindNode* pNode)

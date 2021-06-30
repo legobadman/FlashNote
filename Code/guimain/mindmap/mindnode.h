@@ -69,8 +69,8 @@ public slots:
 	void onNewNote(const QString&);
 
 public:
-	void SetContent(const std::string& content);
-	std::string GetContent() const;
+	void SetContent(const QString& content);
+	QString GetContent() const;
 	QRectF boundingRect() const override;
 
 protected:
