@@ -27,7 +27,7 @@ private slots:
 	void onCreateChildNode(MindNode* pRoot, bool);
 	void onCreateSlibingNode(MindNode* pNode);
 	void onDeleteNode(MindNode* pNode);
-	void onItemTextChanged();
+	void onNodeContentsChanged();
 
 private:
 	void onRedrawItems();

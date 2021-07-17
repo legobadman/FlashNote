@@ -121,10 +121,11 @@ void MindMapScene::onDeleteNode(MindNode* pNode)
 	onRedrawItems();
 }
 
-void MindMapScene::onItemTextChanged()
+void MindMapScene::onNodeContentsChanged()
 {
-	onRedrawItems();
-	emit itemContentChanged();
+	//TODO: 目前规模下看起来没太多问题，以后再优化单个点及子节点的更新
+	if (m_pRoot)
+		onRedrawItems();
 }
 
 void MindMapScene::onRedrawItems()
@@ -143,7 +144,8 @@ void MindMapScene::onRedrawItems()
 void MindMapScene::setupNode(MindNode* node)
 {
 	ScopeBlockSIG scope(node);
-	connect(node, SIGNAL(textChange()), this, SLOT(onItemTextChanged()));
+	if (node->document())
+		connect(node->document(), SIGNAL(contentsChanged()), this, SLOT(onNodeContentsChanged()));
 	connect(node, SIGNAL(dataChanged()), this, SIGNAL(itemContentChanged()));
 	connect(node, SIGNAL(childNodeCreate(MindNode*, bool)), this, SLOT(onCreateChildNode(MindNode*, bool)));
 	connect(node, SIGNAL(silibingNodeCreate(MindNode*)), this, SLOT(onCreateSlibingNode(MindNode*)));
