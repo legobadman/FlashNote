@@ -4,6 +4,24 @@
 #include "mindnodebutton.h"
 #include "mindprogressnode.h"
 
+class ScopeBlockSIG
+{
+public:
+	ScopeBlockSIG(MindNode* pNode) : m_node(pNode)
+	{
+		if (m_node)
+			m_node->blockSignals(true);
+	}
+	~ScopeBlockSIG()
+	{
+		if (m_node)
+			m_node->blockSignals(false);
+	}
+
+private:
+	MindNode* m_node;
+};
+
 
 MindMapScene::MindMapScene(QObject* parent)
 	: QGraphicsScene(parent)
@@ -34,7 +52,7 @@ QString MindMapScene::mindmapXML()
 	XML_NODE* root = _export(m_pRoot, doc);
 	doc.append_node(root);
 
-	char buffer[4096];              // You are responsible for making the buffer large enough!
+	char buffer[40960];              // You are responsible for making the buffer large enough!
 	char* end = print(buffer, doc, 0);
 	*end = L'\0';
 	return QString::fromUtf8(buffer);
@@ -124,6 +142,7 @@ void MindMapScene::onRedrawItems()
 
 void MindMapScene::setupNode(MindNode* node)
 {
+	ScopeBlockSIG scope(node);
 	connect(node, SIGNAL(textChange()), this, SLOT(onItemTextChanged()));
 	connect(node, SIGNAL(dataChanged()), this, SIGNAL(itemContentChanged()));
 	connect(node, SIGNAL(childNodeCreate(MindNode*, bool)), this, SLOT(onCreateChildNode(MindNode*, bool)));
