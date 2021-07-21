@@ -10,4 +10,11 @@ enum BOOKVIEW_TYPE
 
 Q_DECLARE_METATYPE(com_sptr<INote>)
 
+enum EXPAND_STATE
+{
+	EXP_NODEFINE,
+	EXP_COLLAPSE,
+	EXP_EXPAND
+};
+
 #endif

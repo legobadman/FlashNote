@@ -22,12 +22,9 @@ signals:
 	void itemContentChanged();
 
 private:
-	MindMapScene* m_scene;
-	MindMapView* m_view;
+	QPointer<MindMapScene> m_scene;
+	QPointer<MindMapView> m_view;
 	MindNode* m_pRoot;
-
-	QAction* m_pAddNode;
-	QAction* m_pAddLink;
 };
 
 

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "mindmapscene.h"
 #include "mindprogressnode.h"
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QGraphicsView>
@@ -7,63 +8,53 @@
 #include <QTooltip>
 
 
-MindProgressNode::MindProgressNode(const QString& text, MindProgressNode* parent)
+MindProgressNode::MindProgressNode(const QString& text, MindNode* parent)
 	: MindNode(text, parent)
 	, m_progress(0.0)
 	, m_workinghours(0.0)
-	, m_tipItem(new QGraphicsPixmapItem)
+	, m_tipItem(NULL)
 {
+	m_tipItem = new QGraphicsPixmapItem(this);
 }
 
 MindProgressNode::~MindProgressNode()
 {
-	if (m_tipItem != NULL)
-	{
-		scene()->removeItem(m_tipItem);
-		m_tipItem = NULL;
-	}
+	if (m_tipItem)
+		delete m_tipItem;
 }
 
-void MindProgressNode::setup()
+void MindProgressNode::setup(MindMapScene* pScene)
 {
-	if (m_level == 0)
-	{
-		m_backgroudColor = QColor(242, 242, 242);
-		m_highlightedBorder = QColor(23, 157, 235);
-		m_selectedBorder = QColor(23, 157, 235);
-		m_borderFocusout = QColor(m_backgroudColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
-	}
-	else if (m_level == 1) {
-		m_highlightedBorder = QColor(136, 203, 242);
-		m_selectedBorder = QColor(23, 157, 235);
-		m_backgroudColor = QColor(242, 242, 242);
-		m_borderFocusout = QColor(m_backgroudColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
-	}
-	else if (m_level >= 2) {
-		m_highlightedBorder = QColor(136, 203, 242);
-		m_selectedBorder = QColor(23, 157, 235);
-		m_backgroudColor = QColor(255, 255, 255);
-		m_borderFocusout = QColor(m_backgroudColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
-	}
-
-	init();
+	MindNode::setup(pScene);
 	updateNodeColor();
-	scene()->addItem(m_tipItem);
-
 	if (m_children.isEmpty() && m_parent)
 	{
 		updateToParent();
 	}
-
 	QGraphicsTextItem::setProgress(m_progress);
-
 	updateToolTip();
+}
+
+void MindProgressNode::initUIColor()
+{
+	m_selectedBorder = QColor(23, 157, 235);
+	if (m_children.empty())
+	{
+		m_backgroudColor = QColor(255, 255, 255);
+		m_highlightedBorder = QColor(23, 157, 235);
+	}
+	else
+	{
+		m_backgroudColor = QColor(242, 242, 242);
+		m_highlightedBorder = QColor(136, 203, 242);
+	}
+	m_borderFocusout = QColor(m_backgroudColor);	//由于文本框的绘制策略，只能将同色的边框视为无边框。
 }
 
 void MindProgressNode::updateNodeColor()
 {
 	m_textColor = QColor(0, 0, 0);
-	if (m_level >= 2)
+	if (m_children.empty())
 	{
 		QGraphicsTextItem::setProgressColor(QColor(255, 255, 255), QColor(255, 255, 255));
 	}
@@ -72,7 +63,6 @@ void MindProgressNode::updateNodeColor()
 void MindProgressNode::initMenu()
 {
 	MindNode::initMenu();
-
 	if (children().empty())
 	{
 		m_pMenu->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
@@ -152,6 +142,16 @@ void MindProgressNode::setPosition(QPointF pos)
 	adjustIndicator();
 }
 
+void MindProgressNode::onDeleteNode()
+{
+	MindNode::onDeleteNode();
+	MindProgressNode* progressNode = qobject_cast<MindProgressNode*>(m_parent);
+	if (progressNode)
+	{
+		progressNode->updateStatus();
+	}
+}
+
 void MindProgressNode::updateTipIcon()
 {
 	if (m_tipItem)
@@ -180,7 +180,7 @@ void MindProgressNode::adjustIndicator()
 	if (m_tipItem)
 	{
 		m_tipItem->setZValue(zValue() + 1);
-		m_tipItem->setPos(pos() + boundingRect().bottomRight() - QPointF(12, 12));
+		m_tipItem->setPos(boundingRect().bottomRight() - QPointF(12, 12));
 	}
 }
 
@@ -211,7 +211,7 @@ void MindProgressNode::updateStatus()
 	float totalFinished = 0.0;
 	for (auto it = m_children.begin(); it != m_children.end(); it++)
 	{
-		MindProgressNode* pNode = qobject_cast<MindProgressNode*>(*it);
+		MindProgressNode* pNode = qobject_cast<MindProgressNode*>((*it));
 		Q_ASSERT(pNode);
 		float hours = pNode->workHours();
 		float progress = pNode->progress();

@@ -3,16 +3,27 @@
 
 #include <QtWidgets/qgraphicsitem.h>
 
-class MindNodeButton : public QGraphicsItem
+class MindNode;
+
+class MindNodeButton : public QGraphicsObject
 {
+	Q_OBJECT
 public:
-	MindNodeButton(float r, QGraphicsItem* parent = nullptr);
+	MindNodeButton(MindNode* parent = nullptr);
 	QRectF boundingRect() const override;
 	QPainterPath shape() const;
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
+	static const float m_radius;
+
+protected:
+	bool sceneEvent(QEvent* event) override;
+
+signals:
+	void toggled();
+
 private:
-	float m_radius;
+	MindNode* m_pNode;
 };
 
 #endif

@@ -31,6 +31,7 @@
 #include "notecore.h"
 #include "notecoreinit.h"
 #include "note_types.h"
+#include "common_types.h"
 
 //#define USE_RPC
 

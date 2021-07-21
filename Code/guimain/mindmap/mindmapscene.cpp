@@ -4,43 +4,24 @@
 #include "mindnodebutton.h"
 #include "mindprogressnode.h"
 
-class ScopeBlockSIG
-{
-public:
-	ScopeBlockSIG(MindNode* pNode) : m_node(pNode)
-	{
-		if (m_node)
-			m_node->blockSignals(true);
-	}
-	~ScopeBlockSIG()
-	{
-		if (m_node)
-			m_node->blockSignals(false);
-	}
-
-private:
-	MindNode* m_node;
-};
-
 
 MindMapScene::MindMapScene(QObject* parent)
 	: QGraphicsScene(parent)
 	, m_bSchedule(false)
 	, m_pRoot(NULL)
 {
-
 }
 
 MindMapScene::~MindMapScene()
 {
+	clear();
+	m_pRoot = NULL;
 }
 
 void MindMapScene::initContent(QString content, bool bSchedule)
 {
 	m_bSchedule = bSchedule;
 	clear();
-	m_pRoot = NULL;		//TODO: 有没有更好的写法？比如gardpointer
-	m_pathItems.clear();
 	m_pRoot = parseXML(content.toStdString());
 	arrangeAllItems();
 	update();
@@ -58,208 +39,82 @@ QString MindMapScene::mindmapXML()
 	return QString::fromUtf8(buffer);
 }
 
-MindProgressNode* MindMapScene::newProgressNode(MindProgressNode* pRoot, const QString& text, float progress)
+void MindMapScene::onNodeCreated(MindNode* pChild)
 {
-	MindProgressNode* node = new MindProgressNode(text, pRoot);
-	node->setProgress(progress);
-	setupNode(node);
-	return node;
-}
-
-void MindMapScene::onCreateChildNode(MindNode* pRoot, bool bRight)
-{
-	MindNode* pChild = NULL;
-	if (m_bSchedule)
-	{
-		MindProgressNode* pRoot_ = qobject_cast<MindProgressNode*>(pRoot);
-		Q_ASSERT(pRoot_);
-		pChild = new MindProgressNode(u8"进度节点", pRoot_);
-	}
-	else
-	{
-		pChild = new MindNode(u8"新增节点", pRoot);
-	}
-	pChild->setToRight(bRight);
-	pRoot->append(pChild);
-	pChild->setLevel(pRoot->level() + 1);
-	setupNode(pChild);
-
+	//目前暂时只需重绘
+	pChild->setup(this);
 	onRedrawItems();
 }
 
-void MindMapScene::onCreateSlibingNode(MindNode* pNode)
+void MindMapScene::onNodeDeleted(MindNode* pChild)
 {
-	MindNode* parent = pNode->Parent();
-	MindNode* pChild = NULL;
-	if (m_bSchedule)
-	{
-		MindProgressNode* pRoot_ = qobject_cast<MindProgressNode*>(parent);
-		Q_ASSERT(pRoot_);
-		pChild = new MindProgressNode(u8"进度节点", pRoot_);
-	}
-	else
-	{
-		pChild = new MindNode(u8"新增节点", parent);
-	}
-	pChild->setToRight(pNode->isToRight());
-	pChild->setLevel(pNode->level());
-	parent->append(pChild);
-	setupNode(pChild);
-
-	onRedrawItems();
-}
-
-void MindMapScene::onDeleteNode(MindNode* pNode)
-{
-	pNode->Parent()->removeNode(pNode);
-	MindProgressNode* progressNode = qobject_cast<MindProgressNode*>(pNode->Parent());
-	if (progressNode)
-	{
-		progressNode->updateStatus();
-	}
-	unsetupNode(pNode);
+	removeItem(pChild);
 	onRedrawItems();
 }
 
 void MindMapScene::onNodeContentsChanged()
 {
 	//TODO: 目前规模下看起来没太多问题，以后再优化单个点及子节点的更新
-	if (m_pRoot)
-		onRedrawItems();
+	onRedrawItems();
 }
 
 void MindMapScene::onRedrawItems()
 {
-	for (auto it = m_pathItems.begin(); it != m_pathItems.end(); it++)
-	{
-		removeItem(*it);
-	}
-	m_pathItems.clear();
 	arrangeAllItems();
 	clearSelection();
 	update();
 	emit itemContentChanged();
 }
 
-void MindMapScene::setupNode(MindNode* node)
-{
-	ScopeBlockSIG scope(node);
-	if (node->document())
-		connect(node->document(), SIGNAL(contentsChanged()), this, SLOT(onNodeContentsChanged()));
-	connect(node, SIGNAL(dataChanged()), this, SIGNAL(itemContentChanged()));
-	connect(node, SIGNAL(childNodeCreate(MindNode*, bool)), this, SLOT(onCreateChildNode(MindNode*, bool)));
-	connect(node, SIGNAL(silibingNodeCreate(MindNode*)), this, SLOT(onCreateSlibingNode(MindNode*)));
-	connect(node, SIGNAL(deleteNode(MindNode*)), this, SLOT(onDeleteNode(MindNode*)));
-	addItem(node);
-	const QList<MindNode*>& children = node->children();
-	for (auto it = children.begin(); it != children.end(); it++)
-	{
-		setupNode(*it);
-	}
-	node->setup();
-}
-
-void MindMapScene::unsetupNode(MindNode* node)
-{
-	const QList<MindNode*>& children = node->children();
-	for (auto it = children.begin(); it != children.end(); it++)
-	{
-		unsetupNode(*it);
-	}
-	removeItem(node);
-}
-
-void MindMapScene::adjustAllItemPos(MindNode* pRoot, int xoffset, int yoffset, bool bOnlyRightside)
-{
-	if (bOnlyRightside)
-	{
-		// 只调右边的点，不需要动根节点。
-		if (pRoot != m_pRoot)
-			pRoot->setPosition(pRoot->pos() + QPointF(xoffset, yoffset));
-	}
-	else
-	{
-		pRoot->setPosition(pRoot->pos() + QPointF(xoffset, yoffset));
-	}
-	const QList<MindNode*>& children = pRoot->children();
-	for (auto it = children.begin(); it != children.end(); it++)
-	{
-		if (bOnlyRightside)
-		{
-			if ((*it)->isToRight())
-				adjustAllItemPos(*it, xoffset, yoffset, bOnlyRightside);
-		}
-		else
-		{
-			adjustAllItemPos(*it, xoffset, yoffset, bOnlyRightside);
-		}
-	}
-}
-
 void MindMapScene::arrangeAllItems()
 {
-	qreal itemH = m_pRoot->boundingRect().height();
-	qreal itemW = m_pRoot->boundingRect().width();
+	PBOUNDING_NODE pBoundingRoot = construct(m_pRoot, QPoint(0, 0), true, NULL);
 
-	QRectF rRight = arrangeItemPosition(QPoint(0, 0), m_pRoot, true);
-	QPointF oldPos = m_pRoot->pos();
-	QRectF rLeft = arrangeItemPosition(QPoint(0, 0), m_pRoot, false);
+	QRectF rBounding = pBoundingRoot->rrect;
+	int x = rBounding.left() + pBoundingRoot->pNode->boundingRect().width();
+	int y = (rBounding.top() + rBounding.bottom()) / 2;
+	QPoint rootRT(x, y);
 
-	QRectF boundingRect;
-	if (rRight.isValid() && rLeft.isValid())
-	{
-		//移动策略：定左移右。
-		//计算出右边所有节点的偏移量。
-		int xoffset = 0, yoffset = 0;
-		QPointF newPos = m_pRoot->pos();
-		QPointF offset = newPos - oldPos;
-		xoffset = offset.x();
-		yoffset = offset.y();
-
-		rRight.moveTo(rRight.left() + xoffset, rRight.top() + yoffset);
-
-		//对右边所有节点进行移动
-		adjustAllItemPos(m_pRoot, xoffset, yoffset, true);
-
-		//先用rLeft和rRight拼接成一个整体的boundingbox
-		int left = rLeft.left();
-		int right = rRight.right();
-		int top = min(rLeft.top(), rRight.top());
-		int bottom = max(rLeft.bottom(), rRight.bottom());
-		boundingRect = QRectF(QPointF(left, top), QPointF(right, bottom));
-	}
-	else if (rRight.isValid())
-	{
-		boundingRect = rRight;
-	}
-	else if (rLeft.isValid())
-	{
-		boundingRect = rLeft;
-	}
-	else
-	{
-		Q_ASSERT(false);
-	}
-
-	if (!m_pRoot->children().isEmpty())
-	{
-		//调整位置策略：1.根节点在(0,0)。2.boundingbox中心在(0,0)
-		int xoffset = 0 - boundingRect.center().x();
-		int yoffset = 0 - boundingRect.center().y();
-		adjustAllItemPos(m_pRoot, xoffset, yoffset, false);
-	}
-
-	appendPaths(m_pRoot);
+	construct(m_pRoot, rootRT, false, pBoundingRoot);
+	pBoundingRoot->pNode->setPosition(QPointF(0, 0));
+	arrangeItemPosition(pBoundingRoot);
+	return;
 }
 
-QRectF MindMapScene::arrangeItemPosition(QPoint rootLTorRT, MindNode* pRoot, bool toRight)
+void MindMapScene::arrangeItemPosition(PBOUNDING_NODE pBoundingRoot)
+{
+	QPointF currItemPos = pBoundingRoot->pNode->pos();
+	for (auto it = pBoundingRoot->children.begin(); it != pBoundingRoot->children.end(); it++)
+	{
+		PBOUNDING_NODE pChild = *it;
+		QPointF pos = pChild->itemPos(pChild->bRight);
+		QPointF parentPos = pBoundingRoot->itemPos(pChild->bRight);
+		QPointF offset = pos - parentPos;
+		//计算child相对于parent的相对位置。
+		pChild->pNode->setPosition(offset);
+		arrangeItemPosition(pChild);
+	}
+}
+
+PBOUNDING_NODE MindMapScene::construct(MindNode* pRoot, QPoint rootLTorRT, const bool toRight, PBOUNDING_NODE pTopRoot)
 {
 	if (pRoot == NULL)
-		return QRectF();
+		return PBOUNDING_NODE();
 
 	//假设不能换行
 	static int HMargin = 60;
 	static int VMargin = 28;
+
+	PBOUNDING_NODE pBoundingNode;
+	if (pRoot->isTopRoot() && pTopRoot)
+	{
+		pBoundingNode = pTopRoot;
+	}
+	else
+	{
+		pBoundingNode.reset(new BoundingNode());
+	}
+	pBoundingNode->pNode = pRoot;
 
 	const QList<MindNode*>& children = pRoot->children();
 	int n = children.size();
@@ -280,7 +135,10 @@ QRectF MindMapScene::arrangeItemPosition(QPoint rootLTorRT, MindNode* pRoot, boo
 	}
 
 	QRectF boundingRect;
-	if (!children.empty())
+
+	bool bCollasped = ((toRight && pRoot->rightExpandState() != EXP_EXPAND) ||
+		(!toRight && pRoot->leftExpandState() != EXP_EXPAND));
+	if (!children.empty() && !bCollasped)
 	{
 		QVector<QPoint> vecConnectors;
 		bool validItem = false;
@@ -292,109 +150,49 @@ QRectF MindMapScene::arrangeItemPosition(QPoint rootLTorRT, MindNode* pRoot, boo
 				continue;
 			}
 			validItem = true;
-			QRectF rr = arrangeItemPosition(childLTorRT, pChild, toRight);
-			boundingRect = boundingRect | rr;
+			PBOUNDING_NODE pChildNode = construct(pChild, childLTorRT, toRight, NULL);
+			pChildNode->bRight = toRight;
+			pBoundingNode->children.push_back(pChildNode);
+			boundingRect = boundingRect | pChildNode->getRectF();
 			boundingRect.adjust(0, 0, 0, VMargin);
 			childLTorRT.setY(boundingRect.bottom());
 		}
 		if (!validItem)
-			return boundingRect;
+			return pBoundingNode;
 
 		boundingRect.adjust(0, 0, 0, -VMargin);
-	
-		QPointF basePos;
 		if (toRight)
 		{
 			//获得子树形成的boundingbox，然后向左扩展，得到整棵树的boundingrect
 			boundingRect.adjust(-HMargin - itemW, 0, 0, 0);
-			//取boundRect的左中间
-			basePos = QPointF(boundingRect.left(), (boundingRect.top() + boundingRect.bottom() - itemH) / 2.0);
 		}
 		else
 		{
-			boundingRect.adjust(0, 0, HMargin + itemW, 0);
-			//取boundRect的右中间，但需要减去itemW的宽度来设置根的位置。
-			basePos = QPointF(boundingRect.right() - itemW, (boundingRect.top() + boundingRect.bottom() - itemH) / 2.0);
+			boundingRect.adjust(0, 0, HMargin + itemW, 0);	
 		}
-
-		pRoot->setPosition(basePos);
-
-		//绘制添加按钮。
-		float r = 28. / 2;
-		MindNodeButton* pBtn = new MindNodeButton(r);
-		pBtn->setPos(boundingRect.right(), (boundingRect.top() + boundingRect.bottom() - r) / 2.0);
-
-		return boundingRect;
 	}
 	else
 	{
-		addItem(pRoot);
-		QPointF basePos;
 		if (toRight)
 		{
-			basePos = rootLTorRT;
 			boundingRect = QRectF(rootLTorRT.x(), rootLTorRT.y(), itemW, itemH);
 		}
 		else
 		{
-			basePos = QPointF(rootLTorRT.x() - itemW, rootLTorRT.y());
 			boundingRect = QRectF(rootLTorRT.x() - itemW, rootLTorRT.y(), itemW, itemH);
 		}
-		if (pRoot != m_pRoot)
-		{
-			pRoot->setPosition(basePos);
-		}
 	}
-	return boundingRect;
-}
-
-void MindMapScene::appendPaths(MindNode* pRoot)
-{
-	MindNode* pParent = pRoot->Parent();
-	if (pParent != NULL)
+	if (toRight)
 	{
-		QPainterPath path;
-
-		QPointF pos = pRoot->pos();
-
-		QPointF rootConnector;
-		if (pRoot->isToRight())
-		{
-			rootConnector = pParent->pos() + QPointF(pParent->boundingRect().width(), pParent->boundingRect().height() / 2.0F);
-		}
-		else
-		{
-			rootConnector = pParent->pos() + QPointF(0, pParent->boundingRect().height() / 2.0F);
-		}
-
-		path.moveTo(rootConnector);
-
-		QPointF childConnector;
-		QRectF bbox = pRoot->boundingRect();
-		if (pRoot->isToRight())
-		{
-			childConnector = QPointF(pos.x(), pos.y() + bbox.height() / 2);
-		}
-		else
-		{
-			childConnector = QPointF(pos.x() + bbox.width(), pos.y() + bbox.height() / 2);
-		}
-
-		QPointF c1((rootConnector.x() + childConnector.x()) / 2.0, rootConnector.y());
-		QPointF c2((rootConnector.x() + childConnector.x()) / 2.0, childConnector.y());
-
-		path.cubicTo(c1, c2, childConnector);
-
-		QGraphicsPathItem* pathItem = new QGraphicsPathItem(path);
-		pathItem->setPen(QPen(QColor(0, 181, 72), 3));
-		addItem(pathItem);
-		m_pathItems.append(pathItem);
+		pBoundingNode->rrect = boundingRect;
 	}
-	const QList<MindNode*>& children = pRoot->children();
-	for (auto it = children.begin(); it != children.end(); it++)
+	else
 	{
-		appendPaths(*it);
+		pBoundingNode->lrect = boundingRect;
+		pBoundingNode->loffset = -itemW;
 	}
+	pBoundingNode->itemH = itemH;
+	return pBoundingNode;
 }
 
 MindNode* MindMapScene::parseXML(const std::string& content)
@@ -402,8 +200,8 @@ MindNode* MindMapScene::parseXML(const std::string& content)
 	xml_document<> doc;
 	doc.parse<0>(const_cast<char*>(content.c_str()));
 	xml_node<>* root = doc.first_node();
-	MindNode* pRoot = _parse(root, 0);
-	setupNode(pRoot);
+	MindNode* pRoot = _parse(NULL, root, 0);
+	addItem(pRoot);
 	clearSelection();
 	return pRoot;
 }
@@ -417,6 +215,26 @@ XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<>& doc)
 	xml_attribute<>* attr = doc.allocate_attribute("text",
 		doc.allocate_string(value.c_str()));
 	root->append_attribute(attr);
+
+	EXPAND_STATE leftState = pRoot->leftExpandState();
+	if (leftState != EXP_NODEFINE)
+	{
+		if (leftState == EXP_EXPAND)
+			attr = doc.allocate_attribute("left_expand", "1");
+		else
+			attr = doc.allocate_attribute("left_expand", "0");
+		root->append_attribute(attr);
+	}
+	
+	EXPAND_STATE rightState = pRoot->rightExpandState();
+	if (rightState != EXP_NODEFINE)
+	{
+		if (rightState == EXP_EXPAND)
+			attr = doc.allocate_attribute("right_expand", "1");
+		else
+			attr = doc.allocate_attribute("right_expand", "0");
+		root->append_attribute(attr);
+	}
 
 	//level 1的节点需要记录方向。
 	if (pRoot->level() == 1)
@@ -464,21 +282,24 @@ XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<>& doc)
 	return root;
 }
 
-MindNode* MindMapScene::_parse(xml_node<>* root, int level)
+MindNode* MindMapScene::_parse(MindNode* parent, xml_node<>* root, int level)
 {
 	MindNode* pRoot = NULL;
 	MindProgressNode* pProgress = NULL;
 	if (m_bSchedule)
 	{
-		pProgress = new MindProgressNode("");
+		pProgress = new MindProgressNode("", parent);
 		pRoot = pProgress;
 	}
 	else
 	{
-		pRoot = new MindNode("");
+		pRoot = new MindNode("", parent);
 	}
+	if (parent)
+		parent->AddChild(pRoot);
 
 	pRoot->setLevel(level);
+
 	for (xml_attribute<>* attr = root->first_attribute();
 		attr;
 		attr = attr->next_attribute())
@@ -486,6 +307,12 @@ MindNode* MindMapScene::_parse(xml_node<>* root, int level)
 		std::string attr_name = attr->name();
 		std::string value = attr->value();
 
+		//DEBUG
+		if (value == "fifa")
+		{
+			int j;
+			j = 0;
+		}
 		if (attr_name == "text")
 		{
 			pRoot->SetContent(QString::fromUtf8(value.c_str()));
@@ -494,6 +321,16 @@ MindNode* MindMapScene::_parse(xml_node<>* root, int level)
 		{
 			bool toRight = std::stoi(value.c_str());
 			pRoot->setToRight(toRight);
+		}
+		if (attr_name == "left_expand")
+		{
+			bool expand = std::stoi(value.c_str());
+			pRoot->setLeftExpand(expand);
+		}
+		if (attr_name == "right_expand")
+		{
+			bool expand = std::stoi(value.c_str());
+			pRoot->setRightExpand(expand);
 		}
 		if (attr_name == "noteid")
 		{
@@ -519,8 +356,9 @@ MindNode* MindMapScene::_parse(xml_node<>* root, int level)
 		child != NULL;
 		child = child->next_sibling())
 	{
-		MindNode* pChild = _parse(child, level + 1);
-		pRoot->append(pChild);
+		MindNode* pChild = _parse(pRoot, child, level + 1);
 	}
+
+	pRoot->setup(this);
 	return pRoot;
 }

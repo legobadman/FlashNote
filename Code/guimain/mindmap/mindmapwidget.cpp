@@ -6,12 +6,10 @@
 
 MindMapWidget::MindMapWidget(QWidget* parent)
 	: QWidget(parent)
-	, m_scene(NULL)
-	, m_view(NULL)
+	, m_scene(new MindMapScene)
+	, m_view(new MindMapView)
 	, m_pRoot(NULL)
 {
-	m_scene = new MindMapScene;
-	m_view = new MindMapView;
 	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	m_view->setScene(m_scene);

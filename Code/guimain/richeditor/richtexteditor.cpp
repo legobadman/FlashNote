@@ -15,7 +15,7 @@ RichTextEditor::RichTextEditor(QWidget* parent)
 	, highlighter(NULL)
 {
 	QString fontFamily = QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ");
-	QFont font(fontFamily, 10);
+	QFont font(fontFamily, 11);
 	setFont(font);
 
 	setFrameShape(QFrame::NoFrame);

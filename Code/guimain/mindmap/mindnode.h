@@ -2,7 +2,11 @@
 #define __MIND_NODE_H__
 
 #include <QGraphicsItem>
+#include <memory>
 #include "mindnodebutton.h"
+#include "common_types.h"
+
+class MindMapScene;
 
 class MindNode : public QGraphicsTextItem
 {
@@ -24,49 +28,58 @@ class MindNode : public QGraphicsTextItem
 	};
 
 public:
-	MindNode(const QString& text, MindNode* parent = NULL);
-	~MindNode();
-	virtual void setup();
-	void setHintButton(MindNodeButton* pBtn) {
-		m_pBtn = pBtn; m_pBtn->setVisible(false);
-	}
+	MindNode(const QString& text, MindNode* parent);
+	virtual ~MindNode();
+	virtual void setup(MindMapScene* pScene);
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
-	const QList<MindNode*>& children() const { return m_children; }
-	void setParent(MindNode* pNode) { m_parent = pNode; }
+	
+	const QList<MindNode*> children() const { return m_children; }
+	void clearChildren();
 	MindNode* Parent() const { return m_parent; }
-	void setLevel(float level) { m_level = level; }
-	void removeNode(MindNode* pNode);
+	bool isTopRoot() const { return m_parent == NULL; }
 	void setLevel(int nLevel) { m_level = nLevel; }
-	bool isToRight() { return m_bToRight; }
+	int level() const { return m_level; }
+	bool isToRight() const { return m_bToRight; }
 	void setToRight(bool toRight) { m_bToRight = toRight; }
-	bool hasLeftChildren();
+
+	EXPAND_STATE leftExpandState() const { return m_left_expand; }
+	EXPAND_STATE rightExpandState() const { return m_right_expand; }
+	void setLeftExpand(bool bExpanded);
+	void setRightExpand(bool bExpanded);
+
+	bool isExpanded(MindNodeButton* pBtn);
+	bool isCollapsed(bool bRight) const;
 	QString noteid() const { return m_noteid; }
 	void setNoteId(const QString& noteid) { m_noteid = noteid; }
-	int level() const { return m_level; }
+
 	void setBackground(QColor color) { m_backgroudColor = color; }
 	void setFocusoutBorder(QColor color) { m_borderFocusout = color; };
 	void setHighlightedBorder(QColor color) { m_highlightedBorder = color; }
 	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
 	virtual void setPosition(QPointF pos);
-	void append(MindNode* pNode);
+	void AddChild(MindNode* pChild);
+	virtual void NewChild(bool toRight);	//特指后续的创建而非IO初始化的创建。
+
 	QPainterPath shape() const override;
 
 signals:
 	void textChange();
 	void dataChanged();
-	void childNodeCreate(MindNode* parent, bool bRight);
-	void silibingNodeCreate(MindNode* pNode);
-	void deleteNode(MindNode* pNode);
+	void expandChanged();
+	void nodeCreated(MindNode* pNode);
+	void nodeDeleted(MindNode* pNode);
 
 public slots:
 	void onDocumentContentsChanged(int, int, int);
-	void onCreateChildNodeRight();
+	virtual void onCreateChildNodeRight();
 	void onCreateChildNodeLeft();
 	void onCreateSliblingNode();
-	void onDeleteNode();
+	virtual void onDeleteNode();
 	void onCreateAssociateNote();
 	void onEditAssociateNote();
 	void onNewNote(const QString&);
+	void onLeftExpandBtnToggle();
+	void onRightExpandBtnToggle();
 
 public:
 	void SetContent(const QString& content);
@@ -74,21 +87,27 @@ public:
 	QRectF boundingRect() const override;
 
 protected:
-	void init();
+	virtual void initUIColor();
 	void initDirection();
 	virtual void initMenu();
 	virtual void resetDecoration();
 	bool needShowDecoration() const;
 	bool sceneEvent(QEvent* event) override;
+	virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event);
 	void focusOutEvent(QFocusEvent* event) override;
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+	MindNode* findThis();
 
 private:
+	void initSignalSlots(MindMapScene* pScene);
 	void initDocFormat(const QString& text);
+	void initVisible();
 	int pointSize(int level) const;
-	void udpateBorderFormat(const QStyleOptionGraphicsItem* option);	
+	void udpateBorderFormat(const QStyleOptionGraphicsItem* option);
+	void initExpandBtns();
+	void checkRemoveExpandBtns(bool bToRight);
 
 protected:
 	QString m_content;
@@ -105,10 +124,15 @@ protected:
 	bool m_bHovered;
 	bool m_bToRight;	//子节点向右扩展。
 	MindNode* m_parent;
-	MindNodeButton* m_pBtn;
+	QSharedPointer<MindNodeButton> m_pLCollaspBtn;
+	QSharedPointer<MindNodeButton> m_pRCollaspBtn;
+	QGraphicsPathItem* m_pathItem;
 	QPointer<QMenu> m_pMenu;
 	QList<MindNode*> m_children;
 	QString m_noteid;
+
+	EXPAND_STATE m_left_expand;
+	EXPAND_STATE m_right_expand;
 
 	const int iconSize = 24;
 };

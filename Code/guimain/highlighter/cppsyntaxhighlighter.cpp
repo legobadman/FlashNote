@@ -21,7 +21,9 @@ CppSyntaxHighlighter::CppSyntaxHighlighter(QTextDocument* parent /* = 0 */)
 		QStringLiteral("\\btemplate\\b"), QStringLiteral("\\btypedef\\b"), QStringLiteral("\\btypename\\b"),
 		QStringLiteral("\\bunion\\b"), QStringLiteral("\\bunsigned\\b"), QStringLiteral("\\bvirtual\\b"),
 		QStringLiteral("\\bvoid\\b"), QStringLiteral("\\bvolatile\\b"), QStringLiteral("\\bbool\\b"),
-		QStringLiteral("\\bfor\\b"), QStringLiteral("\\bnew\\b"),
+		QStringLiteral("\\bfor\\b"), QStringLiteral("\\bnew\\b"), QStringLiteral("\\breturn\\b"),
+		QStringLiteral("\\bthis\\b"), QStringLiteral("\\bfloat\\b"), QStringLiteral("\\bif\\b"),
+		QStringLiteral("\\bextern\\b"), QStringLiteral("\\bdelete\\b")
 	};
 	for (const QString& pattern : keywordPatterns) {
 		rule.pattern = QRegularExpression(pattern);
@@ -35,6 +37,12 @@ CppSyntaxHighlighter::CppSyntaxHighlighter(QTextDocument* parent /* = 0 */)
 	rule.format = classFormat;
 	highlightingRules.append(rule);
 
+	classFormat.setFontWeight(QFont::Bold);
+	classFormat.setForeground(QColor(255, 215, 0));
+	rule.pattern = QRegularExpression(QStringLiteral("\\bstring\\b"));
+	rule.format = classFormat;
+	highlightingRules.append(rule);
+
 	quotationFormat.setForeground(QColor(213,153,122));
 	rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
 	rule.format = quotationFormat;
@@ -45,7 +53,7 @@ CppSyntaxHighlighter::CppSyntaxHighlighter(QTextDocument* parent /* = 0 */)
 	rule.format = functionFormat;
 	highlightingRules.append(rule);
 
-	singleLineCommentFormat.setForeground(Qt::red);
+	singleLineCommentFormat.setForeground(QColor(69, 159, 74));
 	rule.pattern = QRegularExpression(QStringLiteral("//[^\n]*"));
 	rule.format = singleLineCommentFormat;
 	highlightingRules.append(rule);

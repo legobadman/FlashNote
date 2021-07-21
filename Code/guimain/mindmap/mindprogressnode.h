@@ -7,9 +7,9 @@ class MindProgressNode : public MindNode
 {
 	Q_OBJECT
 public:
-	MindProgressNode(const QString& text, MindProgressNode* parent = NULL);
+	MindProgressNode(const QString& text, MindNode* parent);
 	~MindProgressNode();
-	void setup() override;
+	void setup(MindMapScene*) override;
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 	float progress();
@@ -24,6 +24,7 @@ public slots:
 	void setWorkingHourDlg();
 	void markFinish();
 	void zeroSchedule();
+	virtual void onDeleteNode() override;
 
 private:
 	void _setProgress(float progress);
@@ -35,6 +36,7 @@ private:
 
 protected:
 	void initMenu() override;
+	void initUIColor() override;
 	void resetDecoration() override;
 	bool sceneEvent(QEvent* event) override;
 
