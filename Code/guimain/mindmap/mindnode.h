@@ -103,7 +103,6 @@ protected:
 private:
 	void initSignalSlots(MindMapScene* pScene);
 	void initDocFormat(const QString& text);
-	void initVisible();
 	int pointSize(int level) const;
 	void udpateBorderFormat(const QStyleOptionGraphicsItem* option);
 	void initExpandBtns();

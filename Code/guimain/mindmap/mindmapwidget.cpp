@@ -23,7 +23,7 @@ MindMapWidget::MindMapWidget(QWidget* parent)
 	pMainLayout->addWidget(m_view);
 	setLayout(pMainLayout);
 
-	connect(m_scene, SIGNAL(itemContentChanged()), this, SIGNAL(itemContentChanged()));
+	connect(m_scene, SIGNAL(itemContentChanged(bool)), this, SIGNAL(itemContentChanged(bool)));
 }
 
 MindMapWidget::~MindMapWidget()

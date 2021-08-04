@@ -136,7 +136,7 @@ void NoteEditWindow::initSlots()
 {
 	connect(m_ui->editTitle, SIGNAL(textChanged(const QString&)), this, SLOT(onTitleChanged()));
 	connect(m_ui->noramlEditor, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
-	connect(m_ui->mindmapEditor, SIGNAL(itemContentChanged()), this, SLOT(onMindMapChanged()));
+	connect(m_ui->mindmapEditor, SIGNAL(itemContentChanged(bool)), this, SLOT(onMindMapChanged(bool)));
 }
 
 void NoteEditWindow::initCustomWidget()
@@ -270,7 +270,7 @@ void NoteEditWindow::onTitleChanged()
 	if (m_type == NORMAL_NOTE)
 		onTextChanged();
 	else if (m_type == MINDMAP || m_type == SCHEDULE)
-		onMindMapChanged();
+		onMindMapChanged(true);
 }
 
 void NoteEditWindow::onTextChanged()
@@ -278,14 +278,20 @@ void NoteEditWindow::onTextChanged()
 	QTimer::singleShot(2000, this, SLOT(saveNote()));
 }
 
-void NoteEditWindow::onMindMapChanged()
+void NoteEditWindow::onMindMapChanged(bool bEditChange)
 {
 	if (AppHelper::GetNoteType(m_pNote) == MINDMAP)
 	{
-		QTimer::singleShot(2000, this, SLOT(saveMindMap()));
+		if (bEditChange)
+			QTimer::singleShot(2000, this, SLOT(saveMindMap()));
+		else
+			saveMindMap();
 	}
 	else if (AppHelper::GetNoteType(m_pNote) == SCHEDULE)
 	{
-		QTimer::singleShot(2000, this, SLOT(saveSchedule()));
+		if (bEditChange)
+			QTimer::singleShot(2000, this, SLOT(saveSchedule()));
+		else
+			saveSchedule();
 	}
 }

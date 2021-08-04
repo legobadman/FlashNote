@@ -60,10 +60,11 @@ public:
 	MindNode* root() const { return m_pRoot; }
 
 signals:
-	void itemContentChanged();
+	void itemContentChanged(bool bEditChanged);
 
 private slots:
 	void onNodeContentsChanged();
+	void onNodeStateChanged();
 	void onNodeCreated(MindNode* pNode);
 	void onNodeDeleted(MindNode* pNode);
 

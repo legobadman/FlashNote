@@ -1,7 +1,9 @@
 #ifndef __GUI_STDAFX_H__
 #define __GUI_STDAFX_H__
 
+#include <WinSock2.h>
 #include <Windows.h>
+#include <WS2tcpip.h>
 #include <QApplication>
 #include <QMainWindow>
 #include <QTreeView>

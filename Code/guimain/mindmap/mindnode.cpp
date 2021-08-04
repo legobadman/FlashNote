@@ -75,7 +75,6 @@ void MindNode::setup(MindMapScene* pScene)
 	resetDecoration();
 	initDirection();
 	initMenu();
-	initVisible();
 	if (!isTopRoot())
 	{
 		m_pathItem = new QGraphicsPathItem(this);
@@ -90,28 +89,7 @@ void MindNode::initSignalSlots(MindMapScene* pScene)
 	connect(this, SIGNAL(dataChanged()), pScene, SIGNAL(itemContentChanged()));
 	connect(this, SIGNAL(nodeCreated(MindNode*)), pScene, SLOT(onNodeCreated(MindNode*)));
 	connect(this, SIGNAL(nodeDeleted(MindNode*)), pScene, SLOT(onNodeDeleted(MindNode*)));
-	connect(this, SIGNAL(expandChanged()), pScene, SLOT(onNodeContentsChanged()));
-}
-
-void MindNode::initVisible()
-{
-	//只要parent的expand属性已初始化，就能设置。
-	if (!isTopRoot())
-	{
-		bool bCollasped = false;
-		MindNode* p = m_parent;
-		while (p)
-		{
-			if (p->isCollapsed(isToRight()))
-			{
-				bCollasped = true;
-				break;
-			}
-			p = p->m_parent;
-		}
-		if (bCollasped)
-			setVisible(false);
-	}
+	connect(this, SIGNAL(expandChanged()), pScene, SLOT(onNodeStateChanged()));
 }
 
 void MindNode::initUIColor()

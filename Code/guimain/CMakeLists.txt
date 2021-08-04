@@ -177,6 +177,6 @@ add_executable(guimain
 target_precompile_headers(guimain PRIVATE ./stdafx.h)
 
 # Add the Qt5 Widgets for linking
-target_link_libraries(guimain notecore Qt5::Widgets rpcservice dbservice sqlite)
+target_link_libraries(guimain notecore Qt5::Widgets rpcservice dbservice sqlite Ws2_32)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")

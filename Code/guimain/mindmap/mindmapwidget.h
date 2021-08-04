@@ -19,7 +19,7 @@ public:
 	QString mindmapXML();
 
 signals:
-	void itemContentChanged();
+	void itemContentChanged(bool);
 
 private:
 	QPointer<MindMapScene> m_scene;

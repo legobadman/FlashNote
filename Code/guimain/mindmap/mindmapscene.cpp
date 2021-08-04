@@ -44,18 +44,27 @@ void MindMapScene::onNodeCreated(MindNode* pChild)
 	//目前暂时只需重绘
 	pChild->setup(this);
 	onRedrawItems();
+	emit itemContentChanged(false);
 }
 
 void MindMapScene::onNodeDeleted(MindNode* pChild)
 {
 	removeItem(pChild);
 	onRedrawItems();
+	emit itemContentChanged(false);
 }
 
 void MindMapScene::onNodeContentsChanged()
 {
 	//TODO: 目前规模下看起来没太多问题，以后再优化单个点及子节点的更新
 	onRedrawItems();
+	emit itemContentChanged(true);
+}
+
+void MindMapScene::onNodeStateChanged()
+{
+	onRedrawItems();
+	emit itemContentChanged(false);
 }
 
 void MindMapScene::onRedrawItems()
@@ -63,7 +72,6 @@ void MindMapScene::onRedrawItems()
 	arrangeAllItems();
 	clearSelection();
 	update();
-	emit itemContentChanged();
 }
 
 void MindMapScene::arrangeAllItems()
@@ -357,6 +365,17 @@ MindNode* MindMapScene::_parse(MindNode* parent, xml_node<>* root, int level)
 		child = child->next_sibling())
 	{
 		MindNode* pChild = _parse(pRoot, child, level + 1);
+		//如果当前pChild的方向被折叠，那么pChild设为隐藏。
+		if (pChild->isToRight())
+		{
+			bool bVisible = (pRoot->rightExpandState() == EXP_EXPAND);
+			pChild->setVisible(bVisible);
+		}
+		else
+		{
+			bool bVisible = (pRoot->leftExpandState() == EXP_EXPAND);
+			pChild->setVisible(bVisible);
+		}
 	}
 
 	pRoot->setup(this);
