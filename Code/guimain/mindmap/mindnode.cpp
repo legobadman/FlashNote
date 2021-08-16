@@ -654,10 +654,6 @@ void MindNode::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 			m_pathItem->hide();
 			m_bDragging = true;
 		}
-		else
-		{
-			m_pathItem->hide();
-		}
 	}
 
 	if (m_bDragging)
