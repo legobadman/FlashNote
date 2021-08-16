@@ -4,17 +4,20 @@
 #include "LeftSideItemDelegate.h"
 #include "guihelper.h"
 #include "common_types.h"
-#include "notelistview.h"
+#include <QScrollBar>
 
 
-NoteItemDelegate::NoteItemDelegate(QWidget* parent)
+NoteItemDelegate::NoteItemDelegate(NotesListView* parent)
 	: QStyledItemDelegate(parent)
+	, m_pListView(parent)
 {
 }
 
 QSize NoteItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-	return MyStyle::dpiScaledSize(QSize(361, 87));
+	int W = m_pListView->width();
+	int scrollWidth = m_pListView->verticalScrollBar()->width();
+	return MyStyle::dpiScaledSize(QSize(W - scrollWidth, 100));
 }
 
 void NoteItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const
@@ -47,12 +50,21 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	painter->save();
 	painter->setClipRect(opt.rect);
 
+	bool bVisible = m_pListView->verticalScrollBar()->isVisible();
+	int scrollWidth = m_pListView->verticalScrollBar()->width();
+
+	QRect itemRect;
+	if (bVisible)
+		itemRect = opt.rect.adjusted(0, 0, -4, 0);
+	else
+		itemRect = opt.rect.adjusted(0, 0, -1, 0);
+
 	const NotesListView* noteslist = qobject_cast<const NotesListView*>(option.widget);
 
 	// draw the background
 	if (opt.backgroundBrush.style() != Qt::NoBrush)
 	{
-		QRect rcBg(opt.rect);
+		QRect rcBg(itemRect);
 		const QPointF oldBrushOrigin = painter->brushOrigin();
 		painter->fillRect(rcBg, opt.backgroundBrush);
 
@@ -82,9 +94,6 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	//1. draw title
 	{
 		QFont fontTitle(QString::fromUtf16((char16_t*)L"微软雅黑", 8));
-		QTextLayout textLayout2(title, fontTitle);
-		const int maxLineWidth = 8388607; //参照QCommonStylePrivate::viewItemSize
-		QSizeF szText = AppHelper::viewItemTextLayout(textLayout2, maxLineWidth, 15);
 		QFontMetrics fontMetrics(fontTitle);
 
 		int text_xoffset = 9, text_yoffset = 7;
@@ -101,21 +110,30 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 
 	//2. draw content
 	{
-		QFont fontContent(QString::fromUtf16((char16_t*)L"微软雅黑", 7));
-		QTextLayout textLayout2(content, fontContent);
-		const int maxLineWidth = 8388607; //参照QCommonStylePrivate::viewItemSize
-		QSizeF szText = AppHelper::viewItemTextLayout(textLayout2, maxLineWidth);
+		QFont fontContent(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
+		QTextLayout textLayout(content, fontContent);
 		QFontMetrics fontMetrics(fontContent);
+		int fontHeight = fontMetrics.height();
 
+		//计算一行的显示宽度，需要考虑面板的宽度以及有无滚动条，margin。
 		int text_xoffset = 9, text_yoffset = 30;
-		int w = opt.rect.width() - 2 * text_xoffset;
-		int h = fontMetrics.height() * 2;
-		QRect textRect(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset, w, h);
+		int lineWidth = itemRect.width() - text_xoffset * 2;
+
+		textLayout.beginLayout();
+		int line_limit = 3;
+		for (int i = 0; i < line_limit; i++)
+		{
+			QTextLine line = textLayout.createLine();
+			if (!line.isValid())
+				break;
+			line.setLineWidth(lineWidth);
+			line.setPosition(QPointF(0, fontHeight * i));
+		}
+		textLayout.endLayout();
 
 		painter->setPen(QColor(102, 102, 102));
-		painter->setFont(fontContent);
-		QRect wtf;
-		painter->drawText(textRect, Qt::TextWordWrap, content, &wtf);
+		QPointF topLeft(itemRect.x() + text_xoffset, itemRect.y() + text_yoffset);
+		textLayout.draw(painter, topLeft);
 	}
 	painter->restore();
 }
