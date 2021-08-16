@@ -5,6 +5,7 @@
 #include "newnotewindow.h"
 #include "selectnotebookdlg.h"
 #include "mindprogressnode.h"
+#include "MyStyle.h"
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QGraphicsView>
@@ -37,6 +38,34 @@ private:
 	MindNode* m_node;
 };
 
+
+//////////////////////////////////////////////////////////////
+RoundedRectItem::RoundedRectItem(QGraphicsItem* parent)
+	: MindNode("", NULL)
+{
+
+}
+
+QPainterPath RoundedRectItem::shape() const
+{
+	QPainterPath path;
+	path.addRect(boundingRect());
+	return path;
+}
+
+QRectF RoundedRectItem::boundingRect() const
+{
+	return QRectF(0, 0, MyStyle::dpiScaled(82), MyStyle::dpiScaled(34));
+}
+
+void RoundedRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+	painter->setPen(Qt::NoPen);
+	painter->setBrush(QColor(0, 181, 72));
+	painter->drawRoundedRect(boundingRect(), 2, 2);
+}
+
+
 /////////////////////////////////////////////////////////////
 MindNode::MindNode(const QString& text, MindNode* parent)
 	: QGraphicsTextItem(parent)		//先初始化text会导致格式问题，先不这么处理。
@@ -53,14 +82,35 @@ MindNode::MindNode(const QString& text, MindNode* parent)
 	, m_right_expand(EXP_EXPAND)
 	, m_pMenu(NULL)
 	, m_pathItem(NULL)
+	, m_bDragging(false)
 {
 	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable | ItemClipsToShape);
 }
 
 MindNode::~MindNode()
 {
-	if (m_pathItem)
-		delete m_pathItem;	//todo: smart pointer
+	if (m_pathItem && scene())
+	{
+		//scene()->removeItem(m_pathItem);
+		//m_pathItem = NULL;
+	}
+	//	delete m_pathItem;	//todo: smart pointer
+}
+
+QList<MindNode*> MindNode::Children(bool excludeDragging) const
+{
+	QList<MindNode*> _children;
+	foreach(QGraphicsItem * pObj, m_children)//childItems()) //为了维护插入时的顺序，只能用自己的容器了。
+	{
+		MindNode* p = qgraphicsitem_cast<MindNode*>(pObj);
+		if (p)
+		{
+			if (excludeDragging && p->isDragging())
+				continue;
+			_children.append(p);
+		}
+	}
+	return _children;
 }
 
 void MindNode::setup(MindMapScene* pScene)
@@ -78,6 +128,8 @@ void MindNode::setup(MindMapScene* pScene)
 	if (!isTopRoot())
 	{
 		m_pathItem = new QGraphicsPathItem(this);
+		//m_pathItem = new QGraphicsPathItem;
+		//pScene->addItem(m_pathItem);
 	}
 	initExpandBtns();
 }
@@ -86,10 +138,12 @@ void MindNode::initSignalSlots(MindMapScene* pScene)
 {
 	if (document())
 		connect(document(), SIGNAL(contentsChanged()), pScene, SLOT(onNodeContentsChanged()));
-	connect(this, SIGNAL(dataChanged()), pScene, SIGNAL(itemContentChanged()));
+	connect(this, SIGNAL(dataChanged(bool)), pScene, SIGNAL(itemContentChanged(bool)));
 	connect(this, SIGNAL(nodeCreated(MindNode*)), pScene, SLOT(onNodeCreated(MindNode*)));
 	connect(this, SIGNAL(nodeDeleted(MindNode*)), pScene, SLOT(onNodeDeleted(MindNode*)));
 	connect(this, SIGNAL(expandChanged()), pScene, SLOT(onNodeStateChanged()));
+	connect(this, SIGNAL(nodeDragged(MindNode*)), pScene, SLOT(onNodeDragged(MindNode*)));
+	connect(this, SIGNAL(nodeDragging(MindNode*)), pScene, SLOT(onNodeDragging(MindNode*)));
 }
 
 void MindNode::initUIColor()
@@ -207,6 +261,22 @@ void MindNode::initExpandBtns()
 			}
 		}
 	}
+
+	//设置位置
+	if (m_pLCollaspBtn)
+	{
+		int x = -MindNodeButton::m_radius * 2 + 3;
+		int y = boundingRect().height() / 2 - 13;
+		m_pLCollaspBtn->setZValue(zValue() + 3);
+		m_pLCollaspBtn->setPos(QPointF(x, y));
+	}
+	if (m_pRCollaspBtn)
+	{
+		int x = boundingRect().width() - 3;
+		int y = boundingRect().height() / 2 - 13;
+		m_pRCollaspBtn->setZValue(zValue() + 3);
+		m_pRCollaspBtn->setPos(QPointF(x, y));
+	}
 }
 
 void MindNode::initDirection()
@@ -296,7 +366,7 @@ void MindNode::onNewNote(const QString& noteid)
 	m_noteid = noteid;
 	initMenu();
 	resetDecoration();
-	emit dataChanged();
+	emit dataChanged(false);
 	emit textChange();
 }
 
@@ -375,11 +445,6 @@ void MindNode::focusOutEvent(QFocusEvent* event)
 	setTextInteractionFlags(Qt::NoTextInteraction);
 }
 
-void MindNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
-{
-	QGraphicsTextItem::mousePressEvent(event);
-}
-
 void MindNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
 	QGraphicsTextItem::mouseDoubleClickEvent(event);
@@ -432,22 +497,19 @@ void MindNode::checkRemoveExpandBtns(bool bToRight)
 	}
 	else
 	{
+		bool bHasLeftChildren = false;
 		for (auto it = m_children.begin(); it != m_children.end(); it++)
 		{
-			bool bHasLeftChildren = false;
-			for (auto it = m_children.begin(); it != m_children.end(); it++)
+			if (!(*it)->isToRight())
 			{
-				if (!(*it)->isToRight())
-				{
-					bHasLeftChildren = true;
-					break;
-				}
+				bHasLeftChildren = true;
+				break;
 			}
-			if (bHasLeftChildren == false)
-			{
-				m_pLCollaspBtn->setParentItem(NULL);
-				m_pLCollaspBtn.clear();
-			}
+		}
+		if (bHasLeftChildren == false)
+		{
+			m_pLCollaspBtn->setParentItem(NULL);
+			m_pLCollaspBtn.clear();
 		}
 	}
 }
@@ -513,6 +575,7 @@ void MindNode::onLeftExpandBtnToggle()
 		if (!(*it)->isToRight())
 		{
 			(*it)->setVisible(bVisible);
+			//(*it)->pathItem()->setVisible(bVisible);
 		}
 	}
 	emit expandChanged();
@@ -520,6 +583,13 @@ void MindNode::onLeftExpandBtnToggle()
 
 void MindNode::onRightExpandBtnToggle()
 {
+	if (m_content == u8"新增节点4")
+	{
+		QPointF pos = this->scenePos();
+		int j;
+		j = 0;
+	}
+
 	bool bVisible = true;
 	if (m_right_expand == EXP_EXPAND)
 	{
@@ -537,13 +607,80 @@ void MindNode::onRightExpandBtnToggle()
 		if ((*it)->isToRight())
 		{
 			(*it)->setVisible(bVisible);
+			//(*it)->pathItem()->setVisible(bVisible);
 		}
 	}
 	emit expandChanged();
 }
 
+void MindNode::removeChild(MindNode* pNode)
+{
+	m_children.removeAll(pNode);
+	pNode->setParentItem(NULL);
+}
+
+void MindNode::insertChild(MindNode* pNode, int idx)
+{
+	m_children.insert(m_children.begin() + idx, pNode);
+	pNode->m_parent = this;	//后续逐渐去掉m_parent。
+	pNode->setParentItem(this);
+}
+
+void MindNode::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+	m_initClickScenePos = event->scenePos();
+	QGraphicsTextItem::mousePressEvent(event);
+}
+
+qreal MindNode::_dist(const QPointF& p1, const QPointF& p2)
+{
+	QPointF temp = p2 - p1;
+	return sqrt(temp.x() * temp.x() + temp.y() * temp.y());
+}
+
+void MindNode::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
+	if (isTopRoot())
+		return;
+
+	if (!m_bDragging)
+	{
+		//检查是否有足够的拖动距离认为是脱离
+		qreal dist = _dist(m_initClickScenePos, event->scenePos());
+		if (dist > 3)
+		{
+			m_item_event_offset = event->scenePos() - this->scenePos();
+			m_parent->removeChild(this);
+			m_pathItem->hide();
+			m_bDragging = true;
+		}
+		else
+		{
+			m_pathItem->hide();
+		}
+	}
+
+	if (m_bDragging)
+	{
+		QPointF pos = event->scenePos() - m_item_event_offset;
+		setPos(pos);
+		emit nodeDragging(this);
+	}
+	else
+	{
+		QGraphicsTextItem::mouseMoveEvent(event);
+	}
+}
+
 void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
+	if (m_bDragging)
+	{
+		m_bDragging = false;
+		if (m_pathItem)
+			m_pathItem->show();
+		emit nodeDragged(this);
+	}
 	if (event->button() == Qt::RightButton)
 	{
 		Q_ASSERT(m_pMenu);
@@ -669,35 +806,17 @@ void MindNode::NewChild(bool toRight)
 	emit nodeCreated(pChild);
 }
 
-void MindNode::clearChildren()
-{
-	for (auto it = m_children.begin(); it != m_children.end(); it++)
-	{
-		(*it)->clearChildren();
-	}
-	m_children.clear();
-}
-
-MindNode* MindNode::findThis()
-{
-	if (isTopRoot())
-	{
-		MindMapScene* pScene = qobject_cast<MindMapScene*>(scene());
-		return pScene->root();
-	}
-	else
-	{
-		QList<MindNode*> children = m_parent->children();
-		for (auto it = children.begin(); it != children.end(); it++)
-		{
-			if ((*it) == this)
-			{
-				return (*it);
-			}
-		}
-		return NULL;
-	}
-}
+//QList<MindNode*> MindNode::children(bool toRight)
+//{
+//	QList<MindNode*> result;
+//	QList<MindNode*>& children = m_children;
+//	for (int i = 0; i < children.length(); i++)
+//	{
+//		if (children[i]->isToRight() == toRight)
+//			result.append(children[i]);
+//	}
+//	return result;
+//}
 
 QPainterPath MindNode::shape() const
 {
@@ -753,6 +872,18 @@ QRectF MindNode::boundingRect() const
 		return br;
 }
 
+QRectF MindNode::wholeBoundingRect() const
+{
+	if (Children().isEmpty() || rightExpandState() == EXP_COLLAPSE)
+	{
+		return boundingRect();
+	}
+	else
+	{
+		return childrenBoundingRectExcludingPath();
+	}
+}
+
 void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	udpateBorderFormat(option);
@@ -782,7 +913,8 @@ void MindNode::setPosition(QPointF pos)
 		QGraphicsItem* pParent = parentItem();
 		QRectF bbox = boundingRect();
 
-		QPointF parentPos = pParent->mapToScene(QPointF(0, 0));
+		QPointF parentPos = pParent->scenePos();
+
 		//在scene坐标系下，计算root纵坐标。
 		qreal ytemp = parentPos.y() + pParent->boundingRect().height() / 2.0;
 		ytemp = mapFromScene(QPointF(0, ytemp)).y();
@@ -804,6 +936,29 @@ void MindNode::setPosition(QPointF pos)
 		{
 			childConnector = QPointF(bbox.right(), bbox.height() / 2);
 		}
+
+		//QPointF thisPos = scenePos();
+		////在scene坐标系下，计算root纵坐标。
+		//qreal rootY = parentPos.y() + pParent->boundingRect().height() / 2.0;
+		////ytemp = mapFromScene(QPointF(0, ytemp)).y();
+
+		//QPointF rootConnector, childConnector;
+		//if (isToRight())
+		//{
+		//	rootConnector = QPointF(parentPos.x() + pParent->boundingRect().width(), rootY);
+		//}
+		//else
+		//{
+		//	rootConnector = QPointF(parentPos.x(), rootY);
+		//}
+		//if (isToRight())
+		//{
+		//	childConnector = QPointF(thisPos.x(), thisPos.y() + bbox.height() / 2);
+		//}
+		//else
+		//{
+		//	childConnector = QPointF(thisPos.x() + bbox.width(), thisPos.y() + bbox.height() / 2);
+		//}
 
 		QPointF c1((rootConnector.x() + childConnector.x()) / 2.0, rootConnector.y());
 		QPointF c2((rootConnector.x() + childConnector.x()) / 2.0, childConnector.y());

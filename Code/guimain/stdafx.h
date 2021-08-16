@@ -4,6 +4,7 @@
 #include <WinSock2.h>
 #include <Windows.h>
 #include <WS2tcpip.h>
+#include <stack>
 #include <QApplication>
 #include <QMainWindow>
 #include <QTreeView>

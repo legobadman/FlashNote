@@ -1,0 +1,11 @@
+<node text="根节点" progress_value="0.95" bgcolor="..." fgcolor="...">
+	<node text="子节点1" progress_value="0.95">
+		<node>...</node>
+	</node>
+	<node text="子节点2" progress_value="0.25">
+	</node>
+	<node text="子节点3" progress_value="0.5">
+	</node>
+	<node text="子节点">
+	</node>
+</node>

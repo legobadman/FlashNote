@@ -8,6 +8,8 @@
 
 class MindMapScene;
 
+class RoundedRectItem;
+
 class MindNode : public QGraphicsTextItem
 {
 	Q_OBJECT
@@ -23,7 +25,6 @@ class MindNode : public QGraphicsTextItem
 	{
 		UpdateBatch(int* m_count) : pCounter(m_count) { (*pCounter)++; }
 		~UpdateBatch() { (*pCounter)--; }
-
 		int* pCounter;
 	};
 
@@ -33,14 +34,19 @@ public:
 	virtual void setup(MindMapScene* pScene);
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 	
-	const QList<MindNode*> children() const { return m_children; }
-	void clearChildren();
+	QList<MindNode*> Children(bool excludeDragging = true) const;
+	QRectF wholeBoundingRect() const;
+
+	void removeChild(MindNode* pNode);
+	void insertChild(MindNode* pNode, int idx);
 	MindNode* Parent() const { return m_parent; }
 	bool isTopRoot() const { return m_parent == NULL; }
 	void setLevel(int nLevel) { m_level = nLevel; }
 	int level() const { return m_level; }
 	bool isToRight() const { return m_bToRight; }
 	void setToRight(bool toRight) { m_bToRight = toRight; }
+	bool isDragging() const { return m_bDragging; }
+	virtual bool isHolder() const { return false; }
 
 	EXPAND_STATE leftExpandState() const { return m_left_expand; }
 	EXPAND_STATE rightExpandState() const { return m_right_expand; }
@@ -64,10 +70,12 @@ public:
 
 signals:
 	void textChange();
-	void dataChanged();
+	void dataChanged(bool bEditChanged);
 	void expandChanged();
 	void nodeCreated(MindNode* pNode);
 	void nodeDeleted(MindNode* pNode);
+	void nodeDragged(MindNode* pNode);
+	void nodeDragging(MindNode* pNode);
 
 public slots:
 	void onDocumentContentsChanged(int, int, int);
@@ -97,8 +105,8 @@ protected:
 	void focusOutEvent(QFocusEvent* event) override;
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
+	void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
-	MindNode* findThis();
 
 private:
 	void initSignalSlots(MindMapScene* pScene);
@@ -107,6 +115,7 @@ private:
 	void udpateBorderFormat(const QStyleOptionGraphicsItem* option);
 	void initExpandBtns();
 	void checkRemoveExpandBtns(bool bToRight);
+	qreal _dist(const QPointF& p1, const QPointF& p2);
 
 protected:
 	QString m_content;
@@ -123,6 +132,7 @@ protected:
 	bool m_bHovered;
 	bool m_bToRight;	//子节点向右扩展。
 	MindNode* m_parent;
+
 	QSharedPointer<MindNodeButton> m_pLCollaspBtn;
 	QSharedPointer<MindNodeButton> m_pRCollaspBtn;
 	QGraphicsPathItem* m_pathItem;
@@ -134,6 +144,21 @@ protected:
 	EXPAND_STATE m_right_expand;
 
 	const int iconSize = 24;
+
+	QPointF m_initClickScenePos;
+	QPointF m_item_event_offset;
+
+	bool m_bDragging;
+};
+
+class RoundedRectItem : public MindNode
+{
+public:
+	RoundedRectItem(QGraphicsItem* parent = nullptr);
+	QPainterPath shape() const override;
+	QRectF boundingRect() const override;
+	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+	bool isHolder() const override { return true; }
 };
 
 #endif

@@ -63,7 +63,7 @@ void MindProgressNode::updateNodeColor()
 void MindProgressNode::initMenu()
 {
 	MindNode::initMenu();
-	if (children().empty())
+	if (m_children.empty())
 	{
 		m_pMenu->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
 		m_pMenu->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
@@ -133,7 +133,7 @@ void MindProgressNode::_setProgress(float progress)
 	updateNodeColor();
 	update();
 
-	emit dataChanged();
+	emit dataChanged(false);
 }
 
 void MindProgressNode::setPosition(QPointF pos)
@@ -202,7 +202,7 @@ void MindProgressNode::_setWorkhours(float hours)
 		_setProgress(0.0);
 	}
 	setWorkhours(hours);
-	emit dataChanged();
+	emit dataChanged(false);
 }
 
 void MindProgressNode::updateStatus()
