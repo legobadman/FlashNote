@@ -110,31 +110,32 @@ void MindMapScene::arrangeAllItems()
 		for (int i = 0; i < n; i++)
 		{
 			MindNode* pChild = children[i];
-			QRectF wholeBoundingRect = pChild->wholeBoundingRect();
 			if (pChild->isToRight())
 			{
+				QRectF wholeBoundingRect = pChild->childrenOrSelfRect(true);
 				totalRightH += wholeBoundingRect.height();
-				if (i < n - 1)
-					totalRightH += VMargin;
+				totalRightH += VMargin;
 				rightChildren.append(pChild);
 			}
 			else
 			{
+				QRectF wholeBoundingRect = pChild->childrenOrSelfRect(false);
 				totalLeftH += wholeBoundingRect.height();
-				if (i < n - 1)
-					totalLeftH += VMargin;
+				totalLeftH += VMargin;
 				leftChildren.append(pChild);
 			}
 		}
+		totalRightH -= VMargin;
+		totalLeftH -= VMargin;
 
-		if (pRoot->leftExpandState() != EXP_COLLAPSE && !leftChildren.empty())
+		if (!pRoot->isCollapsed(false) && !leftChildren.empty())
 		{
 			//再遍历每一个子块
 			qreal startY = -totalLeftH / 2. + pRoot->boundingRect().height() / 2.;
 			for (int i = 0; i < leftChildren.size(); i++)
 			{
 				MindNode* pChild = leftChildren[i];
-				QRectF br = pChild->wholeBoundingRect();
+				QRectF br = pChild->childrenOrSelfRect(false);
 				qreal y = startY + br.height() / 2 - pChild->boundingRect().height() / 2.;
 				qreal x = -pChild->boundingRect().width() - HMargin;
 				pChild->setPosition(QPointF(x, y));
@@ -142,14 +143,14 @@ void MindMapScene::arrangeAllItems()
 			}
 		}
 
-		if (pRoot->rightExpandState() != EXP_COLLAPSE && !rightChildren.empty())
+		if (!pRoot->isCollapsed(true) && !rightChildren.empty())
 		{
 			//再遍历每一个子块
 			qreal startY = -totalRightH / 2. + pRoot->boundingRect().height() / 2.;
 			for (int i = 0; i < rightChildren.size(); i++)
 			{
 				MindNode* pChild = rightChildren[i];
-				QRectF br = pChild->wholeBoundingRect();
+				QRectF br = pChild->childrenOrSelfRect(true);
 				qreal y = startY + br.height() / 2 - pChild->boundingRect().height() / 2.;
 				qreal x = W + HMargin;
 				pChild->setPosition(QPointF(x, y));
@@ -179,11 +180,10 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 		sck.pop();
 
 		QRectF currItemRect = pRoot->mapRectToScene(pRoot->boundingRect());
-		QRectF childBoundingRect = pRoot->childrenBoundingRectExcludingPath();
-		childBoundingRect = pRoot->mapRectToScene(childBoundingRect);
+		QRectF rightChildrenRect = pRoot->mapRectToScene(pRoot->childrenRect(true));
 		if (!pRoot->Children().isEmpty() &&
-			childBoundingRect.contains(scenePos) &&
-			scenePos.x() - childBoundingRect.left() < 170)
+			rightChildrenRect.contains(scenePos) &&
+			scenePos.x() - rightChildrenRect.left() < 170)
 		{
 			pNewHolderParent = pRoot;
 
@@ -248,13 +248,16 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 
 void MindMapScene::onNodeDragged(MindNode* pNode)
 {
-	Q_ASSERT(m_pHolder && m_pHolder->Parent());
-	MindNode* parent = m_pHolder->Parent();
-	int idx = parent->Children().indexOf(m_pHolder);
-	parent->removeChild(m_pHolder);
-	parent->insertChild(pNode, idx);
-	m_pHolder->hide();
-	onRedrawItems();
+	if (m_pHolder && m_pHolder->Parent())
+	{
+		MindNode* parent = m_pHolder->Parent();
+		int idx = parent->Children().indexOf(m_pHolder);
+		parent->removeChild(m_pHolder);
+		parent->insertChild(pNode, idx);
+		m_pHolder->hide();
+		onRedrawItems();
+		//emit itemContentChanged(false);
+	}
 }
 
 MindNode* MindMapScene::parseXML(const std::string& content)

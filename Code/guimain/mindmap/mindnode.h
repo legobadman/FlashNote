@@ -35,7 +35,7 @@ public:
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 	
 	QList<MindNode*> Children(bool excludeDragging = true) const;
-	QRectF wholeBoundingRect() const;
+	QRectF childrenOrSelfRect(bool isToRight) const;
 
 	void removeChild(MindNode* pNode);
 	void insertChild(MindNode* pNode, int idx);
@@ -93,6 +93,8 @@ public:
 	void SetContent(const QString& content);
 	QString GetContent() const;
 	QRectF boundingRect() const override;
+	QRectF hierarchyRect(bool bToRight);
+	QRectF childrenRect(bool bToRight) const;
 
 protected:
 	virtual void initUIColor();
@@ -147,7 +149,7 @@ protected:
 
 	QPointF m_initClickScenePos;
 	QPointF m_item_event_offset;
-
+	QRectF m_hierarchyRect;
 	bool m_bDragging;
 };
 

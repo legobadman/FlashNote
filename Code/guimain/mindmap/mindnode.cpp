@@ -868,15 +868,64 @@ QRectF MindNode::boundingRect() const
 		return br;
 }
 
-QRectF MindNode::wholeBoundingRect() const
+QRectF MindNode::childrenOrSelfRect(bool isToRight) const
 {
-	if (Children().isEmpty() || rightExpandState() == EXP_COLLAPSE)
+	if (Children().isEmpty() || isCollapsed(isToRight))
 	{
 		return boundingRect();
 	}
 	else
 	{
-		return childrenBoundingRectExcludingPath();
+		return childrenRect(isToRight);
+	}
+}
+
+QRectF MindNode::childrenRect(bool bToRight) const
+{
+	//折叠以后实际上隐藏的children的rect已经没有意义了，因为没有绘制回来。
+	if (m_children.isEmpty() || isCollapsed(bToRight))
+	{
+		return QRectF();
+	}
+	else
+	{
+		QRectF hRect;
+		//方法：找到最为边界的xy值（以this坐标系为参考系）
+		qreal xLeft = INT_MAX, xRight = INT_MIN, yTop = INT_MAX, yBottom = INT_MIN;
+		for (int i = 0; i < m_children.length(); i++)
+		{
+			MindNode* pChild = m_children[i];
+			//TODO: holder也要设置toRight
+			if (pChild->isToRight() != bToRight)
+				continue;
+
+			QRectF bRect = pChild->boundingRect();
+			QRectF childRect = this->mapRectFromItem(pChild, pChild->childrenRect(bToRight));
+			QPointF itemPos = pChild->pos();
+			if (childRect.isEmpty())
+			{
+				yTop = min(yTop, itemPos.y());
+				yBottom = max(yBottom, itemPos.y() + bRect.height());
+				xLeft = min(xLeft, itemPos.x());
+				xRight = max(xRight, itemPos.x() + bRect.width());
+			}
+			else
+			{
+				yTop = min(yTop, min(itemPos.y(), childRect.y()));
+				yBottom = max(yBottom, max(itemPos.y() + bRect.height(), childRect.bottom()));
+				if (bToRight)
+				{
+					xLeft = min(xLeft, itemPos.x());
+					xRight = max(xRight, childRect.right());
+				}
+				else
+				{
+					xLeft = min(xLeft, childRect.left());
+					xRight = max(xRight, itemPos.x() + bRect.width());
+				}
+			}
+		}
+		return QRectF(QPointF(xLeft, yTop), QPointF(xRight, yBottom));
 	}
 }
 
@@ -932,29 +981,6 @@ void MindNode::setPosition(QPointF pos)
 		{
 			childConnector = QPointF(bbox.right(), bbox.height() / 2);
 		}
-
-		//QPointF thisPos = scenePos();
-		////在scene坐标系下，计算root纵坐标。
-		//qreal rootY = parentPos.y() + pParent->boundingRect().height() / 2.0;
-		////ytemp = mapFromScene(QPointF(0, ytemp)).y();
-
-		//QPointF rootConnector, childConnector;
-		//if (isToRight())
-		//{
-		//	rootConnector = QPointF(parentPos.x() + pParent->boundingRect().width(), rootY);
-		//}
-		//else
-		//{
-		//	rootConnector = QPointF(parentPos.x(), rootY);
-		//}
-		//if (isToRight())
-		//{
-		//	childConnector = QPointF(thisPos.x(), thisPos.y() + bbox.height() / 2);
-		//}
-		//else
-		//{
-		//	childConnector = QPointF(thisPos.x() + bbox.width(), thisPos.y() + bbox.height() / 2);
-		//}
 
 		QPointF c1((rootConnector.x() + childConnector.x()) / 2.0, rootConnector.y());
 		QPointF c2((rootConnector.x() + childConnector.x()) / 2.0, childConnector.y());
