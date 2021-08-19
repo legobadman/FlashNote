@@ -58,8 +58,6 @@ add_executable(guimain
     ./booklistview.ui
     ./bookviewmodel.cpp
     ./bookviewmodel.h
-    ./bookmenubutton.cpp
-    ./bookmenubutton.h
     ./colorgallery.cpp
     ./colorgallery.h
     ./coloritemdelegate.cpp
