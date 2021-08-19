@@ -32,8 +32,8 @@ private slots:
 	void onNodeDragging(MindNode* pNode);
 
 private:
-	void onRedrawItems();
-	void arrangeAllItems();
+	void onRedrawItems(bool bDrawHolder = false);
+	void arrangeAllItems(bool bDrawHolder);
 	MindNode* parseXML(const std::string& content);
 	XML_NODE* _export(MindNode* root, xml_document<>& doc);
 	MindNode* _parse(MindNode* parent, xml_node<>* root, int level);

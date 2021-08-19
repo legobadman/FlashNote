@@ -34,7 +34,8 @@ public:
 	virtual void setup(MindMapScene* pScene);
 	virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 	
-	QList<MindNode*> Children(bool excludeDragging = true) const;
+	//direction: -1  all direction    0: only left     1: only right
+	QList<MindNode*> Children(bool excludeHolder = true, int direction = -1) const;
 	QRectF childrenOrSelfRect(bool isToRight) const;
 
 	void removeChild(MindNode* pNode);
@@ -55,6 +56,7 @@ public:
 
 	bool isExpanded(MindNodeButton* pBtn);
 	bool isCollapsed(bool bRight) const;
+	bool hasDraggingInChildRect(QPointF scenePos, int& dir_idx, bool& toRight);
 	QString noteid() const { return m_noteid; }
 	void setNoteId(const QString& noteid) { m_noteid = noteid; }
 
@@ -118,6 +120,7 @@ private:
 	void initExpandBtns();
 	void checkRemoveExpandBtns(bool bToRight);
 	qreal _dist(const QPointF& p1, const QPointF& p2);
+	void _collaspe(bool toRight);
 
 protected:
 	QString m_content;
@@ -132,7 +135,7 @@ protected:
 	int m_counter;	//防止绘制重入。
 	MOUSE_STATE m_mouseState;
 	bool m_bHovered;
-	bool m_bToRight;	//子节点向右扩展。
+	bool m_bToRight;	//子节点向右扩展，根节点此属性无效。
 	MindNode* m_parent;
 
 	QSharedPointer<MindNodeButton> m_pLCollaspBtn;

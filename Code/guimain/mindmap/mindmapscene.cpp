@@ -28,7 +28,7 @@ void MindMapScene::initContent(QString content, bool bSchedule)
 	m_pHolder->hide();
 	addItem(m_pHolder);
 	m_pRoot = parseXML(content.toStdString());
-	arrangeAllItems();
+	arrangeAllItems(false);
 	update();
 }
 
@@ -72,14 +72,14 @@ void MindMapScene::onNodeStateChanged()
 	emit itemContentChanged(false);
 }
 
-void MindMapScene::onRedrawItems()
+void MindMapScene::onRedrawItems(bool bDrawHolder)
 {
-	arrangeAllItems();
+	arrangeAllItems(bDrawHolder);
 	clearSelection();
 	update();
 }
 
-void MindMapScene::arrangeAllItems()
+void MindMapScene::arrangeAllItems(bool bDrawHolder)
 {
 	std::stack<MindNode*> sck, pre;
 	sck.push(m_pRoot);
@@ -87,7 +87,7 @@ void MindMapScene::arrangeAllItems()
 	{
 		MindNode* pRoot = sck.top();
 		sck.pop();
-		foreach(MindNode * pChild, pRoot->Children(true))
+		foreach(MindNode * pChild, pRoot->Children(!bDrawHolder))
 		{
 			sck.push(pChild);
 		}
@@ -101,7 +101,7 @@ void MindMapScene::arrangeAllItems()
 		MindNode* pRoot = pre.top();
 		
 		//观察子节点的高度，在y的基础上为当前节点
-		QList<MindNode*> children = pRoot->Children(true);
+		QList<MindNode*> children = pRoot->Children(!bDrawHolder);
 		int W = pRoot->boundingRect().width();
 		int n = children.size();
 
@@ -170,7 +170,7 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 
 	MindNode* pNewHolderParent = NULL;
 	int holderIdx = 0;
-	bool toRight = true;
+	bool toRight = false;
 
 	std::stack<MindNode*> sck, post;
 	sck.push(m_pRoot);
@@ -179,38 +179,18 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 		MindNode* pRoot = sck.top();
 		sck.pop();
 
-		QRectF currItemRect = pRoot->mapRectToScene(pRoot->boundingRect());
-		QRectF rightChildrenRect = pRoot->mapRectToScene(pRoot->childrenRect(true));
-		if (!pRoot->Children().isEmpty() &&
-			rightChildrenRect.contains(scenePos) &&
-			scenePos.x() - rightChildrenRect.left() < 170)
+		bool bFinded = pRoot->hasDraggingInChildRect(scenePos, holderIdx, toRight);
+		if (bFinded)
 		{
 			pNewHolderParent = pRoot;
-
-			//观察在哪个子节点之间(上)(下)
-			foreach(MindNode * pChild, pRoot->Children(true))
-			{
-				int yTop = pChild->mapRectToScene(pChild->boundingRect()).top();
-				if (yTop < scenePos.y())
-					holderIdx++;
-				else
-					break;
-			}
 			break;
 		}
-		else if (pRoot->Children().isEmpty() &&
-				 scenePos.y() > currItemRect.top() - 5 &&
-				 scenePos.y() < currItemRect.bottom() + 5 &&
-				 scenePos.x() > currItemRect.right() - 50 &&
-				 scenePos.x() < currItemRect.right() + 160
-				 )
+		else
 		{
-			pNewHolderParent = pRoot;
-			QString content = pNewHolderParent->GetContent();
-			holderIdx = 0;
-			break;
+			holderIdx = -1;
+			toRight = false;
+			pNewHolderParent = NULL;
 		}
-
 		foreach(MindNode * pChild, pRoot->Children())
 		{
 			if (!pChild->isHolder())
@@ -218,32 +198,21 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 		}
 	}
 
-	if (!pNewHolderParent)
-		return;
-
-	//观察位置是否已经有holder
-	if (m_pHolder->parentItem() == pNewHolderParent)
-	{
-		QList<MindNode*> children = pNewHolderParent->Children(false);
-		if (holderIdx < 0 || holderIdx >= children.length())
-			return;
-		else if (children[holderIdx] == m_pHolder)
-			return;
-	}
-
-	if (pNewHolderParent == NULL || holderIdx < 0)
+	//不检查同位置是否有holder了，反正计算位置没啥成本。
+	if (pNewHolderParent == NULL || holderIdx < 0 ||
+		holderIdx > pNewHolderParent->Children().length())
 	{
 		m_pHolder->hide();
-		return;
 	}
 	else
 	{
+		m_pHolder->setToRight(toRight);
 		m_pHolder->setVisible(true);
 		if (m_pHolder->Parent())
 			m_pHolder->Parent()->removeChild(m_pHolder);
 		pNewHolderParent->insertChild(m_pHolder, holderIdx);
 	}
-	onRedrawItems();
+	onRedrawItems(true);
 }
 
 void MindMapScene::onNodeDragged(MindNode* pNode)
@@ -251,9 +220,11 @@ void MindMapScene::onNodeDragged(MindNode* pNode)
 	if (m_pHolder && m_pHolder->Parent())
 	{
 		MindNode* parent = m_pHolder->Parent();
-		int idx = parent->Children().indexOf(m_pHolder);
+		//TODO：后续要作非法判断，现在先用来ASSERT流程的正确性。
+		int idx = parent->Children(false).indexOf(m_pHolder);
 		parent->removeChild(m_pHolder);
 		parent->insertChild(pNode, idx);
+		pNode->setToRight(m_pHolder->isToRight());
 		m_pHolder->hide();
 		onRedrawItems();
 		//emit itemContentChanged(false);

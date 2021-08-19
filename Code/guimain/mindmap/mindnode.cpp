@@ -97,15 +97,20 @@ MindNode::~MindNode()
 	//	delete m_pathItem;	//todo: smart pointer
 }
 
-QList<MindNode*> MindNode::Children(bool excludeDragging) const
+QList<MindNode*> MindNode::Children(bool excludeHolder, int direction) const
 {
 	QList<MindNode*> _children;
-	foreach(QGraphicsItem * pObj, m_children)//childItems()) //为了维护插入时的顺序，只能用自己的容器了。
+	foreach(QGraphicsItem * pObj, m_children)
 	{
 		MindNode* p = qgraphicsitem_cast<MindNode*>(pObj);
+		if (direction == 0 && p->isToRight())
+			continue;
+		if (direction == 1 && !p->isToRight())
+			continue;
+
 		if (p)
 		{
-			if (excludeDragging && p->isDragging())
+			if (excludeHolder && p->isHolder())
 				continue;
 			_children.append(p);
 		}
@@ -204,10 +209,6 @@ void MindNode::initExpandBtns()
 				m_pLCollaspBtn->hide();
 				connect(m_pLCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onLeftExpandBtnToggle()));
 			}
-			else
-			{
-				m_left_expand = EXP_NODEFINE;
-			}
 		}
 
 		if (m_pRCollaspBtn == NULL)
@@ -218,10 +219,6 @@ void MindNode::initExpandBtns()
 				m_pRCollaspBtn->installSceneEventFilter(this);
 				m_pRCollaspBtn->hide();
 				connect(m_pRCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onRightExpandBtnToggle()));
-			}
-			else
-			{
-				m_right_expand = EXP_NODEFINE;
 			}
 		}
 	}
@@ -237,10 +234,6 @@ void MindNode::initExpandBtns()
 				m_pRCollaspBtn->hide();
 				connect(m_pRCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onRightExpandBtnToggle()));
 			}
-			else
-			{
-				m_right_expand = EXP_NODEFINE;
-			}
 		}
 	}
 	else
@@ -254,10 +247,6 @@ void MindNode::initExpandBtns()
 				m_pLCollaspBtn->installSceneEventFilter(this);
 				m_pLCollaspBtn->hide();
 				connect(m_pLCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onLeftExpandBtnToggle()));
-			}
-			else
-			{
-				m_left_expand = EXP_NODEFINE;
 			}
 		}
 	}
@@ -607,10 +596,28 @@ void MindNode::onRightExpandBtnToggle()
 		if ((*it)->isToRight())
 		{
 			(*it)->setVisible(bVisible);
-			//(*it)->pathItem()->setVisible(bVisible);
 		}
 	}
 	emit expandChanged();
+}
+
+void MindNode::_collaspe(bool toRight)
+{
+	if (m_children.isEmpty())
+		return;
+
+	if (toRight)
+		m_right_expand = EXP_COLLAPSE;
+	else
+		m_left_expand = EXP_COLLAPSE;
+
+	for (auto it = m_children.begin(); it != m_children.end(); it++)
+	{
+		if ((*it)->isToRight() == toRight)
+		{
+			(*it)->setVisible(false);
+		}
+	}
 }
 
 void MindNode::removeChild(MindNode* pNode)
@@ -652,6 +659,7 @@ void MindNode::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 			m_item_event_offset = event->scenePos() - this->scenePos();
 			m_parent->removeChild(this);
 			m_pathItem->hide();
+			_collaspe(m_bToRight);
 			m_bDragging = true;
 		}
 	}
@@ -802,18 +810,6 @@ void MindNode::NewChild(bool toRight)
 	emit nodeCreated(pChild);
 }
 
-//QList<MindNode*> MindNode::children(bool toRight)
-//{
-//	QList<MindNode*> result;
-//	QList<MindNode*>& children = m_children;
-//	for (int i = 0; i < children.length(); i++)
-//	{
-//		if (children[i]->isToRight() == toRight)
-//			result.append(children[i]);
-//	}
-//	return result;
-//}
-
 QPainterPath MindNode::shape() const
 {
 	QPainterPath path;
@@ -927,6 +923,116 @@ QRectF MindNode::childrenRect(bool bToRight) const
 		}
 		return QRectF(QPointF(xLeft, yTop), QPointF(xRight, yBottom));
 	}
+}
+
+bool MindNode::hasDraggingInChildRect(QPointF scenePos, int& dir_idx, bool& toRight)
+{
+	bool finded = false;
+	int holderIdx = 0;
+	QRectF currItemRect = mapRectToScene(boundingRect());
+	QList<MindNode*> allChildren = Children();
+	QList<MindNode*> leftChildren = Children(true, 0);
+	QList<MindNode*> rightChildren = Children(true, 1);
+
+	//防止左边节点判断了右边的插入引发混乱
+	if (m_right_expand != EXP_NODEFINE)
+	{
+		QRectF rightChildrenRect = mapRectToScene(childrenRect(true));
+		//为了能匹配最上面子节点的位置，适度往上扩展rightChildrenRect
+		rightChildrenRect.adjust(0, -10, 0, 0);
+
+		if (!rightChildren.isEmpty() &&
+			rightChildrenRect.contains(scenePos) &&
+			scenePos.x() - rightChildrenRect.left() < 110)
+		{
+			if (m_content == u8"思维导图笔记")
+			{
+				int j;
+				j = 0;
+			}
+
+			//观察在哪个子节点之间(上)(下)
+			foreach(MindNode * pChild, rightChildren)
+			{
+				int yTop = pChild->mapRectToScene(pChild->boundingRect()).top();
+				if (yTop < scenePos.y())
+					holderIdx++;
+				else
+					break;
+			}
+			if (holderIdx == 0)
+			{
+				MindNode* behindNode = rightChildren[0];
+				dir_idx = allChildren.indexOf(behindNode);
+			}
+			else
+			{
+				MindNode* aboveNode = rightChildren[max(0, holderIdx - 1)];
+				//找到aboveNode在所有节点的索引。
+				holderIdx = allChildren.indexOf(aboveNode);
+				dir_idx = holderIdx + 1;
+			}
+			toRight = true;
+			return true;
+		}
+		else if (rightChildren.isEmpty() &&
+			scenePos.y() > currItemRect.top() - 5 &&
+			scenePos.y() < currItemRect.bottom() + 5 &&
+			scenePos.x() > currItemRect.right() - 50 &&
+			scenePos.x() < currItemRect.right() + 160
+			)
+		{
+			QString content = GetContent();
+			dir_idx = leftChildren.length();	//可能左边有节点
+			toRight = true;
+			return true;
+		}
+	}
+	
+	if (m_left_expand != EXP_NODEFINE)
+	{
+		//观察左边
+		QRectF leftChildrenRect = mapRectToScene(childrenRect(false));
+		if (!leftChildren.isEmpty() &&
+			leftChildrenRect.contains(scenePos) &&
+			leftChildrenRect.right() - scenePos.x() < 110)
+		{
+
+			if (m_content == u8"思维导图笔记")
+			{
+				int j;
+				j = 0;
+			}
+
+			//观察在哪个子节点之间(上)(下)
+			foreach(MindNode * pChild, leftChildren)
+			{
+				int yTop = pChild->mapRectToScene(pChild->boundingRect()).top();
+				if (yTop < scenePos.y())
+					holderIdx++;
+				else
+					break;
+			}
+			MindNode* aboveNode = leftChildren[max(0, holderIdx - 1)];
+			holderIdx = allChildren.indexOf(aboveNode);
+			dir_idx = holderIdx + 1;
+			toRight = false;
+			return true;
+		}
+		else if (leftChildren.isEmpty() &&
+			scenePos.y() > currItemRect.top() - 5 &&
+			scenePos.y() < currItemRect.bottom() + 5 &&
+			scenePos.x() < currItemRect.left() - 50 &&
+			scenePos.x() > currItemRect.left() - 160
+			)
+		{
+			QString content = GetContent();
+			dir_idx = rightChildren.length();
+			toRight = false;
+			return true;
+		}
+	}
+	return false;
 }
 
 void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

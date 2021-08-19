@@ -540,21 +540,4 @@ void NormalEditor::insertImage()
 
 	QImage image = QImageReader(original).read();
 	textEdit->dropImage(QUrl(original), image);
-
-	//QTextDocument* textDocument = m_ui->textEdit->document();
-	//textDocument->addResource(QTextDocument::ImageResource, Uri, QVariant(image));
-
-	//QTextCursor cursor = m_ui->textEdit->textCursor();
-	//QTextImageFormat imageFormat;
-
-	////调整图片的宽度。
-	////TODO: resize的时候自动调宽
-	//int w = m_ui->textEdit->width();
-	//float ratio = (float)image.width() / image.height();
-	//int h = w / ratio;
-
-	//imageFormat.setWidth(w);
-	//imageFormat.setHeight(h);
-	//imageFormat.setName(Uri.toString());
-	//cursor.insertImage(imageFormat);
 }

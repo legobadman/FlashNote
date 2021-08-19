@@ -35,6 +35,60 @@ void RichTextEditor::updateFrameFormat()
 	rootFrame->setFrameFormat(format);
 }
 
+void RichTextEditor::resizeEvent(QResizeEvent* e)
+{
+	QTextEdit::resizeEvent(e);
+	resizeImages();
+}
+
+void RichTextEditor::resizeImages()
+{
+	QTextBlock currentBlock = textCursor().block();
+	QTextBlock::iterator it;
+
+	for (it = currentBlock.begin(); !(it.atEnd()); ++it)
+	{
+		QTextFragment fragment = it.fragment();
+		if (fragment.isValid())
+		{
+			if (fragment.charFormat().isImageFormat())
+			{
+				QTextImageFormat newImageFormat = fragment.charFormat().toImageFormat();
+				qreal editorWidth = newImageFormat.width();
+				QString name = newImageFormat.name();
+				QUrl url(name);
+				QVariant varRes = document()->resource(QTextDocument::ImageResource, url);
+				if (varRes.type() != QVariant::Image && varRes.type() != QVariant::Pixmap)
+					continue;
+
+				QImage image = varRes.value<QImage>();
+
+				int W = viewport()->width() - 45 * 2;	//ËãÉÏmargin¡£
+				float ratio = 1;
+				if (image.width() > W)
+				{
+					ratio = (float)image.width() / image.height();
+				}
+				else
+				{
+					continue;
+				}
+				newImageFormat.setWidth(W);
+				newImageFormat.setHeight(W / ratio);
+				if (newImageFormat.isValid())
+				{
+					QTextCursor helper = textCursor();
+
+					helper.setPosition(fragment.position());
+					helper.setPosition(fragment.position() + fragment.length(),
+						QTextCursor::KeepAnchor);
+					helper.setCharFormat(newImageFormat);
+				}
+			}
+		}
+	}
+}
+
 void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 {
 	if (!image.isNull())
@@ -70,10 +124,24 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 			fullpath = QString("%1/%2.%3").arg(assertPath).arg(prefix).arg(suffix);
 		}
 
-		bool bRet = image.save(fullpath);
+		bool bRet = image.save(fullpath, suffix.toUtf8(), 100);
 		QUrl url_(fullpath);
 		document()->addResource(QTextDocument::ImageResource, url_, image);
-		textCursor().insertImage(url_.toString());
+		QTextImageFormat imageFormat;
+		imageFormat.setName(url_.toString());
+		int W = viewport()->width() - 45 * 2;	//ËãÉÏmargin¡£
+		float ratio = 1;
+		if (image.width() > W)
+		{
+			ratio = (float)image.width() / image.height();
+		}
+		else
+		{
+			W = image.width() - 45 * 2;
+		}
+		imageFormat.setWidth(W);
+		imageFormat.setHeight(W / ratio);
+		textCursor().insertImage(imageFormat);
 	}
 }
 
