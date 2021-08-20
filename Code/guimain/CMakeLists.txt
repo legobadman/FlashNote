@@ -154,10 +154,6 @@ add_executable(guimain
     ./style/ToolButtonStyle.h
     ./style/toolbuttonstyleoption.cpp
     ./style/toolbuttonstyleoption.h
-    ./typography/customtextdocument.cpp
-    ./typography/customtextdocument.h
-    ./typography/codetextframe.cpp
-    ./typography/codetextframe.h
 
     #qt ‘—È¥˙¬Î
     ./qtexamples/MltpDlgs1.cpp
