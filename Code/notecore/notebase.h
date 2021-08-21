@@ -30,7 +30,7 @@ public:
 	HRESULT SetModifyTime(long time);
 
 public:
-	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	HRESULT QueryInterface(QUuid riid, void** ppvObject);
 	long AddRef(void);
 	long Release(void);
 
@@ -73,7 +73,7 @@ public:
 	HRESULT GetNoteIdx(INote* pNote, int* pIndex);
 
 public:
-	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	HRESULT QueryInterface(QUuid riid, void** ppvObject);
 
 private:
 	wstring m_id;
@@ -96,7 +96,7 @@ public:
 	HRESULT DeleteNotebook(INotebook* pNotebook);
 
 public:
-	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	HRESULT QueryInterface(QUuid riid, void** ppvObject);
 	long AddRef(void);
 	long Release(void);
 
@@ -121,7 +121,7 @@ public:
 	HRESULT DeleteNote(INote* pNote);
 
 public:
-	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	HRESULT QueryInterface(QUuid riid, void** ppvObject);
 };
 
 class SchedulesBase : public NoteCollection<ISchedules>
@@ -142,7 +142,7 @@ public:
 
 	HRESULT GetNoteIdx(INote* pNote, int* pIndex) { return E_NOTIMPL; }
 public:
-	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	HRESULT QueryInterface(QUuid riid, void** ppvObject);
 
 private:
 	wstring m_id;
@@ -165,7 +165,7 @@ public:
 	HRESULT SetSchedules(ISchedules* pSchedules);
 
 public:
-	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	HRESULT QueryInterface(QUuid riid, void** ppvObject);
 	long AddRef(void);
 	long Release(void);
 

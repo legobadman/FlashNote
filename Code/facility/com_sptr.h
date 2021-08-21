@@ -92,17 +92,6 @@ public:
 		return m_ptr = p.m_ptr;
 	}
 
-	/*T* operator=(IUnknown* pObj)
-	{
-		GUID wtf;
-		if (pObj)
-			pObj->AddRef();
-		if (m_ptr)
-			m_ptr->Release();
-		pObj->QueryInterface(wtf, (void**)m_ptr);
-		return m_ptr;
-	}*/
-
 	bool operator!() const
 	{
 		return m_ptr == NULL;

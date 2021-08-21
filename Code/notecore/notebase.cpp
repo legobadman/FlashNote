@@ -111,7 +111,7 @@ HRESULT NoteBase::SetModifyTime(long modify_time)
 }
 
 HRESULT NoteBase::QueryInterface(
-	GUID riid,
+	QUuid riid,
 	void** ppvObject)
 {
 	if (!ppvObject)
@@ -245,7 +245,7 @@ HRESULT NotebookBase::GetNoteIdx(INote* pNote, int* pIndex)
 }
 
 HRESULT NotebookBase::QueryInterface(
-	GUID riid,
+	QUuid riid,
 	void** ppvObject)
 {
 	if (!ppvObject)
@@ -384,7 +384,7 @@ HRESULT NotebooksBase::DeleteNotebook(INotebook* pNotebook)
 }
 
 HRESULT NotebooksBase::QueryInterface(
-	GUID riid,
+	QUuid riid,
 	void** ppvObject)
 {
 	if (!ppvObject)
@@ -438,7 +438,7 @@ HRESULT TrashBase::DeleteNote(INote* pNote)
 }
 
 HRESULT TrashBase::QueryInterface(
-	GUID riid,
+	QUuid riid,
 	void** ppvObject)
 {
 	if (!ppvObject)
@@ -500,7 +500,7 @@ HRESULT SchedulesBase::SetId(const std::wstring& bstrId)
 }
 
 HRESULT SchedulesBase::QueryInterface(
-	GUID riid,
+	QUuid riid,
 	void** ppvObject)
 {
 	if (!ppvObject)
@@ -611,7 +611,7 @@ HRESULT NoteApplication::addWatcher(ICoreNotify* pNotify)
 }
 
 HRESULT NoteApplication::QueryInterface(
-	GUID riid,
+	QUuid riid,
 	void** ppvObject)
 {
 	if (!ppvObject)

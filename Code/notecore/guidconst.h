@@ -3,13 +3,13 @@
 
 #include <QUuid>
 
-extern GUID IID_INoteCoreObj;
-extern GUID IID_INoteApplication;
-extern GUID IID_INoteCollection;
-extern GUID IID_INotebooks;
-extern GUID IID_INotebook;
-extern GUID IID_INote;
-extern GUID IID_ITrash;
-extern GUID IID_ISchedules;
+extern QUuid IID_INoteCoreObj;
+extern QUuid IID_INoteApplication;
+extern QUuid IID_INoteCollection;
+extern QUuid IID_INotebooks;
+extern QUuid IID_INotebook;
+extern QUuid IID_INote;
+extern QUuid IID_ITrash;
+extern QUuid IID_ISchedules;
 
 #endif

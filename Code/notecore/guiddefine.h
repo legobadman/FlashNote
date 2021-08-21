@@ -4,13 +4,13 @@
 #include <QUuid>
 
 template<class T>
-const GUID& uuidof();
+const QUuid& uuidof();
 
 #define __uuid(cls) uuidof<cls>()
 
 #define DEFINE_INTERFACE_GUID(Interface) \
 template<>\
-const GUID& uuidof<Interface>()\
+const QUuid& uuidof<Interface>()\
 {\
 	return IID_##Interface;\
 }

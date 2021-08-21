@@ -65,7 +65,7 @@ signals:
 	void rowInserted(int);
 
 public:
-	HRESULT QueryInterface(GUID, void **) { return E_NOTIMPL; }
+	HRESULT QueryInterface(QUuid, void **) { return E_NOTIMPL; }
 	long AddRef(void) { return 1; }
 	long Release(void) { return 1; }
 

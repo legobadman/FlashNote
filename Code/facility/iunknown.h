@@ -6,7 +6,7 @@
 
 interface IUnknown
 {
-	virtual HRESULT QueryInterface(GUID riid, void** ppvObject) = 0;
+	virtual HRESULT QueryInterface(QUuid riid, void** ppvObject) = 0;
 	virtual long AddRef(void) = 0;
 	virtual long Release(void) = 0;
 };
