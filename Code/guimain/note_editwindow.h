@@ -1,7 +1,7 @@
 #ifndef __NOTE_EDIT_WINDOW_H__
 #define __NOTE_EDIT_WINDOW_H__
 
-#include "notecore.h"
+#include "notecore2.h"
 #include "ui_note_editwindow.h"
 
 namespace Ui

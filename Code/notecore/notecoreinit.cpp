@@ -1,7 +1,7 @@
-#include "notecore.h"
+#include "notecore2.h"
 #include "notebase.h"
 
-BSTR _default_content(NOTE_TYPE type)
+std::wstring _default_content(NOTE_TYPE type)
 {
 	if (type == MINDMAP)
 	{
@@ -14,24 +14,24 @@ BSTR _default_content(NOTE_TYPE type)
 	return L"";
 }
 
-BSTR _default_title(NOTE_TYPE type)
+std::wstring _default_title(NOTE_TYPE type)
 {
 	if (type == MINDMAP)
 	{
-		return SysAllocString(L"思维导图笔记");
+		return L"思维导图笔记";
 	}
 	else if (type == SCHEDULE)
 	{
-		return SysAllocString(L"进度图");
+		return L"进度图";
 	}
-	return NULL;
+	return L"";
 }
 
 HRESULT CreateNote(NOTE_TYPE type, INote** ppNote)
 {
 	if (ppNote == NULL)
 	{
-		return E_POINTER;
+		return E_FAIL;
 	}
 	INote* pNote = new NoteBase;
 	pNote->SetType(type);
@@ -46,7 +46,7 @@ HRESULT CreateNotebook(INotebook** ppNotebook)
 {
 	if (ppNotebook == NULL)
 	{
-		return E_POINTER;
+		return E_FAIL;
 	}
 	INotebook* pNotebook = new NotebookBase;
 	(*ppNotebook) = pNotebook;
@@ -58,7 +58,7 @@ HRESULT CreateNotebooks(INotebooks** ppNotebooks)
 {
 	if (ppNotebooks == NULL)
 	{
-		return E_POINTER;
+		return E_FAIL;
 	}
 	INotebooks* pNotebooks = new NotebooksBase;
 	(*ppNotebooks) = pNotebooks;
@@ -69,7 +69,7 @@ HRESULT CreateNotebooks(INotebooks** ppNotebooks)
 HRESULT CreateApplication(INoteApplication** pApp)
 {
 	if (!pApp)
-		return E_POINTER;
+		return E_FAIL;
 
 	*pApp = new NoteApplication;
 	(*pApp)->AddRef();
@@ -79,7 +79,7 @@ HRESULT CreateApplication(INoteApplication** pApp)
 HRESULT CreateTrash(ITrash** ppTrash)
 {
 	if (!ppTrash)
-		return E_POINTER;
+		return E_FAIL;
 
 	*ppTrash = new TrashBase;
 	(*ppTrash)->AddRef();
@@ -89,7 +89,7 @@ HRESULT CreateTrash(ITrash** ppTrash)
 HRESULT CreateSchedules(ISchedules** ppSchedules)
 {
 	if (!ppSchedules)
-		return E_POINTER;
+		return E_FAIL;
 
 	*ppSchedules = new SchedulesBase;
 	(*ppSchedules)->AddRef();

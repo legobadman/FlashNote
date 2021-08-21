@@ -6,6 +6,10 @@
 #include "ToolButtonStyle.h"
 #include "toolbuttonstyleoption.h"
 
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#endif
+
 
 MyStyle::MyStyle()
 {
@@ -22,10 +26,12 @@ qreal MyStyle::dpiScaled(qreal value)
 	{
 		scale = 1.0;
 		{
+#ifdef Q_OS_WIN
 			HDC hdcScreen = GetDC(0);
 			int dpi = GetDeviceCaps(hdcScreen, LOGPIXELSX);
 			ReleaseDC(0, hdcScreen);
 			scale = dpi / 96.0;
+#endif
 		}
 	}
 	return value * scale;

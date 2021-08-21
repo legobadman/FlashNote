@@ -106,12 +106,12 @@ public:
 	~NavigationPanel();
 	QTreeView* treeview() { return m_treeview; }
 
-	HRESULT STDMETHODCALLTYPE onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
+	HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
 
 public:
-	HRESULT STDMETHODCALLTYPE QueryInterface(REFIID, _COM_Outptr_ void __RPC_FAR* __RPC_FAR*) { return E_NOTIMPL; }
-	ULONG STDMETHODCALLTYPE AddRef(void) { return 1; }
-	ULONG STDMETHODCALLTYPE Release(void) { return 1; }
+	HRESULT QueryInterface(GUID, void **) { return E_NOTIMPL; }
+	long AddRef(void) { return 1; }
+	long Release(void) { return 1; }
 
 protected:
 	void paintEvent(QPaintEvent* event) override;

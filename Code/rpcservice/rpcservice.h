@@ -2,7 +2,7 @@
 #define __RPC_SERVICE_H__
 
 #include "note_types.h"
-#include "notecore.h"
+#include "notecore2.h"
 #include <codecvt>
 #include <string>
 #include <locale>

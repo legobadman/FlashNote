@@ -5,14 +5,13 @@
 #include <thrift/transport/TBufferTransports.h>
 #include <thrift/transport/TTransportUtils.h>
 
-#include "notecore.h"
+#include "notecore2.h"
 #include "com_sptr.h"
 #include "hello_types.h"
 #include "Hello.h"
 #include "UserInfo.h"
 #include "NoteInfo.h"
 #include "rpcservice.h"
-#include "notecore.h"
 #include "../guimain/guihelper.h"
 #include "notecoreinit.h"
 #include "thriftclient.h"
@@ -63,9 +62,8 @@ bool RPCService::SynchronizeNotebook(INotebook* pNotebook)
 
 bool RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, INote* pNote)
 {
-	BSTR bstrId, bstrTitle, bstrContent;
-	pNote->GetId(&bstrId);
-	std::wstring id(bstrId, SysStringLen(bstrId));
+	std::wstring id;
+	pNote->GetId(id);
 	std::wstring bookid = AppHelper::GetNotebookId(pNotebook).toStdWString();
 	if (id.empty())
 	{
@@ -73,8 +71,8 @@ bool RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 		pNote->GetType(&type);
 		//新建的note，需要先向服务端申请id
 		id = RPCService::GetInstance().NewNote(bookid, L"", type);
-		pNote->SetId(SysAllocString(id.c_str()));
-		pNote->SetBookId(SysAllocString(bookid.c_str()));
+		pNote->SetId(id);
+		pNote->SetBookId(bookid);
 		pNotebook->AddNote(pNote);
 
 		if (id.empty())
@@ -84,11 +82,9 @@ bool RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 		}
 	}
 
-	pNote->GetTitle(&bstrTitle);
-	pNote->GetContent(&bstrContent);
-	
-	std::wstring title(bstrTitle, SysStringLen(bstrTitle));
-	std::wstring content(bstrContent, SysStringLen(bstrContent));
+	std::wstring title, content;
+	pNote->GetTitle(title);
+	pNote->GetContent(content);
 
 	bool ret = m_pClient->client()->UpdateNote(converter.to_bytes(id), converter.to_bytes(title), converter.to_bytes(content));
 	return ret;

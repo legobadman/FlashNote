@@ -3,6 +3,7 @@
 
 #include "framework.h"
 #include "notecontainer.h"
+#include "notecore2.h"
 
 class NoteBase : public INote
 {
@@ -10,41 +11,38 @@ public:
 	NoteBase();
 	~NoteBase();
 
-	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
-
-	HRESULT STDMETHODCALLTYPE GetId(OUT BSTR* pbstrId);
-	HRESULT STDMETHODCALLTYPE SetId(IN BSTR bstrId);
-	HRESULT STDMETHODCALLTYPE GetBookId(BSTR* pBookId);
-	HRESULT STDMETHODCALLTYPE SetBookId(BSTR bookId);
-	HRESULT STDMETHODCALLTYPE GetTitle(OUT BSTR* pbstrName);
-	HRESULT STDMETHODCALLTYPE SetTitle(IN BSTR title);
-	HRESULT STDMETHODCALLTYPE GetType(NOTE_TYPE* pType);
-	HRESULT STDMETHODCALLTYPE SetType(NOTE_TYPE type);
-	HRESULT STDMETHODCALLTYPE GetContent(OUT BSTR* pbstrContent);
-	HRESULT STDMETHODCALLTYPE SetContent(IN BSTR content);
-	HRESULT STDMETHODCALLTYPE GetAbbreText(OUT BSTR* pbstrAbbre);
-	HRESULT STDMETHODCALLTYPE SetPlainText(IN BSTR content);
-	HRESULT STDMETHODCALLTYPE GetCreateTime(long* pTime);
-	HRESULT STDMETHODCALLTYPE SetCreateTime(long time);
-	HRESULT STDMETHODCALLTYPE GetModifyTime(long* pTime);
-	HRESULT STDMETHODCALLTYPE SetModifyTime(long time);
+	HRESULT addWatcher(ICoreNotify* pNotify);
+	HRESULT GetId(std::wstring& pbstrId);
+	HRESULT SetId(const std::wstring& bstrId);
+	HRESULT GetBookId(std::wstring& pBookId);
+	HRESULT SetBookId(const std::wstring& bookId);
+	HRESULT GetTitle(std::wstring& pbstrName);
+	HRESULT SetTitle(const std::wstring& title);
+	HRESULT GetType(NOTE_TYPE* pType);
+	HRESULT SetType(NOTE_TYPE type);
+	HRESULT GetContent(std::wstring& pbstrContent);
+	HRESULT SetContent(const std::wstring& content);
+	HRESULT GetAbbreText(std::wstring& pbstrAbbre);
+	HRESULT SetPlainText(const std::wstring& content);
+	HRESULT GetCreateTime(long* pTime);
+	HRESULT SetCreateTime(long time);
+	HRESULT GetModifyTime(long* pTime);
+	HRESULT SetModifyTime(long time);
 
 public:
-	HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-	ULONG STDMETHODCALLTYPE AddRef(void);
-	ULONG STDMETHODCALLTYPE Release(void);
+	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	long AddRef(void);
+	long Release(void);
 
 private:
 	void NotifyThisObj(NotifyOperator ope);
 
 private:
-	CComBSTR m_id;
-	CComBSTR m_bookid;
-	CComBSTR m_bstrTitle;
-	CComBSTR m_bstrContent;
-	CComBSTR m_bstrPlainText;
+	wstring m_id;
+	wstring m_bookid;
+	wstring m_bstrTitle;
+	wstring m_bstrContent;
+	wstring m_bstrPlainText;
 	std::tm m_createtime;
 	std::tm m_modifytime;
 
@@ -61,42 +59,28 @@ public:
 	NotebookBase();
 	~NotebookBase();
 
-	HRESULT STDMETHODCALLTYPE GetId(OUT BSTR* pbstrId);
-	HRESULT STDMETHODCALLTYPE SetId(IN BSTR bstrId);
-	HRESULT STDMETHODCALLTYPE GetName(OUT BSTR* pbstrName);
-	HRESULT STDMETHODCALLTYPE SetName(IN BSTR bstrName);
-	HRESULT STDMETHODCALLTYPE GetCreateTime(long* pTime);
-	HRESULT STDMETHODCALLTYPE SetCreateTime(long create_time);
-	HRESULT STDMETHODCALLTYPE GetModifyTime(long* pTime);
-	HRESULT STDMETHODCALLTYPE SetModifyTime(long time);
-	HRESULT STDMETHODCALLTYPE AddNote(INote* pNote);
-	HRESULT STDMETHODCALLTYPE RemoveNote(INote* pNote);
-	HRESULT STDMETHODCALLTYPE GetNoteIdx(INote* pNote, int* pIndex);
+	HRESULT GetName(std::wstring& pbstrName);
+	HRESULT AddNote(INote* pNote);
+	HRESULT RemoveNote(INote* pNote);
+
+	HRESULT GetId(std::wstring& pbstrId);
+	HRESULT SetId(const std::wstring& bstrId);
+	HRESULT SetName(const std::wstring& bstrName);
+	HRESULT GetCreateTime(long* pTime);
+	HRESULT SetCreateTime(long time);
+	HRESULT GetModifyTime(long* pTime);
+	HRESULT SetModifyTime(long time);
+	HRESULT GetNoteIdx(INote* pNote, int* pIndex);
 
 public:
-	HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
+	HRESULT QueryInterface(GUID riid, void** ppvObject);
 
 private:
-	CComBSTR m_id;
-	CComBSTR m_strName;
+	wstring m_id;
+	wstring m_strName;
 	std::tm m_createtime;
 	std::tm m_modifytime;
 };
-
-
-class Notes : public NoteCollection<INoteCollection>
-{
-public:
-	Notes();
-	~Notes();
-
-	HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-};
-
 
 class NotebooksBase : public INotebooks
 {
@@ -104,18 +88,17 @@ public:
 	NotebooksBase();
 	~NotebooksBase();
 
-	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
-	HRESULT STDMETHODCALLTYPE GetCount(/* [out] */ int* pCount);
-	HRESULT STDMETHODCALLTYPE Item(VARIANT index, INotebook** ppNote);
-	HRESULT STDMETHODCALLTYPE AddNotebook(INotebook* pNotebook);
-	HRESULT STDMETHODCALLTYPE DeleteNotebook(INotebook* pNotebook);
+	HRESULT addWatcher(ICoreNotify* pNotify);
+	HRESULT GetCount(int* pCount);
+	HRESULT Item(const wstring& index, INotebook** ppNotebook);
+	HRESULT Item(int index, INotebook** ppNotebook);
+	HRESULT AddNotebook(INotebook* pNotebook);
+	HRESULT DeleteNotebook(INotebook* pNotebook);
 
 public:
-	HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-	ULONG STDMETHODCALLTYPE AddRef(void);
-	ULONG STDMETHODCALLTYPE Release(void);
+	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	long AddRef(void);
+	long Release(void);
 
 private:
 	void NotifyThisObj(NotifyOperator ope, INotebook* pNote);
@@ -133,14 +116,12 @@ public:
 	~TrashBase();
 
 	/* INoteCollection */
-	HRESULT STDMETHODCALLTYPE GetName(BSTR* pbstrName);
+	HRESULT GetName(std::wstring& name);
 	/* ITrash */
-	HRESULT STDMETHODCALLTYPE DeleteNote(INote* pNote);
+	HRESULT DeleteNote(INote* pNote);
 
 public:
-	HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
+	HRESULT QueryInterface(GUID riid, void** ppvObject);
 };
 
 class SchedulesBase : public NoteCollection<ISchedules>
@@ -149,24 +130,22 @@ public:
 	SchedulesBase();
 	~SchedulesBase();
 
-	HRESULT STDMETHODCALLTYPE GetName(BSTR* pbstrName);
-	HRESULT STDMETHODCALLTYPE SetName(IN BSTR bstrName) { return E_NOTIMPL; }
-	HRESULT STDMETHODCALLTYPE GetId(BSTR* pbstrId);
-	HRESULT STDMETHODCALLTYPE SetId(BSTR bstrId);
+	HRESULT GetName(std::wstring& name);
+	HRESULT SetName(const std::wstring& bstrName) { return E_NOTIMPL; }
+	HRESULT GetId(std::wstring& pbstrId);
+	HRESULT SetId(const std::wstring& bstrId);
 	
-	HRESULT STDMETHODCALLTYPE GetCreateTime(long* pTime) { return E_NOTIMPL; }
-	HRESULT STDMETHODCALLTYPE SetCreateTime(long create_time) { return E_NOTIMPL; }
-	HRESULT STDMETHODCALLTYPE GetModifyTime(long* pTime) { return E_NOTIMPL; }
-	HRESULT STDMETHODCALLTYPE SetModifyTime(long time) { return E_NOTIMPL; }
+	HRESULT GetCreateTime(long* pTime) { return E_NOTIMPL; }
+	HRESULT SetCreateTime(long create_time) { return E_NOTIMPL; }
+	HRESULT GetModifyTime(long* pTime) { return E_NOTIMPL; }
+	HRESULT SetModifyTime(long time) { return E_NOTIMPL; }
 
-	HRESULT STDMETHODCALLTYPE GetNoteIdx(INote* pNote, int* pIndex) { return E_NOTIMPL; }
+	HRESULT GetNoteIdx(INote* pNote, int* pIndex) { return E_NOTIMPL; }
 public:
-	HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
+	HRESULT QueryInterface(GUID riid, void** ppvObject);
 
 private:
-	CComBSTR m_id;
+	wstring m_id;
 };
 
 class NoteApplication : public INoteApplication
@@ -175,25 +154,23 @@ public:
 	NoteApplication();
 	~NoteApplication();
 
-	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify);
-	HRESULT STDMETHODCALLTYPE GetNotebooks(INotebooks** ppNotebooks);
-	HRESULT STDMETHODCALLTYPE SetNotebooks(INotebooks* pNotebooks);
-	HRESULT STDMETHODCALLTYPE GetUserId(OUT BSTR* pbstrId);
-	HRESULT STDMETHODCALLTYPE SetUserId(IN BSTR bstrId);
-	HRESULT STDMETHODCALLTYPE GetTrash(ITrash** ppTrash);
-	HRESULT STDMETHODCALLTYPE SetTrash(ITrash* pTrash);
-	HRESULT STDMETHODCALLTYPE GetSchedules(ISchedules** ppSchedules);
-	HRESULT STDMETHODCALLTYPE SetSchedules(ISchedules* pSchedules);
+	HRESULT addWatcher(ICoreNotify* pNotify);
+	HRESULT GetNotebooks(INotebooks** ppNotebooks);
+	HRESULT SetNotebooks(INotebooks* pNotebooks);
+	HRESULT GetUserId(std::wstring& pbstrId);
+	HRESULT SetUserId(const std::wstring& bstrId);
+	HRESULT GetTrash(ITrash** ppTrash);
+	HRESULT SetTrash(ITrash* pTrash);
+	HRESULT GetSchedules(ISchedules** ppSchedules);
+	HRESULT SetSchedules(ISchedules* pSchedules);
 
 public:
-	HRESULT STDMETHODCALLTYPE QueryInterface(
-		/* [in] */ REFIID riid,
-		/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject);
-	ULONG STDMETHODCALLTYPE AddRef(void);
-	ULONG STDMETHODCALLTYPE Release(void);
+	HRESULT QueryInterface(GUID riid, void** ppvObject);
+	long AddRef(void);
+	long Release(void);
 
 private:
-	CComBSTR m_id;
+	wstring m_id;
 
 	com_sptr<INotebooks> m_spNotebooks;
 	com_sptr<ITrash> m_spTrash;

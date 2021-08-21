@@ -11,87 +11,83 @@ public:
 		Clear();
 	}
 
-	HRESULT STDMETHODCALLTYPE addWatcher(ICoreNotify* pNotify)
+	HRESULT addWatcher(ICoreNotify* pNotify)
 	{
 		m_notifies.insert(pNotify);
 		return S_OK;
 	}
 
-	HRESULT STDMETHODCALLTYPE GetName(BSTR* pbstrName)
+	HRESULT GetName(std::wstring&)
 	{
 		return E_NOTIMPL;
 	}
 
-	HRESULT STDMETHODCALLTYPE GetCount(int* pCount)
+	HRESULT GetCount(int* pCount)
 	{
 		if (!pCount)
-			return E_POINTER;
+			return E_FAIL;
 
 		*pCount = m_container.size();
 		return S_OK;
 	}
 
-	HRESULT STDMETHODCALLTYPE Item(VARIANT index, INote** ppNote)
+	HRESULT Item(const wstring& index, INote** ppNote)
 	{
 		if (!ppNote)
-			return E_POINTER;
+			return E_FAIL;
 
-		if (V_VT(&index) == VT_BSTR)
+		if (m_container.find(index) == m_container.end())
 		{
-			CComBSTR bstrTrashId(V_BSTR(&index));
-			if (m_container.find(bstrTrashId) == m_container.end())
-			{
-				return E_FAIL;
-			}
-			*ppNote = m_container[bstrTrashId];
-			(*ppNote)->AddRef();
-			return S_OK;
+			return E_FAIL;
 		}
-		else if (V_VT(&index) == VT_I4)
-		{
-			int idx = V_I4(&index);
-			for (auto it = m_container.begin(); it != m_container.end(); it++)
-			{
-				if (idx == 0)
-				{
-					*ppNote = it->second;
-					(*ppNote)->AddRef();
-					return S_OK;
-				}
-				idx--;
-			}
-			return E_INVALIDARG;
-		}
-		else
-		{
-			return E_INVALIDARG;
-		}
+		*ppNote = m_container[index];
+		(*ppNote)->AddRef();
+		return S_OK;
 	}
 
-	HRESULT STDMETHODCALLTYPE AddNote(INote* pNote)
+	HRESULT Item(int index, INote** ppNote)
+	{
+		if (!ppNote)
+			return E_FAIL;
+
+		int idx = index;
+		for (auto it = m_container.begin(); it != m_container.end(); it++)
+		{
+			if (idx == 0)
+			{
+				*ppNote = it->second;
+				(*ppNote)->AddRef();
+				return S_OK;
+			}
+			idx--;
+		}
+		return E_FAIL;
+	}
+
+	HRESULT AddNote(INote* pNote)
 	{
 		if (!pNote)
 			return E_FAIL;
 
-		CComBSTR bstrTrashId;
-		pNote->GetId(&bstrTrashId);
+		std::wstring bstrTrashId;
+		pNote->GetId(bstrTrashId);
 
 		pNote->AddRef();
-		m_container.insert(std::pair<CComBSTR, INote*>(bstrTrashId, pNote));
+		m_container.insert(std::pair<std::wstring, INote*>(bstrTrashId, pNote));
 
 		NotifyThisObj(Add, pNote);
 		return S_OK;
 	}
 
-	HRESULT STDMETHODCALLTYPE RemoveNote(INote* pNote)
+	HRESULT RemoveNote(INote* pNote)
 	{
 		if (!pNote)
 			return E_FAIL;
 
-		CComBSTR bstrNoteId;
-		pNote->GetId(&bstrNoteId);
+		std::wstring noteid;
+		pNote->GetId(noteid);
 
-		auto it = m_container.find(bstrNoteId);
+		auto it = m_container.find(noteid);
 		if (it == m_container.end())
 		{
 			return E_FAIL;
@@ -99,11 +95,11 @@ public:
 
 		NotifyThisObj(Delete, pNote);
 		pNote->Release();
-		m_container.erase(bstrNoteId);
+		m_container.erase(noteid);
 		return S_OK;
 	}
 
-	HRESULT STDMETHODCALLTYPE Clear(void)
+	HRESULT Clear(void)
 	{
 		//TODO: Notify
 		for (auto it = m_container.begin(); it != m_container.end(); it++)
@@ -116,13 +112,13 @@ public:
 	}
 
 public:
-	ULONG STDMETHODCALLTYPE AddRef(void)
+	long AddRef(void)
 	{
 		m_ref++;
 		return m_ref;
 	}
 
-	ULONG STDMETHODCALLTYPE Release(void)
+	long Release(void)
 	{
 		m_ref--;
 		if (m_ref == 0)
@@ -137,9 +133,8 @@ private:
 	{
 		for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
 		{
-			BSTR bstrId;
-			pNote->GetId(&bstrId);
-			std::wstring noteid(bstrId, SysStringLen(bstrId));
+			std::wstring noteid;
+			pNote->GetId(noteid);
 			NotifyArg arg;
 			arg.ope = ope;
 			arg.pObj = pNote;
@@ -149,7 +144,7 @@ private:
 
 protected:
 	std::unordered_set<ICoreNotify*> m_notifies;
-	std::map<CComBSTR, INote*> m_container;
+	std::map<std::wstring, INote*> m_container;
 	int m_ref;
 };
 

@@ -1,61 +1,41 @@
 #include "stdafx.h"
 #include "guihelper.h"
 #include <QtCore/QStandardPaths>
+#include <QUuid>
 
 
 void AppHelper::GetNotebook(int idx, INotebook** ppNotebook)
 {
-	VARIANT varBook;
-	V_VT(&varBook) = VT_I4;
-	V_I4(&varBook) = idx;
-
 	com_sptr<INotebooks> spNotebooks;
 	coreApp->GetNotebooks(&spNotebooks);
-
-	HRESULT hr = spNotebooks->Item(varBook, ppNotebook);
+	HRESULT hr = spNotebooks->Item(idx, ppNotebook);
 }
 
 void AppHelper::GetNote(INoteCollection* pNotebook, int idxNote, INote** ppNote)
 {
-	VARIANT varNote;
-	V_VT(&varNote) = VT_I4;
-	V_I4(&varNote) = idxNote;
-
 	if (!pNotebook || !ppNote)
 	{
 		return;
 	}
-	HRESULT hr = pNotebook->Item(varNote, ppNote);
+	HRESULT hr = pNotebook->Item(idxNote, ppNote);
 }
 
 void AppHelper::GetNote(INoteCollection* pNotebook, QString noteid, INote** ppNote)
 {
-	VARIANT varNote;
-	V_VT(&varNote) = VT_BSTR;
-	V_BSTR(&varNote) = SysAllocString(noteid.toStdWString().data());
-
 	com_sptr<INote> spNote;
-	HRESULT hr = pNotebook->Item(varNote, &spNote);
+	HRESULT hr = pNotebook->Item(noteid.toStdWString(), &spNote);
 	if (FAILED(hr))
 	{
-		VariantClear(&varNote);
 		return;
 	}
-
 	*ppNote = spNote;
 	(*ppNote)->AddRef();
-
-	VariantClear(&varNote);
 }
 
 void AppHelper::GetNoteAndBookById(QString noteid, INotebook** ppNotebook, INote** ppNote)
 {
 	if (!ppNotebook || !ppNote)
 		return;
-
-	VARIANT varNote;
-	V_VT(&varNote) = VT_BSTR;
-	V_BSTR(&varNote) = SysAllocString(noteid.toStdWString().data());
 
 	com_sptr<INotebooks> spNotebooks;
 	coreApp->GetNotebooks(&spNotebooks);
@@ -65,27 +45,19 @@ void AppHelper::GetNoteAndBookById(QString noteid, INotebook** ppNotebook, INote
 	for (int i = 0; i < nCount; i++)
 	{
 		com_sptr<INotebook> spNotebook;
-
-		VARIANT varIndex;
-		V_VT(&varIndex) = VT_I4;
-		V_I4(&varIndex) = i;
-
-		spNotebooks->Item(varIndex, &spNotebook);
+		spNotebooks->Item(i, &spNotebook);
 
 		com_sptr<INote> spNote;
-		HRESULT hr = spNotebook->Item(varNote, &spNote);
+		HRESULT hr = spNotebook->Item(noteid.toStdWString(), &spNote);
 		if (FAILED(hr))
 		{
 			continue;
 		}
-
 		*ppNotebook = spNotebook;
 		(*ppNotebook)->AddRef();
 		*ppNote = spNote;
 		(*ppNote)->AddRef();
 	}
-
-	VariantClear(&varNote);
 }
 
 QString AppHelper::GetNotebookName(INoteCollection* pNotebook)
@@ -93,9 +65,9 @@ QString AppHelper::GetNotebookName(INoteCollection* pNotebook)
 	if (!pNotebook)
 		return "";
 
-	BSTR bstrName;
-	pNotebook->GetName(&bstrName);
-	QString bookName = QString::fromUtf16(reinterpret_cast<ushort*>(bstrName));
+	std::wstring name;
+	pNotebook->GetName(name);
+	QString bookName = QString::fromStdWString(name);
 	return bookName;
 }
 
@@ -104,9 +76,9 @@ QString AppHelper::GetNotebookId(INotebook* pNotebook)
 	if (!pNotebook)
 		return "";
 
-	BSTR bstrId;
-	pNotebook->GetId(&bstrId);
-	QString bookId = QString::fromUtf16(reinterpret_cast<ushort*>(bstrId));
+	std::wstring bstrId;
+	pNotebook->GetId(bstrId);
+	QString bookId = QString::fromStdWString(bstrId);
 	return bookId;
 }
 
@@ -114,37 +86,22 @@ void AppHelper::GetNotebookById(const QString& bookid, INotebook** ppNotebook)
 {
 	com_sptr<INotebooks> spNotebooks;
 	coreApp->GetNotebooks(&spNotebooks);
-
-	VARIANT varIndex;
-	V_VT(&varIndex) = VT_BSTR;
-	V_BSTR(&varIndex) = SysAllocString(bookid.toStdWString().data());
-
-	HRESULT hr = spNotebooks->Item(varIndex, ppNotebook);
-
-	VariantClear(&varIndex);
+	HRESULT hr = spNotebooks->Item(bookid.toStdWString(), ppNotebook);
 }
 
 void AppHelper::GetNotebookByNote(INote* pNote, INotebook** ppNotebook)
 {
 	Q_ASSERT(pNote);
 
-	BSTR bstrBookid;
-	pNote->GetBookId(&bstrBookid);
-
+	std::wstring bookId;
+	pNote->GetBookId(bookId);
 	com_sptr<INotebooks> spNotebooks;
 	coreApp->GetNotebooks(&spNotebooks);
-
-	VARIANT varIndex;
-	V_VT(&varIndex) = VT_BSTR;
-	V_BSTR(&varIndex) = bstrBookid;
-
-	HRESULT hr = spNotebooks->Item(varIndex, ppNotebook);
+	HRESULT hr = spNotebooks->Item(bookId, ppNotebook);
 	if (FAILED(hr))
 	{
-		V_VT(&varIndex) = VT_I4;
-		V_I4(&varIndex) = 0;
 		//µÚÒ»¸önotebook
-		hr = spNotebooks->Item(varIndex, ppNotebook);
+		hr = spNotebooks->Item(0, ppNotebook);
 	}
 }
 
@@ -153,9 +110,9 @@ QString AppHelper::GetNoteId(INote* pNote)
 	if (!pNote)
 		return "";
 
-	BSTR bstrId;
-	pNote->GetId(&bstrId);
-	QString noteId = QString::fromUtf16(reinterpret_cast<ushort*>(bstrId));
+	std::wstring noteid;
+	pNote->GetId(noteid);
+	QString noteId = QString::fromStdWString(noteid);
 	return noteId;
 }
 
@@ -179,11 +136,8 @@ QStringList AppHelper::GetNotes(INoteCollection* pNoteColl)
 	pNoteColl->GetCount(&nCount);
 	for (int i = 0; i < nCount; i++)
 	{
-		VARIANT varIndex;
-		V_VT(&varIndex) = VT_I4;
-		V_I4(&varIndex) = i;
 		com_sptr<INote> spNote;
-		pNoteColl->Item(varIndex, &spNote);
+		pNoteColl->Item(i, &spNote);
 		QString noteid = AppHelper::GetNoteId(spNote);
 		list.append(noteid);
 	}
@@ -196,9 +150,9 @@ QString AppHelper::GetNoteContent(INote* pNote)
 	{
 		return "";
 	}
-	BSTR bstrContent;
-	pNote->GetContent(&bstrContent);
-	QString content = QString::fromUtf16(reinterpret_cast<ushort*>(bstrContent));
+	std::wstring bstrContent;
+	pNote->GetContent(bstrContent);
+	QString content = QString::fromStdWString(bstrContent);
 	return content;
 }
 
@@ -208,9 +162,9 @@ QString AppHelper::GetNoteAbbre(INote* pNote)
 	{
 		return "";
 	}
-	BSTR bstrAbbre;
-	pNote->GetAbbreText(&bstrAbbre);
-	QString content = QString::fromUtf16(reinterpret_cast<ushort*>(bstrAbbre));
+	std::wstring bstrAbbre;
+	pNote->GetAbbreText(bstrAbbre);
+	QString content = QString::fromStdWString(bstrAbbre);
 	return content;
 }
 
@@ -220,9 +174,9 @@ QString AppHelper::GetNoteTitle(INote* pNote)
 	{
 		return "";
 	}
-	BSTR bstrContent;
-	pNote->GetTitle(&bstrContent);
-	QString content = QString::fromUtf16(reinterpret_cast<ushort*>(bstrContent));
+	std::wstring bstrContent;
+	pNote->GetTitle(bstrContent);
+	QString content = QString::fromStdWString(bstrContent);
 	return content;
 }
 
@@ -255,15 +209,8 @@ QString AppHelper::GetDbPath()
 
 QString AppHelper::GenerateGUID()
 {
-	GUID gidReference;
-	HRESULT hCreateGuid = CoCreateGuid(&gidReference);
-
-	WCHAR* guidString;
-	StringFromCLSID(gidReference, &guidString);
-	QString guid = QString::fromUtf16((char16_t*)guidString);
-	::CoTaskMemFree(guidString);
-	guid = guid.remove(QRegExp("[\\{\\}\\-]")).toLower();
-	return guid;
+	QUuid wtf = QUuid::createUuid();
+	return wtf.toString();
 }
 
 QSizeF AppHelper::viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight, int* lastVisibleLine)

@@ -110,9 +110,9 @@ void BookListView::MenuActionSlot(QAction* action)
 
 	if (nIndex == REMOVE_NOTE)
 	{
-		BSTR bookId;
-		spNote->GetBookId(&bookId);
-		QString bookid = QString::fromUtf16(reinterpret_cast<ushort*>(bookId));
+		std::wstring bookId;
+		spNote->GetBookId(bookId);
+		QString bookid = QString::fromStdWString(bookId);
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebookById(bookid, &spNotebook);
 #ifdef USE_RPC

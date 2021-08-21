@@ -1,7 +1,7 @@
 #ifndef __DBSERVICE_H__
 #define __DBSERVICE_H__
 
-#include "notecore.h"
+#include "notecore2.h"
 #include "note_types.h"
 #include "CppSQLite3.h"
 #include <codecvt>

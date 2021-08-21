@@ -2,7 +2,7 @@
 #include <QBuffer>
 #include <QFileInfo>
 #include <QCoreApplication>
-#include "notecore.h"
+#include "notecore2.h"
 #include "com_sptr.h"
 #include "notecoreinit.h"
 #include "dbservice.h"
@@ -147,18 +147,13 @@ void DbService::CreateNoteByNOTE(NOTE note, INote** ppNote)
 	CreateNote(note.type, &spNote);
 
 	std::wstring title = note.title.toStdWString();
-	BSTR bstrTitle = SysAllocString(title.c_str());
-	spNote->SetTitle(bstrTitle);
+	spNote->SetTitle(title);
 
 	std::wstring content = note.content.toStdWString();
-	BSTR bstrContent = SysAllocString(content.c_str());
-	spNote->SetContent(bstrContent);
-
+	spNote->SetContent(content);
 	spNote->SetCreateTime(note.create_time.toMSecsSinceEpoch());
 	spNote->SetModifyTime(note.modify_time.toMSecsSinceEpoch());
-
-	BSTR bstrId = SysAllocString(note.id.toStdWString().c_str());
-	spNote->SetId(bstrId);
+	spNote->SetId(note.id.toStdWString());
 
 	*ppNote = spNote;
 	(*ppNote)->AddRef();
@@ -182,8 +177,7 @@ void DbService::inittrashes(INoteApplication* pApp)
 		com_sptr<INote> spNote;
 		CreateNoteByNOTE(note, &spNote);
 
-		BSTR bstrBookId = SysAllocString(srcbook_id.toStdWString().c_str());
-		spNote->SetBookId(bstrBookId);
+		spNote->SetBookId(srcbook_id.toStdWString());
 		spTrash->AddNote(spNote);
 
 		query.nextRow();
@@ -222,7 +216,7 @@ void DbService::InitcoreFromRPC(INoteApplication* pApp)
 
 	std::vector<NOTEBOOK> vecBooks;
 	getnotebooks(vecBooks);
-	pApp->SetUserId(SysAllocString(userid.c_str()));
+	pApp->SetUserId(userid);
 
 	for (int i = 0; i < vecBooks.size(); i++)
 	{
@@ -233,14 +227,10 @@ void DbService::InitcoreFromRPC(INoteApplication* pApp)
 		if (spNotebook)
 		{
 			std::wstring str_ = notebook.name.toStdWString();
-			BSTR bstrName = SysAllocString(str_.c_str());
-			spNotebook->SetName(bstrName);
-
+			spNotebook->SetName(str_);
 			spNotebook->SetCreateTime(notebook.create_time.toMSecsSinceEpoch());
 			spNotebook->SetModifyTime(notebook.modify_time.toMSecsSinceEpoch());
-
-			BSTR bstrId = SysAllocString(notebook.id.toStdWString().c_str());
-			spNotebook->SetId(bstrId);
+			spNotebook->SetId(notebook.id.toStdWString());
 
 			for (int j = 0; j < notebook.notes.size(); j++)
 			{
@@ -248,10 +238,7 @@ void DbService::InitcoreFromRPC(INoteApplication* pApp)
 
 				com_sptr<INote> spNote;
 				CreateNoteByNOTE(note, &spNote);
-
-				bstrId = SysAllocString(notebook.id.toStdWString().c_str());
-				spNote->SetBookId(bstrId);
-
+				spNote->SetBookId(notebook.id.toStdWString());
 				spNotebook->AddNote(spNote);
 			}
 		}
@@ -301,8 +288,8 @@ bool DbService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, IN
 		nRowsChanged = stmt.execDML();
 		Q_ASSERT(nRowsChanged == 1);
 
-		pNote->SetId(SysAllocString(noteid.toStdWString().c_str()));
-		pNote->SetBookId(SysAllocString(bookid.toStdWString().c_str()));
+		pNote->SetId(noteid.toStdWString());
+		pNote->SetBookId(bookid.toStdWString());
 		pNotebook->AddNote(pNote);
 	}
 
@@ -352,7 +339,7 @@ bool DbService::SynchronizeSchedule(INoteApplication* pApp, INote* pNote)
 			Q_ASSERT(nRowsChanged == 1);
 		}
 
-		pNote->SetId(SysAllocString(noteid.toStdWString().c_str()));
+		pNote->SetId(noteid.toStdWString());
 
 		com_sptr<ISchedules> spSchedules;
 		pApp->GetSchedules(&spSchedules);
@@ -389,7 +376,7 @@ bool DbService::SynchronizeNotebook(INotebook* pNotebook)
 		int nRowsChanged = stmt.execDML();
 		Q_ASSERT(nRowsChanged == 1);
 
-		pNotebook->SetId(SysAllocString(bookid.toStdWString().c_str()));
+		pNotebook->SetId(bookid.toStdWString());
 
 		com_sptr<INotebooks> spNotebooks;
 		coreApp->GetNotebooks(&spNotebooks);
@@ -497,13 +484,8 @@ bool DbService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 	pNotebook->GetCount(&nCount);
 	for (int i = 0; i < nCount; i++)
 	{
-		VARIANT varIndex;
-		V_VT(&varIndex) = VT_I4;
-		V_I4(&varIndex) = i;
-
 		com_sptr<INote> spNote;
-		pNotebook->Item(varIndex, &spNote);
-
+		pNotebook->Item(i, &spNote);
 		RemoveNote(pApp, pNotebook, spNote);
 		spNote->SetBookId(NULL);
 	}

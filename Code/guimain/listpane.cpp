@@ -662,12 +662,8 @@ void NavigationPanel::initNotebookItem()
 	spNotebooks->GetCount(&count);
 	for (int i = 0; i < count; i++)
 	{
-		VARIANT index;
-		V_VT(&index) = VT_I4;
-		V_I4(&index) = i;
-
 		com_sptr<INotebook> spNotebook;
-		spNotebooks->Item(index, &spNotebook);
+		spNotebooks->Item(i, &spNotebook);
 
 		QString bookName = AppHelper::GetNotebookName(spNotebook);
 		QString bookId = AppHelper::GetNotebookId(spNotebook);
@@ -707,12 +703,8 @@ void NavigationPanel::initSchedule()
 	spSchedules->GetCount(&count);
 	for (int i = 0; i < count; i++)
 	{
-		VARIANT index;
-		V_VT(&index) = VT_I4;
-		V_I4(&index) = i;
-
 		com_sptr<INote> spNote;
-		spSchedules->Item(index, &spNote);
+		spSchedules->Item(i, &spNote);
 
 		QString title = AppHelper::GetNoteTitle(spNote);
 		QString id = AppHelper::GetNoteId(spNote);

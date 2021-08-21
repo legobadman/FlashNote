@@ -1,7 +1,7 @@
 #ifndef __GUID_DEFINE_H__
 #define __GUID_DEFINE_H__
 
-#include <combaseapi.h>
+#include <QUuid>
 
 template<class T>
 const GUID& uuidof();
@@ -14,5 +14,6 @@ const GUID& uuidof<Interface>()\
 {\
 	return IID_##Interface;\
 }
+
 
 #endif

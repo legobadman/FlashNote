@@ -1,9 +1,11 @@
 #include "framework.h"
-#include "notecore.h"
+#include "notecore2.h"
 #include "notebase.h"
+#include "guidconst.h"
+
 
 NoteBase::NoteBase()
-	: m_type(NORMAL_NOTE)
+	: m_type(NOTE_TYPE::NORMAL_NOTE)
 	, m_ref(0)
 {
 }
@@ -13,40 +15,39 @@ NoteBase::~NoteBase()
 	//TODO: 析构bstr
 }
 
-HRESULT NoteBase::GetId(OUT BSTR* pbstrId)
+HRESULT NoteBase::GetId(std::wstring& pbstrId)
 {
-	return m_id.CopyTo(pbstrId);
-}
-
-HRESULT NoteBase::SetId(IN BSTR bstrId)
-{
-	m_id.Attach(bstrId);
+	pbstrId = m_id;
 	return S_OK;
 }
 
-HRESULT NoteBase::GetBookId(BSTR* pBookId)
+HRESULT NoteBase::SetId(const std::wstring& bstrId)
 {
-	if (!pBookId)
-		return E_FAIL;
-	return m_bookid.CopyTo(pBookId);
-}
-
-HRESULT NoteBase::SetBookId(BSTR bookId)
-{
-	m_bookid.Attach(bookId);
+	m_id = bstrId;
 	return S_OK;
 }
 
-HRESULT NoteBase::GetTitle(OUT BSTR* pbstrName)
+HRESULT NoteBase::GetBookId(std::wstring& pBookId)
 {
-	return m_bstrTitle.CopyTo(pbstrName);
+	pBookId = m_bookid;
+	return S_OK;
 }
 
-HRESULT NoteBase::SetTitle(IN BSTR title)
+HRESULT NoteBase::SetBookId(const std::wstring& bookId)
 {
-	//m_bstrTitle.Detach();
-	int n = SysStringByteLen(title);
-	m_bstrTitle.AssignBSTR(title);
+	m_bookid = bookId;
+	return S_OK;
+}
+
+HRESULT NoteBase::GetTitle(std::wstring& pbstrName)
+{
+	pbstrName = m_bstrTitle;
+	return S_OK;
+}
+
+HRESULT NoteBase::SetTitle(const std::wstring& title)
+{
+	m_bstrTitle = title;
 	NotifyThisObj(NotifyOperator::Update);
 	return S_OK;
 }
@@ -63,32 +64,27 @@ HRESULT NoteBase::SetType(NOTE_TYPE type)
 	return S_OK;
 }
 
-HRESULT NoteBase::GetContent(OUT BSTR* pbstrContent)
+HRESULT NoteBase::GetContent(std::wstring& pbstrContent)
 {
-	return m_bstrContent.CopyTo(pbstrContent);
+	pbstrContent = m_bstrContent;
+	return S_OK;
 }
 
-HRESULT NoteBase::SetContent(IN BSTR content)
+HRESULT NoteBase::SetContent(const std::wstring& content)
 {
-	m_bstrContent.AssignBSTR(content);
+	m_bstrContent = content;
 	NotifyThisObj(NotifyOperator::Update);
 	return S_OK;
 }
 
-HRESULT NoteBase::GetAbbreText(OUT BSTR* pbstrAbbre)
+HRESULT NoteBase::GetAbbreText(std::wstring& pbstrAbbre)
 {
-	if (!pbstrAbbre)
-		return E_POINTER;
-
-	std::wstring plainText(m_bstrPlainText, SysStringLen(m_bstrPlainText));
 	static const int nContentLimit = 74;
-
-	std::wstring abbreText = plainText.substr(0, nContentLimit);
-	*pbstrAbbre = SysAllocStringLen(abbreText.data(), abbreText.size());
+	pbstrAbbre = m_bstrPlainText.substr(0, nContentLimit);
 	return S_OK;
 }
 
-HRESULT NoteBase::SetPlainText(IN BSTR content)
+HRESULT NoteBase::SetPlainText(const std::wstring& content)
 {
 	m_bstrPlainText = content;
 	return S_OK;
@@ -114,33 +110,35 @@ HRESULT NoteBase::SetModifyTime(long modify_time)
 	return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE NoteBase::QueryInterface(
-	/* [in] */ REFIID riid,
-	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+HRESULT NoteBase::QueryInterface(
+	GUID riid,
+	void** ppvObject)
 {
 	if (!ppvObject)
 		return E_FAIL;
 
-	if (riid == IID_INoteCoreObj)
+	if (QUuid(riid) == IID_INoteCoreObj)
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	else if (riid == IID_INote)
+	else if (QUuid(riid) == IID_INote)
 	{
 		*ppvObject = static_cast<INote*>(this);
 	}
-
-	//*ppvObject = this;
+	else
+	{
+		return E_FAIL;
+	}
 	return S_OK;
 }
 
-ULONG STDMETHODCALLTYPE NoteBase::AddRef(void)
+long NoteBase::AddRef(void)
 {
 	m_ref++;
 	return m_ref;
 }
 
-ULONG STDMETHODCALLTYPE NoteBase::Release(void)
+long NoteBase::Release(void)
 {
 	m_ref--;
 	if (m_ref == 0)
@@ -177,25 +175,27 @@ NotebookBase::~NotebookBase()
 {
 }
 
-HRESULT NotebookBase::GetId(OUT BSTR* pbstrId)
+HRESULT NotebookBase::GetId(std::wstring& pbstrId)
 {
-	return m_id.CopyTo(pbstrId);
-}
-
-HRESULT NotebookBase::SetId(IN BSTR bstrId)
-{
-	m_id.Attach(bstrId);
+	pbstrId = m_id;
 	return S_OK;
 }
 
-HRESULT NotebookBase::GetName(OUT BSTR* pbstrName)
+HRESULT NotebookBase::SetId(const std::wstring& bstrId)
 {
-	return m_strName.CopyTo(pbstrName);
+	m_id = bstrId;;
+	return S_OK;
 }
 
-HRESULT NotebookBase::SetName(IN BSTR bstrName)
+HRESULT NotebookBase::GetName(std::wstring& pbstrName)
 {
-	m_strName.Attach(bstrName);
+	pbstrName = m_strName;
+	return S_OK;
+}
+
+HRESULT NotebookBase::SetName(const std::wstring& bstrName)
+{
+	m_strName = bstrName;
 	return S_OK;
 }
 
@@ -224,7 +224,7 @@ HRESULT NotebookBase::AddNote(INote* pNote)
 	HRESULT hr = _base::AddNote(pNote);
 	if (SUCCEEDED(hr))
 	{
-		pNote->SetBookId(m_id.Copy());
+		pNote->SetBookId(m_id);
 	}
 	return hr;
 }
@@ -234,7 +234,7 @@ HRESULT NotebookBase::RemoveNote(INote* pNote)
 	HRESULT hr = _base::RemoveNote(pNote);
 	if (SUCCEEDED(hr))
 	{
-		pNote->SetBookId(CComBSTR(""));
+		pNote->SetBookId(L"");
 	}
 	return hr;
 }
@@ -245,21 +245,21 @@ HRESULT NotebookBase::GetNoteIdx(INote* pNote, int* pIndex)
 }
 
 HRESULT NotebookBase::QueryInterface(
-	/* [in] */ REFIID riid,
-	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+	GUID riid,
+	void** ppvObject)
 {
 	if (!ppvObject)
 		return E_FAIL;
 
-	if (riid == IID_INoteCoreObj)
+	if (QUuid(riid) == IID_INoteCoreObj)
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	else if (riid == IID_INoteCollection)
+	else if (QUuid(riid) == IID_INoteCollection)
 	{
 		*ppvObject = static_cast<INoteCollection*>(this);
 	}
-	else if (riid == IID_INotebook)
+	else if (QUuid(riid) == IID_INotebook)
 	{
 		*ppvObject = static_cast<INotebook*>(this);
 	}
@@ -270,40 +270,7 @@ HRESULT NotebookBase::QueryInterface(
 	return S_OK;
 }
 
-
-Notes::Notes()
-{
-}
-
-Notes::~Notes()
-{
-}
-
-HRESULT Notes::QueryInterface(
-	/* [in] */ REFIID riid,
-	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
-{
-	if (!ppvObject)
-		return E_FAIL;
-
-	if (riid == IID_INoteCoreObj)
-	{
-		*ppvObject = static_cast<INoteCoreObj*>(this);
-	}
-	else if (riid == IID_INoteCollection)
-	{
-		*ppvObject = static_cast<INoteCollection*>(this);
-	}
-	else
-	{
-		return E_FAIL;
-	}
-	return S_OK;
-}
-
-
 ///////////////////////////////////////////////////////////////////
-
 NotebooksBase::NotebooksBase()
 	: m_ref(0)
 {
@@ -327,52 +294,51 @@ HRESULT NotebooksBase::GetCount(/* [out] */ int* pCount)
 	return S_OK;
 }
 
-HRESULT NotebooksBase::Item(VARIANT index, INotebook** ppNotebook)
+HRESULT NotebooksBase::Item(const wstring& index, INotebook** ppNotebook)
 {
 	if (!ppNotebook)
 	{
-		return E_POINTER;
+		return E_FAIL;
 	}
-	if (V_VT(&index) == VT_I4)
+
+	for (auto it = m_vecBooks.begin(); it != m_vecBooks.end(); it++)
 	{
-		int nIndex = V_I4(&index);
-		if (nIndex >= 0 && nIndex < (int)m_vecBooks.size())
+		std::wstring _id;
+		(*it)->GetId(_id);
+		if (index == _id)
 		{
-			*ppNotebook = m_vecBooks[nIndex];
+			*ppNotebook = *it;
 			(*ppNotebook)->AddRef();
 			return S_OK;
 		}
-		else
-		{
-			return E_INVALIDARG;
-		}
 	}
-	else if (V_VT(&index) == VT_BSTR)
+	return E_FAIL;
+}
+
+HRESULT NotebooksBase::Item(int index, INotebook** ppNotebook)
+{
+	if (!ppNotebook)
 	{
-		BSTR bstrId = V_BSTR(&index);
-		for (auto it = m_vecBooks.begin(); it != m_vecBooks.end(); it++)
-		{
-			BSTR _id;
-			(*it)->GetId(&_id);
-			if (0 == wcscmp(bstrId, _id))
-			{
-				*ppNotebook = *it;
-				(*ppNotebook)->AddRef();
-				return S_OK;
-			}
-		}
 		return E_FAIL;
 	}
-	return E_NOTIMPL;
+	if (index >= 0 && index < (int)m_vecBooks.size())
+	{
+		*ppNotebook = m_vecBooks[index];
+		(*ppNotebook)->AddRef();
+		return S_OK;
+	}
+	else
+	{
+		return E_FAIL;
+	}
 }
 
 void NotebooksBase::NotifyThisObj(NotifyOperator ope, INotebook* pNotebook)
 {
 	for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
 	{
-		BSTR bstrId;
-		pNotebook->GetId(&bstrId);
-		std::wstring noteid(bstrId, SysStringLen(bstrId));
+		std::wstring noteid;
+		pNotebook->GetId(noteid);
 		NotifyArg arg;
 		arg.ope = ope;
 		arg.pObj = pNotebook;
@@ -395,7 +361,7 @@ HRESULT NotebooksBase::AddNotebook(INotebook* pNotebook)
 HRESULT NotebooksBase::DeleteNotebook(INotebook* pNotebook)
 {
 	if (!pNotebook)
-		return E_POINTER;
+		return E_FAIL;
 
 	for (auto it = m_vecBooks.begin(); it != m_vecBooks.end(); )
 	{
@@ -403,7 +369,7 @@ HRESULT NotebooksBase::DeleteNotebook(INotebook* pNotebook)
 		{
 			m_vecBooks.erase(it);
 			pNotebook->Release();
-			NotifyThisObj(Delete, pNotebook);
+			NotifyThisObj(NotifyOperator::Delete, pNotebook);
 			return S_OK;
 		}
 		else
@@ -418,17 +384,17 @@ HRESULT NotebooksBase::DeleteNotebook(INotebook* pNotebook)
 }
 
 HRESULT NotebooksBase::QueryInterface(
-	/* [in] */ REFIID riid,
-	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+	GUID riid,
+	void** ppvObject)
 {
 	if (!ppvObject)
 		return E_FAIL;
 
-	if (riid == IID_INoteCoreObj)
+	if (QUuid(riid) == IID_INoteCoreObj)
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	else if (riid == IID_INotebooks)
+	else if (QUuid(riid) == IID_INotebooks)
 	{
 		*ppvObject = static_cast<INotebooks*>(this);
 	}
@@ -439,13 +405,13 @@ HRESULT NotebooksBase::QueryInterface(
 	return S_OK;
 }
 
-ULONG NotebooksBase::AddRef(void)
+long NotebooksBase::AddRef(void)
 {
 	m_ref++;
 	return m_ref;
 }
 
-ULONG NotebooksBase::Release(void)
+long NotebooksBase::Release(void)
 {
 	m_ref--;
 	if (m_ref == 0)
@@ -472,21 +438,21 @@ HRESULT TrashBase::DeleteNote(INote* pNote)
 }
 
 HRESULT TrashBase::QueryInterface(
-	/* [in] */ REFIID riid,
-	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+	GUID riid,
+	void** ppvObject)
 {
 	if (!ppvObject)
 		return E_FAIL;
 
-	if (riid == IID_INoteCoreObj)
+	if (QUuid(riid) == IID_INoteCoreObj)
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	else if (riid == IID_INoteCollection)
+	else if (QUuid(riid) == IID_INoteCollection)
 	{
 		*ppvObject = static_cast<INoteCollection*>(this);
 	}
-	else if (riid == IID_ITrash)
+	else if (QUuid(riid) == IID_ITrash)
 	{
 		*ppvObject = static_cast<ITrash*>(this);
 	}
@@ -497,12 +463,9 @@ HRESULT TrashBase::QueryInterface(
 	return S_OK;
 }
 
-HRESULT TrashBase::GetName(BSTR* pbstrName)
+HRESULT TrashBase::GetName(std::wstring& name)
 {
-	if (!pbstrName)
-		return E_POINTER;
-
-	*pbstrName = SysAllocString(L"废纸篓");
+	name = L"废纸篓";
 	return S_OK;
 }
 
@@ -518,46 +481,44 @@ SchedulesBase::~SchedulesBase()
 
 }
 
-HRESULT SchedulesBase::GetName(BSTR* pbstrName)
+HRESULT SchedulesBase::GetName(std::wstring& name)
 {
-	if (!pbstrName)
-		return E_POINTER;
-
-	*pbstrName = SysAllocString(L"进度表");
+	name = L"进度表";
 	return S_OK;
 }
 
-HRESULT SchedulesBase::GetId(BSTR* pbstrId)
+HRESULT SchedulesBase::GetId(std::wstring& pbstrId)
 {
-	return m_id.CopyTo(pbstrId);
+	pbstrId = m_id;
+	return S_OK;
 }
 
-HRESULT SchedulesBase::SetId(BSTR bstrId)
+HRESULT SchedulesBase::SetId(const std::wstring& bstrId)
 {
-	m_id.Attach(bstrId);
+	m_id = bstrId;
 	return S_OK;
 }
 
 HRESULT SchedulesBase::QueryInterface(
-	/* [in] */ REFIID riid,
-	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+	GUID riid,
+	void** ppvObject)
 {
 	if (!ppvObject)
 		return E_FAIL;
 
-	if (riid == IID_INoteCoreObj)
+	if (QUuid(riid) == IID_INoteCoreObj)
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	else if (riid == IID_INoteCollection)
+	else if (QUuid(riid) == IID_INoteCollection)
 	{
 		*ppvObject = static_cast<INoteCollection*>(this);
 	}
-	else if (riid == IID_INotebook)
+	else if (QUuid(riid) == IID_INotebook)
 	{
 		*ppvObject = static_cast<INotebook*>(this);
 	}
-	else if (riid == IID_ISchedules)
+	else if (QUuid(riid) == IID_ISchedules)
 	{
 		*ppvObject = static_cast<ISchedules*>(this);
 	}
@@ -597,7 +558,7 @@ HRESULT NoteApplication::SetNotebooks(INotebooks* pNotebooks)
 HRESULT NoteApplication::GetTrash(ITrash** ppTrash)
 {
 	if (!ppTrash)
-		return E_POINTER;
+		return E_FAIL;
 
 	*ppTrash = m_spTrash;
 	(*ppTrash)->AddRef();
@@ -607,7 +568,7 @@ HRESULT NoteApplication::GetTrash(ITrash** ppTrash)
 HRESULT NoteApplication::SetTrash(ITrash* pTrash)
 {
 	if (!pTrash)
-		return E_POINTER;
+		return E_FAIL;
 
 	m_spTrash = pTrash;
 	return S_OK;
@@ -616,7 +577,7 @@ HRESULT NoteApplication::SetTrash(ITrash* pTrash)
 HRESULT NoteApplication::GetSchedules(ISchedules** ppSchedules)
 {
 	if (!ppSchedules)
-		return E_POINTER;
+		return E_FAIL;
 
 	*ppSchedules = m_spSchedules;
 	(*ppSchedules)->AddRef();
@@ -626,19 +587,20 @@ HRESULT NoteApplication::GetSchedules(ISchedules** ppSchedules)
 HRESULT NoteApplication::SetSchedules(ISchedules* pSchedules)
 {
 	if (!pSchedules)
-		return E_POINTER;
+		return E_FAIL;
 	m_spSchedules = pSchedules;
 	return S_OK;
 }
 
-HRESULT NoteApplication::GetUserId(OUT BSTR* pbstrId)
+HRESULT NoteApplication::GetUserId(std::wstring& pbstrId)
 {
-	return m_id.CopyTo(pbstrId);
+	pbstrId = m_id;
+	return S_OK;
 }
 
-HRESULT NoteApplication::SetUserId(IN BSTR bstrId)
+HRESULT NoteApplication::SetUserId(const std::wstring& bstrId)
 {
-	m_id.Attach(bstrId);
+	m_id = bstrId;
 	return S_OK;
 }
 
@@ -649,17 +611,17 @@ HRESULT NoteApplication::addWatcher(ICoreNotify* pNotify)
 }
 
 HRESULT NoteApplication::QueryInterface(
-	/* [in] */ REFIID riid,
-	/* [iid_is][out] */ _COM_Outptr_ void __RPC_FAR* __RPC_FAR* ppvObject)
+	GUID riid,
+	void** ppvObject)
 {
 	if (!ppvObject)
 		return E_FAIL;
 
-	if (riid == IID_INoteCoreObj)
+	if (QUuid(riid) == IID_INoteCoreObj)
 	{
 		*ppvObject = static_cast<INoteCoreObj*>(this);
 	}
-	else if (riid == IID_INoteApplication)
+	else if (QUuid(riid) == IID_INoteApplication)
 	{
 		*ppvObject = static_cast<INoteApplication*>(this);
 	}
@@ -670,13 +632,13 @@ HRESULT NoteApplication::QueryInterface(
 	return S_OK;
 }
 
-ULONG NoteApplication::AddRef(void)
+long NoteApplication::AddRef(void)
 {
 	m_ref++;
 	return m_ref;
 }
 
-ULONG NoteApplication::Release(void)
+long NoteApplication::Release(void)
 {
 	m_ref--;
 	if (m_ref == 0)

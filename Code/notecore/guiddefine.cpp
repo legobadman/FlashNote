@@ -1,5 +1,7 @@
 #include "guiddefine.h"
-#include "notecore.h"
+#include "notecore2.h"
+#include <QUuid>
+#include "guidconst.h"
 
 
 DEFINE_INTERFACE_GUID(INoteCoreObj)

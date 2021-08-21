@@ -21,10 +21,7 @@ INoteApplication* coreApp = NULL;
 #include "qtexamples/MltpDlgs2.h"
 #endif
 
-int WINAPI WinMain(__in HINSTANCE hInstance,
-	__in_opt HINSTANCE hPrevInstance,
-	__in LPSTR lpCmdLine,
-	__in int nShowCmd)
+int main(int argc, char *argv[])
 {
 #ifdef TEXT_RICH_EDITOR
 	QApplication app(__argc, __argv);

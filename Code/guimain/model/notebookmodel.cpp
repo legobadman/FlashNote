@@ -16,12 +16,8 @@ NotebookModel::NotebookModel(QObject* parent)
 
 	for (int i = 0; i < count; i++)
 	{
-		VARIANT index;
-		V_VT(&index) = VT_I4;
-		V_I4(&index) = i;
-
 		com_sptr<INotebook> spNotebook;
-		spNotebooks->Item(index, &spNotebook);
+		spNotebooks->Item(i, &spNotebook);
 
 		QString bookName = AppHelper::GetNotebookName(spNotebook);
 		QString bookId = AppHelper::GetNotebookId(spNotebook);

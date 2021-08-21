@@ -1,8 +1,8 @@
 #ifndef __COM_SPTR_H__
 #define __COM_SPTR_H__
 
-#include <combaseapi.h>
 #include "../notecore/guiddefine.h"
+#include "iunknown.h"
 
 template <class T>
 class com_sptr

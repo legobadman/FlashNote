@@ -1,10 +1,8 @@
 #ifndef __GUI_STDAFX_H__
 #define __GUI_STDAFX_H__
 
-#include <WinSock2.h>
-#include <Windows.h>
-#include <WS2tcpip.h>
 #include <stack>
+
 #include <QApplication>
 #include <QMainWindow>
 #include <QTreeView>
@@ -30,8 +28,7 @@
 #include <QtWidgets/QMdiArea>
 #include <QSystemTrayIcon>
 #include "com_sptr.h"
-#include "notecore.h"
-#include "notecore.h"
+#include "notecore2.h"
 #include "notecoreinit.h"
 #include "note_types.h"
 #include "common_types.h"

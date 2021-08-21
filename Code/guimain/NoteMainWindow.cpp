@@ -99,8 +99,7 @@ void NoteMainWindow::onAddNotebook()
 		HRESULT hr = CreateNotebook(&spNotebook);
 		if (hr == S_OK)
 		{
-			BSTR bstrTitle = SysAllocString(bookName.toStdWString().c_str());
-			spNotebook->SetName(bstrTitle);
+			spNotebook->SetName(bookName.toStdWString());
 #ifdef USE_RPC
 			bool ret = RPCService::GetInstance().SynchronizeNotebook(spNotebook);
 #else
@@ -128,12 +127,8 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		com_sptr<INotebooks> spNotebooks;
 		coreApp->GetNotebooks(&spNotebooks);
 
-		VARIANT varIndex;
-		V_VT(&varIndex) = VT_BSTR;
-		V_BSTR(&varIndex) = SysAllocString(bookid.toStdWString().data());
-
 		com_sptr<INotebook> spNotebook;
-		HRESULT hr = spNotebooks->Item(varIndex, &spNotebook);
+		HRESULT hr = spNotebooks->Item(bookid.toStdWString(), &spNotebook);
 		if (hr == S_OK)
 		{
 			m_ui->notesview->setNotebook(VIEW_NOTEBOOK, spNotebook);
@@ -166,12 +161,8 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		com_sptr<INotebook> spNotebook = spSchedules;
 
 		QString noteid = index.data(ItemCoreObjIdRole).toString();
-		VARIANT varIndex;
-		V_VT(&varIndex) = VT_BSTR;
-		V_BSTR(&varIndex) = SysAllocString(noteid.toStdWString().data());
-
 		com_sptr<INote> spNote;
-		spNotebook->Item(varIndex, &spNote);
+		spNotebook->Item(noteid.toStdWString(), &spNote);
 
 		m_ui->scheduleeditor->updateNoteInfo(spNotebook, spNote, true);
 		m_ui->stackedWidget2->setCurrentWidget(m_ui->scheduleeditor);

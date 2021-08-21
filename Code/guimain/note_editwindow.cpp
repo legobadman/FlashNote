@@ -175,12 +175,9 @@ void NoteEditWindow::saveNote()
 	QString html = p->toHtml();
 	QString plainText = p->toPlainText();
 
-	BSTR bstrTitle = SysAllocString(title.toStdWString().c_str());
-	m_pNote->SetTitle(bstrTitle);
-	BSTR bstrContent = SysAllocString(html.toStdWString().c_str());
-	m_pNote->SetContent(bstrContent);
-	BSTR bstrPlainText = SysAllocString(plainText.toStdWString().c_str());
-	m_pNote->SetPlainText(bstrPlainText);
+	m_pNote->SetTitle(title.toStdWString());
+	m_pNote->SetContent(html.toStdWString());
+	m_pNote->SetPlainText(plainText.toStdWString());
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 #ifdef USE_RPC
@@ -199,12 +196,10 @@ void NoteEditWindow::saveMindMap()
 {
 	QString title = m_ui->editTitle->text();
 
-	BSTR bstrTitle = SysAllocString(title.toStdWString().c_str());
-	m_pNote->SetTitle(bstrTitle);
+	m_pNote->SetTitle(title.toStdWString());
 
 	QString wtf = m_ui->mindmapEditor->mindmapXML();
-	BSTR bstrMap = SysAllocString(wtf.toStdWString().c_str());
-	m_pNote->SetContent(bstrMap);
+	m_pNote->SetContent(wtf.toStdWString());
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 #ifdef USE_RPC
@@ -218,12 +213,10 @@ void NoteEditWindow::saveSchedule()
 {
 	QString title = m_ui->editTitle->text();
 
-	BSTR bstrTitle = SysAllocString(title.toStdWString().c_str());
-	m_pNote->SetTitle(bstrTitle);
+	m_pNote->SetTitle(title.toStdWString());
 
 	QString wtf = m_ui->mindmapEditor->mindmapXML();
-	BSTR bstrMap = SysAllocString(wtf.toStdWString().c_str());
-	m_pNote->SetContent(bstrMap);
+	m_pNote->SetContent(wtf.toStdWString());
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 
 	DbService::GetInstance().SynchronizeSchedule(coreApp, m_pNote);
@@ -244,13 +237,10 @@ void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
 void NoteEditWindow::switchtobook(int bookidx)
 {
 	//TODO
-	VARIANT newindex;
-	V_VT(&newindex) = VT_I4;
-	V_I4(&newindex) = bookidx;
 	com_sptr<INotebook> spNewbook;
 	com_sptr<INotebooks> spNotebooks;
 	coreApp->GetNotebooks(&spNotebooks);
-	HRESULT hr = spNotebooks->Item(newindex, &spNewbook);
+	HRESULT hr = spNotebooks->Item(bookidx, &spNewbook);
 	if (FAILED(hr) || !spNewbook)
 	{
 		Q_ASSERT(FALSE);
