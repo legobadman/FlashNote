@@ -6,7 +6,7 @@
 SearchEditor::SearchEditor(QWidget* parent)
 	: QLineEdit(parent)
 {
-	setPlaceholderText(QString::fromUtf16((char16_t*)L"微软雅黑"));
+	setPlaceholderText(u8"搜索功能暂未开放。");
 	setFixedHeight(MyStyle::dpiScaled(25));
 }
 
