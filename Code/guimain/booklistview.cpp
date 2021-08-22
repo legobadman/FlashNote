@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "booklistview.h"
 #include "ui_booklistview.h"
 #include "MyStyle.h"

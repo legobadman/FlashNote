@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "listpane.h"
 #include "LeftSideItemDelegate.h"
 #include "newitemdelegate.h"

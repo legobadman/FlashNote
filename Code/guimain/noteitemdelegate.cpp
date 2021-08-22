@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "noteitemdelegate.h"
 #include "MyStyle.h"
 #include "LeftSideItemDelegate.h"
@@ -115,7 +115,6 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		QFontMetrics fontMetrics(fontContent);
 		int fontHeight = fontMetrics.height();
 
-		//¼ÆËãÒ»ÐÐµÄÏÔÊ¾¿í¶È£¬ÐèÒª¿¼ÂÇÃæ°åµÄ¿í¶ÈÒÔ¼°ÓÐÎÞ¹ö¶¯Ìõ£¬margin¡£
 		int text_xoffset = 9, text_yoffset = 30;
 		int lineWidth = itemRect.width() - text_xoffset * 2;
 

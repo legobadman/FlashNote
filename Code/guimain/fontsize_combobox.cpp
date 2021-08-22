@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "fontsize_combobox.h"
 #include "MyStyle.h"
 #include "moc_fontsize_combobox.cpp"

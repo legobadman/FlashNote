@@ -1,15 +1,15 @@
-#include "notecore2.h"
+﻿#include "notecore2.h"
 #include "notebase.h"
 
 std::wstring _default_content(NOTE_TYPE type)
 {
 	if (type == MINDMAP)
 	{
-		return L"<node text=\"MindMap\"></node>";
+		return L"<node text=\"思维导图笔记\"></node>";
 	}
 	else if (type == SCHEDULE)
 	{
-		return L"<node text=\"Schedule\"></node>";
+		return L"<node text=\"进度图\"></node>";
 	}
 	return L"";
 }
@@ -18,11 +18,11 @@ std::wstring _default_title(NOTE_TYPE type)
 {
 	if (type == MINDMAP)
 	{
-		return L"MindMap";
+		return L"思维导图笔记";
 	}
 	else if (type == SCHEDULE)
 	{
-		return L"Schedule";
+		return L"进度图";
 	}
 	return L"";
 }

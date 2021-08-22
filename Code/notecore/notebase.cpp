@@ -1,4 +1,4 @@
-#include "framework.h"
+﻿#include "framework.h"
 #include "notecore2.h"
 #include "notebase.h"
 #include "guidconst.h"

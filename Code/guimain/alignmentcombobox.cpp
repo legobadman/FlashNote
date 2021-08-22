@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "popupwidget.h"
 #include "MyStyle.h"
 #include "menubutton.h"

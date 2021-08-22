@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "mindnode.h"
 #include "mindmapscene.h"
 #include "guihelper.h"

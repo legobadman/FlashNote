@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "note_editwindow.h"
 #include "rpcservice.h"

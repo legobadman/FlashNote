@@ -1,4 +1,4 @@
-#include "sql_const.h"
+ï»¿#include "sql_const.h"
 #include <QBuffer>
 #include <QFileInfo>
 #include <QCoreApplication>
@@ -209,7 +209,7 @@ void DbService::InitcoreFromRPC(INoteApplication* pApp)
 	if (!pApp)
 		return;
 
-	//´´½¨notebooks
+	//åˆ›å»ºnotebooks
 	com_sptr<INotebooks> spNotebooks;
 	CreateNotebooks(&spNotebooks);
 	pApp->SetNotebooks(spNotebooks);
@@ -382,7 +382,7 @@ bool DbService::SynchronizeNotebook(INotebook* pNotebook)
 		coreApp->GetNotebooks(&spNotebooks);
 		spNotebooks->AddNotebook(pNotebook);
 	}
-	//ÆäËû¸üÐÂ´ýÐø
+	//å…¶ä»–æ›´æ–°å¾…ç»­
 	return true;
 }
 

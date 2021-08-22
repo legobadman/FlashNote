@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "mindmapscene.h"
 #include "mindprogressnode.h"
 #include <QtWidgets/QInputDialog>
