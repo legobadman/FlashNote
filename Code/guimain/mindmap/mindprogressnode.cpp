@@ -5,7 +5,7 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QMenu>
-#include <QTooltip>
+#include <QToolTip>
 
 
 MindProgressNode::MindProgressNode(const QString& text, MindNode* parent)
@@ -48,7 +48,7 @@ void MindProgressNode::initUIColor()
 		m_backgroudColor = QColor(242, 242, 242);
 		m_highlightedBorder = QColor(136, 203, 242);
 	}
-	m_borderFocusout = QColor(m_backgroudColor);	//ÓÉÓÚÎÄ±¾¿òµÄ»æÖÆ²ßÂÔ£¬Ö»ÄÜ½«Í¬É«µÄ±ß¿òÊÓÎªÎŞ±ß¿ò¡£
+	m_borderFocusout = QColor(m_backgroudColor);	//Ã“Ã‰Ã“ÃšÃÃ„Â±Â¾Â¿Ã²ÂµÃ„Â»Ã¦Ã–Ã†Â²ÃŸÃ‚Ã”Â£Â¬Ã–Â»Ã„ÃœÂ½Â«ÃÂ¬Ã‰Â«ÂµÃ„Â±ÃŸÂ¿Ã²ÃŠÃ“ÃÂªÃÃÂ±ÃŸÂ¿Ã²Â¡Â£
 }
 
 void MindProgressNode::updateNodeColor()
@@ -65,9 +65,9 @@ void MindProgressNode::initMenu()
 	MindNode::initMenu();
 	if (m_children.empty())
 	{
-		m_pMenu->addAction(QString(u8"ÉèÖÃ¹¤×÷Ê±¼ä"), this, SLOT(setWorkingHourDlg()));
-		m_pMenu->addAction(QString(u8"±ê¼ÇÍê³É"), this, SLOT(markFinish()));
-		m_pMenu->addAction(QString(u8"Çå¿Õ½ø¶È"), this, SLOT(zeroSchedule()));
+		m_pMenu->addAction(QString(u8"è®¾ç½®å·¥ä½œæ—¶é—´"), this, SLOT(setWorkingHourDlg()));
+		m_pMenu->addAction(QString(u8"æ ‡è®°å®Œæˆ"), this, SLOT(markFinish()));
+		m_pMenu->addAction(QString(u8"æ¸…ç©ºè¿›åº¦"), this, SLOT(zeroSchedule()));
 	}
 }
 
@@ -100,11 +100,11 @@ void MindProgressNode::updateToolTip()
 	QString toolTipText;
 	if (m_workinghours <= 0)
 	{
-		toolTipText = QString(u8"µ±Ç°½ø¶È»òÕß×Ó½ø¶È»¹Ã»ÉèÖÃ¹¤Ê±¡£");
+		toolTipText = QString(u8"å½“å‰è¿›åº¦æˆ–è€…å­è¿›åº¦è¿˜æ²¡è®¾ç½®å·¥æ—¶ã€‚");
 	}
 	else
 	{
-		toolTipText = QString(u8"×Ü¹¤Ê±Îª%1¸öĞ¡Ê±£¬µ±Ç°½ø¶ÈÎª%2%¡£").arg(QString::number(m_workinghours)).arg(QString::number(m_progress * 100));
+		toolTipText = QString(u8"æ€»å·¥æ—¶ä¸º%1ä¸ªå°æ—¶ï¼Œå½“å‰è¿›åº¦ä¸º%2%ã€‚").arg(QString::number(m_workinghours)).arg(QString::number(m_progress * 100));
 	}
 	setToolTip(toolTipText);
 }
@@ -245,7 +245,7 @@ void MindProgressNode::setWorkingHourDlg()
 {
 	QGraphicsView* pView = scene()->views()[0];
 	QString text = QInputDialog::getText(pView,
-		u8"ÊäÈë¸Ã½ø¶ÈµÄ¹¤×÷Ê±¼ä", u8"ÉèÖÃ¹¤×÷Ê±¼ä£¨µ¥Î»£ºĞ¡Ê±£©",
+		u8"è¾“å…¥è¯¥è¿›åº¦çš„å·¥ä½œæ—¶é—´", u8"è®¾ç½®å·¥ä½œæ—¶é—´ï¼ˆå•ä½ï¼šå°æ—¶ï¼‰",
 		QLineEdit::Normal, QString::number(m_workinghours));
 	if (!text.isEmpty())
 	{

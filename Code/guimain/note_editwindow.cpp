@@ -91,7 +91,7 @@ void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
 	QString bookName = AppHelper::GetNotebookName(pNotebook);
 	m_ui->bookmenu->blockSignals(true);
 	m_ui->bookmenu->font();
-	QFont font(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), 9);
+	QFont font(QString::fromUtf16((char16_t*)L"å¾®è½¯é›…é»‘"), 9);
 	m_ui->bookmenu->setFont(font);
 	QFontMetrics fm(font);
 	int width = fm.horizontalAdvance(bookName);
@@ -164,7 +164,7 @@ void NoteEditWindow::initCustomWidget()
 
 void NoteEditWindow::initContent()
 {
-    m_ui->editTitle->setPlaceholderText(u8"±êÌâ");
+    m_ui->editTitle->setPlaceholderText(u8"æ ‡é¢˜");
 }
 
 void NoteEditWindow::saveNote()

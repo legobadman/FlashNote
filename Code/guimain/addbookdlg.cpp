@@ -13,9 +13,9 @@ AddBookDlg::AddBookDlg(QWidget* parent)
 
 	m_ui = new Ui::AddBookDlg();
 	m_ui->setupUi(this);
-	m_ui->lineEdit->setPlaceholderText(u8"请输入笔记本名称");
-	m_ui->buttonBox->button(QDialogButtonBox::Ok)->setText(u8"确认");
-	m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(u8"取消");
+	m_ui->lineEdit->setPlaceholderText(u8"璇疯緭鍏ョ瑪璁版湰鍚嶇О");
+	m_ui->buttonBox->button(QDialogButtonBox::Ok)->setText(u8"纭");
+	m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(u8"鍙栨秷");
 }
 
 QString AddBookDlg::getName()

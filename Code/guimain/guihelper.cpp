@@ -2,6 +2,7 @@
 #include "guihelper.h"
 #include <QtCore/QStandardPaths>
 #include <QUuid>
+#include <QDebug>
 
 
 void AppHelper::GetNotebook(int idx, INotebook** ppNotebook)
@@ -100,7 +101,7 @@ void AppHelper::GetNotebookByNote(INote* pNote, INotebook** ppNotebook)
 	HRESULT hr = spNotebooks->Item(bookId, ppNotebook);
 	if (FAILED(hr))
 	{
-		//第一个notebook
+		//锟斤拷一锟斤拷notebook
 		hr = spNotebooks->Item(0, ppNotebook);
 	}
 }
@@ -190,6 +191,7 @@ int AppHelper::GetNoteCounts(INoteCollection* pNotebook)
 
 QString AppHelper::GetProgDataPath()
 {
+#ifdef Q_OS_WIN
 	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
 	locations.removeOne(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 	locations.removeOne(QCoreApplication::applicationDirPath());
@@ -200,6 +202,11 @@ QString AppHelper::GetProgDataPath()
 	Q_ASSERT(locations.size() == 1);
 	QString appData = locations[0];
 	return appData;
+#else
+	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+	qDebug() << locations;
+	return locations[0];
+#endif
 }
 
 QString AppHelper::GetDbPath()

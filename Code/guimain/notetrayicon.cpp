@@ -11,7 +11,7 @@ NoteTrayIcon::NoteTrayIcon(QObject* parent /* = nullptr */)
 {
 	setIcon(QIcon(":/icons/bluewhite.png"));
 	QMenu* pContext = new QMenu(NULL);
-	QAction* pQuitAction = pContext->addAction(u8"�˳�");
+	QAction* pQuitAction = pContext->addAction(u8"ÍË³ö");
 	setContextMenu(pContext);
 
 	connect(pQuitAction, SIGNAL(triggered()),

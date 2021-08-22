@@ -80,17 +80,17 @@ void BookListView::onCustomContextMenu(const QPoint& point)
 
 	if (itemType == ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM)
 	{
-		QAction* pDelete = new QAction(u8"É¾³ý±Ê¼Ç", m_pCustomMenu);
+		QAction* pDelete = new QAction(u8"åˆ é™¤ç¬”è®°", m_pCustomMenu);
 		pDelete->setData((int)REMOVE_NOTE);
 		m_pCustomMenu->addAction(pDelete);
 	}
 	else
 	{
-		QAction* pDelete = new QAction(u8"³¹µ×É¾³ý±Ê¼Ç", m_pCustomMenu);
+		QAction* pDelete = new QAction(u8"å½»åº•åˆ é™¤ç¬”è®°", m_pCustomMenu);
 		pDelete->setData((int)DELETE_NOTE);
 		m_pCustomMenu->addAction(pDelete);
 
-		QAction* pRecover = new QAction(u8"»Ö¸´±Ê¼Ç", m_pCustomMenu);
+		QAction* pRecover = new QAction(u8"æ¢å¤ç¬”è®°", m_pCustomMenu);
 		pRecover->setData((int)RECOVER_NOTE);
 		m_pCustomMenu->addAction(pRecover);
 	}
@@ -146,7 +146,7 @@ void BookListView::MenuActionSlot(QAction* action)
 void BookListView::onRowInserted(int row)
 {
 	QAbstractItemModel* pModel = m_ui->listView->model();
-	m_ui->lblNumberNotes->setText(QString(u8"%1Ìõ±Ê¼Ç").arg(QString::number(pModel->rowCount())));
+	m_ui->lblNumberNotes->setText(QString(u8"%1æ¡ç¬”è®°").arg(QString::number(pModel->rowCount())));
 
 	QModelIndex idx = pModel->index(row, 0);
 	m_ui->listView->setCurrentIndex(idx);
@@ -157,7 +157,7 @@ void BookListView::onRowRemoved(int row)
 {
 	QAbstractItemModel* pModel = m_ui->listView->model();
 	int n = pModel->rowCount();
-	m_ui->lblNumberNotes->setText(QString(u8"%1Ìõ±Ê¼Ç").arg(QString::number(n)));
+	m_ui->lblNumberNotes->setText(QString(u8"%1æ¡ç¬”è®°").arg(QString::number(n)));
 
 	if (n > 0 && row >= 0)
 	{
@@ -182,11 +182,11 @@ void BookListView::resetModel(BookViewModel* pModel, BOOKVIEW_TYPE type, INoteCo
 
 	QString bookName;
 	if (type == VIEW_ALLNOTES)
-		bookName = u8"È«²¿±Ê¼Ç";
+		bookName = u8"å…¨éƒ¨ç¬”è®°";
 	else if (type == VIEW_NOTEBOOK || type == VIEW_TRASH)
 		bookName = AppHelper::GetNotebookName(pNoteCollection);
 
 	m_ui->lblNotebook->setText(bookName);
-	m_ui->lblNumberNotes->setText(QString(u8"%1Ìõ±Ê¼Ç").arg(
+	m_ui->lblNumberNotes->setText(QString(u8"%1æ¡ç¬”è®°").arg(
 		QString::number(pModel->rowCount())));
 }

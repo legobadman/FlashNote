@@ -12,7 +12,7 @@ NoteBase::NoteBase()
 
 NoteBase::~NoteBase()
 {
-	//TODO: Îö¹¹bstr
+	//TODO:
 }
 
 HRESULT NoteBase::GetId(std::wstring& pbstrId)
@@ -465,7 +465,7 @@ HRESULT TrashBase::QueryInterface(
 
 HRESULT TrashBase::GetName(std::wstring& name)
 {
-	name = L"·ÏÖ½Â¨";
+	name = L"åºŸçº¸ç¯“";
 	return S_OK;
 }
 
@@ -483,7 +483,7 @@ SchedulesBase::~SchedulesBase()
 
 HRESULT SchedulesBase::GetName(std::wstring& name)
 {
-	name = L"½ø¶È±í";
+	name = L"è¿›åº¦è¡¨";
 	return S_OK;
 }
 

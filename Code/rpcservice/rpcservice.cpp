@@ -56,7 +56,7 @@ bool RPCService::SynchronizeNotebook(INotebook* pNotebook)
 		spNotebooks->AddNotebook(pNotebook);
 	}
 
-	//ÆäËû¸üĞÂ´ıĞø
+	//Ã†Ã¤Ã‹Ã»Â¸Ã¼ÃÃ‚Â´Ã½ÃÃ¸
 	return true;
 }
 
@@ -69,7 +69,7 @@ bool RPCService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, I
 	{
 		NOTE_TYPE type = NORMAL_NOTE;
 		pNote->GetType(&type);
-		//ĞÂ½¨µÄnote£¬ĞèÒªÏÈÏò·şÎñ¶ËÉêÇëid
+		//ÃÃ‚Â½Â¨ÂµÃ„noteÂ£Â¬ÃÃ¨Ã’ÂªÃÃˆÃÃ²Â·Ã¾ÃÃ±Â¶Ã‹Ã‰ÃªÃ‡Ã«id
 		id = RPCService::GetInstance().NewNote(bookid, L"", type);
 		pNote->SetId(id);
 		pNote->SetBookId(bookid);
@@ -147,7 +147,7 @@ bool RPCService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 	bool bRet = m_pClient->client()->DeleteNotebook(_userid, bookid);
 	if (bRet)
 	{
-		// ÒÆ³ınotebookÏÂËùÓĞnoteÖÁFreeNotes
+		// Ã’Ã†Â³Ã½notebookÃÃ‚Ã‹Ã¹Ã“ÃnoteÃ–ÃFreeNotes
 		com_sptr<ITrash> spTrash;
 		pApp->GetTrash(&spTrash);
 
@@ -192,7 +192,6 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 	if (!pApp)
 		return;
 
-	//´´½¨notebooks
 	com_sptr<INotebooks> spNotebooks;
 	CreateNotebooks(&spNotebooks);
 	pApp->SetNotebooks(spNotebooks);
@@ -204,7 +203,7 @@ void RPCService::InitcoreFromRPC(INoteApplication* pApp)
 	for (int i = 0; i < vecBooks.size(); i++)
 	{
 		NOTEBOOK notebook(vecBooks[i]);
-		if (notebook.name == QString::fromUtf8(u8"luzhµÄ½ø¶È±í"))
+		if (notebook.name == QString::fromUtf8(u8"luzhçš„è¿›åº¦è¡¨"))
 		{
 			initschedules(pApp, notebook);
 			continue;
@@ -278,7 +277,7 @@ void RPCService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
 			Note _note = _notebook.notes[j];
 
 			note.title = QString::fromUtf8(_note.title.c_str());
-			//·şÎñ¶ËÔİÊ±»¹Ã»×öÌáÈ¡ËõÂÔÎÄ±¾¡£
+			//Â·Ã¾ÃÃ±Â¶Ã‹Ã”ÃÃŠÂ±Â»Â¹ÃƒÂ»Ã—Ã¶ÃŒÃ¡ÃˆÂ¡Ã‹ÃµÃ‚Ã”ÃÃ„Â±Â¾Â¡Â£
 			note.content = QString::fromUtf8(_note.text_abbre.c_str());
 			note.create_time = QDateTime::fromMSecsSinceEpoch(_note.create_time, Qt::UTC);
 			note.modify_time = QDateTime::fromMSecsSinceEpoch(_note.modify_time, Qt::UTC);
@@ -340,7 +339,7 @@ void RPCService::initschedules(INoteApplication* pApp, const NOTEBOOK& schedules
 
 void RPCService::inittrashes(INoteApplication* pApp)
 {
-	//trashÉæ¼°µ½noteºÍnotebookµÄË÷Òı£¬Òò´ËÓÃcoreµÄnote¶ÔÏóÀ´³õÊ¼»¯·½±ãĞ©¡£
+	//trashæ¶‰åŠåˆ°noteå’Œnotebookçš„ç´¢å¼•ï¼Œå› æ­¤ç”¨coreçš„noteå¯¹è±¡æ¥åˆå§‹åŒ–æ–¹ä¾¿äº›ã€‚
 	com_sptr<ITrash> spTrash;
 	CreateTrash(&spTrash);
 
@@ -371,7 +370,7 @@ void RPCService::inittrashes(INoteApplication* pApp)
 			spNote->SetContent(bstrContent);
 
 			spNote->SetCreateTime(create_time.toMSecsSinceEpoch());
-			//Ä¿Ç°ÔİÊ±ÓÃmodifytime×÷ÎªÒÆ³ıÖÁtrashµÄÊ±¼ä¡£
+			//ç›®å‰æš‚æ—¶ç”¨modifytimeä½œä¸ºç§»é™¤è‡³trashçš„æ—¶é—´ã€‚
 			spNote->SetModifyTime(trash_time.toMSecsSinceEpoch());
 
 			BSTR bstrId = SysAllocString(note_id.toStdWString().c_str());

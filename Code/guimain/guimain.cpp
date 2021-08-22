@@ -24,7 +24,7 @@ INoteApplication* coreApp = NULL;
 int main(int argc, char *argv[])
 {
 #ifdef TEXT_RICH_EDITOR
-	QApplication app(__argc, __argv);
+	QApplication app(argc, argv);
 
 	QDialog* dialog = new QDialog;
 	MRichTextEdit* rte = new MRichTextEdit(dialog);
@@ -38,14 +38,14 @@ int main(int argc, char *argv[])
 	return app.exec();
 
 #elif defined(TEST_WIDGET_WINDOW_PARENT)
-	QApplication a(__argc, __argv);
+	QApplication a(argc, argv);
 	MltpDlgs1 w;
 	w.setMinimumSize(300, 100);
 	w.show();
 	return a.exec();
 
 #elif defined(TEST_SQLITE)
-	QApplication app(__argc, __argv);
+	QApplication app(argc, argv);
 	QApplication::setStyle(new MyStyle);
 
 	QString guid = AppHelper::GenerateGUID();
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
 #else
 	QApplication::addLibraryPath("C:/Qt/Qt-5.15.0/plugins");
-	QApplication app(__argc, __argv);
+	QApplication app(argc, argv);
 
 	QApplication::setStyle(new MyStyle);
 

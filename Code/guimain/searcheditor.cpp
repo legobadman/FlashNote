@@ -6,7 +6,7 @@
 SearchEditor::SearchEditor(QWidget* parent)
 	: QLineEdit(parent)
 {
-	setPlaceholderText(QString::fromUtf16((char16_t*)L"ËÑË÷±Ê¼Ç"));
+	setPlaceholderText(QString::fromUtf16((char16_t*)L"å¾®è½¯é›…é»‘"));
 	setFixedHeight(MyStyle::dpiScaled(25));
 }
 

@@ -14,7 +14,7 @@ RichTextEditor::RichTextEditor(QWidget* parent)
 	: QTextEdit(parent)
 	, highlighter(NULL)
 {
-	QString fontFamily = QString::fromUtf16((char16_t*)L"΢���ź�");
+	QString fontFamily = QString::fromUtf16((char16_t*)L"微软雅黑");
 	QFont font(fontFamily, 11);
 	setFont(font);
 
@@ -63,7 +63,7 @@ void RichTextEditor::resizeImages()
 
 				QImage image = varRes.value<QImage>();
 
-				int W = viewport()->width() - 45 * 2;	//����margin��
+				int W = viewport()->width() - 45 * 2;	//ËãÉÏmargin¡£
 				float ratio = 1;
 				if (image.width() > W)
 				{
@@ -93,7 +93,7 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 {
 	if (!image.isNull())
 	{
-		//��Ҫ����ͼƬ��assetsĿ¼������assetsĿ¼�µ�ͼƬ��Ϊurl��
+		//ÐèÒª¸´ÖÆÍ¼Æ¬µ½assetsÄ¿Â¼£¬²¢ÒÔassetsÄ¿Â¼ÏÂµÄÍ¼Æ¬×÷Îªurl¡£
 		QString strUrl = url.url();
 		int idx = strUrl.lastIndexOf("/") + 1;
 
@@ -115,7 +115,7 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 		QString assertPath = appPath + "/" + "assets";
 
 		QDir dir(assertPath);
-		//TODO: �ݲ�����ظ�ͼƬ��
+		//TODO: ÔÝ²»¼ì²âÖØ¸´Í¼Æ¬¡£
 		QString fullpath = QString("%1/%2.%3").arg(assertPath).arg(prefix).arg(suffix);
 		int i = 1;
 		while (QFileInfo(fullpath).exists())
@@ -129,7 +129,7 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 		document()->addResource(QTextDocument::ImageResource, url_, image);
 		QTextImageFormat imageFormat;
 		imageFormat.setName(url_.toString());
-		int W = viewport()->width() - 45 * 2;	//����margin��
+		int W = viewport()->width() - 45 * 2;	//ËãÉÏmargin¡£
 		float ratio = 1;
 		if (image.width() > W)
 		{

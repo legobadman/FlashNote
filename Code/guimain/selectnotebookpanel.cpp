@@ -43,7 +43,7 @@ void BooksListView::calcWidthByItems()
 		int icon_yoffset = 5;
 		int icon_to_text = 5;
 
-		QFont font(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), 9);
+		QFont font(QString::fromUtf16((char16_t*)L"å¾®è½¯é›…é»‘"), 9);
 		QFontMetricsF fontMetrics(font);
 		int textWidth = fontMetrics.horizontalAdvance(text);
 		int w = icon_xoffset + iconSize + icon_to_text + textWidth;
@@ -104,7 +104,7 @@ void BookItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt,
 	
 	icon.paint(painter, iconRect, opt.decorationAlignment, QIcon::Normal, QIcon::On);
 
-	QFont font(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), 9);
+	QFont font(QString::fromUtf16((char16_t*)L"å¾®è½¯é›…é»‘"), 9);
 	QFontMetricsF fontMetrics(font);
 	int w = fontMetrics.horizontalAdvance(text);
 	int h = fontMetrics.height();

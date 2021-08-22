@@ -21,7 +21,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QDialog>
-#include <QPushbutton>
+#include <QPushButton>
 #include <QTextEdit>
 #include <QListView>
 #include <QTimer>

@@ -100,7 +100,7 @@ void NewNoteItem::paintEvent(QPaintEvent* event)
 	textOption.setTextDirection(Qt::LeftToRight);
 	textOption.setAlignment(QStyle::visualAlignment(Qt::LeftToRight, Qt::AlignLeft));
 
-	QTextLayout textLayout(u8"–¬Ω®± º«", font);
+	QTextLayout textLayout(u8"Êñ∞Âª∫Á¨îËÆ∞", font);
 	textLayout.setTextOption(textOption);
 	viewItemTextLayout(textLayout, 100);
 	textLayout.draw(&painter, paintPosition);
@@ -278,13 +278,13 @@ NewNoteMenu::NewNoteMenu(QWidget* parent)
 
 	QStandardItemModel* pModel = new QStandardItemModel;
 
-	QStandardItem* pNormalNote = new QStandardItem(u8"± º«");
+	QStandardItem* pNormalNote = new QStandardItem(u8"Á¨îËÆ∞");
 	pModel->appendRow(pNormalNote);
 
-	QStandardItem* pMindMap = new QStandardItem(u8"ÀºŒ¨µºÕº");
+	QStandardItem* pMindMap = new QStandardItem(u8"ÊÄùÁª¥ÂØºÂõæ");
 	pModel->appendRow(pMindMap);
 
-	QStandardItem* pSchedule = new QStandardItem(u8"Ω¯∂»Õº");
+	QStandardItem* pSchedule = new QStandardItem(u8"ËøõÂ∫¶Âõæ");
 	pModel->appendRow(pSchedule);
 
 	setModel(pModel);
@@ -365,7 +365,7 @@ void NavigationPanel::initModel()
 
 	QStandardItem* pAllNotesItem = new QStandardItem(
 		QIcon(":/icons/allnotes.png"),
-		u8"»´≤ø± º«"
+		u8"ÂÖ®ÈÉ®Á¨îËÆ∞"
 	);
 	pAllNotesItem->setEditable(false);
 	pAllNotesItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -375,7 +375,7 @@ void NavigationPanel::initModel()
 
 	QStandardItem* pMaterialItem = new QStandardItem(
 		QIcon(":/icons/material.png"),
-		u8"»´≤øÀÿ≤ƒ"
+		u8"ÂÖ®ÈÉ®Á¥†Êùê"
 	);
 	pMaterialItem->setEditable(false);
 	pMaterialItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -385,7 +385,7 @@ void NavigationPanel::initModel()
 
 	QStandardItem* pFragmentItem = new QStandardItem(
 		QIcon(":/icons/socialmediashare.png"),
-		u8"ÀÈ∆¨–≈œ¢"
+		u8"Á¢éÁâá‰ø°ÊÅØ"
 	);
 	pFragmentItem->setEditable(false);
 	pFragmentItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -395,7 +395,7 @@ void NavigationPanel::initModel()
 
 	QStandardItem* pDiaryItem = new QStandardItem(
 		QIcon(":/icons/myspace.png"),
-		u8"»’º«"
+		u8"Êó•ËÆ∞"
 	);
 	pDiaryItem->setEditable(false);
 	pDiaryItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -405,7 +405,7 @@ void NavigationPanel::initModel()
 
 	QStandardItem* pScheduleItem = new QStandardItem(
 		QIcon(":/icons/schedules.png"),
-		u8"Ω¯∂»±Ì"
+		u8"ËøõÂ∫¶Ë°®"
 	);
 	pScheduleItem->setEditable(false);
 	pScheduleItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -415,7 +415,7 @@ void NavigationPanel::initModel()
 
 	QStandardItem* pDraftItem = new QStandardItem(
 		QIcon(":/icons/draft.png"),
-		u8"≤›∏Â"
+		u8"ËçâÁ®ø"
 	);
 	pDraftItem->setEditable(false);
 	pDraftItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -425,7 +425,7 @@ void NavigationPanel::initModel()
 
 	QStandardItem* pTrashItem = new QStandardItem(
 		QIcon(":/icons/trash.png"),
-		u8"∑œ÷Ω¬®"
+		u8"Â∫üÁ∫∏ÁØì"
 	);
 	pTrashItem->setEditable(false);
 	pTrashItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -458,13 +458,13 @@ void NavigationPanel::onCustomContextMenu(const QPoint& point)
 		connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
 	}
 
-	//‘› ±÷ª¥¶¿ÌNotebooks
+	//√î√ù√ä¬±√ñ¬ª¬¥¬¶√Ä√≠Notebooks
 	ITEM_CONTENT_TYPE type = index.data(LEFT_SIDE_ROLE::ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
 	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM)
 	{
 		m_pCustomMenu->clear();
 
-		QAction* pDelete = new QAction(u8"…æ≥˝± º«±æ", m_pCustomMenu);
+		QAction* pDelete = new QAction(u8"Âà†Èô§Á¨îËÆ∞Êú¨", m_pCustomMenu);
 		pDelete->setData((int)NavigationPanel::DELETE_NOTEBOOK);
 		m_pCustomMenu->addAction(pDelete);
 
@@ -474,7 +474,7 @@ void NavigationPanel::onCustomContextMenu(const QPoint& point)
 	{
 		m_pCustomMenu->clear();
 
-		QAction* pDelete = new QAction(u8"…æ≥˝Ω¯∂»±Ì", m_pCustomMenu);
+		QAction* pDelete = new QAction(u8"Âà†Èô§ËøõÂ∫¶Ë°®", m_pCustomMenu);
 		pDelete->setData((int)NavigationPanel::DELETE_SCHEDULE);
 		m_pCustomMenu->addAction(pDelete);
 
@@ -644,7 +644,7 @@ void NavigationPanel::initNotebookItem()
 {
 	QStandardItem* pNoteBookItem = new QStandardItem(
 		QIcon(":/icons/notebooks.png"),
-		u8"± º«±æ"
+		u8"Á¨îËÆ∞Êú¨"
 	);
 	pNoteBookItem->setEditable(false);
 	pNoteBookItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -685,7 +685,7 @@ void NavigationPanel::initSchedule()
 {
 	QStandardItem* pScheduleItem = new QStandardItem(
 		QIcon(":/icons/schedules.png"),
-		u8"Ω¯∂»±Ì"
+		u8"ËøõÂ∫¶Ë°®"
 	);
 	pScheduleItem->setEditable(false);
 	pScheduleItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(

@@ -68,7 +68,7 @@ void RoundedRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 
 /////////////////////////////////////////////////////////////
 MindNode::MindNode(const QString& text, MindNode* parent)
-	: QGraphicsTextItem(parent)		//ÏÈ³õÊ¼»¯text»áµ¼ÖÂ¸ñÊ½ÎÊÌâ£¬ÏÈ²»ÕâÃ´´¦Àí¡£
+	: QGraphicsTextItem(parent)		//ÃÃˆÂ³ÃµÃŠÂ¼Â»Â¯textÂ»Ã¡ÂµÂ¼Ã–Ã‚Â¸Ã±ÃŠÂ½ÃÃŠÃŒÃ¢Â£Â¬ÃÃˆÂ²Â»Ã•Ã¢ÃƒÂ´Â´Â¦Ã€Ã­Â¡Â£
 	, m_level(0)
 	, m_content(text)
 	, m_mouseState(MS_UNKNOWN)
@@ -120,8 +120,8 @@ QList<MindNode*> MindNode::Children(bool excludeHolder, int direction) const
 
 void MindNode::setup(MindMapScene* pScene)
 {
-	//setupµÄË³ĞòÊÇ£ºÏÈÖ´ĞĞ×Ó½ÚµãµÄsetup£¬ÔÙÖ´ĞĞparent½ÚµãµÄsetup¡£
-	//¶ø×Ó½ÚµãÔÚsetupÇ°£¬ÆäparentµÄ»ù±¾ÊôĞÔÒÑ¶ÁÈ¡¡£
+	//setupÂµÃ„Ã‹Â³ÃÃ²ÃŠÃ‡Â£ÂºÃÃˆÃ–Â´ÃÃÃ—Ã“Â½ÃšÂµÃ£ÂµÃ„setupÂ£Â¬Ã”Ã™Ã–Â´ÃÃparentÂ½ÃšÂµÃ£ÂµÃ„setupÂ¡Â£
+	//Â¶Ã¸Ã—Ã“Â½ÃšÂµÃ£Ã”ÃšsetupÃ‡Â°Â£Â¬Ã†Ã¤parentÂµÃ„Â»Ã¹Â±Â¾ÃŠÃ´ÃÃ”Ã’Ã‘Â¶ÃÃˆÂ¡Â¡Â£
 	ScopeBlockSIG scope(this);
 	initSignalSlots(pScene);
 	initUIColor();
@@ -153,32 +153,32 @@ void MindNode::initSignalSlots(MindMapScene* pScene)
 
 void MindNode::initUIColor()
 {
-	// setupĞèÒªÔÚ×îºóÒ»²½×ö£¬²ÅÄÜ»ñÈ¡ÕæÕıµÄlevelÒÔ¼°ÊÇ·ñ°üº¬½ø¶ÈÌõ¡£
+	// setupÃÃ¨Ã’ÂªÃ”ÃšÃ—Ã®ÂºÃ³Ã’Â»Â²Â½Ã—Ã¶Â£Â¬Â²Ã…Ã„ÃœÂ»Ã±ÃˆÂ¡Ã•Ã¦Ã•Ã½ÂµÃ„levelÃ’Ã”Â¼Â°ÃŠÃ‡Â·Ã±Â°Ã¼ÂºÂ¬Â½Ã¸Â¶ÃˆÃŒÃµÂ¡Â£
 	if (m_level == 0)
 	{
 		m_textColor = QColor(255, 255, 255);
 		m_backgroudColor = QColor(0, 181, 72);
 		m_highlightedBorder = QColor(23, 157, 235);
 		m_selectedBorder = QColor(23, 157, 235);
-		m_borderFocusout = QColor(m_backgroudColor);	//ÓÉÓÚÎÄ±¾¿òµÄ»æÖÆ²ßÂÔ£¬Ö»ÄÜ½«Í¬É«µÄ±ß¿òÊÓÎªÎŞ±ß¿ò¡£
+		m_borderFocusout = QColor(m_backgroudColor);	//Ã“Ã‰Ã“ÃšÃÃ„Â±Â¾Â¿Ã²ÂµÃ„Â»Ã¦Ã–Ã†Â²ÃŸÃ‚Ã”Â£Â¬Ã–Â»Ã„ÃœÂ½Â«ÃÂ¬Ã‰Â«ÂµÃ„Â±ÃŸÂ¿Ã²ÃŠÃ“ÃÂªÃÃÂ±ÃŸÂ¿Ã²Â¡Â£
 	}
 	else if (m_level == 1) {
 		m_textColor = QColor(0, 0, 0);
 		m_highlightedBorder = QColor(136, 203, 242);
 		m_selectedBorder = QColor(23, 157, 235);
 		m_backgroudColor = QColor(242, 242, 242);
-		m_borderFocusout = QColor(m_backgroudColor);	//ÓÉÓÚÎÄ±¾¿òµÄ»æÖÆ²ßÂÔ£¬Ö»ÄÜ½«Í¬É«µÄ±ß¿òÊÓÎªÎŞ±ß¿ò¡£
+		m_borderFocusout = QColor(m_backgroudColor);	//Ã“Ã‰Ã“ÃšÃÃ„Â±Â¾Â¿Ã²ÂµÃ„Â»Ã¦Ã–Ã†Â²ÃŸÃ‚Ã”Â£Â¬Ã–Â»Ã„ÃœÂ½Â«ÃÂ¬Ã‰Â«ÂµÃ„Â±ÃŸÂ¿Ã²ÃŠÃ“ÃÂªÃÃÂ±ÃŸÂ¿Ã²Â¡Â£
 	}
 	else if (m_level >= 2) {
 		m_textColor = QColor(0, 0, 0);
 		m_highlightedBorder = QColor(136, 203, 242);
 		m_selectedBorder = QColor(23, 157, 235);
 		m_backgroudColor = QColor(255, 255, 255);
-		m_borderFocusout = QColor(m_backgroudColor);	//ÓÉÓÚÎÄ±¾¿òµÄ»æÖÆ²ßÂÔ£¬Ö»ÄÜ½«Í¬É«µÄ±ß¿òÊÓÎªÎŞ±ß¿ò¡£
+		m_borderFocusout = QColor(m_backgroudColor);	//Ã“Ã‰Ã“ÃšÃÃ„Â±Â¾Â¿Ã²ÂµÃ„Â»Ã¦Ã–Ã†Â²ÃŸÃ‚Ã”Â£Â¬Ã–Â»Ã„ÃœÂ½Â«ÃÂ¬Ã‰Â«ÂµÃ„Â±ÃŸÂ¿Ã²ÃŠÃ“ÃÂªÃÃÂ±ÃŸÂ¿Ã²Â¡Â£
 	}
 
 	QPalette pal = palette();
-	//´¦ÀíÑ¡ÖĞÎÄ±¾µÄÇé¿ö¡£
+	//Â´Â¦Ã€Ã­Ã‘Â¡Ã–ÃÃÃ„Â±Â¾ÂµÃ„Ã‡Ã©Â¿Ã¶Â¡Â£
 	pal.setBrush(QPalette::Active, QPalette::Highlight, QColor(0, 129, 218));
 	pal.setBrush(QPalette::Active, QPalette::HighlightedText, QColor(255, 255, 255));
 	pal.setBrush(QPalette::Inactive, QPalette::Highlight, m_backgroudColor);
@@ -251,7 +251,7 @@ void MindNode::initExpandBtns()
 		}
 	}
 
-	//ÉèÖÃÎ»ÖÃ
+	//Ã‰Ã¨Ã–ÃƒÃÂ»Ã–Ãƒ
 	if (m_pLCollaspBtn)
 	{
 		int x = -MindNodeButton::m_radius * 2 + 3;
@@ -297,26 +297,26 @@ void MindNode::initMenu()
 
 	if (m_level == 0)
 	{
-		m_pMenu->addAction(QString(u8"Ôö¼Ó×Ó¼¶½Úµã(ÓÒ)"), this, SLOT(onCreateChildNodeRight()));
-		m_pMenu->addAction(QString(u8"Ôö¼Ó×Ó¼¶½Úµã(×ó)"), this, SLOT(onCreateChildNodeLeft()));
+		m_pMenu->addAction(QString(u8"å¢åŠ å­çº§èŠ‚ç‚¹(å³)"), this, SLOT(onCreateChildNodeRight()));
+		m_pMenu->addAction(QString(u8"å¢åŠ å­çº§èŠ‚ç‚¹(å·¦)"), this, SLOT(onCreateChildNodeLeft()));
 	}
 	else
 	{
 		if (isToRight())
-			m_pMenu->addAction(QString(u8"Ôö¼Ó×Ó¼¶½Úµã"), this, SLOT(onCreateChildNodeRight()));
+			m_pMenu->addAction(QString(u8"å¢åŠ å­çº§èŠ‚ç‚¹"), this, SLOT(onCreateChildNodeRight()));
 		else
-			m_pMenu->addAction(QString(u8"Ôö¼Ó×Ó¼¶½Úµã"), this, SLOT(onCreateChildNodeLeft()));
+			m_pMenu->addAction(QString(u8"å¢åŠ å­çº§èŠ‚ç‚¹"), this, SLOT(onCreateChildNodeLeft()));
 	}
 
 	if (m_parent != NULL)
 	{
-		m_pMenu->addAction(QString(u8"Ôö¼ÓÍ¬¼¶½Úµã"), this, SLOT(onCreateSliblingNode()));
-		m_pMenu->addAction(QString(u8"É¾³ı½Úµã"), this, SLOT(onDeleteNode()));
+		m_pMenu->addAction(QString(u8"å¢åŠ åŒçº§èŠ‚ç‚¹"), this, SLOT(onCreateSliblingNode()));
+		m_pMenu->addAction(QString(u8"åˆ é™¤èŠ‚ç‚¹"), this, SLOT(onDeleteNode()));
 	}
 
 	if (m_noteid.isEmpty())
 	{
-		m_pMenu->addAction(QString(u8"ĞÂ½¨¹ØÁª±Ê¼Ç"), this, SLOT(onCreateAssociateNote()));
+		m_pMenu->addAction(QString(u8"æ–°å»ºå…³è”ç¬”è®°"), this, SLOT(onCreateAssociateNote()));
 	}
 	else
 	{
@@ -326,11 +326,11 @@ void MindNode::initMenu()
 		if (!spNote || !spNotebook)
 		{
 			m_noteid = "";
-			m_pMenu->addAction(QString(u8"ĞÂ½¨¹ØÁª±Ê¼Ç"), this, SLOT(onCreateAssociateNote()));
+			m_pMenu->addAction(QString(u8"æ–°å»ºå…³è”ç¬”è®°"), this, SLOT(onCreateAssociateNote()));
 		}
 		else
 		{
-			m_pMenu->addAction(QString(u8"±à¼­¹ØÁª±Ê¼Ç"), this, SLOT(onEditAssociateNote()));
+			m_pMenu->addAction(QString(u8"ç¼–è¾‘å…³è”ç¬”è®°"), this, SLOT(onEditAssociateNote()));
 		}
 	}
 }
@@ -407,7 +407,7 @@ void MindNode::initDocFormat(const QString& text)
 			cursor.setBlockFormat(format);
 
 			QTextCharFormat chrFormat = childBlock.charFormat();
-			chrFormat.setFont(QFont(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), pointSize(m_level)));
+			chrFormat.setFont(QFont(QString::fromUtf16((char16_t*)L"å¾®è½¯é›…é»‘"), pointSize(m_level)));
 			chrFormat.setForeground(m_textColor);
 			cursor.setBlockCharFormat(chrFormat);
 		}
@@ -441,7 +441,7 @@ void MindNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 
 void MindNode::onCreateChildNodeRight()
 {
-	//Õ¹¿ª×ÓÏî¡£
+	//Ã•Â¹Â¿ÂªÃ—Ã“ÃÃ®Â¡Â£
 	m_right_expand = EXP_EXPAND;
 	NewChild(true);
 }
@@ -558,7 +558,7 @@ void MindNode::onLeftExpandBtnToggle()
 		m_left_expand = EXP_EXPAND;
 		bVisible = true;
 	}
-	//½«ËùÓĞ×ó½ÚµãÒş²ØÆğÀ´
+	//Â½Â«Ã‹Ã¹Ã“ÃÃ—Ã³Â½ÃšÂµÃ£Ã’Ã¾Â²Ã˜Ã†Ã°Ã€Â´
 	for (auto it = m_children.begin(); it != m_children.end(); it++)
 	{
 		if (!(*it)->isToRight())
@@ -572,7 +572,7 @@ void MindNode::onLeftExpandBtnToggle()
 
 void MindNode::onRightExpandBtnToggle()
 {
-	if (m_content == u8"ĞÂÔö½Úµã4")
+	if (m_content == u8"æ–°å¢èŠ‚ç‚¹4")
 	{
 		QPointF pos = this->scenePos();
 		int j;
@@ -590,7 +590,7 @@ void MindNode::onRightExpandBtnToggle()
 		m_right_expand = EXP_EXPAND;
 		bVisible = true;
 	}
-	//½«ËùÓĞÓÒ½ÚµãÒş²ØÆğÀ´
+	//Â½Â«Ã‹Ã¹Ã“ÃÃ“Ã’Â½ÃšÂµÃ£Ã’Ã¾Â²Ã˜Ã†Ã°Ã€Â´
 	for (auto it = m_children.begin(); it != m_children.end(); it++)
 	{
 		if ((*it)->isToRight())
@@ -629,7 +629,7 @@ void MindNode::removeChild(MindNode* pNode)
 void MindNode::insertChild(MindNode* pNode, int idx)
 {
 	m_children.insert(m_children.begin() + idx, pNode);
-	pNode->m_parent = this;	//ºóĞøÖğ½¥È¥µôm_parent¡£
+	pNode->m_parent = this;	//ÂºÃ³ÃÃ¸Ã–Ã°Â½Â¥ÃˆÂ¥ÂµÃ´m_parentÂ¡Â£
 	pNode->setParentItem(this);
 }
 
@@ -652,7 +652,7 @@ void MindNode::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 	if (!m_bDragging)
 	{
-		//¼ì²éÊÇ·ñÓĞ×ã¹»µÄÍÏ¶¯¾àÀëÈÏÎªÊÇÍÑÀë
+		//Â¼Ã¬Â²Ã©ÃŠÃ‡Â·Ã±Ã“ÃÃ—Ã£Â¹Â»ÂµÃ„ÃÃÂ¶Â¯Â¾Ã Ã€Ã«ÃˆÃÃÂªÃŠÃ‡ÃÃ‘Ã€Ã«
 		qreal dist = _dist(m_initClickScenePos, event->scenePos());
 		if (dist > 3)
 		{
@@ -709,7 +709,7 @@ bool MindNode::sceneEvent(QEvent* event)
 	switch (event->type())
 	{
 	case QEvent::GraphicsSceneHoverEnter:
-		//°´Å¥²¿·ÖÒÑ¾­ÔÚ¾ØĞÎÒÔÍâÁË£¬»¹ĞèÒªÒ»Ğ©ÅĞ¶Ï¡£
+		//Â°Â´Ã…Â¥Â²Â¿Â·Ã–Ã’Ã‘Â¾Â­Ã”ÃšÂ¾Ã˜ÃÃÃ’Ã”ÃÃ¢ÃÃ‹Â£Â¬Â»Â¹ÃÃ¨Ã’ÂªÃ’Â»ÃÂ©Ã…ÃÂ¶ÃÂ¡Â£
 		{
 			QGraphicsSceneHoverEvent* e = static_cast<QGraphicsSceneHoverEvent*>(event);
 			if (contains(e->pos()))
@@ -796,11 +796,11 @@ void MindNode::NewChild(bool toRight)
 	MindNode* pChild = NULL;
 	if (qobject_cast<MindProgressNode*>(this))
 	{
-		pChild = new MindProgressNode(u8"½ø¶È½Úµã", this);
+		pChild = new MindProgressNode(u8"è¿›åº¦èŠ‚ç‚¹", this);
 	}
 	else
 	{
-		pChild = new MindNode(u8"ĞÂÔö½Úµã", this);
+		pChild = new MindNode(u8"æ–°å¢èŠ‚ç‚¹", this);
 	}
 	pChild->setToRight(toRight);
 	pChild->setLevel(level() + 1);
@@ -842,7 +842,7 @@ void MindNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
 	}
 	else
 	{
-		//ÓÉÓÚ±ß¿òÊÇ»­ÔÚ±³¾°±ßÔµ£¬Òò´ËÎªÁËÒş²Ø±ß¿òĞèÒªÉè³É±³¾°µÄÑÕÉ«¡£
+		//Ã“Ã‰Ã“ÃšÂ±ÃŸÂ¿Ã²ÃŠÃ‡Â»Â­Ã”ÃšÂ±Â³Â¾Â°Â±ÃŸÃ”ÂµÂ£Â¬Ã’Ã²Â´Ã‹ÃÂªÃÃ‹Ã’Ã¾Â²Ã˜Â±ÃŸÂ¿Ã²ÃÃ¨Ã’ÂªÃ‰Ã¨Â³Ã‰Â±Â³Â¾Â°ÂµÃ„Ã‘Ã•Ã‰Â«Â¡Â£
 		if (m_mouseState == MS_FOCUSOUT)
 			return;
 		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
@@ -878,7 +878,7 @@ QRectF MindNode::childrenOrSelfRect(bool isToRight) const
 
 QRectF MindNode::childrenRect(bool bToRight) const
 {
-	//ÕÛµşÒÔºóÊµ¼ÊÉÏÒş²ØµÄchildrenµÄrectÒÑ¾­Ã»ÓĞÒâÒåÁË£¬ÒòÎªÃ»ÓĞ»æÖÆ»ØÀ´¡£
+	//Ã•Ã›ÂµÃ¾Ã’Ã”ÂºÃ³ÃŠÂµÂ¼ÃŠÃ‰ÃÃ’Ã¾Â²Ã˜ÂµÃ„childrenÂµÃ„rectÃ’Ã‘Â¾Â­ÃƒÂ»Ã“ÃÃ’Ã¢Ã’Ã¥ÃÃ‹Â£Â¬Ã’Ã²ÃÂªÃƒÂ»Ã“ÃÂ»Ã¦Ã–Ã†Â»Ã˜Ã€Â´Â¡Â£
 	if (m_children.isEmpty() || isCollapsed(bToRight))
 	{
 		return QRectF();
@@ -886,12 +886,12 @@ QRectF MindNode::childrenRect(bool bToRight) const
 	else
 	{
 		QRectF hRect;
-		//·½·¨£ºÕÒµ½×îÎª±ß½çµÄxyÖµ£¨ÒÔthis×ø±êÏµÎª²Î¿¼Ïµ£©
+		//Â·Â½Â·Â¨Â£ÂºÃ•Ã’ÂµÂ½Ã—Ã®ÃÂªÂ±ÃŸÂ½Ã§ÂµÃ„xyÃ–ÂµÂ£Â¨Ã’Ã”thisÃ—Ã¸Â±ÃªÃÂµÃÂªÂ²ÃÂ¿Â¼ÃÂµÂ£Â©
 		qreal xLeft = INT_MAX, xRight = INT_MIN, yTop = INT_MAX, yBottom = INT_MIN;
 		for (int i = 0; i < m_children.length(); i++)
 		{
 			MindNode* pChild = m_children[i];
-			//TODO: holderÒ²ÒªÉèÖÃtoRight
+			//TODO: holderÃ’Â²Ã’ÂªÃ‰Ã¨Ã–ÃƒtoRight
 			if (pChild->isToRight() != bToRight)
 				continue;
 
@@ -934,24 +934,24 @@ bool MindNode::hasDraggingInChildRect(QPointF scenePos, int& dir_idx, bool& toRi
 	QList<MindNode*> leftChildren = Children(true, 0);
 	QList<MindNode*> rightChildren = Children(true, 1);
 
-	//·ÀÖ¹×ó±ß½ÚµãÅĞ¶ÏÁËÓÒ±ßµÄ²åÈëÒı·¢»ìÂÒ
+	//é˜²æ­¢å·¦è¾¹èŠ‚ç‚¹åˆ¤æ–­äº†å³è¾¹çš„æ’å…¥å¼•å‘æ··ä¹±
 	if (m_right_expand != EXP_NODEFINE)
 	{
 		QRectF rightChildrenRect = mapRectToScene(childrenRect(true));
-		//ÎªÁËÄÜÆ¥Åä×îÉÏÃæ×Ó½ÚµãµÄÎ»ÖÃ£¬ÊÊ¶ÈÍùÉÏÀ©Õ¹rightChildrenRect
+		//ä¸ºäº†èƒ½åŒ¹é…æœ€ä¸Šé¢å­èŠ‚ç‚¹çš„ä½ç½®ï¼Œé€‚åº¦å¾€ä¸Šæ‰©å±•rightChildrenRect
 		rightChildrenRect.adjust(0, -10, 0, 0);
 
 		if (!rightChildren.isEmpty() &&
 			rightChildrenRect.contains(scenePos) &&
 			scenePos.x() - rightChildrenRect.left() < 110)
 		{
-			if (m_content == u8"Ë¼Î¬µ¼Í¼±Ê¼Ç")
+			if (m_content == u8"æ€ç»´å¯¼å›¾ç¬”è®°")
 			{
 				int j;
 				j = 0;
 			}
 
-			//¹Û²ìÔÚÄÄ¸ö×Ó½ÚµãÖ®¼ä(ÉÏ)(ÏÂ)
+			//è§‚å¯Ÿåœ¨å“ªä¸ªå­èŠ‚ç‚¹ä¹‹é—´(ä¸Š)(ä¸‹)
 			foreach(MindNode * pChild, rightChildren)
 			{
 				int yTop = pChild->mapRectToScene(pChild->boundingRect()).top();
@@ -968,7 +968,7 @@ bool MindNode::hasDraggingInChildRect(QPointF scenePos, int& dir_idx, bool& toRi
 			else
 			{
 				MindNode* aboveNode = rightChildren[max(0, holderIdx - 1)];
-				//ÕÒµ½aboveNodeÔÚËùÓĞ½ÚµãµÄË÷Òı¡£
+				//æ‰¾åˆ°aboveNodeåœ¨æ‰€æœ‰èŠ‚ç‚¹çš„ç´¢å¼•ã€‚
 				holderIdx = allChildren.indexOf(aboveNode);
 				dir_idx = holderIdx + 1;
 			}
@@ -983,7 +983,7 @@ bool MindNode::hasDraggingInChildRect(QPointF scenePos, int& dir_idx, bool& toRi
 			)
 		{
 			QString content = GetContent();
-			dir_idx = leftChildren.length();	//¿ÉÄÜ×ó±ßÓĞ½Úµã
+			dir_idx = leftChildren.length();	//å¯èƒ½å·¦è¾¹æœ‰èŠ‚ç‚¹
 			toRight = true;
 			return true;
 		}
@@ -991,20 +991,20 @@ bool MindNode::hasDraggingInChildRect(QPointF scenePos, int& dir_idx, bool& toRi
 	
 	if (m_left_expand != EXP_NODEFINE)
 	{
-		//¹Û²ì×ó±ß
+		//è§‚å¯Ÿå·¦è¾¹
 		QRectF leftChildrenRect = mapRectToScene(childrenRect(false));
 		if (!leftChildren.isEmpty() &&
 			leftChildrenRect.contains(scenePos) &&
 			leftChildrenRect.right() - scenePos.x() < 110)
 		{
 
-			if (m_content == u8"Ë¼Î¬µ¼Í¼±Ê¼Ç")
+			if (m_content == u8"æ€ç»´å¯¼å›¾ç¬”è®°")
 			{
 				int j;
 				j = 0;
 			}
 
-			//¹Û²ìÔÚÄÄ¸ö×Ó½ÚµãÖ®¼ä(ÉÏ)(ÏÂ)
+			//è§‚å¯Ÿåœ¨å“ªä¸ªå­èŠ‚ç‚¹ä¹‹é—´(ä¸Š)(ä¸‹)
 			foreach(MindNode * pChild, leftChildren)
 			{
 				int yTop = pChild->mapRectToScene(pChild->boundingRect()).top();
@@ -1060,13 +1060,13 @@ void MindNode::setPosition(QPointF pos)
 	}
 	if (m_pathItem)
 	{
-		static int HMargin = 60;	//²ÉÓÃsceneÄÚ²¿¼ÆËãµÄHMargin
+		static int HMargin = 60;	//é‡‡ç”¨sceneå†…éƒ¨è®¡ç®—çš„HMargin
 		QGraphicsItem* pParent = parentItem();
 		QRectF bbox = boundingRect();
 
 		QPointF parentPos = pParent->scenePos();
 
-		//ÔÚscene×ø±êÏµÏÂ£¬¼ÆËãroot×İ×ø±ê¡£
+		//åœ¨sceneåæ ‡ç³»ä¸‹ï¼Œè®¡ç®—rootçºµåæ ‡ã€‚
 		qreal ytemp = parentPos.y() + pParent->boundingRect().height() / 2.0;
 		ytemp = mapFromScene(QPointF(0, ytemp)).y();
 

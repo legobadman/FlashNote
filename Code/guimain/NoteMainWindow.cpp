@@ -16,7 +16,7 @@ NoteMainWindow::NoteMainWindow(QWidget* parent)
 	: QMainWindow(parent, Qt::Window)
 {
 	init();
-	//TODO: ±¾µØ×¢²á±í»º´æbookindex¡£
+	//TODO: ï¿½ï¿½ï¿½ï¿½×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½bookindexï¿½ï¿½
 	int bookidx = 0;
 	initNotesView(bookidx, getActiveNoteInBook(bookidx));
 }
@@ -42,14 +42,14 @@ void NoteMainWindow::init()
 
 void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 {
-	//Ë÷Òýµ½±Ê¼Ç±¾ÏÂÀ­ÁÐ±íµÄµÚidxNotebookÏî£¬ÒÔ¼°±Ê¼Ç±¾ÁÐ±íµÄµÚidxNoteÏî¡£
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼Ç±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½Äµï¿½idxNotebookï¿½î£¬ï¿½Ô¼ï¿½ï¿½Ê¼Ç±ï¿½ï¿½Ð±ï¿½ï¿½Äµï¿½idxNoteï¿½î¡£
 	QModelIndex idx = m_ui->listpane->treeview()->model()->index(1, 0);
 	m_ui->listpane->treeview()->expand(idx);
 
 	idx = m_ui->listpane->treeview()->model()->index(2, 0);
 	m_ui->listpane->treeview()->expand(idx);
 
-	//×î×ó±ßÏîµÄÑ¡Ôñ¡£
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½
 	QModelIndex book_idx = idx.child(idxNotebook, 0);
 	m_ui->listpane->treeview()->selectionModel()->select(book_idx, QItemSelectionModel::Select);
 
@@ -112,7 +112,7 @@ void NoteMainWindow::onAddNotebook()
 
 int NoteMainWindow::getActiveNoteInBook(int bookidx)
 {
-	//TODO: ÒÔºóÔÙ»º´æ»î¶¯index
+	//TODO: ï¿½Ôºï¿½ï¿½Ù»ï¿½ï¿½ï¿½î¶¯index
 	return 0;
 }
 
@@ -158,7 +158,7 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	{
 		com_sptr<ISchedules> spSchedules;
 		coreApp->GetSchedules(&spSchedules);
-		com_sptr<INotebook> spNotebook = spSchedules;
+		com_sptr<INotebook> spNotebook(spSchedules);
 
 		QString noteid = index.data(ItemCoreObjIdRole).toString();
 		com_sptr<INote> spNote;

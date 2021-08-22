@@ -44,6 +44,9 @@ include_directories(
 # Find the QtWidgets library
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 link_directories(../3rdparty/boost_1_55_0/stage/lib)
 
 # Tell CMake to create the helloworld executable
@@ -155,22 +158,24 @@ add_executable(guimain
     ./style/toolbuttonstyleoption.cpp
     ./style/toolbuttonstyleoption.h
 
-    #qt试验代码
-    ./qtexamples/MltpDlgs1.cpp
-    ./qtexamples/MltpDlgs1.h
-    ./qtexamples/MltpDlgs2.cpp
-    ./qtexamples/MltpDlgs2.h
+    #./qtexamples/MltpDlgs1.cpp
+    #./qtexamples/MltpDlgs1.h
+    #./qtexamples/MltpDlgs2.cpp
+    #./qtexamples/MltpDlgs2.h
 
-    #thrift生成的类型
-	#../server/gen-cpp/UserInfo.cpp
-	#../server/gen-cpp/NoteInfo.cpp
-	#../server/gen-cpp/notestructure_constants.cpp
-	#../server/gen-cpp/notestructure_types.cpp
+    #../server/gen-cpp/UserInfo.cpp
+    #../server/gen-cpp/NoteInfo.cpp
+    #../server/gen-cpp/notestructure_constants.cpp
+    #../server/gen-cpp/notestructure_types.cpp
 )
 
 target_precompile_headers(guimain PRIVATE ./stdafx.h)
 
 # Add the Qt5 Widgets for linking
-target_link_libraries(guimain notecore Qt5::Widgets dbservice sqlite Ws2_32)
+if (WIN32)
+	target_link_libraries(guimain notecore Qt5::Widgets dbservice sqlite Ws2_32)
+else()
+	target_link_libraries(guimain notecore Qt5::Widgets dbservice sqlite Threads::Threads dl)
+endif(WIN32)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")

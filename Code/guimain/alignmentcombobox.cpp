@@ -51,10 +51,10 @@ void AlignmentComboBox::popup()
         m_pView = new QListView(m_popup);
         m_pModel = new QStandardItemModel(m_pView);
 
-        QStandardItem* pLeftAlignment = new QStandardItem(QIcon(":/icons/16x16/left_alignment.png"), u8"×ó¶ÔÆë");
-        QStandardItem* pCenterAlignment = new QStandardItem(QIcon(":/icons/16x16/center_alignment.png"), u8"¾ÓÖÐ");
-        QStandardItem* pRightAlignment = new QStandardItem(QIcon(":/icons/16x16/right_alignment.png"), u8"ÓÒ¶ÔÆë");
-        QStandardItem* pTwoSideAlignment = new QStandardItem(QIcon(":/icons/16x16/twoside_alignment.png"), u8"Á½¶Ë¶ÔÆë");
+        QStandardItem* pLeftAlignment = new QStandardItem(QIcon(":/icons/16x16/left_alignment.png"), u8"å·¦å¯¹é½");
+        QStandardItem* pCenterAlignment = new QStandardItem(QIcon(":/icons/16x16/center_alignment.png"), u8"å±…ä¸­");
+        QStandardItem* pRightAlignment = new QStandardItem(QIcon(":/icons/16x16/right_alignment.png"), u8"å³å¯¹é½");
+        QStandardItem* pTwoSideAlignment = new QStandardItem(QIcon(":/icons/16x16/twoside_alignment.png"), u8"ä¸¤ç«¯å¯¹é½");
 
         m_pModel->appendRow(pLeftAlignment);
         m_pModel->appendRow(pCenterAlignment);

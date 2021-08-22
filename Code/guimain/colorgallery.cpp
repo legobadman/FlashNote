@@ -22,7 +22,7 @@ void ColorGallery::init()
 	QHBoxLayout* pHBoxLayout1 = new QHBoxLayout;
 	m_btnDefaultClr = new ToolButton(this);
 	m_btnDefaultClr->setFixedSize(MyStyle::dpiScaledSize(QSize(97, 24)));
-	m_btnDefaultClr->setText(u8"默认颜色(D)");
+	m_btnDefaultClr->setText(u8"榛樿棰滆壊(D)");
 	m_btnDefaultClr->setButtonStyle(ToolButton::ButtonText | ToolButton::ButtonIcon);
 	m_btnDefaultClr->setIcon(QIcon(":/icons/16x16/default_color.png"));
 	m_btnDefaultClr->setIconSize(MyStyle::dpiScaledSize(QSize(16,16)));
@@ -37,7 +37,7 @@ void ColorGallery::init()
 	QHBoxLayout* pHBoxLayout2 = new QHBoxLayout;
 	m_btnMoreClr = new ToolButton(this);
 	m_btnMoreClr->setFixedSize(MyStyle::dpiScaledSize(QSize(108, 24)));
-	m_btnMoreClr->setText(u8"更多颜色(M)...");
+	m_btnMoreClr->setText(u8"鏇村棰滆壊(M)...");
 	m_btnMoreClr->setButtonStyle(ToolButton::ButtonText | ToolButton::ButtonIcon);
 	m_btnMoreClr->setIcon(QIcon(":/icons/16x16/morecolor.png"));
 	m_btnMoreClr->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));

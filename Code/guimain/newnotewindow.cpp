@@ -32,7 +32,7 @@ void NewNoteWindow::open(QString bookid, QString noteid)
 {
 	Q_ASSERT(!bookid.isEmpty() && !noteid.isEmpty());
 
-	setWindowTitle(QString(u8"�༭�ʼ�"));
+	setWindowTitle(QString(u8"编辑笔记"));
 
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebookById(bookid, &spNotebook);
@@ -48,7 +48,7 @@ void NewNoteWindow::initSchedule()
 	com_sptr<ISchedules> spSchedules;
 	coreApp->GetSchedules(&spSchedules);
 	HRESULT hr = CreateNote(m_type, &m_pNote);
-	com_sptr<INotebook> spNotebook = spSchedules;
+	com_sptr<INotebook> spNotebook(spSchedules);
 	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
 }
 

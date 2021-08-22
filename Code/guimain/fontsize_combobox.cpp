@@ -7,8 +7,7 @@ FontComboSizeBox::FontComboSizeBox(QWidget* parent)
 	: QComboBox(parent)
 {
 	setEditable(true);
-	QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
-	//TODO: 不知为何指定不了高度。
+	QFont font(QString::fromUtf16((char16_t*)L"寰蒋闆呴粦"), 9);
 	//setFixedSize(MyStyle::dpiScaledSize(QSize(60, 25)));
 	setFont(font);
 	addItem("8");

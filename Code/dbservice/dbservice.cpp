@@ -86,7 +86,7 @@ void DbService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
 	{
 		QString id = query.getStringField("ID");
 		QString create_time = query.getStringField("create_time");
-		QString modify_time = query.getIntField("modify_time");
+		QString modify_time = query.getStringField("modify_time");
 		QString bookName = QString::fromUtf8(query.getStringField("name"));
 		QString notes = QString::fromUtf8(query.getStringField("notes"));
 		QStringList list = notes.split('|', Qt::SkipEmptyParts);

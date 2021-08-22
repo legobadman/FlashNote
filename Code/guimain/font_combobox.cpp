@@ -17,7 +17,7 @@ FontComboBox::~FontComboBox()
 
 void FontComboBox::init()
 {
-	QFont font(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), 9);
+	QFont font(QString::fromUtf16((char16_t*)L"å¾®è½¯é›…é»‘"), 9);
 	setFont(font);
 	setFixedHeight(MyStyle::dpiScaled(25));
 	setMaxVisibleItems(20);

@@ -43,8 +43,6 @@ private:
 	wstring m_bstrTitle;
 	wstring m_bstrContent;
 	wstring m_bstrPlainText;
-	std::tm m_createtime;
-	std::tm m_modifytime;
 
 	std::vector<ICoreNotify*> m_notifies;
 
@@ -78,8 +76,6 @@ public:
 private:
 	wstring m_id;
 	wstring m_strName;
-	std::tm m_createtime;
-	std::tm m_modifytime;
 };
 
 class NotebooksBase : public INotebooks

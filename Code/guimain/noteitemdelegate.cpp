@@ -93,7 +93,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 
 	//1. draw title
 	{
-		QFont fontTitle(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ", 8));
+		QFont fontTitle(QString::fromUtf16((char16_t*)L"å¾®è½¯é›…é»‘", 8));
 		QFontMetrics fontMetrics(fontTitle);
 
 		int text_xoffset = 9, text_yoffset = 7;
@@ -110,12 +110,12 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 
 	//2. draw content
 	{
-		QFont fontContent(QString::fromUtf16((char16_t*)L"Î¢ÈíÑÅºÚ"), 9);
+		QFont fontContent(QString::fromUtf16((char16_t*)L"å¾®è½¯é›…é»‘"), 9);
 		QTextLayout textLayout(content, fontContent);
 		QFontMetrics fontMetrics(fontContent);
 		int fontHeight = fontMetrics.height();
 
-		//¼ÆËãÒ»ĞĞµÄÏÔÊ¾¿í¶È£¬ĞèÒª¿¼ÂÇÃæ°åµÄ¿í¶ÈÒÔ¼°ÓĞÎŞ¹ö¶¯Ìõ£¬margin¡£
+		//Â¼Ã†Ã‹Ã£Ã’Â»ÃÃÂµÃ„ÃÃ”ÃŠÂ¾Â¿Ã­Â¶ÃˆÂ£Â¬ÃÃ¨Ã’ÂªÂ¿Â¼Ã‚Ã‡ÃƒÃ¦Â°Ã¥ÂµÃ„Â¿Ã­Â¶ÃˆÃ’Ã”Â¼Â°Ã“ÃÃÃÂ¹Ã¶Â¶Â¯ÃŒÃµÂ£Â¬marginÂ¡Â£
 		int text_xoffset = 9, text_yoffset = 30;
 		int lineWidth = itemRect.width() - text_xoffset * 2;
 
