@@ -315,11 +315,6 @@ void NormalEditor::addCodeBlock()
 	charFormat.setForeground(QColor(213, 221, 227));
 	QFont fontClr("Consolas", 12);
 	charFormat.setFont(fontClr);
-
-	QFontMetrics fontMetrics(fontClr);
-	int spaceWidth = fontMetrics.width(' ');
-	textEdit->setTabStopDistance(spaceWidth * 4);
-
 	cursor.setBlockCharFormat(charFormat);
 }
 

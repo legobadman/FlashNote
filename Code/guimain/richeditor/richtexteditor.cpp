@@ -22,6 +22,10 @@ RichTextEditor::RichTextEditor(QWidget* parent)
 	setFrameShape(QFrame::NoFrame);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+	QTextOption opt = document()->defaultTextOption();
+	opt.setTabStopDistance(mtabStopDist);
+	document()->setDefaultTextOption(opt);
+
 	highlighter = new CppSyntaxHighlighter(document());
 }
 

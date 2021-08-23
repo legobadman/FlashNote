@@ -23,6 +23,7 @@ protected:
 
 private:
 	CppSyntaxHighlighter* highlighter;
+	const qreal mtabStopDist = 36;	//以Consola字体11号计算的tab大小。
 };
 
 #endif
