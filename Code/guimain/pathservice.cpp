@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "pathservice.h"
 #include <QStandardPaths>
+#include <QDebug>
 
 
 PathService& PathService::instance()
@@ -17,6 +18,7 @@ PathService::PathService()
 void PathService::_ensurePath()
 {
 	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+	qDebug() << locations;
 	QString appData;
 
 #ifdef Q_OS_WIN
@@ -36,15 +38,15 @@ void PathService::_ensurePath()
 
 	m_appDataPath.setPath(appData);
 	if (!m_appDataPath.exists())
-		m_appDataPath.mkdir(".");
+		m_appDataPath.mkpath(".");
 
 	m_dbPath.setPath(appData + "/" + "database");
 	if (!m_dbPath.exists())
-		m_dbPath.mkdir(".");
+		m_dbPath.mkpath(".");
 
 	m_assetsPath.setPath(appData + "/" + "assets");
 	if (!m_assetsPath.exists())
-		m_assetsPath.mkdir(".");
+		m_assetsPath.mkpath(".");
 }
 
 QString PathService::GetDbPath()
