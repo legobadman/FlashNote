@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "newnotewindow.h"
 #include "ui_newnotewindow.h"
 #include "guihelper.h"
