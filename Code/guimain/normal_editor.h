@@ -20,7 +20,7 @@ public:
 	QTextDocument* document();
 
 Q_SIGNALS:
-	void textChanged();
+	void textChanged(bool delay);
 	void currentCharFormatChanged(const QTextCharFormat& format);
 	void cursorPositionChanged();
 
@@ -41,10 +41,12 @@ protected slots:
 	void textBgColor();
 	void textFgColor(const QColor& color);
 	void insertImage();
+	void onEditting();
 
 protected:
 	void fontChanged(const QFont& f);
 	void focusInEvent(QFocusEvent*);
+	bool eventFilter(QObject* watched, QEvent* event);
 
 private:
 	void init();

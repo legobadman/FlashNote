@@ -135,7 +135,7 @@ void NoteEditWindow::setBookName(const QString& name)
 void NoteEditWindow::initSlots()
 {
 	connect(m_ui->editTitle, SIGNAL(textChanged(const QString&)), this, SLOT(onTitleChanged()));
-	connect(m_ui->noramlEditor, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+	connect(m_ui->noramlEditor, SIGNAL(textChanged(bool)), this, SLOT(onTextChanged(bool)));
 	connect(m_ui->mindmapEditor, SIGNAL(itemContentChanged(bool)), this, SLOT(onMindMapChanged(bool)));
 }
 
@@ -258,14 +258,17 @@ void NoteEditWindow::switchtobook(int bookidx)
 void NoteEditWindow::onTitleChanged()
 {
 	if (m_type == NORMAL_NOTE)
-		onTextChanged();
+		onTextChanged(true);
 	else if (m_type == MINDMAP || m_type == SCHEDULE)
 		onMindMapChanged(true);
 }
 
-void NoteEditWindow::onTextChanged()
+void NoteEditWindow::onTextChanged(bool delay)
 {
-	QTimer::singleShot(2000, this, SLOT(saveNote()));
+	if (delay)
+		QTimer::singleShot(2000, this, SLOT(saveNote()));
+	else
+		saveNote();
 }
 
 void NoteEditWindow::onMindMapChanged(bool bEditChange)

@@ -58,6 +58,8 @@ void NormalEditor::init()
 	pMainLayout->addWidget(textEdit);
 
 	setLayout(pMainLayout);
+
+	textEdit->installEventFilter(this);
 }
 
 QHBoxLayout* NormalEditor::initToolButtons()
@@ -163,7 +165,7 @@ void NormalEditor::initSlots()
 {
 	connect(textEdit, SIGNAL(currentCharFormatChanged(QTextCharFormat)), this, SLOT(slotCurrentCharFormatChanged(QTextCharFormat)));
 	connect(textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(slotCursorPositionChanged()));
-	connect(textEdit, SIGNAL(textChanged()), this, SIGNAL(textChanged()));
+	connect(textEdit, SIGNAL(textChanged()), this, SIGNAL(onEditting()));
 
 	fontChanged(textEdit->font());
 
@@ -535,4 +537,19 @@ void NormalEditor::insertImage()
 
 	QImage image = QImageReader(original).read();
 	textEdit->dropImage(QUrl(original), image);
+}
+
+bool NormalEditor::eventFilter(QObject* watched, QEvent* event)
+{
+	if (watched == textEdit && event->type() == QEvent::FocusOut)
+	{
+		//先不排除普通焦点移除的可能
+		emit textChanged(false);
+	}
+	return QWidget::eventFilter(watched, event);
+}
+
+void NormalEditor::onEditting()
+{
+	emit textChanged(true);
 }

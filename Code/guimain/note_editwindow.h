@@ -24,7 +24,7 @@ public:
 
 public slots:
 	void onTitleChanged();
-	void onTextChanged();
+	void onTextChanged(bool delay);
 	void onMindMapChanged(bool bEditChange);
 	void saveNote();
 	void saveMindMap();

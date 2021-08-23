@@ -20,6 +20,7 @@ protected:
 	void insertFromMimeData(const QMimeData* source);
 	QMimeData* createMimeDataFromSelection() const;
 	void resizeEvent(QResizeEvent* e) override;
+	void focusOutEvent(QFocusEvent* e) override;
 
 private:
 	CppSyntaxHighlighter* highlighter;

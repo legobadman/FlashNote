@@ -46,6 +46,11 @@ void RichTextEditor::resizeEvent(QResizeEvent* e)
 	resizeImages();
 }
 
+void RichTextEditor::focusOutEvent(QFocusEvent* e)
+{
+	QTextEdit::focusOutEvent(e);
+}
+
 void RichTextEditor::resizeImages()
 {
 	QTextBlock currentBlock = textCursor().block();
@@ -132,15 +137,15 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 		document()->addResource(QTextDocument::ImageResource, url_, image);
 		QTextImageFormat imageFormat;
 		imageFormat.setName(url_.toString());
-		int W = viewport()->width() - 45 * 2;	//算上margin。
-		float ratio = 1;
+		float W = viewport()->width() - 45 * 2;	//算上margin。
+		float ratio = (float)image.width() / image.height();
 		if (image.width() > W)
 		{
-			ratio = (float)image.width() / image.height();
+			//ratio = (float)image.width() / image.height();
 		}
 		else
 		{
-			W = image.width() - 45 * 2;
+			W = image.width();
 		}
 		imageFormat.setWidth(W);
 		imageFormat.setHeight(W / ratio);
