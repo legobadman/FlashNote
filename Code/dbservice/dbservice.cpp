@@ -1,28 +1,42 @@
 ﻿#include "sql_const.h"
 #include <QBuffer>
 #include <QFileInfo>
+#include <QDir>
+#include <QtCore/QStandardPaths>
 #include <QCoreApplication>
 #include "notecore2.h"
 #include "com_sptr.h"
 #include "notecoreinit.h"
 #include "dbservice.h"
+#include "../guimain/pathservice.h"
 #include "../guimain/guihelper.h"
 
 
 DbService& DbService::GetInstance()
 {
-	static DbService inst(AppHelper::GetDbPath());
+	static DbService inst;
 	return inst;
 }
 
-DbService::DbService(QString dbPath)
+DbService::DbService()
 {
-	userid = L"609638963d8ba27ccea4e20d";
-	_userid = "609638963d8ba27ccea4e20d";
-	m_dbPath = dbPath;
-	QString fullPath = m_dbPath + "/" + m_dbName;
-	m_db.open(fullPath.toUtf8());
-	//reconstruct();
+	QString dbPath = PathService::instance().GetDbPath();
+	QString fullPath = dbPath + "/" + m_dbName;
+	if (!QDir(dbPath).exists(m_dbName))
+	{
+		m_db.open(fullPath.toUtf8());
+		if (!m_db.tableExists(TABLE_NAME_NOTE) ||
+			!m_db.tableExists(TABLE_NAME_NOTEBOOK) ||
+			!m_db.tableExists(TABLE_NAME_TRASH) ||
+			!m_db.tableExists(TABLE_NAME_SCHEDULE))
+		{
+			reconstruct();
+		}
+	}
+	else
+	{
+		m_db.open(fullPath.toUtf8());
+	}
 }
 
 DbService::~DbService()
@@ -216,7 +230,6 @@ void DbService::InitcoreFromRPC(INoteApplication* pApp)
 
 	std::vector<NOTEBOOK> vecBooks;
 	getnotebooks(vecBooks);
-	pApp->SetUserId(userid);
 
 	for (int i = 0; i < vecBooks.size(); i++)
 	{

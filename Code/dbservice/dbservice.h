@@ -34,18 +34,16 @@ public:
 	bool TrashNote(INoteApplication* pApp, INoteCollection* pNoteColl, INote* pNote);
 
 private:
-	DbService(QString dbPath);
+	DbService();
 	DbService(const DbService&) {}
 	~DbService();
 	void dropAllTables();
 	void CreateNoteByNOTE(NOTE note, INote** ppNote);
 
-	QString m_dbPath;
+	const QString m_dbDirName = "database";
+	const QString m_assetDirName = "assets";
 	const QString m_dbName = "note.db";
 	CppSQLite3DB m_db;
-	std::string _userid;
-	std::wstring userid;
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 };
 
 

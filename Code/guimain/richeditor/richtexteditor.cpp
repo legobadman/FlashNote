@@ -7,6 +7,7 @@
 #include <QtGui/QImageReader>
 #include <QDir>
 #include "richtexteditor.h"
+#include "pathservice.h"
 #include "moc_richtexteditor.cpp"
 
 
@@ -63,7 +64,7 @@ void RichTextEditor::resizeImages()
 
 				QImage image = varRes.value<QImage>();
 
-				int W = viewport()->width() - 45 * 2;	//ËãÉÏmargin¡£
+				int W = viewport()->width() - 45 * 2;
 				float ratio = 1;
 				if (image.width() > W)
 				{
@@ -93,7 +94,7 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 {
 	if (!image.isNull())
 	{
-		//ÐèÒª¸´ÖÆÍ¼Æ¬µ½assetsÄ¿Â¼£¬²¢ÒÔassetsÄ¿Â¼ÏÂµÄÍ¼Æ¬×÷Îªurl¡£
+		//需要复制图片到assets目录，并以assets目录下的图片作为url。
 		QString strUrl = url.url();
 		int idx = strUrl.lastIndexOf("/") + 1;
 
@@ -111,11 +112,9 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 			suffix = "jpg";
 		}
 
-		QString appPath = QCoreApplication::applicationDirPath();
-		QString assertPath = appPath + "/" + "assets";
-
+		QString assertPath = PathService::instance().GetAssetsPath();
 		QDir dir(assertPath);
-		//TODO: ÔÝ²»¼ì²âÖØ¸´Í¼Æ¬¡£
+		//TODO: 暂不检测重复图片。
 		QString fullpath = QString("%1/%2.%3").arg(assertPath).arg(prefix).arg(suffix);
 		int i = 1;
 		while (QFileInfo(fullpath).exists())
@@ -129,7 +128,7 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 		document()->addResource(QTextDocument::ImageResource, url_, image);
 		QTextImageFormat imageFormat;
 		imageFormat.setName(url_.toString());
-		int W = viewport()->width() - 45 * 2;	//ËãÉÏmargin¡£
+		int W = viewport()->width() - 45 * 2;	//算上margin。
 		float ratio = 1;
 		if (image.width() > W)
 		{

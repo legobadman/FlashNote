@@ -22,8 +22,6 @@ public:
 	static NOTE_TYPE GetNoteType(INote* pNote);
 	static QStringList GetNotes(INoteCollection* pNoteColl);
 
-	static QString GetProgDataPath();
-	static QString GetDbPath();
 	static QString GenerateGUID();
 
 	static int GetNoteCounts(INoteCollection* pNotebook);

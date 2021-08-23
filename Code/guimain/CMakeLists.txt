@@ -130,6 +130,8 @@ add_executable(guimain
     ./notewinservice.h
     ./normal_editor.cpp
     ./normal_editor.h
+    ./pathservice.cpp
+    ./pathservice.h
     ./popupwidget.cpp
     ./popupwidget.h
     ./res/icons.qrc

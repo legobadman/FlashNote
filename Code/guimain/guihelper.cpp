@@ -3,6 +3,7 @@
 #include <QtCore/QStandardPaths>
 #include <QUuid>
 #include <QDebug>
+#include <QDir>
 
 
 void AppHelper::GetNotebook(int idx, INotebook** ppNotebook)
@@ -187,31 +188,6 @@ int AppHelper::GetNoteCounts(INoteCollection* pNotebook)
 	Q_ASSERT(pNotebook);
 	pNotebook->GetCount(&nCount);
 	return nCount;
-}
-
-QString AppHelper::GetProgDataPath()
-{
-#ifdef Q_OS_WIN
-	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-	locations.removeOne(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-	locations.removeOne(QCoreApplication::applicationDirPath());
-	locations.removeOne(QCoreApplication::applicationDirPath() + QLatin1String("/data"));
-	locations.removeOne(QCoreApplication::applicationDirPath() + QLatin1String("/bin/data"));
-
-	locations = locations.filter("ProgramData");
-	Q_ASSERT(locations.size() == 1);
-	QString appData = locations[0];
-	return appData;
-#else
-	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-	qDebug() << locations;
-	return locations[0];
-#endif
-}
-
-QString AppHelper::GetDbPath()
-{
-	return GetProgDataPath() + "/" + "database";
 }
 
 QString AppHelper::GenerateGUID()
