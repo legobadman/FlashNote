@@ -138,7 +138,7 @@ QHBoxLayout* NormalEditor::initToolButtons()
 
 	item_id = new ToolButton;
 	item_id->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	item_id->setIcon(QIcon(":/icons/16x16/item_symbol.png"));
+	item_id->setIcon(QIcon(":/icons/16x16/item_id.png"));
 	item_id->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	item_id->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(item_id);

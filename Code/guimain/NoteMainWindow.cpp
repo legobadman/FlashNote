@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "ui_NoteMainWindow.h"
 #include "notetrayicon.h"
 #include "LeftSideItemDelegate.h"
@@ -16,7 +16,7 @@ NoteMainWindow::NoteMainWindow(QWidget* parent)
 	: QMainWindow(parent, Qt::Window)
 {
 	init();
-	//TODO: ����ע�������bookindex��
+	//TODO: 本地注册表缓存bookindex。
 	int bookidx = 0;
 	initNotesView(bookidx, getActiveNoteInBook(bookidx));
 }
@@ -42,14 +42,14 @@ void NoteMainWindow::init()
 
 void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 {
-	//�������ʼǱ������б��ĵ�idxNotebook��Լ��ʼǱ��б��ĵ�idxNote�
+	//索引到笔记本下拉列表的第idxNotebook项，以及笔记本列表的第idxNote项。
 	QModelIndex idx = m_ui->listpane->treeview()->model()->index(1, 0);
 	m_ui->listpane->treeview()->expand(idx);
 
 	idx = m_ui->listpane->treeview()->model()->index(2, 0);
 	m_ui->listpane->treeview()->expand(idx);
 
-	//��������ѡ��
+	//最左边项的选择。
 	QModelIndex book_idx = idx.child(idxNotebook, 0);
 	m_ui->listpane->treeview()->selectionModel()->select(book_idx, QItemSelectionModel::Select);
 
@@ -112,7 +112,7 @@ void NoteMainWindow::onAddNotebook()
 
 int NoteMainWindow::getActiveNoteInBook(int bookidx)
 {
-	//TODO: �Ժ��ٻ���index
+	//TODO: 以后再缓存活动index
 	return 0;
 }
 

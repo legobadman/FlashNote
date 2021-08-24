@@ -102,13 +102,14 @@ void FontColorComboBox::updateIcon()
 	p.setFont(font);
 
 	QPen pen;
-	pen.setColor(m_clr);
+	pen.setColor(QColor(63, 62, 61));
 	p.setPen(pen);
 	p.drawText(QRect(9,0,24,24), "a");
 
 	pen.setWidth(3);
+	pen.setColor(m_clr);
 	p.setPen(pen);
-	p.drawLine(4, 21, 23, 21);
+	p.drawLine(6, 21, 22, 21);
 	p.end();
 
 	m_icon = QIcon(newIcon);

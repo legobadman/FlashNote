@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "colorgallery.h"
 #include "moc_colorgallery.cpp"
 #include "MyStyle.h"
