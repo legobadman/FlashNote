@@ -35,7 +35,4 @@ struct NOTEBOOK
 
 Q_DECLARE_METATYPE(NOTEBOOK)
 
-class INoteApplication;
-extern INoteApplication* coreApp;
-
 #endif

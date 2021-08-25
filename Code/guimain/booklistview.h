@@ -20,6 +20,7 @@ class BookListView : public QWidget
 		REMOVE_NOTE = 0,	//将笔记本中的笔记移除至废纸篓
 		RECOVER_NOTE,		//恢复废纸篓中的笔记。
 		DELETE_NOTE,		//彻底删除笔记。
+		OPEN_NOTE,			//单独打开笔记。
 	};
 
 public:

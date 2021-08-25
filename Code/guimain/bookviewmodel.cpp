@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "bookviewmodel.h"
 #include "guihelper.h"
-
+#include "uiapplication.h"
 
 
 BookViewModel::BookViewModel(QObject* parent /* = nullptr */)
@@ -358,7 +358,7 @@ void AllNotesModel::initAllNotes()
 	m_type = VIEW_ALLNOTES;
 
 	com_sptr<INotebooks> spNotebooks;
-	coreApp->GetNotebooks(&spNotebooks);
+	AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 
 	spNotebooks->addWatcher(this);
 

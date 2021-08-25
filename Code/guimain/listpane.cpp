@@ -497,9 +497,9 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 		AppHelper::GetNotebookById(bookid, &spNotebook);
 
 #ifdef USE_RPC
-		bool bRet = RPCService::GetInstance().RemoveNotebook(coreApp, spNotebook);
+		bool bRet = RPCService::GetInstance().RemoveNotebook(AppHelper::coreApp(), spNotebook);
 #else
-		bool bRet = DbService::GetInstance().RemoveNotebook(coreApp, spNotebook);
+		bool bRet = DbService::GetInstance().RemoveNotebook(AppHelper::coreApp(), spNotebook);
 #endif
 	}
 	else if (nIndex == DELETE_SCHEDULE)
@@ -508,12 +508,12 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 		QString noteid = index.data(ItemCoreObjIdRole).toString();
 
 		com_sptr<ISchedules> spSchedules;
-		coreApp->GetSchedules(&spSchedules);
+		AppHelper::coreApp()->GetSchedules(&spSchedules);
 
 		com_sptr<INote> spNote;
 		AppHelper::GetNote(spSchedules, noteid, &spNote);
 
-		DbService::GetInstance().RemoveSchedule(coreApp, spNote);
+		DbService::GetInstance().RemoveSchedule(AppHelper::coreApp(), spNote);
 	}
 }
 
@@ -652,7 +652,7 @@ void NavigationPanel::initNotebookItem()
 	pNoteBookItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
 		ITEM_WIDGET_TYPE::ITEM_TOPLEVEL), ItemWidgetTypeRole);
 
-	com_sptr<INoteApplication> spApp = coreApp;
+	com_sptr<INoteApplication> spApp = AppHelper::coreApp();
 	com_sptr<INotebooks> spNotebooks;
 	spApp->GetNotebooks(&spNotebooks);
 
@@ -693,7 +693,7 @@ void NavigationPanel::initSchedule()
 	pScheduleItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
 		ITEM_WIDGET_TYPE::ITEM_TOPLEVEL), ItemWidgetTypeRole);
 
-	com_sptr<INoteApplication> spApp = coreApp;
+	com_sptr<INoteApplication> spApp = AppHelper::coreApp();
 	com_sptr<ISchedules> spSchedules;
 	spApp->GetSchedules(&spSchedules);
 

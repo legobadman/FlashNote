@@ -181,9 +181,9 @@ void NoteEditWindow::saveNote()
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 #ifdef USE_RPC
-	bool ret = RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+	bool ret = RPCService::GetInstance().SynchronizeNote(AppHelper::coreApp(), spNotebook, m_pNote);
 #else
-	bool ret = DbService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+	bool ret = DbService::GetInstance().SynchronizeNote(AppHelper::coreApp(), spNotebook, m_pNote);
 #endif
 	if (ret)
 	{
@@ -203,9 +203,9 @@ void NoteEditWindow::saveMindMap()
 
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 #ifdef USE_RPC
-	RPCService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+	RPCService::GetInstance().SynchronizeNote(AppHelper::coreApp(), spNotebook, m_pNote);
 #else
-	DbService::GetInstance().SynchronizeNote(coreApp, spNotebook, m_pNote);
+	DbService::GetInstance().SynchronizeNote(AppHelper::coreApp(), spNotebook, m_pNote);
 #endif
 }
 
@@ -219,7 +219,7 @@ void NoteEditWindow::saveSchedule()
 	m_pNote->SetContent(wtf.toStdWString());
 	com_sptr<INotebook> spNotebook = m_pNotebook;
 
-	DbService::GetInstance().SynchronizeSchedule(coreApp, m_pNote);
+	DbService::GetInstance().SynchronizeSchedule(AppHelper::coreApp(), m_pNote);
 }
 
 void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
@@ -239,7 +239,7 @@ void NoteEditWindow::switchtobook(int bookidx)
 	//TODO
 	com_sptr<INotebook> spNewbook;
 	com_sptr<INotebooks> spNotebooks;
-	coreApp->GetNotebooks(&spNotebooks);
+	AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 	HRESULT hr = spNotebooks->Item(bookidx, &spNewbook);
 	if (FAILED(hr) || !spNewbook)
 	{

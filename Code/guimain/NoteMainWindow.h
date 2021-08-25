@@ -31,7 +31,6 @@ private:
 
 private:
 	Ui::NoteMainWindow* m_ui;
-	com_sptr<INotebook> m_pNotebook;
 };
 
 #endif

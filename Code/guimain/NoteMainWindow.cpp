@@ -125,7 +125,8 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		m_ui->stackedWidget2->setCurrentWidget(m_ui->notesview);
 		QString bookid = index.data(ItemCoreObjIdRole).toString();
 		com_sptr<INotebooks> spNotebooks;
-		coreApp->GetNotebooks(&spNotebooks);
+
+		AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 
 		com_sptr<INotebook> spNotebook;
 		HRESULT hr = spNotebooks->Item(bookid.toStdWString(), &spNotebook);
@@ -142,7 +143,7 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	{
 		m_ui->stackedWidget2->setCurrentWidget(m_ui->notesview);
 		com_sptr<ITrash> spTrash;
-		coreApp->GetTrash(&spTrash);
+		AppHelper::coreApp()->GetTrash(&spTrash);
 		m_ui->notesview->setNotebook(VIEW_TRASH, spTrash);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_ALLNOTE)
@@ -157,7 +158,7 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM)
 	{
 		com_sptr<ISchedules> spSchedules;
-		coreApp->GetSchedules(&spSchedules);
+		AppHelper::coreApp()->GetSchedules(&spSchedules);
 		com_sptr<INotebook> spNotebook(spSchedules);
 
 		QString noteid = index.data(ItemCoreObjIdRole).toString();
@@ -182,7 +183,7 @@ QString NoteMainWindow::getActiveBookId()
 	else
 	{
 		com_sptr<INotebooks> spNotebooks;
-		coreApp->GetNotebooks(&spNotebooks);
+		AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebook(0, &spNotebook);
 		bookId = AppHelper::GetNotebookId(spNotebook);

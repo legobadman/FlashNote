@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "NoteMainWindow.h"
-#include "notewinservice.h"
 #include "notetrayicon.h"
 #include "MyStyle.h"
 #include "richeditor/mrichtextedit.h"
@@ -8,9 +7,8 @@
 #include "CppSQLite3.h"
 #include "dbservice.h"
 #include "guihelper.h"
+#include "uiapplication.h"
 
-
-INoteApplication* coreApp = NULL;
 
 //#define TEST_RICH_EDITOR
 //#define TEST_WIDGET_WINDOW_PARENT
@@ -60,15 +58,8 @@ int main(int argc, char *argv[])
 	db.reconstruct();
 
 #else
-	QApplication::addLibraryPath("C:/Qt/Qt-5.15.0/plugins");
-	QApplication app(argc, argv);
-
-	QApplication::setStyle(new MyStyle);
-
-	CreateApplication(&coreApp);
-
-	NoteWinService::GetInstance().startup();
-
+	UiApplication app(argc, argv);
+	app.showWidget();
 	app.exec();
 	return 0;
 #endif

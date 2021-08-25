@@ -1,15 +1,22 @@
 #include "stdafx.h"
 #include "guihelper.h"
+#include "uiapplication.h"
 #include <QtCore/QStandardPaths>
 #include <QUuid>
 #include <QDebug>
 #include <QDir>
 
 
+INoteApplication* AppHelper::coreApp()
+{
+	UiApplication* pApp = qobject_cast<UiApplication*>(QApplication::instance());
+	return pApp->coreApplication();
+}
+
 void AppHelper::GetNotebook(int idx, INotebook** ppNotebook)
 {
 	com_sptr<INotebooks> spNotebooks;
-	coreApp->GetNotebooks(&spNotebooks);
+	AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 	HRESULT hr = spNotebooks->Item(idx, ppNotebook);
 }
 
@@ -40,7 +47,7 @@ void AppHelper::GetNoteAndBookById(QString noteid, INotebook** ppNotebook, INote
 		return;
 
 	com_sptr<INotebooks> spNotebooks;
-	coreApp->GetNotebooks(&spNotebooks);
+	AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 	int nCount = 0;
 	spNotebooks->GetCount(&nCount);
 
@@ -87,7 +94,7 @@ QString AppHelper::GetNotebookId(INotebook* pNotebook)
 void AppHelper::GetNotebookById(const QString& bookid, INotebook** ppNotebook)
 {
 	com_sptr<INotebooks> spNotebooks;
-	coreApp->GetNotebooks(&spNotebooks);
+	AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 	HRESULT hr = spNotebooks->Item(bookid.toStdWString(), ppNotebook);
 }
 
@@ -98,7 +105,7 @@ void AppHelper::GetNotebookByNote(INote* pNote, INotebook** ppNotebook)
 	std::wstring bookId;
 	pNote->GetBookId(bookId);
 	com_sptr<INotebooks> spNotebooks;
-	coreApp->GetNotebooks(&spNotebooks);
+	AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 	HRESULT hr = spNotebooks->Item(bookId, ppNotebook);
 	if (FAILED(hr))
 	{

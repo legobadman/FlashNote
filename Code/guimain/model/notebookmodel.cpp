@@ -7,7 +7,7 @@
 NotebookModel::NotebookModel(QObject* parent)
 	: QStandardItemModel(parent)
 {
-	com_sptr<INoteApplication> spApp = coreApp;
+	com_sptr<INoteApplication> spApp = AppHelper::coreApp();
 	com_sptr<INotebooks> spNotebooks;
 	spApp->GetNotebooks(&spNotebooks);
 

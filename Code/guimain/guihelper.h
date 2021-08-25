@@ -6,6 +6,7 @@
 class AppHelper
 {
 public:
+	static INoteApplication* coreApp();
 	static void GetNotebook(int idx, INotebook** ppNotebook);
 	static void GetNote(INoteCollection* pNotebook, int idxNote, INote** ppNote);
 	static void GetNote(INoteCollection* pNotebook, QString noteid, INote** ppNote);

@@ -1,24 +1,30 @@
 #include "stdafx.h"
-#include "notewinservice.h"
-#include "note_types.h"
-#include "rpcservice.h"
+#include "uiapplication.h"
+#include "MyStyle.h"
 #include "dbservice.h"
 #include "guihelper.h"
 
 
-NoteWinService::NoteWinService()
-	: QObject(NULL)
+UiApplication::UiApplication(int& argc, char** argv)
+	: QApplication(argc, argv)
 {
-	m_spApp = coreApp;
+	QApplication::setStyle(new MyStyle);
+	CreateApplication(&m_spApp);
 	initCoreFromRPC();
 	initUI();
 }
 
-NoteWinService::~NoteWinService()
+UiApplication::~UiApplication()
 {
+
 }
 
-void NoteWinService::initUI()
+INoteApplication* UiApplication::coreApplication()
+{
+	return m_spApp;
+}
+
+void UiApplication::initUI()
 {
 	NoteMainWindow* pwtf = new NoteMainWindow(NULL);
 	m_mainWindow = QSharedPointer<NoteMainWindow>(pwtf);
@@ -30,38 +36,24 @@ void NoteWinService::initUI()
 		this, SLOT(onQuickApp()));
 }
 
-NoteWinService& NoteWinService::GetInstance()
+void UiApplication::initCoreFromRPC()
 {
-	static NoteWinService inst;
-	return inst;
-}
-
-INoteApplication* NoteWinService::coreApplication()
-{
-	return m_spApp;
-}
-
-void NoteWinService::initCoreFromRPC()
-{
-#ifdef USE_RPC
-	RPCService::GetInstance().InitcoreFromRPC(m_spApp);
-#else
 	DbService::GetInstance().InitcoreFromRPC(m_spApp);
-#endif
 }
 
-void NoteWinService::startup()
+void UiApplication::showWidget()
 {
 	m_trayIcon.show();
 	m_mainWindow->showMaximized();
 }
 
-void NoteWinService::onQuickApp()
+void UiApplication::onQuickApp()
 {
+	m_mainWindow.clear();
 	QApplication::quit();
 }
 
-void NoteWinService::onTrigger()
+void UiApplication::onTrigger()
 {
 	m_mainWindow->show();
 }

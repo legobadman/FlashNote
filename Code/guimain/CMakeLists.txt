@@ -126,8 +126,6 @@ add_executable(guimain
     ./noteseditview.h
     ./notetrayicon.cpp
     ./notetrayicon.h
-    ./notewinservice.cpp
-    ./notewinservice.h
     ./normal_editor.cpp
     ./normal_editor.h
     ./pathservice.cpp
@@ -159,16 +157,8 @@ add_executable(guimain
     ./style/ToolButtonStyle.h
     ./style/toolbuttonstyleoption.cpp
     ./style/toolbuttonstyleoption.h
-
-    #./qtexamples/MltpDlgs1.cpp
-    #./qtexamples/MltpDlgs1.h
-    #./qtexamples/MltpDlgs2.cpp
-    #./qtexamples/MltpDlgs2.h
-
-    #../server/gen-cpp/UserInfo.cpp
-    #../server/gen-cpp/NoteInfo.cpp
-    #../server/gen-cpp/notestructure_constants.cpp
-    #../server/gen-cpp/notestructure_types.cpp
+    ./uiapplication.cpp
+    ./uiapplication.h
 )
 
 target_precompile_headers(guimain PRIVATE ./stdafx.h)

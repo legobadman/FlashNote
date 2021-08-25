@@ -17,7 +17,7 @@ SelectNotebookDlg::SelectNotebookDlg(QDialog* parent)
 
 	QStandardItemModel* model = new QStandardItemModel;
 
-	com_sptr<INoteApplication> spApp = coreApp;
+	com_sptr<INoteApplication> spApp = AppHelper::coreApp();
 	com_sptr<INotebooks> spNotebooks;
 	spApp->GetNotebooks(&spNotebooks);
 

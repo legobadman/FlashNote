@@ -407,7 +407,7 @@ bool DbService::SynchronizeNotebook(INotebook* pNotebook)
 		pNotebook->SetId(bookid.toStdWString());
 
 		com_sptr<INotebooks> spNotebooks;
-		coreApp->GetNotebooks(&spNotebooks);
+		AppHelper::coreApp()->GetNotebooks(&spNotebooks);
 		spNotebooks->AddNotebook(pNotebook);
 	}
 	//其他更新待续

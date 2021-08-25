@@ -46,7 +46,7 @@ void NewNoteWindow::open(QString bookid, QString noteid)
 void NewNoteWindow::initSchedule()
 {
 	com_sptr<ISchedules> spSchedules;
-	coreApp->GetSchedules(&spSchedules);
+	AppHelper::coreApp()->GetSchedules(&spSchedules);
 	HRESULT hr = CreateNote(m_type, &m_pNote);
 	com_sptr<INotebook> spNotebook(spSchedules);
 	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);

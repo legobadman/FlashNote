@@ -142,7 +142,7 @@ void NotesEditView::onShowNotesView(INote* pNote)
 		if (AppHelper::GetNoteType(pNote) == SCHEDULE)
 		{
 			com_sptr<ISchedules> spSchedules;
-			coreApp->GetSchedules(&spSchedules);
+			AppHelper::coreApp()->GetSchedules(&spSchedules);
 			spNotebook = spSchedules;
 		}
 		else

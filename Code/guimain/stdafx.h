@@ -2,7 +2,6 @@
 #define __GUI_STDAFX_H__
 
 #include <stack>
-
 #include <QApplication>
 #include <QMainWindow>
 #include <QTreeView>
@@ -32,7 +31,5 @@
 #include "notecoreinit.h"
 #include "note_types.h"
 #include "common_types.h"
-
-//#define USE_RPC
 
 #endif

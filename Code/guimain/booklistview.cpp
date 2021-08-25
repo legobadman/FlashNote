@@ -83,6 +83,10 @@ void BookListView::onCustomContextMenu(const QPoint& point)
 		QAction* pDelete = new QAction(u8"删除笔记", m_pCustomMenu);
 		pDelete->setData((int)REMOVE_NOTE);
 		m_pCustomMenu->addAction(pDelete);
+
+		QAction* pOpen = new QAction(u8"打开笔记", m_pCustomMenu);
+		pOpen->setData((int)OPEN_NOTE);
+		m_pCustomMenu->addAction(pOpen);
 	}
 	else
 	{
@@ -116,30 +120,34 @@ void BookListView::MenuActionSlot(QAction* action)
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebookById(bookid, &spNotebook);
 #ifdef USE_RPC
-		bool bRet = RPCService::GetInstance().RemoveNote(coreApp, spNotebook, spNote);
+		bool bRet = RPCService::GetInstance().RemoveNote(AppHelper::coreApp(), spNotebook, spNote);
 #else
-		bool bRet = DbService::GetInstance().RemoveNote(coreApp, spNotebook, spNote);
+		bool bRet = DbService::GetInstance().RemoveNote(AppHelper::coreApp(), spNotebook, spNote);
 #endif
 	}
 	else if (nIndex == RECOVER_NOTE)
 	{
 		com_sptr<ITrash> pTrash;
-		coreApp->GetTrash(&pTrash);
+		AppHelper::coreApp()->GetTrash(&pTrash);
 #ifdef USE_RPC
-		bool bRet = RPCService::GetInstance().RecoverNote(coreApp, pTrash, spNote);
+		bool bRet = RPCService::GetInstance().RecoverNote(AppHelper::coreApp(), pTrash, spNote);
 #else
-		bool bRet = DbService::GetInstance().RecoverNote(coreApp, pTrash, spNote);
+		bool bRet = DbService::GetInstance().RecoverNote(AppHelper::coreApp(), pTrash, spNote);
 #endif
 	}
 	else if (nIndex == DELETE_NOTE)
 	{
 		com_sptr<ITrash> pTrash;
-		coreApp->GetTrash(&pTrash);
+		AppHelper::coreApp()->GetTrash(&pTrash);
 #ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().DeleteNote(pTrash, spNote);
 #else
 		bool bRet = DbService::GetInstance().DeleteNote(pTrash, spNote);
 #endif
+	}
+	else if (nIndex == OPEN_NOTE)
+	{
+
 	}
 }
 
