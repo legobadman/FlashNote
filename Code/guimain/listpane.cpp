@@ -5,7 +5,6 @@
 #include "rpcservice.h"
 #include "dbservice.h"
 #include "note_types.h"
-#include "notewinservice.h"
 #include "MyStyle.h"
 #include "guihelper.h"
 #include "popupwidget.h"
