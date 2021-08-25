@@ -55,10 +55,10 @@ interface INote: public INoteCoreObj
 	virtual HRESULT SetContent(const std::wstring& content) = 0;
 	virtual HRESULT GetAbbreText(std::wstring& pbstrAbbre) = 0;
 	virtual HRESULT SetPlainText(const std::wstring& content) = 0;
-	virtual HRESULT GetCreateTime(long* pTime) = 0;
-	virtual HRESULT SetCreateTime(long time) = 0;
-	virtual HRESULT GetModifyTime(long* pTime) = 0;
-	virtual HRESULT SetModifyTime(long time) = 0;
+	virtual HRESULT GetCreateTime(long long* pTime) = 0;
+	virtual HRESULT SetCreateTime(long long time) = 0;
+	virtual HRESULT GetModifyTime(long long* pTime) = 0;
+	virtual HRESULT SetModifyTime(long long time) = 0;
 };
 
 interface INoteCollection : public INoteCoreObj
@@ -79,10 +79,10 @@ public:
 	virtual HRESULT GetId(std::wstring& pbstrId) = 0;
 	virtual HRESULT SetId(const std::wstring& bstrId) = 0;
 	virtual HRESULT SetName(const std::wstring& bstrName) = 0;
-	virtual HRESULT GetCreateTime(long* pTime) = 0;
-	virtual HRESULT SetCreateTime(long time) = 0;
-	virtual HRESULT GetModifyTime(long* pTime) = 0;
-	virtual HRESULT SetModifyTime(long time) = 0;
+	virtual HRESULT GetCreateTime(long long* pTime) = 0;
+	virtual HRESULT SetCreateTime(long long time) = 0;
+	virtual HRESULT GetModifyTime(long long* pTime) = 0;
+	virtual HRESULT SetModifyTime(long long time) = 0;
 	virtual HRESULT GetNoteIdx(INote* pNote, int* pIndex) = 0;
 };
 

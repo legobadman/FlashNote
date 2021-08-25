@@ -19,6 +19,8 @@ public:
 	static QString GetNoteAbbre(INote* pNote);
 	static QString GetNoteTitle(INote* pNote);
 	static QString GetNoteId(INote* pNote);
+	static QString GetCreateTime(INote* pNote, const QString& dateTimeFormat);
+	static QString GetModifyTime(INote* pNote, const QString& dateTimeFormat);
 	static NOTE_TYPE GetNoteType(INote* pNote);
 	static QStringList GetNotes(INoteCollection* pNoteColl);
 

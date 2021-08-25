@@ -118,6 +118,30 @@ QString AppHelper::GetNoteId(INote* pNote)
 	return noteId;
 }
 
+QString AppHelper::GetCreateTime(INote* pNote, const QString& dateTimeFormat)
+{
+	if (!pNote)
+		return "";
+
+	long long time;
+	pNote->GetCreateTime(&time);
+	QDateTime dt = QDateTime::fromMSecsSinceEpoch(time);
+	Q_ASSERT(dt.isValid());
+	return dt.toString(dateTimeFormat);
+}
+
+QString AppHelper::GetModifyTime(INote* pNote, const QString& dateTimeFormat)
+{
+	if (!pNote)
+		return "";
+
+	long long time;
+	pNote->GetModifyTime(&time);
+	QDateTime dt = QDateTime::fromMSecsSinceEpoch(time);
+	Q_ASSERT(dt.isValid());
+	return dt.toString(dateTimeFormat);
+}
+
 NOTE_TYPE AppHelper::GetNoteType(INote* pNote)
 {
 	if (!pNote)

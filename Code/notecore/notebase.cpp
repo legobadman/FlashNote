@@ -7,6 +7,8 @@
 NoteBase::NoteBase()
 	: m_type(NOTE_TYPE::NORMAL_NOTE)
 	, m_ref(0)
+	, modify_time(0)
+	, create_time(0)
 {
 }
 
@@ -90,24 +92,34 @@ HRESULT NoteBase::SetPlainText(const std::wstring& content)
 	return S_OK;
 }
 
-HRESULT NoteBase::GetCreateTime(long* pTime)
+HRESULT NoteBase::GetCreateTime(long long* pTime)
 {
-	return E_NOTIMPL;
+	if (!pTime)
+		return E_FAIL;
+
+	*pTime = create_time;
+	return S_OK;
 }
 
-HRESULT NoteBase::SetCreateTime(long create_time)
+HRESULT NoteBase::SetCreateTime(long long time)
 {
-	return E_NOTIMPL;
+	create_time = time;
+	return S_OK;
 }
 
-HRESULT NoteBase::GetModifyTime(long* pTime)
+HRESULT NoteBase::GetModifyTime(long long* pTime)
 {
-	return E_NOTIMPL;
+	if (!pTime)
+		return E_FAIL;
+
+	*pTime = modify_time;
+	return S_OK;
 }
 
-HRESULT NoteBase::SetModifyTime(long modify_time)
+HRESULT NoteBase::SetModifyTime(long long time)
 {
-	return E_NOTIMPL;
+	modify_time = time;
+	return S_OK;
 }
 
 HRESULT NoteBase::QueryInterface(
@@ -168,6 +180,8 @@ void NoteBase::NotifyThisObj(NotifyOperator ope)
 
 /////////////////////////////////////////////////
 NotebookBase::NotebookBase()
+	: modify_time(0)
+	, create_time(0)
 {
 }
 
@@ -199,24 +213,34 @@ HRESULT NotebookBase::SetName(const std::wstring& bstrName)
 	return S_OK;
 }
 
-HRESULT NotebookBase::GetCreateTime(long* pTime)
+HRESULT NotebookBase::GetCreateTime(long long* pTime)
 {
-	return E_NOTIMPL;
+	if (!pTime)
+		return E_FAIL;
+
+	*pTime = create_time;
+	return S_OK;
 }
 
-HRESULT NotebookBase::SetCreateTime(long create_time)
+HRESULT NotebookBase::SetCreateTime(long long time)
 {
-	return E_NOTIMPL;
+	create_time = time;
+	return S_OK;
 }
 
-HRESULT NotebookBase::GetModifyTime(long* pTime)
+HRESULT NotebookBase::GetModifyTime(long long* pTime)
 {
-	return E_NOTIMPL;
+	if (!pTime)
+		return E_FAIL;
+
+	*pTime = modify_time;
+	return S_OK;
 }
 
-HRESULT NotebookBase::SetModifyTime(long modify_time)
+HRESULT NotebookBase::SetModifyTime(long long time)
 {
-	return E_NOTIMPL;
+	modify_time = time;
+	return S_OK;
 }
 
 HRESULT NotebookBase::AddNote(INote* pNote)

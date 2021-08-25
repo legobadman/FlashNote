@@ -109,6 +109,10 @@ void DbService::getnotebooks(std::vector<NOTEBOOK>& vecBooks)
 		notebook.notes = getnotes(list);
 		notebook.id = id;
 		notebook.name = bookName;
+		notebook.create_time = QDateTime::fromString(create_time, m_timeFormat);
+		Q_ASSERT(notebook.create_time.isValid());
+		notebook.modify_time = QDateTime::fromString(modify_time, m_timeFormat);
+		Q_ASSERT(notebook.modify_time.isValid());
 
 		vecBooks.push_back(notebook);
 		query.nextRow();
@@ -133,14 +137,19 @@ NOTE DbService::getnote(const QString& noteid)
 	Q_ASSERT(!query.eof());
 	QString title = query.getStringField("title");
 	QString content = query.getStringField("content");
-	int create_time = query.getIntField("create_time");
-	int modify_time = query.getIntField("modify_time");
+	QString create_time = query.getStringField("create_time");
+	QString modify_time = query.getStringField("modify_time");
 	int type = query.getIntField("type");
 
 	NOTE note;
 	note.id = noteid;
 	note.content = content;
 	note.title = title;
+	note.create_time = QDateTime::fromString(create_time, m_timeFormat);
+	Q_ASSERT(note.create_time.isValid());
+	note.modify_time = QDateTime::fromString(modify_time, m_timeFormat);
+	Q_ASSERT(note.modify_time.isValid());
+
 	switch (type)
 	{
 	case 0: note.type = NORMAL_NOTE; break;
@@ -242,6 +251,12 @@ void DbService::InitcoreFromRPC(INoteApplication* pApp)
 			std::wstring str_ = notebook.name.toStdWString();
 			spNotebook->SetName(str_);
 			spNotebook->SetCreateTime(notebook.create_time.toMSecsSinceEpoch());
+
+			long long tt;
+			spNotebook->GetCreateTime(&tt);
+			QDateTime dt = QDateTime::fromMSecsSinceEpoch(QDateTime::currentMSecsSinceEpoch());
+			QString wtf = dt.toString(m_timeFormat);
+
 			spNotebook->SetModifyTime(notebook.modify_time.toMSecsSinceEpoch());
 			spNotebook->SetId(notebook.id.toStdWString());
 
@@ -270,7 +285,7 @@ bool DbService::SynchronizeNote(INoteApplication* pApp, INotebook* pNotebook, IN
 	QString content = AppHelper::GetNoteContent(pNote);
 	QString bookid = AppHelper::GetNotebookId(pNotebook);
 	QString noteid = AppHelper::GetNoteId(pNote);
-	QString localtime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+	QString localtime = QDateTime::currentDateTime().toString(m_timeFormat);
 
 	if (noteid.isEmpty())
 	{
@@ -321,7 +336,7 @@ bool DbService::SynchronizeSchedule(INoteApplication* pApp, INote* pNote)
 	QString title = AppHelper::GetNoteTitle(pNote);
 	QString content = AppHelper::GetNoteContent(pNote);
 	QString noteid = AppHelper::GetNoteId(pNote);
-	QString localtime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+	QString localtime = QDateTime::currentDateTime().toString(m_timeFormat);
 	if (noteid.isEmpty())
 	{
 		NOTE_TYPE type = NORMAL_NOTE;

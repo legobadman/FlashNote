@@ -51,7 +51,15 @@ QModelIndex BookViewModel::index(int row, int column, const QModelIndex& parent)
 	}
 }
 
-void BookViewModel::GetShowContent(INote* pNote, QString& noteid, QString& title, QString& content, QString& text_abbre)
+void BookViewModel::GetShowContent(
+			INote* pNote,
+			const QString& time_format,
+			QString& noteid,
+			QString& title,
+			QString& content,
+			QString& text_abbre,
+			QString& create_time,
+			QString& modify_time)
 {
 	int nContentLimit = 74;
 	title = AppHelper::GetNoteTitle(pNote);
@@ -59,6 +67,8 @@ void BookViewModel::GetShowContent(INote* pNote, QString& noteid, QString& title
 	QString showContent;
 
 	noteid = AppHelper::GetNoteId(pNote);
+	create_time = AppHelper::GetCreateTime(pNote, time_format);
+	modify_time = AppHelper::GetModifyTime(pNote, time_format);
 
 	QTextDocument html;
 	html.setHtml(content);
@@ -77,11 +87,13 @@ void BookViewModel::AddBookItems(INoteCollection* pNoteCollection)
 	{
 		com_sptr<INote> spNote;
 		AppHelper::GetNote(pNoteCollection, j, &spNote);
-		QString id, title, content, textabbre;
-		GetShowContent(spNote, id, title, content, textabbre);
+		QString id, title, content, textabbre, create_time, modify_time;
+		GetShowContent(spNote, "yyyy-MM-dd", id, title, content, textabbre, create_time, modify_time);
 		NoteItem* pItem = new NoteItem(id, title, textabbre);
 		pItem->m_content = content;
 		pItem->m_spNote = spNote;
+		pItem->m_create_time = create_time;
+		pItem->m_modify_time = modify_time;
 		m_vec.push_back(pItem);
 		m_mapper.insert(id, pItem);
 		spNote->addWatcher(this);
@@ -187,13 +199,15 @@ HRESULT BookViewModel::onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 		{
 			if (m_vec[i]->m_id == noteid)
 			{
-				QString noteid, title, content, textAbbre;
-				GetShowContent(pNote, noteid, title, content, textAbbre);
+				QString noteid, title, content, textAbbre, create_time, modify_time;
+				GetShowContent(pNote, "yyyy-MM-dd", noteid, title, content, textAbbre, create_time, modify_time);
 
 				m_vec[i]->m_id = noteid;
 				m_vec[i]->m_title = title;
 				m_vec[i]->m_textAbbre = textAbbre;
 				m_vec[i]->m_content = content;
+				m_vec[i]->m_create_time = create_time;
+				m_vec[i]->m_modify_time = modify_time;
 
 				QModelIndex idx = index(i, 0);
 				emit dataChanged(idx, idx);
@@ -214,11 +228,13 @@ bool BookViewModel::insertRow(INote* pNote)
 {
 	beginInsertRows(QModelIndex(), m_vec.size(), m_vec.size());
 
-	QString noteid, title, textAbbre, content;
-	GetShowContent(pNote, noteid, title, content, textAbbre);
+	QString noteid, title, textAbbre, content, create_time, modify_time;
+	GetShowContent(pNote, "yyyy-MM-dd", noteid, title, content, textAbbre, create_time, modify_time);
 	NoteItem* pItem = new NoteItem(noteid, title, textAbbre);
 	pItem->m_content = content;
 	pItem->m_spNote = pNote;
+	pItem->m_create_time = create_time;
+	pItem->m_modify_time = modify_time;
 	m_vec.push_back(pItem);
 	m_mapper.insert(noteid, pItem);
 	emit rowInserted(m_vec.size() - 1);

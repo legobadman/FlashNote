@@ -24,10 +24,10 @@ public:
 	HRESULT SetContent(const std::wstring& content);
 	HRESULT GetAbbreText(std::wstring& pbstrAbbre);
 	HRESULT SetPlainText(const std::wstring& content);
-	HRESULT GetCreateTime(long* pTime);
-	HRESULT SetCreateTime(long time);
-	HRESULT GetModifyTime(long* pTime);
-	HRESULT SetModifyTime(long time);
+	HRESULT GetCreateTime(long long* pTime);
+	HRESULT SetCreateTime(long long time);
+	HRESULT GetModifyTime(long long* pTime);
+	HRESULT SetModifyTime(long long time);
 
 public:
 	HRESULT QueryInterface(QUuid riid, void** ppvObject);
@@ -47,6 +47,8 @@ private:
 	std::vector<ICoreNotify*> m_notifies;
 
 	NOTE_TYPE m_type;
+	long long modify_time;
+	long long create_time;
 	int m_ref;
 };
 
@@ -64,10 +66,10 @@ public:
 	HRESULT GetId(std::wstring& pbstrId);
 	HRESULT SetId(const std::wstring& bstrId);
 	HRESULT SetName(const std::wstring& bstrName);
-	HRESULT GetCreateTime(long* pTime);
-	HRESULT SetCreateTime(long time);
-	HRESULT GetModifyTime(long* pTime);
-	HRESULT SetModifyTime(long time);
+	HRESULT GetCreateTime(long long* pTime);
+	HRESULT SetCreateTime(long long time);
+	HRESULT GetModifyTime(long long* pTime);
+	HRESULT SetModifyTime(long long time);
 	HRESULT GetNoteIdx(INote* pNote, int* pIndex);
 
 public:
@@ -76,6 +78,8 @@ public:
 private:
 	wstring m_id;
 	wstring m_strName;
+	long long modify_time;
+	long long create_time;
 };
 
 class NotebooksBase : public INotebooks
@@ -131,10 +135,10 @@ public:
 	HRESULT GetId(std::wstring& pbstrId);
 	HRESULT SetId(const std::wstring& bstrId);
 	
-	HRESULT GetCreateTime(long* pTime) { return E_NOTIMPL; }
-	HRESULT SetCreateTime(long create_time) { return E_NOTIMPL; }
-	HRESULT GetModifyTime(long* pTime) { return E_NOTIMPL; }
-	HRESULT SetModifyTime(long time) { return E_NOTIMPL; }
+	HRESULT GetCreateTime(long long* pTime) { return E_NOTIMPL; }
+	HRESULT SetCreateTime(long long create_time) { return E_NOTIMPL; }
+	HRESULT GetModifyTime(long long* pTime) { return E_NOTIMPL; }
+	HRESULT SetModifyTime(long long time) { return E_NOTIMPL; }
 
 	HRESULT GetNoteIdx(INote* pNote, int* pIndex) { return E_NOTIMPL; }
 public:

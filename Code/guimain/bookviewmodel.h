@@ -25,6 +25,8 @@ public:
 	QString m_title;
 	QString m_textAbbre;
 	QString m_content;
+	QString m_create_time;
+	QString m_modify_time;
 	com_sptr<INote> m_spNote;
 };
 Q_DECLARE_METATYPE(NoteItem)
@@ -70,7 +72,7 @@ public:
 	long Release(void) { return 1; }
 
 protected:
-	void GetShowContent(INote* pNote, QString& noteid, QString& title, QString& content, QString& text_abbr);
+	void GetShowContent(INote* pNote, const QString& time_format, QString& noteid, QString& title, QString& content, QString& text_abbr, QString& create_time, QString& modify_time);
 	void AddBookItems(INoteCollection* pNoteCollection);
 	virtual HRESULT onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg);
 	virtual HRESULT onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg);

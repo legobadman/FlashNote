@@ -43,6 +43,7 @@ private:
 	const QString m_dbDirName = "database";
 	const QString m_assetDirName = "assets";
 	const QString m_dbName = "note.db";
+	const QString m_timeFormat = "yyyy-MM-dd hh:mm:ss";
 	CppSQLite3DB m_db;
 };
 
