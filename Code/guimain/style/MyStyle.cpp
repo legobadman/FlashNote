@@ -61,6 +61,36 @@ void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPaint
 	{
 		return drawMyLineEdit(pe, opt, p, widget);
 	}
+	if (pe == PE_ComboBoxLineEdit)
+	{
+		QRect r = opt->rect;
+		bool hasFocus = opt->state & (State_MouseOver | State_HasFocus);
+
+		p->save();
+
+		p->setRenderHint(QPainter::Antialiasing, true);
+		//  ### highdpi painter bug.
+		p->translate(0.5, 0.5);
+
+		// Draw Outline
+		p->setPen(QPen(QColor(0, 0, 0), 1));
+
+		if (hasFocus) {
+			p->setPen(QColor(22, 22, 22));
+		}
+		else
+		{
+			p->setPen(QColor(122, 122, 122));
+		}
+
+		p->drawRect(r.adjusted(0, 0, -1, -1));
+
+		// Draw inner shadow
+		//p->setPen(d->topShadow());
+		//p->drawLine(QPoint(r.left() + 2, r.top() + 1), QPoint(r.right() - 2, r.top() + 1));
+
+		p->restore();
+	}
 	if (pe == PE_ComboBoxDropdownButton)
 	{
 		if (const QStyleOptionButton* btn = qstyleoption_cast<const QStyleOptionButton*>(opt)) {
@@ -143,7 +173,7 @@ void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionCompl
 {
 	switch (control)
 	{
-		case CC_ComboBox:
+		case CC_MyComboBox:
 		{
 			//return base::drawComplexControl(control, option, painter, widget);
 			if (const QStyleOptionComboBox* cmb = qstyleoption_cast<const QStyleOptionComboBox*>(option))
@@ -160,9 +190,8 @@ void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionCompl
 					painter->translate(0.5, 0.5);
 					painter->setPen(Qt::NoPen);
 					painter->setBrush(editorOption.palette.base());
-					painter->drawRect(option->rect);
 					painter->restore();
-					proxy()->drawPrimitive(PE_FrameLineEdit, &editorOption, painter, widget);
+					proxy()->drawPrimitive(static_cast<PrimitiveElement>(PE_ComboBoxLineEdit), &editorOption, painter, widget);
 
 					painter->save();
 

@@ -18,11 +18,13 @@ public:
 	enum MyComplexControl
 	{
 		CC_MyToolButton = CC_CustomBase + 1,
+		CC_MyComboBox,
 	};
 
 	enum MyPrimitiveElement
 	{
 		PE_ComboBoxDropdownButton = PE_CustomBase + 1,
+		PE_ComboBoxLineEdit,
 	};
 
 	MyStyle();

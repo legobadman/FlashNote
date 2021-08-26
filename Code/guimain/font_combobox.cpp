@@ -31,5 +31,17 @@ QSize FontComboBox::sizeHint() const
 
 void FontComboBox::paintEvent(QPaintEvent* event)
 {
-	QFontComboBox::paintEvent(event);
+	QStylePainter painter(this);
+	painter.setPen(palette().color(QPalette::Text));
+
+	// draw the combobox frame, focusrect and selected etc.
+	QStyleOptionComboBox opt;
+	initStyleOption(&opt);
+	painter.drawComplexControl(static_cast<QStyle::ComplexControl>(MyStyle::CC_MyComboBox), opt);
+
+	if (currentIndex() < 0)
+		opt.palette.setBrush(QPalette::ButtonText, opt.palette.brush(QPalette::ButtonText).color().lighter());
+
+	// draw the icon and text
+	painter.drawControl(QStyle::CE_ComboBoxLabel, opt);
 }
