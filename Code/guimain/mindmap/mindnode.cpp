@@ -366,14 +366,7 @@ bool MindNode::needShowDecoration() const
 
 void MindNode::onEditAssociateNote()
 {
-	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, NORMAL_NOTE);
-
-	com_sptr<INote> spNote;
-	com_sptr<INotebook> spNotebook;
-	AppHelper::GetNoteAndBookById(m_noteid, &spNotebook, &spNote);
-	QString bookid = AppHelper::GetNotebookId(spNotebook);
-	pNewNoteWindow->open(bookid, m_noteid);
-	pNewNoteWindow->show();
+	AppHelper::openNoteInIsoWindow(m_noteid);
 }
 
 void MindNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAdded)

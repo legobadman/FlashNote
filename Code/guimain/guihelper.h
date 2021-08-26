@@ -29,6 +29,7 @@ public:
 
 	static int GetNoteCounts(INoteCollection* pNotebook);
 	static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight = -1, int* lastVisibleLine = nullptr);
+	static void openNoteInIsoWindow(const QString& noteid);
 };
 
 #endif

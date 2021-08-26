@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "guihelper.h"
 #include "uiapplication.h"
+#include "newnotewindow.h"
 #include <QtCore/QStandardPaths>
 #include <QUuid>
 #include <QDebug>
@@ -253,4 +254,17 @@ QSizeF AppHelper::viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int
 	}
 	textLayout.endLayout();
 	return QSizeF(widthUsed, height);
+}
+
+void AppHelper::openNoteInIsoWindow(const QString& noteid)
+{
+	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, NORMAL_NOTE);
+
+	com_sptr<INote> spNote;
+	com_sptr<INotebook> spNotebook;
+	AppHelper::GetNoteAndBookById(noteid, &spNotebook, &spNote);
+	QString bookid = AppHelper::GetNotebookId(spNotebook);
+	pNewNoteWindow->open(bookid, noteid);
+	pNewNoteWindow->setWindowTitle(AppHelper::GetNoteTitle(spNote));
+	pNewNoteWindow->show();
 }

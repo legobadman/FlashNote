@@ -147,7 +147,7 @@ void BookListView::MenuActionSlot(QAction* action)
 	}
 	else if (nIndex == OPEN_NOTE)
 	{
-
+		AppHelper::openNoteInIsoWindow(AppHelper::GetNoteId(spNote));
 	}
 }
 
