@@ -139,6 +139,22 @@ void MyStyle::drawControl(ControlElement element, const QStyleOption* opt, QPain
 	return base::drawControl(element, opt, p, w);
 }
 
+QRect MyStyle::subControlRect(ComplexControl cc, const QStyleOptionComplex* opt, SubControl sc, const QWidget* widget) const
+{
+	if (cc == MyStyle::CC_MyComboBox && sc == MyStyle::SC_ComboBoxArrow)
+	{
+		if (const QStyleOptionComboBox* cb = qstyleoption_cast<const QStyleOptionComboBox*>(opt))
+		{
+			static const int arrowRcWidth = 18;
+			const int xpos = cb->rect.x() + cb->rect.width() - dpiScaled(arrowRcWidth);
+			//only left to right
+			QRect rc(xpos, cb->rect.y(), dpiScaled(arrowRcWidth), cb->rect.height());
+			return rc;
+		}
+	}
+	return base::subControlRect(cc, opt, sc, widget);
+}
+
 int MyStyle::styleHint(StyleHint sh, const QStyleOption* opt, const QWidget* w, QStyleHintReturn* shret) const
 {
 	if (QStyle::SH_ItemView_PaintAlternatingRowColorsForEmptyArea == sh)
@@ -196,7 +212,9 @@ void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionCompl
 					painter->save();
 
 					QStyleOptionComboBox comboBoxCopy = *cmb;
-					QRect downArrowRect = proxy()->subControlRect(CC_ComboBox, &comboBoxCopy, SC_ComboBoxArrow, widget);
+					QRect downArrowRect = proxy()->subControlRect(
+						static_cast<QStyle::ComplexControl>(MyStyle::CC_MyComboBox),
+						&comboBoxCopy, SC_ComboBoxArrow, widget);
 					painter->setClipRect(downArrowRect);
 
 					QStyleOptionButton buttonOption;
