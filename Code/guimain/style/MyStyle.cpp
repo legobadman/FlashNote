@@ -182,7 +182,18 @@ void MyStyle::drawComplexControl_MyToolButton(const StyleOptionToolButton* optio
 
 void MyStyle::drawDropdownArrow(QPainter* painter, QRect downArrowRect) const
 {
+	QRectF arrowRect;
+	arrowRect.setWidth(dpiScaled(16));
+	arrowRect.setHeight(dpiScaled(16));
+	arrowRect.moveTo(downArrowRect.x() + (downArrowRect.width() - arrowRect.width()) / 2.0,
+		downArrowRect.y() + (downArrowRect.height() - arrowRect.height()) / 2.0);
 
+	QPointF bottomPoint = QPointF(arrowRect.center().x(), arrowRect.bottom());
+
+	QPixmap px = QIcon(":/icons/16x16/downarrow.png").pixmap(
+		MyStyle::dpiScaledSize(QSize(16, 16)));
+
+	painter->drawPixmap(arrowRect.topLeft(), px);
 }
 
 void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex* option, QPainter* painter, const QWidget* widget) const
@@ -191,7 +202,7 @@ void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionCompl
 	{
 		case CC_MyComboBox:
 		{
-			//return base::drawComplexControl(control, option, painter, widget);
+			//return base::drawComplexControl(CC_ComboBox, option, painter, widget);
 			if (const QStyleOptionComboBox* cmb = qstyleoption_cast<const QStyleOptionComboBox*>(option))
 			{
 				if (cmb->editable)
@@ -234,8 +245,8 @@ void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionCompl
 
 					painter->restore();
 
-					//painter->setPen(QPen(QColor(0, 0, 0), 1));
-					//drawDropdownArrow(painter, downArrowRect);
+					painter->setPen(QPen(QColor(0, 0, 0), 1));
+					drawDropdownArrow(painter, downArrowRect);
 					return;
 				}
 				else
