@@ -4,6 +4,7 @@
 #include "colorgallery.h"
 #include "popupwidget.h"
 #include "moc_FontColorComboBox.cpp"
+#include "MyStyle.h"
 
 //#define USE_POPUP_FLAG
 
@@ -93,19 +94,16 @@ void FontColorComboBox::paintEvent(QPaintEvent* event)
 
 void FontColorComboBox::updateIcon()
 {
-	QPixmap newIcon(24, 24);
+	int sz = MyStyle::dpiScaled(24);
+	QPixmap newIcon(sz, sz);
 	newIcon.fill(Qt::transparent);
 
 	QPainter p(&newIcon);
 
-	QFont font("Calibri Light", 13, QFont::Normal, false);
-	p.setFont(font);
+	QIcon fontClr(":/icons/16x16/fontcolor.png");
+	p.drawPixmap(QPoint(6, 5), QIcon(":/icons/16x16/fontcolor.png").pixmap(MyStyle::dpiScaledSize(QSize(16, 16))));
 
 	QPen pen;
-	pen.setColor(QColor(63, 62, 61));
-	p.setPen(pen);
-	p.drawText(QRect(9,0,24,24), "a");
-
 	pen.setWidth(3);
 	pen.setColor(m_clr);
 	p.setPen(pen);
