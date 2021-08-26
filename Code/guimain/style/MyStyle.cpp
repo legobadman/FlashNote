@@ -61,6 +61,27 @@ void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPaint
 	{
 		return drawMyLineEdit(pe, opt, p, widget);
 	}
+	if (pe == PE_ComboBoxDropdownButton)
+	{
+		if (const QStyleOptionButton* btn = qstyleoption_cast<const QStyleOptionButton*>(opt)) {
+			QBrush fill;
+			State flags = opt->state;
+			QPalette pal = opt->palette;
+			QRect r = opt->rect;
+
+			if (flags & (State_MouseOver | State_HasFocus))
+			{
+				p->setPen(QPen(QColor(26, 112, 185), 1));
+				p->setBrush(QColor(228, 239, 249));
+				p->drawRect(r.adjusted(0, 0, -1, -1));
+			}
+			else
+			{
+				p->fillRect(r, QColor(255, 255, 255));
+			}
+		}
+		return;
+	}
 	if (qobject_cast<const NoteItemTreeView*>(widget))
 	{
 		const QStyleOptionViewItem* vopt = qstyleoption_cast<const QStyleOptionViewItem*>(opt);
@@ -113,10 +134,70 @@ void MyStyle::drawComplexControl_MyToolButton(const StyleOptionToolButton* optio
 	style.paint(painter, widget);
 }
 
+void MyStyle::drawDropdownArrow(QPainter* painter, QRect downArrowRect) const
+{
+
+}
+
 void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex* option, QPainter* painter, const QWidget* widget) const
 {
 	switch (control)
 	{
+		case CC_ComboBox:
+		{
+			//return base::drawComplexControl(control, option, painter, widget);
+			if (const QStyleOptionComboBox* cmb = qstyleoption_cast<const QStyleOptionComboBox*>(option))
+			{
+				if (cmb->editable)
+				{
+					QStyleOptionFrame editorOption;
+					editorOption.QStyleOption::operator=(*cmb);
+					editorOption.rect = option->rect;
+					editorOption.state = (cmb->state & (State_Enabled | State_MouseOver | State_HasFocus) | State_KeyboardFocusChange);
+
+					painter->save();
+					painter->setRenderHint(QPainter::Antialiasing, true);
+					painter->translate(0.5, 0.5);
+					painter->setPen(Qt::NoPen);
+					painter->setBrush(editorOption.palette.base());
+					painter->drawRect(option->rect);
+					painter->restore();
+					proxy()->drawPrimitive(PE_FrameLineEdit, &editorOption, painter, widget);
+
+					painter->save();
+
+					QStyleOptionComboBox comboBoxCopy = *cmb;
+					QRect downArrowRect = proxy()->subControlRect(CC_ComboBox, &comboBoxCopy, SC_ComboBoxArrow, widget);
+					painter->setClipRect(downArrowRect);
+
+					QStyleOptionButton buttonOption;
+					QPalette pal;
+					QBrush brush;
+
+					pal.setBrush(QPalette::Button, QColor(255, 255, 255));
+					pal.setBrush(QPalette::Light, QColor(228, 239, 249));
+					buttonOption.palette = pal;
+					buttonOption.rect = downArrowRect;
+					buttonOption.state = (cmb->state & (State_Enabled | State_MouseOver | State_HasFocus) | State_KeyboardFocusChange);
+
+					if (buttonOption.state & (State_MouseOver | State_HasFocus))
+					{
+						proxy()->drawPrimitive(static_cast<PrimitiveElement>(PE_ComboBoxDropdownButton), &buttonOption, painter, widget);
+					}
+
+					painter->restore();
+
+					//painter->setPen(QPen(QColor(0, 0, 0), 1));
+					//drawDropdownArrow(painter, downArrowRect);
+					return;
+				}
+				else
+				{
+					return base::drawComplexControl(control, option, painter, widget);
+				}
+			}
+			break;
+		}
 		case CC_MyToolButton:
 			if (const StyleOptionToolButton* opt = qstyleoption_cast<const StyleOptionToolButton*>(option))
 			{
@@ -124,6 +205,6 @@ void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionCompl
 				break;
 			}
 		default:
-			return QProxyStyle::drawComplexControl(control, option, painter, widget);
+			return base::drawComplexControl(control, option, painter, widget);
 	}
 }

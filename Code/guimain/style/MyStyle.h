@@ -20,6 +20,11 @@ public:
 		CC_MyToolButton = CC_CustomBase + 1,
 	};
 
+	enum MyPrimitiveElement
+	{
+		PE_ComboBoxDropdownButton = PE_CustomBase + 1,
+	};
+
 	MyStyle();
 	~MyStyle();
 
@@ -39,6 +44,7 @@ public:
 private:
 	void drawMyLineEdit(PrimitiveElement pe, const QStyleOption* opt, QPainter* p, const QWidget* widget) const;
 	void drawComplexControl_MyToolButton(const StyleOptionToolButton* option, QPainter* painter, const QWidget* widget) const;
+	void drawDropdownArrow(QPainter* painter, QRect downArrowRect) const;
 };
 
 #endif
