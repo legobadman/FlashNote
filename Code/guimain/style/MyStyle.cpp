@@ -94,20 +94,18 @@ void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPaint
 	if (pe == PE_ComboBoxDropdownButton)
 	{
 		if (const QStyleOptionButton* btn = qstyleoption_cast<const QStyleOptionButton*>(opt)) {
-			QBrush fill;
 			State flags = opt->state;
-			QPalette pal = opt->palette;
-			QRect r = opt->rect;
-
-			if (flags & (State_MouseOver | State_HasFocus))
+			if (flags & (State_Sunken | State_On))
+			{
+				p->setPen(QPen(QColor(26, 112, 185), 1));
+				p->setBrush(QColor(202, 224, 243));
+				p->drawRect(opt->rect.adjusted(0, 0, -1, -1));
+			}
+			else if (flags & State_MouseOver)
 			{
 				p->setPen(QPen(QColor(26, 112, 185), 1));
 				p->setBrush(QColor(228, 239, 249));
-				p->drawRect(r.adjusted(0, 0, -1, -1));
-			}
-			else
-			{
-				p->fillRect(r, QColor(255, 255, 255));
+				p->drawRect(opt->rect.adjusted(0, 0, -1, -1));
 			}
 		}
 		return;
@@ -229,19 +227,12 @@ void MyStyle::drawComplexControl(ComplexControl control, const QStyleOptionCompl
 					painter->setClipRect(downArrowRect);
 
 					QStyleOptionButton buttonOption;
-					QPalette pal;
-					QBrush brush;
-
-					pal.setBrush(QPalette::Button, QColor(255, 255, 255));
-					pal.setBrush(QPalette::Light, QColor(228, 239, 249));
-					buttonOption.palette = pal;
 					buttonOption.rect = downArrowRect;
-					buttonOption.state = (cmb->state & (State_Enabled | State_MouseOver | State_HasFocus) | State_KeyboardFocusChange);
-
-					if (buttonOption.state & (State_MouseOver | State_HasFocus))
+					if (cmb->activeSubControls == SC_ComboBoxArrow)
 					{
-						proxy()->drawPrimitive(static_cast<PrimitiveElement>(PE_ComboBoxDropdownButton), &buttonOption, painter, widget);
+						buttonOption.state = cmb->state;
 					}
+					proxy()->drawPrimitive(static_cast<PrimitiveElement>(PE_ComboBoxDropdownButton), &buttonOption, painter, widget);
 
 					painter->restore();
 
