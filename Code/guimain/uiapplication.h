@@ -13,6 +13,7 @@ public:
 
 	INoteApplication* coreApplication();
 	void showWidget();
+	void screenshot();
 
 public slots:
 	void onQuickApp();

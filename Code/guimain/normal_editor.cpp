@@ -2,6 +2,7 @@
 #include "common_types.h"
 #include "normal_editor.h"
 #include "MyStyle.h"
+#include "screenshot/screenshotwindow.h"
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentWriter>
 #include <QMimeData>
@@ -18,6 +19,8 @@
 #include <QPlainTextEdit>
 #include <QMenu>
 #include <QDialog>
+#include "guihelper.h"
+#include "uiapplication.h"
 
 
 NormalEditor::NormalEditor(QWidget* parent)
@@ -153,6 +156,9 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	pLayout->addWidget(attachment);
 
 	photo = new ToolButton;
+	photo->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
+	photo->setIcon(QIcon(":/icons/16x16/screenshot.png"));
+	photo->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	pLayout->addWidget(photo);
 
 	QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -187,7 +193,7 @@ void NormalEditor::initSlots()
 
 	connect(item_symbol, SIGNAL(clicked()), this, SLOT(listBullet()));
 	connect(item_id, SIGNAL(clicked()), this, SLOT(listOrdered()));
-	connect(photo, SIGNAL(clicked()), this, SLOT(setHtmlFile()));
+	connect(photo, SIGNAL(clicked()), this, SLOT(screenShot()));
 	connect(attachment, SIGNAL(clicked()), this, SLOT(checkDocument()));
 }
 
@@ -506,17 +512,9 @@ void NormalEditor::mergeFormatOnWordOrSelection(const QTextCharFormat& format)
 	textEdit->setFocus(Qt::TabFocusReason);
 }
 
-void NormalEditor::setHtmlFile()
+void NormalEditor::screenShot()
 {
-	QString original = QFileDialog::getOpenFileName(this, tr("Select an html"),
-		".", tr("HTML (*.html *htm)\n"));
-	QFile file(original);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return;
-
-	QByteArray htmlFile = file.readAll();
-	QString content = QString::fromUtf8(htmlFile);
-	textEdit->setHtml(content);
+	AppHelper::uiApp()->screenshot();
 }
 
 QTextDocument* NormalEditor::document()

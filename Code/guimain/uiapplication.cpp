@@ -3,6 +3,7 @@
 #include "MyStyle.h"
 #include "dbservice.h"
 #include "guihelper.h"
+#include "screenshot/screenshotwindow.h"
 
 
 UiApplication::UiApplication(int& argc, char** argv)
@@ -45,6 +46,12 @@ void UiApplication::showWidget()
 {
 	m_trayIcon.show();
 	m_mainWindow->showMaximized();
+}
+
+void UiApplication::screenshot()
+{
+	ScreenshotWindow* pShot = new ScreenshotWindow;
+	pShot->showFullScreen();
 }
 
 void UiApplication::onQuickApp()

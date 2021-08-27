@@ -24,6 +24,7 @@
 #include <QTextEdit>
 #include <QListView>
 #include <QTimer>
+#include <QLabel>
 #include <QtWidgets/QMdiArea>
 #include <QSystemTrayIcon>
 #include "com_sptr.h"

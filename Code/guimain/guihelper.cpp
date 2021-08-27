@@ -1,12 +1,17 @@
 #include "stdafx.h"
-#include "guihelper.h"
 #include "uiapplication.h"
+#include "guihelper.h"
 #include "newnotewindow.h"
 #include <QtCore/QStandardPaths>
 #include <QUuid>
 #include <QDebug>
 #include <QDir>
 
+UiApplication* AppHelper::uiApp()
+{
+	UiApplication* pApp = qobject_cast<UiApplication*>(QApplication::instance());
+	return pApp;
+}
 
 INoteApplication* AppHelper::coreApp()
 {

@@ -8,11 +8,14 @@
 #include "dbservice.h"
 #include "guihelper.h"
 #include "uiapplication.h"
+#include <QScreen>
+#include "screenshot/screenshot.h"
 
 
 //#define TEST_RICH_EDITOR
 //#define TEST_WIDGET_WINDOW_PARENT
 //#define TEST_SQLITE
+//#define TEST_SCREENSHOT
 
 #ifdef TEST_WIDGET_WINDOW_PARENT
 #include "qtexamples/MltpDlgs1.h"
@@ -21,7 +24,13 @@
 
 int main(int argc, char *argv[])
 {
-#ifdef TEXT_RICH_EDITOR
+#ifdef TEST_SCREENSHOT
+	QApplication app(argc, argv);
+	Screenshot screenshot;
+	screenshot.move(screenshot.screen()->availableGeometry().topLeft() + QPoint(20, 20));
+	screenshot.show();
+	return app.exec();
+#elif TEXT_RICH_EDITOR
 	QApplication app(argc, argv);
 
 	QDialog* dialog = new QDialog;

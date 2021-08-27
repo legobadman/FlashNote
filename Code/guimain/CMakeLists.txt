@@ -149,6 +149,12 @@ add_executable(guimain
     ./selectnotebookdlg.ui
     ./selectnotebookpanel.cpp
     ./selectnotebookpanel.h
+    ./screenshot/screenshotwindow.cpp
+    ./screenshot/screenshotwindow.h
+    ./screenshot/screenshot.cpp
+    ./screenshot/screenshot.h
+    ./screenshot/screenwidget.cpp
+    ./screenshot/screenwidget.h
     ./stdafx.cpp
     ./stdafx.h
     ./style/MyStyle.cpp

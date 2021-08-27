@@ -3,9 +3,12 @@
 
 #include <QtGui/QTextLayout>
 
+class UiApplication;
+
 class AppHelper
 {
 public:
+	static UiApplication* uiApp();
 	static INoteApplication* coreApp();
 	static void GetNotebook(int idx, INotebook** ppNotebook);
 	static void GetNote(INoteCollection* pNotebook, int idxNote, INote** ppNote);

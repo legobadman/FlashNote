@@ -42,6 +42,7 @@ protected slots:
 	void textFgColor(const QColor& color);
 	void insertImage();
 	void onEditting();
+	void screenShot();
 
 protected:
 	void fontChanged(const QFont& f);
@@ -54,7 +55,6 @@ private:
 	QHBoxLayout* initToolButtons();
 	void list(bool checked, QTextListFormat::Style style);
 	void mergeFormatOnWordOrSelection(const QTextCharFormat& format);
-	void setHtmlFile();
 
 private:
 	ToolButton* bold;

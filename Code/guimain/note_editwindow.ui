@@ -182,7 +182,6 @@
 	 <item>
       <widget class="ToolButton" name="socialmediashare" native="true"/>
      </item>
-
     </layout>
    </item>
    <item>

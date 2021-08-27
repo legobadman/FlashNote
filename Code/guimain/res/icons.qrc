@@ -47,6 +47,7 @@
 	<file>icons/16x16/info.png</file>
 	<file>icons/16x16/more.png</file>
 	<file>icons/16x16/socialmediashare.png</file>
+	<file>icons/16x16/screenshot.png</file>
 	<file>icons/24x24/sort_options.png</file>
 	<file>icons/24x24/listview.png</file>
 </qresource>
