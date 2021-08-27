@@ -25,10 +25,20 @@ FontComboSizeBox::FontComboSizeBox(QWidget* parent)
 
 FontComboSizeBox::~FontComboSizeBox()
 {
-
 }
 
 void FontComboSizeBox::paintEvent(QPaintEvent* e)
 {
-	QComboBox::paintEvent(e);
+	QStylePainter painter(this);
+	painter.setPen(palette().color(QPalette::Text));
+
+	// draw the combobox frame, focusrect and selected etc.
+	QStyleOptionComboBox opt;
+	initStyleOption(&opt);
+	painter.drawComplexControl(static_cast<QStyle::ComplexControl>(MyStyle::CC_MyComboBox), opt);
+
+	if (currentIndex() < 0)
+		opt.palette.setBrush(QPalette::ButtonText, opt.palette.brush(QPalette::ButtonText).color().lighter());
+
+	painter.drawControl(QStyle::CE_ComboBoxLabel, opt);
 }
