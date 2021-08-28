@@ -4,6 +4,8 @@
 #include <QLabel>
 #include "screenwidget.h"
 
+//#define USE_WIDGET
+
 class ScreenshotWindow : public QMainWindow
 {
 	typedef QMainWindow base;
@@ -17,7 +19,11 @@ protected:
 
 private:
 	QLabel* m_lblImage;
+#ifdef USE_WIDGET
 	ScreenWidget* m_screenWidget;
+#else
+	ScreenShotWidget* m_view;
+#endif
 	QPixmap m_screenPixmap;
 };
 

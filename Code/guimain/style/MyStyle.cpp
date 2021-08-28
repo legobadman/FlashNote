@@ -133,6 +133,8 @@ void MyStyle::drawControl(ControlElement element, const QStyleOption* opt, QPain
 	{
 	case CE_ComboBoxLabel:
 		break;
+	case CE_ShapedFrame:
+		break;
 	}
 	return base::drawControl(element, opt, p, w);
 }
