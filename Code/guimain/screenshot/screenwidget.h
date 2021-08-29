@@ -67,15 +67,6 @@ private:
 		QPointF fixed_point;
 		qreal fixed_x;	//left
 		qreal fixed_y;	//top
-
-		QPointF fixed_topleft;
-		QPointF fixed_topright;
-		QPointF fixed_bottomleft;
-		QPointF fixed_bottomright;
-		qreal fixed_top;
-		qreal fixed_bottom;
-		qreal fixed_left;
-		qreal fixed_right;
 	} m_movescale_info;
 };
 

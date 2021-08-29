@@ -73,7 +73,7 @@ ScreenGrabRect::ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGra
 		m_dragPoints[i]->setAcceptHoverEvents(true);
 	}
 
-	setFlags(ItemIsMovable);// | ItemIsSelectable /*| ItemSendsGeometryChanges*/);
+	setFlags(ItemIsMovable);
 }
 
 void ScreenGrabRect::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -88,18 +88,18 @@ void ScreenGrabRect::mousePressEvent(QGraphicsSceneMouseEvent* event)
 		m_movescale_info.fixed_point = scenePos;
 		break;
 	case SCALE_RIGHT_TOP:
-		m_movescale_info.fixed_point = QPointF(scenePos.x(), scenePos.y() + H);
+		m_movescale_info.fixed_point = QPointF(scenePos.x(), scenePos.y() + H - 1);
 		break;
 	case SCALE_LEFT_TOP:
-		m_movescale_info.fixed_point = QPointF(scenePos.x() + W, scenePos.y() + H);
+		m_movescale_info.fixed_point = QPointF(scenePos.x() + W - 1, scenePos.y() + H - 1);
 		break;
 	case SCALE_LEFT_BOTTOM:
-		m_movescale_info.fixed_point = QPointF(scenePos.x() + W, scenePos.y());
+		m_movescale_info.fixed_point = QPointF(scenePos.x() + W - 1, scenePos.y());
 		break;
 
 	case SCALE_MID_TOP:
 		m_movescale_info.fixed_x = scenePos.x();
-		m_movescale_info.fixed_y = scenePos.y() + H;
+		m_movescale_info.fixed_y = scenePos.y() + H - 1;
 		break;
 
 	case SCALE_MID_BOTTOM:
@@ -109,7 +109,7 @@ void ScreenGrabRect::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 	case SCALE_LEFT_MID:
 		m_movescale_info.fixed_y = scenePos.y();
-		m_movescale_info.fixed_x = scenePos.x() + W;
+		m_movescale_info.fixed_x = scenePos.x() + W - 1;
 		break;
 	case SCALE_RIGHT_MID:
 		m_movescale_info.fixed_y = scenePos.y();
@@ -176,6 +176,7 @@ void ScreenGrabRect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 				break;
 			}
 			case SCALE_LEFT_MID:
+			case SCALE_RIGHT_MID:
 			{
 				qreal left = min(scenePos.x(), m_movescale_info.fixed_x);
 				qreal right = max(scenePos.x(), m_movescale_info.fixed_x);
@@ -185,13 +186,14 @@ void ScreenGrabRect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 				newTopLeft = QPointF(left, top);
 				break;
 			}
-			case SCALE_RIGHT_MID:
+			case SCALE_MID_TOP:
+			case SCALE_MID_BOTTOM:
 			{
-				qreal left = min(scenePos.x(), m_movescale_info.fixed_x);
-				qreal right = max(scenePos.x(), m_movescale_info.fixed_x);
-				qreal top = m_movescale_info.fixed_y;
-				newWidth = right - left + 1;
-				newHeight = m_movescale_info.old_height;
+				qreal left = m_movescale_info.fixed_x;
+				qreal top = min(scenePos.y(), m_movescale_info.fixed_y);
+				qreal bottom = max(scenePos.y(), m_movescale_info.fixed_y);
+				newWidth = m_movescale_info.old_width;
+				newHeight = bottom - top + 1;
 				newTopLeft = QPointF(left, top);
 				break;
 			}
@@ -229,29 +231,30 @@ ScreenGrabRect::MOUSE_TRANSFORM ScreenGrabRect::getMouseEventType(QPointF pressP
 {
 	qreal xp = pressPoint.x(), yp = pressPoint.y();
 	qreal h = boundingRect().height(), w = boundingRect().width();
-	if (xp < -3)
+	static int offset = 5;		//为了更容易捕获鼠标而设的容错偏移
+	if (xp < -3 - offset)
 	{
 		return OUTSIDE;
 	}
-	else if (xp >= -3 && xp <= 6)
+	else if (xp >= -3 - offset && xp <= 6 + offset)
 	{
-		if (yp < -3)
+		if (yp < -3 - offset)
 		{
 			return OUTSIDE;
 		}
-		else if (yp >= -3 && yp <= 6)
+		else if (yp >= -3 - offset && yp <= 6 + offset)
 		{
 			return SCALE_LEFT_TOP;
 		}
-		else if (yp >= h / 2 - 3 && yp <= h / 2 + 3)
+		else if (yp >= h / 2 - 3 - offset && yp <= h / 2 + 3 + offset)
 		{
 			return SCALE_LEFT_MID;
 		}
-		else if (yp >= h - 3 && yp <= h + 3)
+		else if (yp >= h - 3 - offset && yp <= h + 3 + offset)
 		{
 			return SCALE_LEFT_BOTTOM;
 		}
-		else if (yp > h + 3)
+		else if (yp > h + 3 + offset)
 		{
 			return OUTSIDE;
 		}
@@ -260,21 +263,21 @@ ScreenGrabRect::MOUSE_TRANSFORM ScreenGrabRect::getMouseEventType(QPointF pressP
 			return TRANSLATE;
 		}
 	}
-	else if (xp >= w / 2 - 3 && xp <= w / 2 + 3)
+	else if (xp >= w / 2 - 3 - offset && xp <= w / 2 + 3 + offset)
 	{
-		if (yp < -3)
+		if (yp < -3 - offset)
 		{
 			return OUTSIDE;
 		}
-		else if (yp >= -3 && yp <= 6)
+		else if (yp >= -3 - offset && yp <= 6 + offset)
 		{
 			return SCALE_MID_TOP;
 		}
-		else if (yp >= h - 3 && yp <= h + 3)
+		else if (yp >= h - 3 - offset && yp <= h + 3 + offset)
 		{
 			return SCALE_MID_BOTTOM;
 		}
-		else if (yp > h + 3)
+		else if (yp > h + 3 + offset)
 		{
 			return OUTSIDE;
 		}
@@ -283,25 +286,25 @@ ScreenGrabRect::MOUSE_TRANSFORM ScreenGrabRect::getMouseEventType(QPointF pressP
 			return TRANSLATE;
 		}
 	}
-	else if (xp >= w - 3 && xp <= w + 3)
+	else if (xp >= w - 3 - offset && xp <= w + 3 + offset)
 	{
-		if (yp < -3)
+		if (yp < -3 - offset)
 		{
 			return OUTSIDE;
 		}
-		else if (yp >= -3 && yp <= 6)
+		else if (yp >= -3 - offset && yp <= 6 + offset)
 		{
 			return SCALE_RIGHT_TOP;
 		}
-		else if (yp >= h / 2 - 3 && yp <= h / 2 + 3)
+		else if (yp >= h / 2 - 3 - offset && yp <= h / 2 + 3 + offset)
 		{
 			return SCALE_RIGHT_MID;
 		}
-		else if (yp >= h - 3 && yp <= h + 3)
+		else if (yp >= h - 3 - offset && yp <= h + 3 + offset)
 		{
 			return SCALE_RIGHT_BOTTOM;
 		}
-		else if (yp > h + 3)
+		else if (yp > h + 3 + offset)
 		{
 			return OUTSIDE;
 		}
@@ -310,7 +313,7 @@ ScreenGrabRect::MOUSE_TRANSFORM ScreenGrabRect::getMouseEventType(QPointF pressP
 			return TRANSLATE;
 		}
 	}
-	else if (xp > w + 3)
+	else if (xp > w + 3 + offset)
 	{
 		return OUTSIDE;
 	}
