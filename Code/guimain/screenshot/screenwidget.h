@@ -3,6 +3,8 @@
 
 #include <QGraphicsView>
 #include <QGraphicsItem>
+#include "screentoolbar.h"
+
 
 class GrabDraggingRect : public QGraphicsRectItem
 {
@@ -13,8 +15,11 @@ protected:
 	QRectF boundingRect() const override;
 };
 
-class ScreenGrabRect : public QGraphicsPixmapItem
+class ScreenGrabRect : public QObject
+					, public QGraphicsPixmapItem
 {
+	Q_OBJECT
+
 	typedef QGraphicsPixmapItem _base;
 
 	enum MOUSE_TRANSFORM
@@ -40,6 +45,11 @@ public:
 	ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGraphicsItem* parent = nullptr);
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 	QRectF boundingRect() const override;
+	QRectF getCurrentShot(QPixmap& retImage);
+
+signals:
+	void grabStarted();
+	void grabFinish();
 
 protected:
 	bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
@@ -52,10 +62,11 @@ private:
 
 private:
 	QPixmap m_originalShot;
+	QPixmap m_currentShot;
 	QRectF m_rect;
 	QGraphicsRectItem* m_borderItem;
 	QGraphicsRectItem* m_dragHolderItem;
-	QVector<GrabDraggingRect*> m_dragPoints;
+	QVector<QGraphicsRectItem*> m_dragPoints;
 	map<MOUSE_TRANSFORM, Qt::CursorShape> m_cursor_mapper;
 	MOUSE_TRANSFORM m_transform;
 	const int m_borderWidth = 1;
@@ -79,9 +90,17 @@ public:
 	ScreenShotWidget(QWidget* parent = nullptr);
 	~ScreenShotWidget();
 	void grab();
+	QRectF getGrabImage(QPixmap& retImage);
+
+signals:
+	void grabFinish();
 
 protected:
+	void keyPressEvent(QKeyEvent* event);
 
+private slots:
+	void onGrabFinish();
+	void onGrabStarted();
 
 private:
 	QPixmap m_originalShot;
@@ -90,6 +109,7 @@ private:
 	QGraphicsPixmapItem* m_background;
 	QGraphicsPixmapItem* m_grabRegion;
 	ScreenGrabRect* m_grabber;
+	ScreenToolBar* m_toolbar;
 };
 
 

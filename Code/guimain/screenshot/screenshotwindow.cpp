@@ -5,15 +5,13 @@
 
 ScreenshotWindow::ScreenshotWindow(QWidget* parent /* = nullptr */)
 	: QMainWindow(parent, Qt::FramelessWindowHint | Qt::SubWindow)
+	, m_toolbar(NULL)
 {
-	//m_lblImage = new QLabel(this);
-#ifdef USE_WIDGET
-	m_screenWidget = new ScreenWidget(nullptr);
-	setCentralWidget(m_screenWidget);
-#else
 	m_view = new ScreenShotWidget(nullptr);
+	connect(m_view, SIGNAL(grabFinish()), this, SLOT(onGrabFinish()));
 	setCentralWidget(m_view);
-#endif
+	m_toolbar = new ScreenToolBar(this);
+	m_toolbar->hide();
 }
 
 ScreenshotWindow::~ScreenshotWindow()
@@ -27,4 +25,14 @@ void ScreenshotWindow::keyPressEvent(QKeyEvent* event)
 		this->close();
 	}
 	base::keyPressEvent(event);
+}
+
+void ScreenshotWindow::onGrabFinish()
+{
+	QPixmap retImage;
+	QRectF rc = m_view->getGrabImage(retImage);
+	qreal top = rc.bottom() + 5;
+	qreal left = rc.right() - 100;
+	m_toolbar->setGeometry(QRect(left, top, 100, 40));
+	m_toolbar->show();
 }

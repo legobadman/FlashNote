@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include "screenwidget.h"
+#include "screentoolbar.h"
 
 //#define USE_WIDGET
 
@@ -17,14 +18,12 @@ public:
 protected:
 	void keyPressEvent(QKeyEvent* event) override;
 
+private slots:
+	void onGrabFinish();
+
 private:
-	QLabel* m_lblImage;
-#ifdef USE_WIDGET
-	ScreenWidget* m_screenWidget;
-#else
 	ScreenShotWidget* m_view;
-#endif
-	QPixmap m_screenPixmap;
+	ScreenToolBar* m_toolbar;
 };
 
 #endif

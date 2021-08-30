@@ -155,6 +155,8 @@ add_executable(guimain
     ./screenshot/screenshot.h
     ./screenshot/screenwidget.cpp
     ./screenshot/screenwidget.h
+    ./screenshot/screentoolbar.cpp
+    ./screenshot/screentoolbar.h
     ./stdafx.cpp
     ./stdafx.h
     ./style/MyStyle.cpp

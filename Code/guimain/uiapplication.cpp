@@ -50,7 +50,7 @@ void UiApplication::showWidget()
 
 void UiApplication::screenshot()
 {
-	ScreenshotWindow* pShot = new ScreenshotWindow;
+	ScreenShotWidget* pShot = new ScreenShotWidget;
 	pShot->showFullScreen();
 }
 

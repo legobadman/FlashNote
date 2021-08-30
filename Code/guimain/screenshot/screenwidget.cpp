@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "screenwidget.h"
+#include "MyStyle.h"
 #include <QWindow>
 #include <QScreen>
 #include <QGraphicsSceneEvent>
@@ -66,7 +67,7 @@ ScreenGrabRect::ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGra
 
 	for (int i = 0; i < pts.size(); i++)
 	{
-		m_dragPoints[i] = new GrabDraggingRect(QRectF(pts[i].x(), pts[i].y(), 6, 6), this);
+		m_dragPoints[i] = new QGraphicsRectItem(QRectF(pts[i].x(), pts[i].y(), 6, 6), this);
 		m_dragPoints[i]->setPen(Qt::NoPen);
 		m_dragPoints[i]->setBrush(QColor(21, 152, 255));
 		m_dragPoints[i]->installSceneEventFilter(this);
@@ -125,10 +126,17 @@ void ScreenGrabRect::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	m_movescale_info.old_height = H;
 	m_movescale_info.old_width = W;
 	_base::mousePressEvent(event);
+	emit grabStarted();
 }
 
 void ScreenGrabRect::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
+	m_currentShot = pixmap();
+	if (m_transform != OUTSIDE)
+	{
+		emit grabFinish();
+	}
+	m_transform = OUTSIDE;
 	_base::mouseReleaseEvent(event);
 }
 
@@ -328,6 +336,12 @@ QRectF ScreenGrabRect::boundingRect() const
 	return _base::boundingRect();
 }
 
+QRectF ScreenGrabRect::getCurrentShot(QPixmap& retImage)
+{
+	retImage = m_currentShot;
+	return mapRectToScene(boundingRect());
+}
+
 bool ScreenGrabRect::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
 {
 	if (event->type() == QEvent::GraphicsSceneHoverEnter || event->type() == QEvent::GraphicsSceneHoverMove)
@@ -354,15 +368,20 @@ void ScreenGrabRect::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 /////////////////////////////////////////////////
 ScreenShotWidget::ScreenShotWidget(QWidget* parent)
 	: _base(parent)
+	, m_toolbar(NULL)
 {
 	m_scene = new QGraphicsScene;
 	m_background = new QGraphicsPixmapItem;
+	setWindowFlags(Qt::FramelessWindowHint | Qt::SubWindow);
+	
 	setScene(m_scene);
 	m_scene->addItem(m_background);
 	setFrameShape(QFrame::NoFrame);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	grab();
+	m_toolbar = new ScreenToolBar(this);
+	m_toolbar->hide();
 }
 
 ScreenShotWidget::~ScreenShotWidget()
@@ -392,4 +411,44 @@ void ScreenShotWidget::grab()
 	QPoint bottomRight(1000, 550);
 	QRectF rc(topLeft, bottomRight);
 	m_grabber = new ScreenGrabRect(m_originalShot, rc, m_background);
+	m_grabber->installEventFilter(this);
+
+	connect(m_grabber, SIGNAL(grabStarted()), this, SLOT(onGrabStarted()));
+	connect(m_grabber, SIGNAL(grabFinish()), this, SLOT(onGrabFinish()));
+}
+
+void ScreenShotWidget::onGrabFinish()
+{
+	static const int sMarginToBar = MyStyle::dpiScaled(5);
+	QPixmap retImage;
+	QRectF rc = getGrabImage(retImage);
+	QSize sz = m_toolbar->sizeHint();
+	//TODO:如果位于最下方
+	qreal top = rc.bottom() + sMarginToBar;
+	qreal left = rc.right() - sz.width();
+	m_toolbar->setGeometry(QRect(left, top, sz.width(), sz.height()));
+	m_toolbar->show();
+}
+
+void ScreenShotWidget::onGrabStarted()
+{
+	m_toolbar->hide();
+}
+
+void ScreenShotWidget::keyPressEvent(QKeyEvent* event)
+{
+	if (event->key() == 'E')
+	{
+		this->close();
+	}
+	_base::keyPressEvent(event);
+}
+
+QRectF ScreenShotWidget::getGrabImage(QPixmap& retImage)
+{
+	if (m_grabber)
+	{
+		return m_grabber->getCurrentShot(retImage);
+	}
+	return QRectF();
 }
