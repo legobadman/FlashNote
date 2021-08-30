@@ -31,6 +31,8 @@ ScreenGrabRect::ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGra
 	, m_transform(MOUSE_DONOTHING)
 	, m_choosingRect(true)
 {
+	maxW = m_originalShot.width();
+	maxH = m_originalShot.height();
 	qreal w = m_rect.width();
 	qreal h = m_rect.height();
 	QPixmap grabImage = QPixmap(QSize(w, h));
@@ -180,7 +182,15 @@ void ScreenGrabRect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 		QPixmap grabImage = QPixmap(QSize(w, h));
 		QPainter p2(&grabImage);
 		QPointF topLeft = this->scenePos();
-		QPixmap slice = m_originalShot.copy(topLeft.x(), topLeft.y(), w, h);
+		qreal px = topLeft.x(), py = topLeft.y();
+		if (px < 0 || py < 0 || px + w  > maxW || py + h > maxH)
+		{
+			px = min(max(0., px), maxW - w);
+			py = min(max(0., py), maxH - h);
+			//ÐÞÕýÎ»ÖÃ¡£
+			setPos(px, py);
+		}
+		QPixmap slice = m_originalShot.copy(px, py, w, h);
 		p2.drawPixmap(0, 0, slice);
 		setPixmap(grabImage);
 		update();

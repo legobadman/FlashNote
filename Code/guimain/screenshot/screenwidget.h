@@ -69,6 +69,8 @@ private:
 	map<MOUSE_TRANSFORM, Qt::CursorShape> m_cursor_mapper;
 	MOUSE_TRANSFORM m_transform;
 	const int m_borderWidth = 1;
+	qreal maxW;		//屏幕的最大宽度
+	qreal maxH;		//屏幕的最大高度
 	bool m_choosingRect;	//一开始选择rect，在点击鼠标以后，就设为false
 
 	struct {
