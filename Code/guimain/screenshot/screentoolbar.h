@@ -13,6 +13,11 @@ public:
 protected:
 	void paintEvent(QPaintEvent* event);
 
+signals:
+	void closeTriggered();
+	void finishTriggered();
+	void saveTriggered();
+
 private:
 	ToolButton* m_pSave;
 	ToolButton* m_pFinish;

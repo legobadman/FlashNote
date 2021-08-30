@@ -4,6 +4,10 @@
 #include <QWindow>
 #include <QScreen>
 #include <QGraphicsSceneEvent>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QImageWriter>
+#include <QMessageBox>
 
 
 GrabDraggingRect::GrabDraggingRect(const QRectF& rect, QGraphicsItem* parent)
@@ -13,9 +17,9 @@ GrabDraggingRect::GrabDraggingRect(const QRectF& rect, QGraphicsItem* parent)
 
 QRectF GrabDraggingRect::boundingRect() const
 {
+	return this->rect();
 	QRectF br = QGraphicsRectItem::boundingRect();
 	return br;
-	return br.adjusted(-50, -50, 50, 50);
 }
 
 
@@ -24,6 +28,7 @@ ScreenGrabRect::ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGra
 	, m_originalShot(original)
 	, m_rect(rect)
 	, m_transform(MOUSE_DONOTHING)
+	, m_choosingRect(true)
 {
 	qreal w = m_rect.width();
 	qreal h = m_rect.height();
@@ -35,8 +40,8 @@ ScreenGrabRect::ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGra
 	setPixmap(grabImage);
 	setPos(topLeft);
 
-	m_borderItem = new QGraphicsRectItem(QRectF(0, 0, w, h), this);
-	m_borderItem->setPen(QPen(QColor(21, 152, 255), m_borderWidth));
+	m_borderItem = new GrabDraggingRect(QRectF(0, 0, w, h), this);
+	m_borderItem->setPen(QPen(QColor(21, 152, 255), m_borderWidth + 1));
 	m_borderItem->setBrush(Qt::NoBrush);
 	m_borderItem->setAcceptHoverEvents(true);
 	m_borderItem->installSceneEventFilter(this);
@@ -67,11 +72,20 @@ ScreenGrabRect::ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGra
 
 	for (int i = 0; i < pts.size(); i++)
 	{
-		m_dragPoints[i] = new QGraphicsRectItem(QRectF(pts[i].x(), pts[i].y(), 6, 6), this);
+		//防止越过全屏boundingrect
+		qreal xp = pts[i].x(), yp = pts[i].y();
+		QPointF scenePt = mapToScene(pts[i]);
+		if (scenePt.x() < 0)
+			xp = 0;
+		if (scenePt.y() < 0)
+			yp = 0;
+		QRectF rcPoint = QRectF(xp, yp, 6, 6);
+		m_dragPoints[i] = new QGraphicsRectItem(rcPoint, this);
 		m_dragPoints[i]->setPen(Qt::NoPen);
 		m_dragPoints[i]->setBrush(QColor(21, 152, 255));
 		m_dragPoints[i]->installSceneEventFilter(this);
 		m_dragPoints[i]->setAcceptHoverEvents(true);
+		m_dragPoints[i]->hide();
 	}
 
 	setFlags(ItemIsMovable);
@@ -79,6 +93,19 @@ ScreenGrabRect::ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGra
 
 void ScreenGrabRect::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
+	if (m_choosingRect)
+	{
+		//TODO：根据鼠标位置定位到当前可以形成的一个窗口区域。
+		//要根据这个区域，实时更新pixmap区域。
+
+		//当然用户也有可能想开始拖选，于是也得记下固定点。
+		m_transform = SCALE_LEFT_TOP;
+		m_movescale_info.fixed_point = event->scenePos();
+		_base::mousePressEvent(event);
+		emit grabStarted();
+		return;
+	}
+
 	m_transform = getMouseEventType(event->pos());
 	QRectF br = boundingRect();
 	QPointF scenePos = this->scenePos();
@@ -136,6 +163,7 @@ void ScreenGrabRect::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	{
 		emit grabFinish();
 	}
+	m_choosingRect = false;
 	m_transform = OUTSIDE;
 	_base::mouseReleaseEvent(event);
 }
@@ -213,7 +241,12 @@ void ScreenGrabRect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 		p2.drawPixmap(0, 0, slice);
 		setPixmap(grabImage);
 		setPos(newTopLeft);
-		m_borderItem->setRect(QRectF(0, 0, newWidth, newHeight));
+
+		if (m_borderItem)
+		{
+			m_borderItem->setPen(QPen(QColor(21, 152, 255), m_borderWidth));
+			m_borderItem->setRect(QRectF(0, 0, newWidth, newHeight));
+		}
 
 		QVector<QPointF> pts = {
 			QPointF(-3, -3),
@@ -229,7 +262,17 @@ void ScreenGrabRect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 		};
 		for (int i = 0; i < m_dragPoints.size(); i++)
 		{
-			m_dragPoints[i]->setRect(QRectF(pts[i].x(), pts[i].y(), 6, 6));
+			qreal xp = pts[i].x(), yp = pts[i].y();
+			QPointF scenePt = mapToScene(pts[i]);
+			if (scenePt.x() < 0)
+				xp = 0;
+			if (scenePt.y() < 0)
+				yp = 0;
+			QRectF rcPoint = QRectF(xp, yp, 6, 6);
+			m_dragPoints[i]->setRect(rcPoint);
+			m_dragPoints[i]->setVisible(true);
+			m_dragPoints[i]->installSceneEventFilter(this);
+			m_dragPoints[i]->setAcceptHoverEvents(true);
 		}
 		update();
 	}
@@ -347,8 +390,11 @@ bool ScreenGrabRect::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
 	if (event->type() == QEvent::GraphicsSceneHoverEnter || event->type() == QEvent::GraphicsSceneHoverMove)
 	{
 		QGraphicsSceneHoverEvent* e = static_cast<QGraphicsSceneHoverEvent*>(event);
-		MOUSE_TRANSFORM mouse_type = getMouseEventType(e->pos());
-		setCursor(m_cursor_mapper[mouse_type]);
+		if (!m_choosingRect)
+		{
+			MOUSE_TRANSFORM mouse_type = getMouseEventType(e->pos());
+			setCursor(m_cursor_mapper[mouse_type]);
+		}
 	}
 	else if (event->type() == QEvent::GraphicsSceneHoverLeave)
 	{
@@ -377,11 +423,13 @@ ScreenShotWidget::ScreenShotWidget(QWidget* parent)
 	setScene(m_scene);
 	m_scene->addItem(m_background);
 	setFrameShape(QFrame::NoFrame);
+	setFrameStyle(QFrame::NoFrame);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	grab();
 	m_toolbar = new ScreenToolBar(this);
 	m_toolbar->hide();
+	grab();
 }
 
 ScreenShotWidget::~ScreenShotWidget()
@@ -397,8 +445,8 @@ void ScreenShotWidget::grab()
 		return;
 
 	m_originalShot = screen->grabWindow(0);
-
-	QPixmap backgroundShot(m_originalShot.size());
+	QSize sz = m_originalShot.size();
+	QPixmap backgroundShot(sz);
 	int alpha = 125;
 	QPainter p(&backgroundShot);
 	p.setCompositionMode(QPainter::CompositionMode_Source);
@@ -407,14 +455,16 @@ void ScreenShotWidget::grab()
 	p.fillRect(backgroundShot.rect(), QColor(0, 0, 0, alpha));
 	m_background->setPixmap(backgroundShot);
 
-	QPoint topLeft(500, 250);
-	QPoint bottomRight(1000, 550);
-	QRectF rc(topLeft, bottomRight);
+	int offset = 10;
+	QRectF rc(offset, offset, sz.width() - offset * 2, sz.height() - offset * 2);
 	m_grabber = new ScreenGrabRect(m_originalShot, rc, m_background);
 	m_grabber->installEventFilter(this);
 
 	connect(m_grabber, SIGNAL(grabStarted()), this, SLOT(onGrabStarted()));
 	connect(m_grabber, SIGNAL(grabFinish()), this, SLOT(onGrabFinish()));
+	connect(m_toolbar, SIGNAL(closeTriggered()), this, SLOT(close()));
+	connect(m_toolbar, SIGNAL(finishTriggered()), this, SLOT(onShotFinished()));
+	connect(m_toolbar, SIGNAL(saveTriggered()), this, SLOT(onSaveShot()));
 }
 
 void ScreenShotWidget::onGrabFinish()
@@ -444,6 +494,11 @@ void ScreenShotWidget::keyPressEvent(QKeyEvent* event)
 	_base::keyPressEvent(event);
 }
 
+void ScreenShotWidget::paintEvent(QPaintEvent* event)
+{
+	_base::paintEvent(event);
+}
+
 QRectF ScreenShotWidget::getGrabImage(QPixmap& retImage)
 {
 	if (m_grabber)
@@ -451,4 +506,43 @@ QRectF ScreenShotWidget::getGrabImage(QPixmap& retImage)
 		return m_grabber->getCurrentShot(retImage);
 	}
 	return QRectF();
+}
+
+void ScreenShotWidget::onShotFinished()
+{
+	QPixmap retImage;
+	m_grabber->getCurrentShot(retImage);
+	//to clipboard
+}
+
+void ScreenShotWidget::onSaveShot()
+{
+	QPixmap retImage;
+	m_grabber->getCurrentShot(retImage);
+
+	const QString format = "png";
+	QString initialPath = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+	if (initialPath.isEmpty())
+		initialPath = QDir::currentPath();
+	initialPath += tr("/untitled.") + format;
+
+	QFileDialog fileDialog(this, tr("Save As"), initialPath);
+	fileDialog.setAcceptMode(QFileDialog::AcceptSave);
+	fileDialog.setFileMode(QFileDialog::AnyFile);
+	fileDialog.setDirectory(initialPath);
+	QStringList mimeTypes;
+	const QList<QByteArray> baMimeTypes = QImageWriter::supportedMimeTypes();
+	for (const QByteArray& bf : baMimeTypes)
+		mimeTypes.append(QLatin1String(bf));
+	fileDialog.setMimeTypeFilters(mimeTypes);
+	fileDialog.selectMimeTypeFilter("image/" + format);
+	fileDialog.setDefaultSuffix(format);
+	if (fileDialog.exec() != QDialog::Accepted)
+		return;
+	const QString fileName = fileDialog.selectedFiles().first();
+	if (!retImage.save(fileName)) {
+		QMessageBox::warning(this, tr("Save Error"), tr("The image could not be saved to \"%1\".")
+			.arg(QDir::toNativeSeparators(fileName)));
+	}
+	close();
 }

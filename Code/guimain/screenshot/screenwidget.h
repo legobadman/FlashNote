@@ -64,12 +64,12 @@ private:
 	QPixmap m_originalShot;
 	QPixmap m_currentShot;
 	QRectF m_rect;
-	QGraphicsRectItem* m_borderItem;
-	QGraphicsRectItem* m_dragHolderItem;
+	GrabDraggingRect* m_borderItem;
 	QVector<QGraphicsRectItem*> m_dragPoints;
 	map<MOUSE_TRANSFORM, Qt::CursorShape> m_cursor_mapper;
 	MOUSE_TRANSFORM m_transform;
 	const int m_borderWidth = 1;
+	bool m_choosingRect;	//一开始选择rect，在点击鼠标以后，就设为false
 
 	struct {
 		qreal old_width;
@@ -97,17 +97,19 @@ signals:
 
 protected:
 	void keyPressEvent(QKeyEvent* event);
+	void paintEvent(QPaintEvent* event);
 
 private slots:
 	void onGrabFinish();
 	void onGrabStarted();
+	void onShotFinished();
+	void onSaveShot();
 
 private:
 	QPixmap m_originalShot;
 	QPixmap m_grabImage;
 	QPointer<QGraphicsScene> m_scene;
 	QGraphicsPixmapItem* m_background;
-	QGraphicsPixmapItem* m_grabRegion;
 	ScreenGrabRect* m_grabber;
 	ScreenToolBar* m_toolbar;
 };

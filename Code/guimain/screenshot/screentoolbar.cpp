@@ -35,13 +35,16 @@ ScreenToolBar::ScreenToolBar(QWidget* parent)
 	m_pClose->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_pClose->setButtonStyle(ToolButton::ButtonIcon);
 
-	
 	pLayout->setMargin(sMarginToBar);
 	pLayout->addWidget(m_pSave);
 	pLayout->addWidget(m_pClose);
 	pLayout->addWidget(m_pFinish);
 
 	setLayout(pLayout);
+
+	connect(m_pSave, SIGNAL(clicked()), this, SIGNAL(saveTriggered()));
+	connect(m_pFinish, SIGNAL(clicked()), this, SIGNAL(finishTriggered()));
+	connect(m_pClose, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
 }
 
 ScreenToolBar::~ScreenToolBar()
