@@ -427,7 +427,6 @@ ScreenShotWidget::ScreenShotWidget(QWidget* parent)
 	setFrameStyle(QFrame::NoFrame);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	grab();
 	m_toolbar = new ScreenToolBar(this);
 	m_toolbar->hide();
 	grab();
