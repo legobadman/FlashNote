@@ -8,6 +8,7 @@
 #include <QStandardPaths>
 #include <QImageWriter>
 #include <QMessageBox>
+#include <QClipboard>
 
 
 GrabDraggingRect::GrabDraggingRect(const QRectF& rect, QGraphicsItem* parent)
@@ -512,7 +513,13 @@ void ScreenShotWidget::onShotFinished()
 {
 	QPixmap retImage;
 	m_grabber->getCurrentShot(retImage);
-	//to clipboard
+	
+	if (!retImage.isNull())
+	{
+		QClipboard* pClipBoard = QApplication::clipboard();
+		pClipBoard->setPixmap(retImage);
+	}
+	close();
 }
 
 void ScreenShotWidget::onSaveShot()
