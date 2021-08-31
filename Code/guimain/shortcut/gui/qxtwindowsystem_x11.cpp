@@ -30,7 +30,7 @@
 *****************************************************************************/
 
 #include <QLibrary>
-#include <QX11Info>
+#include <QtX11Extras/QX11Info>
 #include <X11/Xutil.h>
 
 static WindowList qxt_getWindows(Atom prop)

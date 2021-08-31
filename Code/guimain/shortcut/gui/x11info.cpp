@@ -24,7 +24,7 @@
 # include <xcb/xcb.h>
 # include <QtGlobal>
 #else
-# include <QX11Info>
+# include <QtX11Extras/QX11Info>
 #endif
 
 

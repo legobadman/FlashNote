@@ -34,7 +34,7 @@
 #   include <QX11Info>
 #else
 #   include <QApplication>
-#   include <qpa/qplatformnativeinterface.h>
+#   include <QtGui/5.15.0/QtGui/qpa/qplatformnativeinterface.h>
 #   include <xcb/xcb.h>
 #endif
 #include <X11/Xlib.h>

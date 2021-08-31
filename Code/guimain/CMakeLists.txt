@@ -41,9 +41,6 @@ include_directories(
     ../dbservice
     )
 
-# Find the QtWidgets library
-find_package(Qt5 REQUIRED COMPONENTS Widgets)
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
@@ -51,11 +48,14 @@ link_directories(../3rdparty/boost_1_55_0/stage/lib)
 
 IF (WIN32)
     SET(SHORTCUT_SRCS "./shortcut/gui/qxtwindowsystem.cpp" "./shortcut/gui/qxtwindowsystem.h" "./shortcut/gui/qxtglobalshortcut_win.cpp" "./shortcut/gui/qxtwindowsystem_win.cpp")
+    find_package(Qt5 REQUIRED COMPONENTS Widgets)
 ENDIF (WIN32)
 
 IF (UNIX)
+    find_package(X11)
+    find_package(Qt5 REQUIRED COMPONENTS Widgets X11Extras)
     IF (APPLE)
-       SET(SHORTCUT_SRCS "./shortcut/gui/qxtglobalshortcut_mac.cpp" "./shortcut/gui/qxtwindowsystem_mac.cpp" "./shortcut/gui/qxtwindowsystem_mac.h") 
+        SET(SHORTCUT_SRCS "./shortcut/gui/qxtglobalshortcut_mac.cpp" "./shortcut/gui/qxtwindowsystem_mac.cpp" "./shortcut/gui/qxtwindowsystem_mac.h") 
     ELSE (APPLE)
         SET(SHORTCUT_SRCS "./shortcut/gui/qxtwindowsystem_x11.cpp" "./shortcut/gui/qxtglobalshortcut_x11.cpp" "./shortcut/gui/x11info.cpp" "./shortcut/gui/x11info.h")
     ENDIF(APPLE)
@@ -194,7 +194,7 @@ target_precompile_headers(guimain PRIVATE ./stdafx.h)
 if (WIN32)
 	target_link_libraries(guimain notecore Qt5::Widgets dbservice sqlite Ws2_32)
 else()
-	target_link_libraries(guimain notecore Qt5::Widgets dbservice sqlite Threads::Threads dl)
+	target_link_libraries(guimain notecore Qt5::Widgets Qt5::X11Extras dbservice sqlite Threads::Threads dl X11)
 endif(WIN32)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")
