@@ -497,7 +497,7 @@ void ScreenShotWidget::onGrabStarted()
 
 void ScreenShotWidget::keyPressEvent(QKeyEvent* event)
 {
-	if (event->key() == 'E')
+	if (event->key() == Qt::Key_Escape)
 	{
 		this->close();
 	}

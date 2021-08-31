@@ -39,6 +39,7 @@ include_directories(
     ../3rdparty/rapidxml
     ../3rdparty/sqlite
     ../dbservice
+    ../notehook
     )
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -192,7 +193,7 @@ target_precompile_headers(guimain PRIVATE ./stdafx.h)
 
 # Add the Qt5 Widgets for linking
 if (WIN32)
-	target_link_libraries(guimain notecore Qt5::Widgets dbservice sqlite Ws2_32)
+	target_link_libraries(guimain notecore Qt5::Widgets dbservice sqlite Ws2_32 notehook)
 else()
 	target_link_libraries(guimain notecore Qt5::Widgets Qt5::X11Extras dbservice sqlite Threads::Threads dl X11)
 endif(WIN32)

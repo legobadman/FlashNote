@@ -43,6 +43,7 @@ protected slots:
 	void insertImage();
 	void onEditting();
 	void screenShot();
+	void onHookToggled();
 
 protected:
 	void fontChanged(const QFont& f);
@@ -70,6 +71,7 @@ private:
 	SeperateVLine* vline2;
 	ToolButton* attachment;
 	ToolButton* photo;
+	ToolButton* hook;
 	FontComboBox* font_comboBox;
 	FontComboSizeBox* fontsize_comboBox;
 	FontColorComboBox* fontcolor;
