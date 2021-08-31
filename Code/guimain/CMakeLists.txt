@@ -49,6 +49,19 @@ find_package(Threads REQUIRED)
 
 link_directories(../3rdparty/boost_1_55_0/stage/lib)
 
+IF (WIN32)
+    SET(SHORTCUT_SRCS "./shortcut/gui/qxtwindowsystem.cpp" "./shortcut/gui/qxtwindowsystem.h" "./shortcut/gui/qxtglobalshortcut_win.cpp" "./shortcut/gui/qxtwindowsystem_win.cpp")
+ENDIF (WIN32)
+
+IF (UNIX)
+    IF (APPLE)
+       SET(SHORTCUT_SRCS "./shortcut/gui/qxtglobalshortcut_mac.cpp" "./shortcut/gui/qxtwindowsystem_mac.cpp" "./shortcut/gui/qxtwindowsystem_mac.h") 
+    ELSE (APPLE)
+        SET(SHORTCUT_SRCS "./shortcut/gui/qxtwindowsystem_x11.cpp" "./shortcut/gui/qxtglobalshortcut_x11.cpp" "./shortcut/gui/x11info.cpp" "./shortcut/gui/x11info.h")
+    ENDIF(APPLE)
+ENDIF (UNIX)
+
+
 # Tell CMake to create the helloworld executable
 add_executable(guimain
     ./addbookdlg.cpp
@@ -157,6 +170,12 @@ add_executable(guimain
     ./screenshot/screenwidget.h
     ./screenshot/screentoolbar.cpp
     ./screenshot/screentoolbar.h
+    ./shortcut/gui/qxtglobalshortcut.cpp
+    ./shortcut/gui/qxtglobalshortcut.h
+    ./shortcut/gui/qxtglobalshortcut_p.h
+    ${SHORTCUT_SRCS}
+    ./shortcut/core/qxtglobal.cpp
+    ./shortcut/core/qxtglobal.h
     ./stdafx.cpp
     ./stdafx.h
     ./style/MyStyle.cpp

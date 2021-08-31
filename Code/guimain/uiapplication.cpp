@@ -4,6 +4,7 @@
 #include "dbservice.h"
 #include "guihelper.h"
 #include "screenshot/screenshotwindow.h"
+#include "shortcut/gui/qxtglobalshortcut.h"
 
 
 UiApplication::UiApplication(int& argc, char** argv)
@@ -35,6 +36,10 @@ void UiApplication::initUI()
 		this, SLOT(onTrigger()));
 	connect(&m_trayIcon, SIGNAL(quickTriggerd()),
 		this, SLOT(onQuickApp()));
+
+	QxtGlobalShortcut* shortcut = new QxtGlobalShortcut(this);
+	shortcut->setShortcut(QKeySequence("Alt+Q"));
+	connect(shortcut, SIGNAL(activated()), this, SLOT(screenshot()));
 }
 
 void UiApplication::initCoreFromRPC()
