@@ -17,8 +17,11 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 	if (code >= 0)
 	{
 		//TODO：组合键更合适
-		if (wParam == VK_F2)
+		WORD vkCode = LOWORD(wParam);
+		BOOL altDownFlag = (HIWORD(lParam) & KF_ALTDOWN);
+		if (altDownFlag && vkCode == 0x53)
 		{
+			Sleep(100);
 			INPUT* input = new INPUT[4];
 			for (int i = 0; i < 4; i++)
 			{
