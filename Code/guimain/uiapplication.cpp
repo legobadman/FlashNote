@@ -3,8 +3,10 @@
 #include "MyStyle.h"
 #include "dbservice.h"
 #include "guihelper.h"
+#include "floatingmenubutton.h"
 #include "screenshot/screenshotwindow.h"
 #include "shortcut/gui/qxtglobalshortcut.h"
+#include "notehook.h"
 
 
 UiApplication::UiApplication(int& argc, char** argv)
@@ -40,6 +42,8 @@ void UiApplication::initUI()
 	QxtGlobalShortcut* shortcut = new QxtGlobalShortcut(this);
 	shortcut->setShortcut(QKeySequence("Alt+Q"));
 	connect(shortcut, SIGNAL(activated()), this, SLOT(screenshot()));
+
+	m_pMenuButton = new FloatingMenuButton(NULL);
 }
 
 void UiApplication::initCoreFromRPC()
@@ -57,6 +61,26 @@ void UiApplication::screenshot()
 {
 	ScreenShotWidget* pShot = new ScreenShotWidget;
 	pShot->showFullScreen();
+}
+
+void UiApplication::installGlobalHook()
+{
+	installHook();
+}
+
+void UiApplication::uninstallGlobalHook()
+{
+	uninstallHook();
+}
+
+void UiApplication::showFloatingWin()
+{
+	m_pMenuButton->show();
+}
+
+void UiApplication::hideFloatingWin()
+{
+	m_pMenuButton->hide();
 }
 
 void UiApplication::onQuickApp()

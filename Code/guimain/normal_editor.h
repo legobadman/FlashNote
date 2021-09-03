@@ -44,6 +44,7 @@ protected slots:
 	void onEditting();
 	void screenShot();
 	void onHookToggled();
+	void onFloatWinToggled();
 
 protected:
 	void fontChanged(const QFont& f);
@@ -72,6 +73,7 @@ private:
 	ToolButton* attachment;
 	ToolButton* photo;
 	ToolButton* hook;
+	ToolButton* floatWin;
 	FontComboBox* font_comboBox;
 	FontComboSizeBox* fontsize_comboBox;
 	FontColorComboBox* fontcolor;

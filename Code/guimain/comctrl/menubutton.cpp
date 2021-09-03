@@ -26,24 +26,26 @@ void MenuButton::setCreateContentCallback(std::function<QWidget* ()> func)
 
 void MenuButton::popupChildWidget()
 {
-	Q_ASSERT(func_createContentWid);
+	if (func_createContentWid)
+	{
+		PopupWidget popup(this);
 
-	PopupWidget popup(this);
+		connect(this, SIGNAL(popout()), &popup, SIGNAL(aboutToHide()));
 
-	connect(this, SIGNAL(popout()), &popup, SIGNAL(aboutToHide()));
+		QWidget* pContentWidget = func_createContentWid();
+		popup.setContentWidget(pContentWidget);
 
-	QWidget* pContentWidget = func_createContentWid();
-	popup.setContentWidget(pContentWidget);
+		QPoint pGlobal = mapToGlobal(QPoint(0, 0));
+		const int margin = 5;
+		setDown(true);
 
-	QPoint pGlobal = mapToGlobal(QPoint(0, 0));
-	const int margin = 5;
-	setDown(true);
+		int nWidth = 300; pContentWidget->width();
+		int nHeight = pContentWidget->height();
 
-	int nWidth = 300; pContentWidget->width();
-	int nHeight = pContentWidget->height();
-
-	popup.exec(pGlobal.x(), pGlobal.y() + height() + margin, nWidth, nHeight);
-	setDown(false);
+		popup.exec(pGlobal.x(), pGlobal.y() + height() + margin, nWidth, nHeight);
+		setDown(false);
+	}
+	
 }
 
 void MenuButton::initStyleOption(StyleOptionToolButton* option) const

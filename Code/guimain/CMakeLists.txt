@@ -91,6 +91,8 @@ add_executable(guimain
     ./guimain.cpp
     ./guihelper.cpp
     ./guihelper.h
+    ./floatingmenubutton.cpp
+    ./floatingmenubutton.h
     ./fontitemdelegate.cpp
     ./fontitemdelegate.h
     ./FontColorComboBox.cpp

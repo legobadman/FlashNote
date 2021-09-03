@@ -8,6 +8,8 @@ HHOOK g_Hook = NULL;
 
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
+#define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
+#define FLOAT_WIN_NAME L"floating_window"
 
 DWORD buffSize = 1024;
 TCHAR ProcessName[1024];
@@ -19,8 +21,13 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 		//TODO：组合键更合适
 		WORD vkCode = LOWORD(wParam);
 		BOOL altDownFlag = (HIWORD(lParam) & KF_ALTDOWN);
-		if (altDownFlag && vkCode == 0x53)
+		if (altDownFlag && vkCode == 'S')
 		{
+			POINT p;
+			GetCursorPos(&p);
+			//HWND hwnd = WindowFromPoint(p);
+			//SendMessage(hwnd, WM_COPY, 0, 0);		暂时无法从消息机制通知复制
+
 			Sleep(100);
 			INPUT* input = new INPUT[4];
 			for (int i = 0; i < 4; i++)
@@ -47,6 +54,18 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 			input[3].ki.wVk = VK_CONTROL;
 			input[3].ki.dwFlags = KEYEVENTF_KEYUP;
 			SendInput(4, input, sizeof(INPUT));
+
+			HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
+			if (hwnd)
+			{
+				COPYDATASTRUCT data;
+				data.dwData = 0;
+				data.cbData = sizeof(p);
+				data.lpData = &p;
+				//TODO: 其实也可以把剪贴板之前的数据发过去
+				LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
+				DWORD lastErr = GetLastError();
+			}
 		}
 	}
 	return CallNextHookEx(g_Hook, code, wParam, lParam);

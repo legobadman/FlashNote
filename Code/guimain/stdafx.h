@@ -33,4 +33,8 @@
 #include "note_types.h"
 #include "common_types.h"
 
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#endif
+
 #endif

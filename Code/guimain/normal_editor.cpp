@@ -17,11 +17,13 @@
 #include <QBuffer>
 #include <QUrl>
 #include <QPlainTextEdit>
+#include <QWindow>
 #include <QMenu>
 #include <QDialog>
 #include "guihelper.h"
 #include "uiapplication.h"
 #include "notehook.h"
+#include "floatingmenubutton.h"
 
 
 NormalEditor::NormalEditor(QWidget* parent)
@@ -167,6 +169,11 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	hook->setButtonStyle(ToolButton::ButtonCheckable);
 	pLayout->addWidget(hook);
 
+	floatWin = new ToolButton;
+	floatWin->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
+	floatWin->setButtonStyle(ToolButton::ButtonCheckable);
+	pLayout->addWidget(floatWin);
+
 	QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	pLayout->addItem(horizontalSpacer);
 
@@ -201,6 +208,7 @@ void NormalEditor::initSlots()
 	connect(item_id, SIGNAL(clicked()), this, SLOT(listOrdered()));
 	connect(photo, SIGNAL(clicked()), this, SLOT(screenShot()));
 	connect(hook, SIGNAL(clicked()), this, SLOT(onHookToggled()));
+	connect(floatWin, SIGNAL(clicked()), this, SLOT(onFloatWinToggled()));
 	connect(attachment, SIGNAL(clicked()), this, SLOT(checkDocument()));
 }
 
@@ -495,12 +503,21 @@ void NormalEditor::onHookToggled()
 	bool checked = hook->isChecked();
 	if (checked)
 	{
-		installHook();
+		AppHelper::uiApp()->installGlobalHook();
 	}
 	else
 	{
-		uninstallHook();
+		AppHelper::uiApp()->uninstallGlobalHook();
 	}
+}
+
+void NormalEditor::onFloatWinToggled()
+{
+	bool checked = floatWin->isChecked();
+	if (checked)
+		AppHelper::uiApp()->showFloatingWin();
+	else
+		AppHelper::uiApp()->hideFloatingWin();
 }
 
 void NormalEditor::list(bool checked, QTextListFormat::Style style)
