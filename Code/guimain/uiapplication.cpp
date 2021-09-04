@@ -11,16 +11,24 @@
 
 UiApplication::UiApplication(int& argc, char** argv)
 	: QApplication(argc, argv)
+#ifdef Q_OS_WIN
+	, m_hFileMapT(INVALID_HANDLE_VALUE)
+	, m_hNamedEvent(INVALID_HANDLE_VALUE)
+#endif
 {
 	QApplication::setStyle(new MyStyle);
 	CreateApplication(&m_spApp);
 	initCoreFromRPC();
 	initUI();
+	initFileMapping();
 }
 
 UiApplication::~UiApplication()
 {
-
+	if (m_hFileMapT != INVALID_HANDLE_VALUE)
+	{
+		CloseHandle(m_hFileMapT);
+	}
 }
 
 INoteApplication* UiApplication::coreApplication()
@@ -51,6 +59,16 @@ void UiApplication::initCoreFromRPC()
 	DbService::GetInstance().InitcoreFromRPC(m_spApp);
 }
 
+#ifdef Q_OS_WIN
+void UiApplication::initFileMapping()
+{
+	//创建内存映射文件。
+	m_hFileMapT = CreateFileMapping(INVALID_HANDLE_VALUE, NULL,
+		PAGE_READWRITE, 0, 4 * 1024, TEXT("FlashMousePosition"));
+	m_hNamedEvent = CreateEventW(NULL, FALSE, FALSE, L"FlashMouseEvnet");
+}
+#endif
+
 void UiApplication::showWidget()
 {
 	m_trayIcon.show();
@@ -75,7 +93,15 @@ void UiApplication::uninstallGlobalHook()
 
 void UiApplication::showFloatingWin()
 {
-	m_pMenuButton->show();
+	//读取共享文件上的值
+#ifdef Q_OS_WIN
+	if (m_hFileMapT != INVALID_HANDLE_VALUE)
+	{
+        PVOID pView = MapViewOfFile(m_hFileMapT, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+        POINT p = *(POINT*)pView;
+        m_pMenuButton->show();
+	}
+#endif
 }
 
 void UiApplication::hideFloatingWin()

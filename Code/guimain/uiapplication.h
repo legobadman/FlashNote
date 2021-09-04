@@ -27,13 +27,20 @@ public slots:
 private:
 	void initUI();
 	void initCoreFromRPC();
+#ifdef Q_OS_WIN
+	void initFileMapping();
+#endif
 
 private:
 	NoteTrayIcon m_trayIcon;
 	com_sptr<INoteApplication> m_spApp;
 	QSharedPointer<NoteMainWindow> m_mainWindow;
 	FloatingMenuButton* m_pMenuButton;
+#ifdef Q_OS_WIN
+	HANDLE m_hFileMapT;
+	HANDLE m_hNamedEvent;
+	HANDLE m_hThread;
+#endif
 };
-
 
 #endif

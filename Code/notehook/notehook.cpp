@@ -5,6 +5,8 @@ typedef unsigned char byte;
 
 HINSTANCE g_hInstance = NULL;
 HHOOK g_Hook = NULL;
+HANDLE hFileMapT = INVALID_HANDLE_VALUE;
+HANDLE hEvent = INVALID_HANDLE_VALUE;
 
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
@@ -13,6 +15,7 @@ HHOOK g_Hook = NULL;
 
 DWORD buffSize = 1024;
 TCHAR ProcessName[1024];
+POINT GlobalP;
 
 LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 {
@@ -23,8 +26,7 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 		BOOL altDownFlag = (HIWORD(lParam) & KF_ALTDOWN);
 		if (altDownFlag && vkCode == 'S')
 		{
-			POINT p;
-			GetCursorPos(&p);
+			GetCursorPos(&GlobalP);
 			//HWND hwnd = WindowFromPoint(p);
 			//SendMessage(hwnd, WM_COPY, 0, 0);		暂时无法从消息机制通知复制
 
@@ -56,15 +58,31 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 			SendInput(4, input, sizeof(INPUT));
 
 			HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
-			if (hwnd)
+			if (false && hwnd)
 			{
 				COPYDATASTRUCT data;
 				data.dwData = 0;
-				data.cbData = sizeof(p);
-				data.lpData = &p;
+				data.cbData = sizeof(GlobalP);
+				data.lpData = &GlobalP;
 				//TODO: 其实也可以把剪贴板之前的数据发过去
 				LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
 				DWORD lastErr = GetLastError();
+			}
+			if (true)
+			{
+				if (hFileMapT == INVALID_HANDLE_VALUE)
+					hFileMapT = OpenFileMapping(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, TEXT("FlashMousePosition"));
+				if (hEvent == INVALID_HANDLE_VALUE)
+					hEvent = OpenEventW(SYNCHRONIZE, FALSE, L"FlashMouseEvnet");
+				if (hFileMapT != INVALID_HANDLE_VALUE && hEvent != INVALID_HANDLE_VALUE)
+				{
+                    PVOID pView = MapViewOfFile(hFileMapT, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+					if (pView != NULL) {
+						memcpy(pView, &GlobalP, sizeof(GlobalP));
+						//SetEvent(hEvent);
+						UnmapViewOfFile(pView);
+					}
+				}
 			}
 		}
 	}
@@ -152,7 +170,13 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 	case DLL_PROCESS_DETACH:
-		
+		{
+			if (hFileMapT != INVALID_HANDLE_VALUE)
+			{
+				CloseHandle(hFileMapT);
+				hFileMapT = INVALID_HANDLE_VALUE;
+			}
+		}
 		break;
 	}
 	return TRUE;
