@@ -211,7 +211,7 @@ bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, lon
 			COPYDATASTRUCT* data = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
 			POINT* pGloal = reinterpret_cast<POINT*>(data->lpData);
 			//取出剪贴板数据
-			m_pMenuButton->setGeometry(QRect(pGloal->x, pGloal->y, 24, 24));
+			m_pMenuButton->setGeometry(QRect(pGloal->x + 20, pGloal->y + 10, 24, 24));
 			m_pMenuButton->show();
 		}
 	}

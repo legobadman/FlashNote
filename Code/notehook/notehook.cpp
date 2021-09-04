@@ -4,21 +4,59 @@
 typedef unsigned char byte;
 
 HINSTANCE g_hInstance = NULL;
-HHOOK g_Hook = NULL;
+HHOOK g_KeyboardHook = NULL;
+HHOOK g_msgHook = NULL;
 HANDLE hFileMapT = INVALID_HANDLE_VALUE;
 HANDLE hEvent = INVALID_HANDLE_VALUE;
+
+
+//#define ENABLE_KEYBOARD_HOOK
+#define ENABLE_MOUSE_HOOK
+
 
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
 #define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
-//#define FLOAT_WIN_NAME L"floating_window"
 #define FLOAT_WIN_NAME L"我的笔记本"
 
 DWORD buffSize = 1024;
 TCHAR ProcessName[1024];
 POINT GlobalP;
+POINT mouseDownPos, mouseUpPos, mouseDblClickPos;
+#define NUM_KEYS 4
 
-LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
+INPUT* Generate_Ctrl_C()
+{
+    INPUT* input = new INPUT[NUM_KEYS];
+	if (input == NULL)
+		return NULL;
+    for (int i = 0; i < 4; i++)
+    {
+        input[i].type = INPUT_KEYBOARD;
+        input[i].ki.wScan = 0;
+        input[i].ki.time = 0;
+        input[i].ki.dwExtraInfo = 0;
+    }
+
+    // Press the "Ctrl" key
+    input[0].ki.wVk = VK_CONTROL;
+    input[0].ki.dwFlags = 0;
+
+    // Press the "C" key
+    input[1].ki.wVk = 'C';
+    input[1].ki.dwFlags = 0;
+
+    // Release the "C" key
+    input[2].ki.wVk = 'C';
+    input[2].ki.dwFlags = KEYEVENTF_KEYUP;
+
+    // Release the "Ctrl" key
+    input[3].ki.wVk = VK_CONTROL;
+    input[3].ki.dwFlags = KEYEVENTF_KEYUP;
+	return input;
+}
+
+LRESULT CALLBACK keyboarMsgProc(int code, WPARAM wParam, LPARAM lParam)
 {
 	if (code >= 0)
 	{
@@ -28,35 +66,11 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 		if (altDownFlag && vkCode == 'S')
 		{
 			GetCursorPos(&GlobalP);
-			//HWND hwnd = WindowFromPoint(p);
-			//SendMessage(hwnd, WM_COPY, 0, 0);		暂时无法从消息机制通知复制
-
 			Sleep(100);
-			INPUT* input = new INPUT[4];
-			for (int i = 0; i < 4; i++)
-			{
-				input[i].type = INPUT_KEYBOARD;
-				input[i].ki.wScan = 0;
-				input[i].ki.time = 0;
-				input[i].ki.dwExtraInfo = 0;
-			}
-
-			// Press the "Ctrl" key
-			input[0].ki.wVk = VK_CONTROL;
-			input[0].ki.dwFlags = 0;
-
-			// Press the "C" key
-			input[1].ki.wVk = 'C';
-			input[1].ki.dwFlags = 0;
-
-			// Release the "C" key
-			input[2].ki.wVk = 'C';
-			input[2].ki.dwFlags = KEYEVENTF_KEYUP;
-
-			// Release the "Ctrl" key
-			input[3].ki.wVk = VK_CONTROL;
-			input[3].ki.dwFlags = KEYEVENTF_KEYUP;
-			SendInput(4, input, sizeof(INPUT));
+			INPUT* input = Generate_Ctrl_C();
+            if (input == NULL)
+                return 0;
+            SendInput(NUM_KEYS, input, sizeof(INPUT));
 
 			HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
 			if (hwnd)
@@ -68,6 +82,7 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 				//TODO: 其实也可以把剪贴板之前的数据发过去
 				LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
 				DWORD lastErr = GetLastError();
+				return 0;
 			}
 			if (false)
 			{
@@ -87,17 +102,87 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 			}
 		}
 	}
-	return CallNextHookEx(g_Hook, code, wParam, lParam);
+	return CallNextHookEx(g_KeyboardHook, code, wParam, lParam);
+}
+
+LRESULT CALLBACK MouseMsgProc(int code, WPARAM wParam, LPARAM lParam)
+{
+	if (code < 0)
+		return CallNextHookEx(g_msgHook, code, wParam, lParam);
+
+	PMOUSEHOOKSTRUCT pHookStruct = (PMOUSEHOOKSTRUCT)lParam;
+	switch (wParam)
+	{
+		case WM_LBUTTONDOWN:
+		{
+			mouseDownPos = pHookStruct->pt;
+			break;
+		}
+		case WM_LBUTTONUP:
+		{
+			mouseUpPos = pHookStruct->pt;
+			int dist = std::pow(mouseUpPos.x - mouseDownPos.x, 2) + std::pow(mouseUpPos.y - mouseDownPos.y, 2);
+			if (dist > 16)
+			{
+                INPUT* input = Generate_Ctrl_C();
+				if (input == NULL)
+					break;
+                SendInput(NUM_KEYS, input, sizeof(INPUT));
+                HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
+                if (hwnd)
+                {
+                    COPYDATASTRUCT data;
+                    data.dwData = 0;
+                    data.cbData = sizeof(mouseUpPos);
+                    data.lpData = &mouseUpPos;
+                    LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
+                    return 0;
+                }
+			}
+			break;
+		}
+		case WM_LBUTTONDBLCLK:
+		{
+			mouseDblClickPos = pHookStruct->pt;
+            INPUT* input = Generate_Ctrl_C();
+            if (input == NULL)
+                break;
+            SendInput(NUM_KEYS, input, sizeof(INPUT));
+            HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
+            if (hwnd)
+            {
+                COPYDATASTRUCT data;
+                data.dwData = 0;
+                data.cbData = sizeof(mouseUpPos);
+                data.lpData = &mouseUpPos;
+                LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
+                return 0;
+            }
+			break;
+		}
+	}
+
+	return CallNextHookEx(g_msgHook, code, wParam, lParam);
 }
 
 void installHook()
 {
-	g_Hook = SetWindowsHookEx(WH_KEYBOARD, GetMsgProc, g_hInstance, 0);
+#ifdef ENABLE_KEYBOARD_HOOK
+	g_KeyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboarMsgProc, g_hInstance, 0);
+#endif
+#ifdef ENABLE_MOUSE_HOOK
+	g_msgHook = SetWindowsHookEx(WH_MOUSE, MouseMsgProc, g_hInstance, 0);
+#endif
 }
 
 void uninstallHook()
 {
-	UnhookWindowsHookEx(g_Hook);
+#ifdef ENABLE_KEYBOARD_HOOK
+	UnhookWindowsHookEx(g_KeyboardHook);
+#endif
+#ifdef ENABLE_MOUSE_HOOK
+	UnhookWindowsHookEx(g_msgHook);
+#endif
 }
 
 BOOL hook_by_code(LPCSTR szDllName, LPCSTR szFuncName, PROC pfnNew, PBYTE pOrgBytes)

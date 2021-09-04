@@ -9,3 +9,4 @@
 #include <memory.h>
 #include <tchar.h>
 #include <tlhelp32.h>
+#include <iostream>
