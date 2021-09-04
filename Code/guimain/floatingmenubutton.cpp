@@ -7,7 +7,7 @@ FloatingMenuButton::FloatingMenuButton(QWidget* parent)
 	: QWidget(parent)
 {
 	setWindowTitle("floating_window");
-	setWindowFlags(Qt::SubWindow | Qt::FramelessWindowHint);
+	setWindowFlags(Qt::SubWindow | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 	m_menubutton = new ToolButton(this);
 	m_menubutton->setIcon(QIcon(":/icons/24x24/floatwin.png"));
 	m_menubutton->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));

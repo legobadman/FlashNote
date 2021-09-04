@@ -11,7 +11,8 @@ HANDLE hEvent = INVALID_HANDLE_VALUE;
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
 #define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
-#define FLOAT_WIN_NAME L"floating_window"
+//#define FLOAT_WIN_NAME L"floating_window"
+#define FLOAT_WIN_NAME L"我的笔记本"
 
 DWORD buffSize = 1024;
 TCHAR ProcessName[1024];
@@ -58,7 +59,7 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 			SendInput(4, input, sizeof(INPUT));
 
 			HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
-			if (false && hwnd)
+			if (hwnd)
 			{
 				COPYDATASTRUCT data;
 				data.dwData = 0;
@@ -68,7 +69,7 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
 				LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
 				DWORD lastErr = GetLastError();
 			}
-			if (true)
+			if (false)
 			{
 				if (hFileMapT == INVALID_HANDLE_VALUE)
 					hFileMapT = OpenFileMapping(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, TEXT("FlashMousePosition"));
@@ -79,7 +80,7 @@ LRESULT CALLBACK GetMsgProc(int code, WPARAM wParam, LPARAM lParam)
                     PVOID pView = MapViewOfFile(hFileMapT, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
 					if (pView != NULL) {
 						memcpy(pView, &GlobalP, sizeof(GlobalP));
-						//SetEvent(hEvent);
+						SetEvent(hEvent);
 						UnmapViewOfFile(pView);
 					}
 				}

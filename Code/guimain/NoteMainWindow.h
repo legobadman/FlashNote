@@ -7,6 +7,7 @@ namespace Ui
 }
 
 #include "LeftSideItemDelegate.h"
+#include "floatingmenubutton.h"
 
 class NoteMainWindow : public QMainWindow
 {
@@ -24,6 +25,7 @@ public slots:
 
 protected:
 	void closeEvent(QCloseEvent* event) override;
+	bool nativeEvent(const QByteArray& eventType, void* message, long* result) override;
 
 private:
 	QString getActiveBookId();
@@ -31,6 +33,7 @@ private:
 
 private:
 	Ui::NoteMainWindow* m_ui;
+	FloatingMenuButton* m_pMenuButton;
 };
 
 #endif

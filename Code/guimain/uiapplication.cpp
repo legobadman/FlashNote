@@ -95,12 +95,7 @@ void UiApplication::showFloatingWin()
 {
 	//读取共享文件上的值
 #ifdef Q_OS_WIN
-	if (m_hFileMapT != INVALID_HANDLE_VALUE)
-	{
-        PVOID pView = MapViewOfFile(m_hFileMapT, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
-        POINT p = *(POINT*)pView;
-        m_pMenuButton->show();
-	}
+    m_pMenuButton->show();
 #endif
 }
 

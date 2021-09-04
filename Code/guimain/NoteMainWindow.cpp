@@ -10,10 +10,12 @@
 #include "newnotewindow.h"
 #include "addbookdlg.h"
 #include "noteseditview.h"
+#include "floatingmenubutton.h"
 
 
 NoteMainWindow::NoteMainWindow(QWidget* parent)
 	: QMainWindow(parent, Qt::Window)
+	, m_pMenuButton(NULL)
 {
 	init();
 	//TODO: 本地注册表缓存bookindex。
@@ -38,6 +40,8 @@ void NoteMainWindow::init()
 		this, SLOT(onLeftTreeClicked(const QModelIndex&)));
 	connect(m_ui->listpane, SIGNAL(newnote(NOTE_TYPE)), this, SLOT(onNewNote(NOTE_TYPE)));
 	connect(m_ui->listpane, SIGNAL(addnotebook()), this, SLOT(onAddNotebook()));
+
+	m_pMenuButton = new FloatingMenuButton(NULL);
 }
 
 void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
@@ -195,4 +199,21 @@ void NoteMainWindow::closeEvent(QCloseEvent* event)
 {
 	event->ignore();
 	hide();
+}
+
+bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+	if (message)
+	{
+		MSG* msg = reinterpret_cast<MSG*>(message);
+		if (msg->message == WM_COPYDATA)
+		{
+			COPYDATASTRUCT* data = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
+			POINT* pGloal = reinterpret_cast<POINT*>(data->lpData);
+			//取出剪贴板数据
+			m_pMenuButton->setGeometry(QRect(pGloal->x, pGloal->y, 24, 24));
+			m_pMenuButton->show();
+		}
+	}
+	return QWidget::nativeEvent(eventType, message, result);
 }
