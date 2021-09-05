@@ -3,7 +3,7 @@
 
 #include "menubutton.h"
 
-#define DEBUG_EXTRACT_TEXT
+//#define DEBUG_EXTRACT_TEXT
 
 class FloatingMenuButton : public QWidget
 {
@@ -14,9 +14,11 @@ public:
 	void SetExtractText(const QString& text);
 
 protected:
-	bool nativeEvent(const QByteArray& eventType, void* message, long* result) override;
 	void enterEvent(QEvent* event) override;
 	void leaveEvent(QEvent* event) override;
+
+private slots:
+	void onBtnClicked();
 
 private:
 	QString m_text;

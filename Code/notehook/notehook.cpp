@@ -13,11 +13,9 @@ HANDLE hFileMapT = INVALID_HANDLE_VALUE;
 HANDLE hEvent = INVALID_HANDLE_VALUE;
 char* p = NULL;
 
-
 //#define ENABLE_KEYBOARD_HOOK
 #define ENABLE_MOUSE_HOOK
 
-#define MAX_EXTRACT_LENGTH 1024
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
 #define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
@@ -29,12 +27,6 @@ POINT GlobalP;
 POINT mouseDownPos, mouseUpPos, mouseDblClickPos;
 bool bSendedCp = false;
 #define NUM_KEYS 4
-
-struct EXTRACT_INFO
-{
-	WCHAR text[MAX_EXTRACT_LENGTH];
-	POINT p;
-};
 
 
 INPUT* Generate_Ctrl_C()
@@ -115,34 +107,36 @@ LRESULT CALLBACK MouseMsgProc(int code, WPARAM wParam, LPARAM lParam)
 			if (bSendedCp)
 			{
 				bSendedCp = false;
-                if (!OpenClipboard(NULL))
-                    break;
+				HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
+				if (!hwnd)
+					break;
 
-                HANDLE hData = GetClipboardData(CF_UNICODETEXT);
-                if (hData == NULL)
-                    break;
-                WCHAR* pszText = static_cast<WCHAR*>(GlobalLock(hData));
-                if (pszText == nullptr)
-                    break;
-				int len = wcslen(pszText);
-                GlobalUnlock(hData);
-                CloseClipboard();
+				EXTRACT_INFO info;
+				int len = 0;
+				if (OpenClipboard(NULL))
+				{
+                    HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+                    if (hData != NULL)
+                    {
+                        WCHAR* pszText = static_cast<WCHAR*>(GlobalLock(hData));
+                        if (pszText)
+                        {
+                            len = wcslen(pszText);
+							wcscpy(info.text, pszText);
+                        }
+                        GlobalUnlock(hData);
+                    }
+				}
+				info.text[len] = '\0';
+				info.p = mouseUpPos;
+				EmptyClipboard();
+				CloseClipboard();
 
-                HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
-                if (hwnd && len > 0)
-                {
-					EXTRACT_INFO info;
-					info.p = mouseDownPos;
-					wcscpy(info.text, pszText);
-					info.text[len] = '\0';
-
-                    COPYDATASTRUCT data;
-                    data.dwData = 0;
-                    data.cbData = sizeof(EXTRACT_INFO);
-                    data.lpData = &info;
-                    LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
-                    return 0;
-                }
+                COPYDATASTRUCT data;
+                data.dwData = 0;
+                data.cbData = sizeof(EXTRACT_INFO);
+                data.lpData = &info;
+                SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
 			}
 			break;
 		}
@@ -153,17 +147,12 @@ LRESULT CALLBACK MouseMsgProc(int code, WPARAM wParam, LPARAM lParam)
 		}
 		case WM_LBUTTONUP:
 		{
-			//if (p == NULL || _stricmp(p + 1, WHITE_LIST) != 0) break;
 			mouseUpPos = pHookStruct->pt;
-			int dist = std::pow(mouseUpPos.x - mouseDownPos.x, 2) + std::pow(mouseUpPos.y - mouseDownPos.y, 2);
-			if (dist > 16)
-			{
-                INPUT* input = Generate_Ctrl_C();
-				if (input == NULL)
-					break;
-                SendInput(NUM_KEYS, input, sizeof(INPUT));
-				bSendedCp = true;
-			}
+            INPUT* input = Generate_Ctrl_C();
+			if (input == NULL)
+				break;
+            SendInput(NUM_KEYS, input, sizeof(INPUT));
+			bSendedCp = true;
 			break;
 		}
 		case WM_LBUTTONDBLCLK:

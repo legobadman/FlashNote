@@ -195,6 +195,11 @@ void DbService::inittrashes(INoteApplication* pApp)
 		QString note_id = query.getStringField("note_id");
 		int trash_time = query.getIntField("trash_time");
 
+		if (note_id.isEmpty())
+		{
+			query.nextRow();
+			continue;
+		}
 		NOTE note = getnote(note_id);
 
 		com_sptr<INote> spNote;

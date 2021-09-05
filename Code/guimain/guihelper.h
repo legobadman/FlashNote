@@ -18,6 +18,7 @@ public:
 	static QString GetNotebookId(INotebook* pNotebook);
 	static void GetNotebookById(const QString& id, INotebook** ppNotebook);
 	static void GetNotebookByNote(INote* pNote, INotebook** ppNotebook);
+	static void GetNotebookByName(const QString& name, INotebook** ppNotebook);
 
 	static QString GetNoteContent(INote* pNote);
 	static QString GetNoteAbbre(INote* pNote);

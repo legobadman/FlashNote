@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "uiapplication.h"
 #include "guihelper.h"
 #include "newnotewindow.h"
@@ -115,8 +115,28 @@ void AppHelper::GetNotebookByNote(INote* pNote, INotebook** ppNotebook)
 	HRESULT hr = spNotebooks->Item(bookId, ppNotebook);
 	if (FAILED(hr))
 	{
-		//��һ��notebook
 		hr = spNotebooks->Item(0, ppNotebook);
+	}
+}
+
+void AppHelper::GetNotebookByName(const QString& name, INotebook** ppNotebook)
+{
+    com_sptr<INotebooks> spNotebooks;
+    AppHelper::coreApp()->GetNotebooks(&spNotebooks);
+	int nCount = 0;
+	spNotebooks->GetCount(&nCount);
+	for (int i = 0; i < nCount; i++)
+	{
+		com_sptr<INotebook> spNotebook;
+		spNotebooks->Item(i, &spNotebook);
+		wstring bookName;
+		spNotebook->GetName(bookName);
+		if (name.toStdWString() == bookName)
+		{
+			*ppNotebook = spNotebook;
+			(*ppNotebook)->AddRef();
+			return;
+		}
 	}
 }
 

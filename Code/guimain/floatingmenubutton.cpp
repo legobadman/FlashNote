@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "floatingmenubutton.h"
 #include "MyStyle.h"
+#include "guihelper.h"
+#include "dbservice.h"
 
 
 FloatingMenuButton::FloatingMenuButton(QWidget* parent)
@@ -16,10 +18,10 @@ FloatingMenuButton::FloatingMenuButton(QWidget* parent)
 	setLayout(pLayout);
 #else
     m_menubutton = new ToolButton(this);
-    m_menubutton->setIcon(QIcon(":/icons/24x24/floatwin.png"));
-    m_menubutton->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
-    m_menubutton->setFixedSize(MyStyle::dpiScaledSize(QSize(124, 24)));
-    connect(m_menubutton, SIGNAL(clicked()), this, SLOT(hide()));
+    m_menubutton->setIcon(QIcon(":/icons/32x32/floatwin32.png"));
+    m_menubutton->setIconSize(MyStyle::dpiScaledSize(QSize(32, 32)));
+    m_menubutton->setFixedSize(MyStyle::dpiScaledSize(QSize(32, 32)));
+    connect(m_menubutton, SIGNAL(clicked()), this, SLOT(onBtnClicked()));
 #endif
 }
 
@@ -39,6 +41,22 @@ void FloatingMenuButton::SetExtractText(const QString& text)
 #endif
 }
 
+void FloatingMenuButton::onBtnClicked()
+{
+    hide();
+	com_sptr<INotebook> spNotebook;
+	AppHelper::GetNotebookByName(u8"临时笔记本", &spNotebook);
+	if (spNotebook)
+	{
+		com_sptr<INote> spNote;
+		HRESULT hr = CreateNote(NORMAL_NOTE, &spNote);
+		spNote->SetTitle(m_text.toStdWString());
+		//TODO: 要转为html作为正文。
+		spNotebook->AddNote(spNote);
+		//bool ret = DbService::GetInstance().SynchronizeNotebook(spNotebook);
+	}
+}
+
 void FloatingMenuButton::enterEvent(QEvent* event)
 {
 }
@@ -46,21 +64,4 @@ void FloatingMenuButton::enterEvent(QEvent* event)
 void FloatingMenuButton::leaveEvent(QEvent* event)
 {
 
-}
-
-bool FloatingMenuButton::nativeEvent(const QByteArray& eventType, void* message, long* result)
-{
-	if (message)
-	{
-		MSG* msg = reinterpret_cast<MSG*>(message);
-		if (msg->message == WM_COPYDATA)
-		{
-			COPYDATASTRUCT* data = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
-			POINT* pGloal = reinterpret_cast<POINT*>(data->lpData);
-			//取出剪贴板数据
-			this->setGeometry(QRect(pGloal->x, pGloal->y, 24, 24));
-			this->show();
-		}
-	}
-	return QWidget::nativeEvent(eventType, message, result);
 }

@@ -11,6 +11,7 @@
 #include "addbookdlg.h"
 #include "noteseditview.h"
 #include "floatingmenubutton.h"
+#include "notehook.h"
 
 
 NoteMainWindow::NoteMainWindow(QWidget* parent)
@@ -207,14 +208,6 @@ void NoteMainWindow::closeEvent(QCloseEvent* event)
 	hide();
 }
 
-#define MAX_EXTRACT_LENGTH 1024
-
-struct EXTRACT_INFO
-{
-    WCHAR text[MAX_EXTRACT_LENGTH];
-    POINT p;
-};
-
 bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
 {
 	if (message)
@@ -224,9 +217,17 @@ bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, lon
 		{
 			COPYDATASTRUCT* data = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
 			EXTRACT_INFO info = *reinterpret_cast<EXTRACT_INFO*>(data->lpData);
-			m_pMenuButton->SetExtractText(QString::fromStdWString(info.text));
-            //m_pMenuButton->setGeometry(QRect(pGloal->x + 20, pGloal->y + 10, 124, 32));
-            m_pMenuButton->show();
+			QString extractText = QString::fromStdWString(info.text);
+			m_pMenuButton->SetExtractText(extractText);
+			if (extractText.isEmpty())
+			{
+				m_pMenuButton->hide();
+			}
+			else
+			{
+				m_pMenuButton->setGeometry(QRect(info.p.x + 20, info.p.y + 20, 32, 32));
+				m_pMenuButton->show();
+			}
 		}
 	}
 	return QWidget::nativeEvent(eventType, message, result);

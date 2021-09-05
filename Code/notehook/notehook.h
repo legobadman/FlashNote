@@ -6,4 +6,11 @@ extern "C" {
 	__declspec(dllexport) void uninstallHook();
 }
 
+#define MAX_EXTRACT_LENGTH 4096
+struct EXTRACT_INFO
+{
+    WCHAR text[MAX_EXTRACT_LENGTH + 1];
+    POINT p;
+};
+
 #endif
