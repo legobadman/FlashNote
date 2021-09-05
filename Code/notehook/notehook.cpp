@@ -1,5 +1,8 @@
 #include "framework.h"
 #include "notehook.h"
+#include <uiautomation.h>
+#include <codecvt>
+#include <string>
 
 typedef unsigned char byte;
 
@@ -8,12 +11,13 @@ HHOOK g_KeyboardHook = NULL;
 HHOOK g_msgHook = NULL;
 HANDLE hFileMapT = INVALID_HANDLE_VALUE;
 HANDLE hEvent = INVALID_HANDLE_VALUE;
+char* p = NULL;
 
 
 //#define ENABLE_KEYBOARD_HOOK
 #define ENABLE_MOUSE_HOOK
 
-
+#define MAX_EXTRACT_LENGTH 1024
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
 #define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
@@ -23,7 +27,15 @@ DWORD buffSize = 1024;
 TCHAR ProcessName[1024];
 POINT GlobalP;
 POINT mouseDownPos, mouseUpPos, mouseDblClickPos;
+bool bSendedCp = false;
 #define NUM_KEYS 4
+
+struct EXTRACT_INFO
+{
+	WCHAR text[MAX_EXTRACT_LENGTH];
+	POINT p;
+};
+
 
 INPUT* Generate_Ctrl_C()
 {
@@ -56,56 +68,114 @@ INPUT* Generate_Ctrl_C()
 	return input;
 }
 
-LRESULT CALLBACK keyboarMsgProc(int code, WPARAM wParam, LPARAM lParam)
+HRESULT FindTextPatternElement(IUIAutomation* automation, _In_ IUIAutomationElement* element, _Outptr_result_maybenull_ IUIAutomationElement** textElement)
 {
-	if (code >= 0)
-	{
-		//TODO：组合键更合适
-		WORD vkCode = LOWORD(wParam);
-		BOOL altDownFlag = (HIWORD(lParam) & KF_ALTDOWN);
-		if (altDownFlag && vkCode == 'S')
-		{
-			GetCursorPos(&GlobalP);
-			Sleep(100);
-			INPUT* input = Generate_Ctrl_C();
-            if (input == NULL)
-                return 0;
-            SendInput(NUM_KEYS, input, sizeof(INPUT));
+    HRESULT hr = S_OK;
 
-			HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
-			if (hwnd)
-			{
-				COPYDATASTRUCT data;
-				data.dwData = 0;
-				data.cbData = sizeof(GlobalP);
-				data.lpData = &GlobalP;
-				//TODO: 其实也可以把剪贴板之前的数据发过去
-				LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
-				DWORD lastErr = GetLastError();
-				return 0;
-			}
-			if (false)
-			{
-				if (hFileMapT == INVALID_HANDLE_VALUE)
-					hFileMapT = OpenFileMapping(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, TEXT("FlashMousePosition"));
-				if (hEvent == INVALID_HANDLE_VALUE)
-					hEvent = OpenEventW(SYNCHRONIZE, FALSE, L"FlashMouseEvnet");
-				if (hFileMapT != INVALID_HANDLE_VALUE && hEvent != INVALID_HANDLE_VALUE)
-				{
-                    PVOID pView = MapViewOfFile(hFileMapT, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
-					if (pView != NULL) {
-						memcpy(pView, &GlobalP, sizeof(GlobalP));
-						SetEvent(hEvent);
-						UnmapViewOfFile(pView);
-					}
-				}
-			}
-		}
-	}
-	return CallNextHookEx(g_KeyboardHook, code, wParam, lParam);
+    // Create a condition that will be true for anything that supports Text Pattern 2
+    IUIAutomationCondition* textPatternCondition;
+    VARIANT trueVar;
+    trueVar.vt = VT_BOOL;
+    trueVar.boolVal = VARIANT_TRUE;
+    hr = automation->CreatePropertyCondition(UIA_IsTextPattern2AvailablePropertyId, trueVar, &textPatternCondition);
+
+    if (FAILED(hr))
+    {
+        wprintf(L"Failed to CreatePropertyCondition, HR: 0x%08x\n", hr);
+    }
+    else
+    {
+        // Actually do the search
+        hr = element->FindFirst(TreeScope_Subtree, textPatternCondition, textElement);
+        if (FAILED(hr))
+        {
+            wprintf(L"FindFirst failed, HR: 0x%08x\n", hr);
+        }
+        else if (*textElement == NULL)
+        {
+            wprintf(L"No element supporting TextPattern2 found.\n");
+            hr = E_FAIL;
+        }
+        textPatternCondition->Release();
+    }
+
+    return hr;
 }
 
 LRESULT CALLBACK MouseMsgProc(int code, WPARAM wParam, LPARAM lParam)
+{
+	if (code < 0)
+		return CallNextHookEx(g_msgHook, code, wParam, lParam);
+
+	PMOUSEHOOKSTRUCT pHookStruct = (PMOUSEHOOKSTRUCT)lParam;
+	switch (wParam)
+	{
+		case WM_MOUSEMOVE:
+		{
+			if (bSendedCp)
+			{
+				bSendedCp = false;
+                if (!OpenClipboard(NULL))
+                    break;
+
+                HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+                if (hData == NULL)
+                    break;
+                WCHAR* pszText = static_cast<WCHAR*>(GlobalLock(hData));
+                if (pszText == nullptr)
+                    break;
+				int len = wcslen(pszText);
+                GlobalUnlock(hData);
+                CloseClipboard();
+
+                HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
+                if (hwnd && len > 0)
+                {
+					EXTRACT_INFO info;
+					info.p = mouseDownPos;
+					wcscpy(info.text, pszText);
+					info.text[len] = '\0';
+
+                    COPYDATASTRUCT data;
+                    data.dwData = 0;
+                    data.cbData = sizeof(EXTRACT_INFO);
+                    data.lpData = &info;
+                    LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
+                    return 0;
+                }
+			}
+			break;
+		}
+		case WM_LBUTTONDOWN:
+		{
+			mouseDownPos = pHookStruct->pt;
+			break;
+		}
+		case WM_LBUTTONUP:
+		{
+			//if (p == NULL || _stricmp(p + 1, WHITE_LIST) != 0) break;
+			mouseUpPos = pHookStruct->pt;
+			int dist = std::pow(mouseUpPos.x - mouseDownPos.x, 2) + std::pow(mouseUpPos.y - mouseDownPos.y, 2);
+			if (dist > 16)
+			{
+                INPUT* input = Generate_Ctrl_C();
+				if (input == NULL)
+					break;
+                SendInput(NUM_KEYS, input, sizeof(INPUT));
+				bSendedCp = true;
+			}
+			break;
+		}
+		case WM_LBUTTONDBLCLK:
+		{
+			break;
+		}
+	}
+
+	return CallNextHookEx(g_msgHook, code, wParam, lParam);
+}
+
+LRESULT CALLBACK MouseMsgProc2(int code, WPARAM wParam, LPARAM lParam)
 {
 	if (code < 0)
 		return CallNextHookEx(g_msgHook, code, wParam, lParam);
@@ -124,44 +194,72 @@ LRESULT CALLBACK MouseMsgProc(int code, WPARAM wParam, LPARAM lParam)
 			int dist = std::pow(mouseUpPos.x - mouseDownPos.x, 2) + std::pow(mouseUpPos.y - mouseDownPos.y, 2);
 			if (dist > 16)
 			{
-                INPUT* input = Generate_Ctrl_C();
-				if (input == NULL)
+				HRESULT hr = CoInitialize(NULL);
+				if (FAILED(hr))
 					break;
-                SendInput(NUM_KEYS, input, sizeof(INPUT));
-                HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
-                if (hwnd)
-                {
-                    COPYDATASTRUCT data;
-                    data.dwData = 0;
-                    data.cbData = sizeof(mouseUpPos);
-                    data.lpData = &mouseUpPos;
-                    LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
-                    return 0;
-                }
+
+                IUIAutomation* _automation = NULL;
+                hr = CoCreateInstance(__uuidof(CUIAutomation8), NULL,
+                    CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&_automation));
+				if (FAILED(hr) || _automation == NULL)
+					break;
+
+				IUIAutomationElement* element = NULL;
+				hr = _automation->ElementFromPoint(mouseUpPos, &element);
+				if (SUCCEEDED(hr) && element != NULL)
+				{
+                    IUIAutomationElement* textElement = NULL;
+                    hr = FindTextPatternElement(_automation, element, &textElement);
+                    if (SUCCEEDED(hr) && textElement != NULL)
+                    {
+						IUIAutomationTextPattern2* textPattern = NULL;
+						hr = textElement->GetCurrentPatternAs(UIA_TextPattern2Id, IID_PPV_ARGS(&textPattern));
+						if (SUCCEEDED(hr) && textPattern)
+						{
+							IUIAutomationTextRangeArray* uiaRangeArray = NULL;
+							hr = textPattern->GetSelection(&uiaRangeArray);
+							if (FAILED(hr) || uiaRangeArray == NULL)
+								break;
+
+                            int length = -1;
+                            hr = uiaRangeArray->get_Length(&length);
+                            if (!SUCCEEDED(hr) || length <= 0)
+								break;
+
+							IUIAutomationTextRange* uiaRange = NULL;
+							hr = uiaRangeArray->GetElement(0, &uiaRange);
+							if (!SUCCEEDED(hr) || uiaRange == NULL)
+								break;
+							uiaRangeArray->Release();
+
+                            BSTR text;
+                            HRESULT hr = uiaRange->GetText(10000, &text);
+							if (FAILED(hr))
+								break;
+
+                            HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
+                            if (hwnd)
+                            {
+								std::wstring ws(text, SysStringLen(text));
+
+                                COPYDATASTRUCT data;
+                                data.dwData = 0;
+                                data.cbData = sizeof(std::wstring);
+                                data.lpData = &ws;
+
+                                LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
+                                return 0;
+                            }
+						}
+                    }
+					element->Release();
+				}
+				_automation->Release();
+				CoUninitialize();
 			}
 			break;
 		}
-		case WM_LBUTTONDBLCLK:
-		{
-			mouseDblClickPos = pHookStruct->pt;
-            INPUT* input = Generate_Ctrl_C();
-            if (input == NULL)
-                break;
-            SendInput(NUM_KEYS, input, sizeof(INPUT));
-            HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
-            if (hwnd)
-            {
-                COPYDATASTRUCT data;
-                data.dwData = 0;
-                data.cbData = sizeof(mouseUpPos);
-                data.lpData = &mouseUpPos;
-                LRESULT ret = SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)(LPVOID)&data);
-                return 0;
-            }
-			break;
-		}
 	}
-
 	return CallNextHookEx(g_msgHook, code, wParam, lParam);
 }
 
@@ -182,6 +280,7 @@ void uninstallHook()
 #endif
 #ifdef ENABLE_MOUSE_HOOK
 	UnhookWindowsHookEx(g_msgHook);
+
 #endif
 }
 
@@ -247,22 +346,16 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 )
 {
 	GetModuleFileName(NULL, ProcessName, buffSize);
+	//p = strrchr(ProcessName, '\\');
 
 	g_hInstance = hModule;
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-
+		break;
 	case DLL_THREAD_ATTACH:
 	case DLL_THREAD_DETACH:
 	case DLL_PROCESS_DETACH:
-		{
-			if (hFileMapT != INVALID_HANDLE_VALUE)
-			{
-				CloseHandle(hFileMapT);
-				hFileMapT = INVALID_HANDLE_VALUE;
-			}
-		}
 		break;
 	}
 	return TRUE;

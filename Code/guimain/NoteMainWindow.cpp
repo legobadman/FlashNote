@@ -73,6 +73,12 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 	}
 }
 
+void NoteMainWindow::_temp_hide_floatWin()
+{
+	if (m_pMenuButton)
+		m_pMenuButton->hide();
+}
+
 void NoteMainWindow::onNewNote(NOTE_TYPE noteType)
 {
 	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, noteType);
@@ -201,6 +207,14 @@ void NoteMainWindow::closeEvent(QCloseEvent* event)
 	hide();
 }
 
+#define MAX_EXTRACT_LENGTH 1024
+
+struct EXTRACT_INFO
+{
+    WCHAR text[MAX_EXTRACT_LENGTH];
+    POINT p;
+};
+
 bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
 {
 	if (message)
@@ -209,10 +223,10 @@ bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, lon
 		if (msg->message == WM_COPYDATA)
 		{
 			COPYDATASTRUCT* data = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
-			POINT* pGloal = reinterpret_cast<POINT*>(data->lpData);
-			//取出剪贴板数据
-			m_pMenuButton->setGeometry(QRect(pGloal->x + 20, pGloal->y + 10, 24, 24));
-			m_pMenuButton->show();
+			EXTRACT_INFO info = *reinterpret_cast<EXTRACT_INFO*>(data->lpData);
+			m_pMenuButton->SetExtractText(QString::fromStdWString(info.text));
+            //m_pMenuButton->setGeometry(QRect(pGloal->x + 20, pGloal->y + 10, 124, 32));
+            m_pMenuButton->show();
 		}
 	}
 	return QWidget::nativeEvent(eventType, message, result);

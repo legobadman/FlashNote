@@ -10,3 +10,4 @@
 #include <tchar.h>
 #include <tlhelp32.h>
 #include <iostream>
+#include <UIAnimation.h>

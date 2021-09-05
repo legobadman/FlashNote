@@ -22,6 +22,7 @@ public slots:
 	void onNewNote(NOTE_TYPE);
 	void onAddNotebook();
 	void initNotesView(int idxNotebook, int idxNote);
+	void _temp_hide_floatWin();
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

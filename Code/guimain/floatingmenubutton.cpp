@@ -8,14 +8,42 @@ FloatingMenuButton::FloatingMenuButton(QWidget* parent)
 {
 	setWindowTitle("floating_window");
 	setWindowFlags(Qt::SubWindow | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-	m_menubutton = new ToolButton(this);
-	m_menubutton->setIcon(QIcon(":/icons/24x24/floatwin.png"));
-	m_menubutton->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
-	m_menubutton->setFixedSize(MyStyle::dpiScaledSize(QSize(24, 24)));
-	connect(m_menubutton, SIGNAL(clicked()), this, SLOT(hide()));
+#ifdef DEBUG_EXTRACT_TEXT
+	m_pushbutton = new QPushButton(this);
+	m_pushbutton->setText("init");
+	QHBoxLayout* pLayout = new QHBoxLayout;
+	pLayout->addWidget(m_pushbutton);
+	setLayout(pLayout);
+#else
+    m_menubutton = new ToolButton(this);
+    m_menubutton->setIcon(QIcon(":/icons/24x24/floatwin.png"));
+    m_menubutton->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
+    m_menubutton->setFixedSize(MyStyle::dpiScaledSize(QSize(124, 24)));
+    connect(m_menubutton, SIGNAL(clicked()), this, SLOT(hide()));
+#endif
 }
 
 FloatingMenuButton::~FloatingMenuButton()
+{
+
+}
+
+void FloatingMenuButton::SetExtractText(const QString& text)
+{
+	m_text = text;
+#ifdef DEBUG_EXTRACT_TEXT
+	m_pushbutton->setText(text);
+	update();
+#else
+	m_menubutton->setText(m_text);
+#endif
+}
+
+void FloatingMenuButton::enterEvent(QEvent* event)
+{
+}
+
+void FloatingMenuButton::leaveEvent(QEvent* event)
 {
 
 }

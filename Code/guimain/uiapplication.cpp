@@ -51,6 +51,10 @@ void UiApplication::initUI()
 	shortcut->setShortcut(QKeySequence("Alt+Q"));
 	connect(shortcut, SIGNAL(activated()), this, SLOT(screenshot()));
 
+	QxtGlobalShortcut* selectTray = new QxtGlobalShortcut(this);
+	selectTray->setShortcut(QKeySequence("Alt+S"));
+	connect(selectTray, SIGNAL(activated()), this, SLOT(showFloatingWin()));
+
 	m_pMenuButton = new FloatingMenuButton(NULL);
 }
 
@@ -89,12 +93,16 @@ void UiApplication::installGlobalHook()
 void UiApplication::uninstallGlobalHook()
 {
 	uninstallHook();
+	m_mainWindow->_temp_hide_floatWin();
 }
 
 void UiApplication::showFloatingWin()
 {
 	//读取共享文件上的值
 #ifdef Q_OS_WIN
+	POINT GlobalP;
+	GetCursorPos(&GlobalP);
+	m_pMenuButton->setGeometry(QRect(GlobalP.x + 20, GlobalP.y + 10, 24, 24));
     m_pMenuButton->show();
 #endif
 }
