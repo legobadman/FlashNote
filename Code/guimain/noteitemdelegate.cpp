@@ -90,6 +90,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	com_sptr<INote> spNote = index.data(ItemCoreObjRole).value<com_sptr<INote>>();
 	QString title = AppHelper::GetNoteTitle(spNote);
 	QString content = index.data(ItemNoteShowContent).toString();
+	QString datetime = index.data(ItemNoteShowDataTime).toString();
 
 	//1. draw title
 	{
@@ -119,7 +120,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		int lineWidth = itemRect.width() - text_xoffset * 2;
 
 		textLayout.beginLayout();
-		int line_limit = 3;
+		int line_limit = 2;
 		for (int i = 0; i < line_limit; i++)
 		{
 			QTextLine line = textLayout.createLine();
@@ -134,5 +135,21 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		QPointF topLeft(itemRect.x() + text_xoffset, itemRect.y() + text_yoffset);
 		textLayout.draw(painter, topLeft);
 	}
+
+	//3. draw modify_time
+	{
+        QFont fontDate(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
+        QFontMetrics fontMetrics(fontDate);
+        int fontHeight = fontMetrics.height();
+
+		int text_xoffset = 9, text_yoffset = fontHeight * 4 + 5;
+		QSize sz = MyStyle::dpiScaledSize(QSize(80, fontHeight));
+		QPoint topLeft(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset);
+		QRect dateRect(topLeft, sz);
+        painter->setPen(QColor(21, 152, 255));
+		painter->setFont(fontDate);
+        painter->drawText(dateRect, Qt::TextWordWrap, datetime);
+	}
+
 	painter->restore();
 }
