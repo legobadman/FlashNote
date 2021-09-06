@@ -2,6 +2,7 @@
 #define __BOOK_LIST_VIEW_H__
 
 #include <QMenu>
+#include <QSortFilterProxyModel>
 #include "LeftSideItemDelegate.h"
 #include "noteseditview.h"
 #include "bookviewmodel.h"
@@ -28,16 +29,18 @@ public:
 	~BookListView();
 
 	void init();
-	void resetModel(BookViewModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection);
+	void resetModel(QSortFilterProxyModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection);
 
 signals:
 	void noteitemselected(const QModelIndex&);
+	void searchTriggered(const QString&);
 
 public slots:
 	void onCustomContextMenu(const QPoint& point);
 	void MenuActionSlot(QAction *action);
 	void onRowRemoved(int);
 	void onRowInserted(int);
+	void onSearchTextChanged(const QString&);
 
 private:
 	Ui::BookListView* m_ui;

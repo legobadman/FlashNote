@@ -129,6 +129,7 @@ LRESULT CALLBACK MouseMsgProc(int code, WPARAM wParam, LPARAM lParam)
 				}
 				info.text[len] = '\0';
 				info.p = mouseUpPos;
+				info.dwProcessId = GetCurrentProcessId();
 				EmptyClipboard();
 				CloseClipboard();
 

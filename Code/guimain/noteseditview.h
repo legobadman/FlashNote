@@ -42,6 +42,7 @@ private:
 	QMap<QString, BookViewModel*> m_models;
 	AllNotesModel* m_pAllNotesModel;
 	BookViewModel* m_pTrashModel;
+	QSharedPointer<QSortFilterProxyModel> m_pCurrFilterModel;
 	BookListView* m_pListView;
 	BOOKVIEW_TYPE m_type;
 };

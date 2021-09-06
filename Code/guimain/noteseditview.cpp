@@ -80,7 +80,9 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 			m_pAllNotesModel->initAllNotes();
 			index = m_pAllNotesModel->index(0, 0);
 		}
-		m_pListView->resetModel(m_pAllNotesModel, VIEW_ALLNOTES, NULL);
+		m_pCurrFilterModel.reset(new QSortFilterProxyModel(this));
+		m_pCurrFilterModel->setSourceModel(m_pAllNotesModel);
+		m_pListView->resetModel(m_pCurrFilterModel.get(), VIEW_ALLNOTES, NULL);
 	}
 	else if (VIEW_NOTEBOOK == m_type)
 	{
@@ -101,7 +103,9 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 			pModel = iter.value();
 		}
 		index = pModel->index(0, 0);
-		m_pListView->resetModel(pModel, VIEW_NOTEBOOK, pNoteCollection);
+		m_pCurrFilterModel.reset(new QSortFilterProxyModel(this));
+		m_pCurrFilterModel->setSourceModel(pModel);
+		m_pListView->resetModel(m_pCurrFilterModel.get(), VIEW_NOTEBOOK, pNoteCollection);
 	}
 	else if (VIEW_TRASH == m_type)
 	{
@@ -112,7 +116,9 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 			noteid = getCurrentNoteId(pNoteCollection);
 		}
 		index = m_pTrashModel->index(0, 0);
-		m_pListView->resetModel(m_pTrashModel, VIEW_TRASH, pNoteCollection);
+		m_pCurrFilterModel.reset(new QSortFilterProxyModel(this));
+		m_pCurrFilterModel->setSourceModel(m_pTrashModel);
+		m_pListView->resetModel(m_pCurrFilterModel.get(), VIEW_TRASH, pNoteCollection);
 	}
 	else
 	{

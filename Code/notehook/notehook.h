@@ -11,6 +11,7 @@ struct EXTRACT_INFO
 {
     WCHAR text[MAX_EXTRACT_LENGTH + 1];
     POINT p;
+    DWORD dwProcessId;
 };
 
 #endif

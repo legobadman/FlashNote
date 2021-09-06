@@ -56,6 +56,8 @@ void BookListView::init()
 
 	connect(this, SIGNAL(noteitemselected(const QModelIndex&)), 
 		m_pNotesView, SLOT(onNoteItemSelected(const QModelIndex&)));
+	connect(m_ui->searcheditor, SIGNAL(textChanged(const QString&)),
+		this, SLOT(onSearchTextChanged(const QString&)));
 
 	m_ui->listView->setItemDelegate(new NoteItemDelegate(m_ui->listView));
 }
@@ -179,11 +181,19 @@ void BookListView::onRowRemoved(int row)
 	}
 }
 
-void BookListView::resetModel(BookViewModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
+void BookListView::onSearchTextChanged(const QString&)
+{
+	QString searchContent = m_ui->searcheditor->text();
+	emit searchTriggered(searchContent);
+}
+
+void BookListView::resetModel(QSortFilterProxyModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
 {
 	m_ui->listView->setModel(pModel);
 	connect(pModel, SIGNAL(rowRemoved(int)), this, SLOT(onRowRemoved(int)));
 	connect(pModel, SIGNAL(rowInserted(int)), this, SLOT(onRowInserted(int)));
+	connect(this, SIGNAL(searchTriggered(const QString&)),
+		pModel, SLOT(setFilterWildcard(const QString&)));
 
 	QModelIndex selectedIndex = pModel->index(0, 0);
 	m_ui->listView->setCurrentIndex(selectedIndex);
