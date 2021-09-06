@@ -3,7 +3,7 @@
 
 #include "notetrayicon.h"
 #include "NoteMainWindow.h"
-#include "floatingmenubutton.h"
+#include "globalsearcheditor.h"
 
 class UiApplication : public QApplication
 {
@@ -19,7 +19,7 @@ public slots:
 	void onQuickApp();
 	void onTrigger();
 	void screenshot();
-	void showFloatingWin();
+	void showFloatingSearcher();
 	void hideFloatingWin();
 	void installGlobalHook();
 	void uninstallGlobalHook();
@@ -36,6 +36,7 @@ private:
 	com_sptr<INoteApplication> m_spApp;
 	QSharedPointer<NoteMainWindow> m_mainWindow;
 	FloatingMenuButton* m_pMenuButton;
+	GlobalSearchEditor* m_pSearchEditor;
 #ifdef Q_OS_WIN
 	HANDLE m_hFileMapT;
 	HANDLE m_hNamedEvent;

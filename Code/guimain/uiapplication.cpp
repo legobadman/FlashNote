@@ -7,6 +7,7 @@
 #include "screenshot/screenshotwindow.h"
 #include "shortcut/gui/qxtglobalshortcut.h"
 #include "notehook.h"
+#include "globalsearcheditor.h"
 
 
 UiApplication::UiApplication(int& argc, char** argv)
@@ -15,6 +16,7 @@ UiApplication::UiApplication(int& argc, char** argv)
 	, m_hFileMapT(INVALID_HANDLE_VALUE)
 	, m_hNamedEvent(INVALID_HANDLE_VALUE)
 #endif
+	, m_pSearchEditor(NULL)
 {
 	QApplication::setStyle(new MyStyle);
 	CreateApplication(&m_spApp);
@@ -53,9 +55,7 @@ void UiApplication::initUI()
 
 	QxtGlobalShortcut* selectTray = new QxtGlobalShortcut(this);
 	selectTray->setShortcut(QKeySequence("Alt+S"));
-	connect(selectTray, SIGNAL(activated()), this, SLOT(showFloatingWin()));
-
-	m_pMenuButton = new FloatingMenuButton(NULL);
+	connect(selectTray, SIGNAL(activated()), this, SLOT(showFloatingSearcher()));
 }
 
 void UiApplication::initCoreFromRPC()
@@ -96,20 +96,16 @@ void UiApplication::uninstallGlobalHook()
 	m_mainWindow->_temp_hide_floatWin();
 }
 
-void UiApplication::showFloatingWin()
+void UiApplication::showFloatingSearcher()
 {
 	//读取共享文件上的值
-#ifdef Q_OS_WIN
-	POINT GlobalP;
-	GetCursorPos(&GlobalP);
-	m_pMenuButton->setGeometry(QRect(GlobalP.x + 20, GlobalP.y + 10, 24, 24));
-    m_pMenuButton->show();
-#endif
+	if (m_pSearchEditor == NULL)
+		m_pSearchEditor = new GlobalSearchEditor(NULL);
+	m_pSearchEditor->show();
 }
 
 void UiApplication::hideFloatingWin()
 {
-	m_pMenuButton->hide();
 }
 
 void UiApplication::onQuickApp()

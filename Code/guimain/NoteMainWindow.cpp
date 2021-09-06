@@ -217,10 +217,10 @@ bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, lon
 		{
 			COPYDATASTRUCT* data = reinterpret_cast<COPYDATASTRUCT*>(msg->lParam);
 			EXTRACT_INFO info = *reinterpret_cast<EXTRACT_INFO*>(data->lpData);
-			if (GetCurrentProcessId() == info.dwProcessId)
-			{
-                return QWidget::nativeEvent(eventType, message, result);
-			}
+			//if (GetCurrentProcessId() == info.dwProcessId)
+			//{
+   //             return QWidget::nativeEvent(eventType, message, result);
+			//}
 			QString extractText = QString::fromStdWString(info.text);
 			m_pMenuButton->SetExtractText(extractText);
 			if (extractText.isEmpty())

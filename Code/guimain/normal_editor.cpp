@@ -515,7 +515,7 @@ void NormalEditor::onFloatWinToggled()
 {
 	bool checked = floatWin->isChecked();
 	if (checked)
-		AppHelper::uiApp()->showFloatingWin();
+		AppHelper::uiApp()->showFloatingSearcher();
 	else
 		AppHelper::uiApp()->hideFloatingWin();
 }

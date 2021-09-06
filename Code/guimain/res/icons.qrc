@@ -51,6 +51,7 @@
 	<file>icons/16x16/download.png</file>
 	<file>icons/16x16/finish.png</file>
 	<file>icons/16x16/close.png</file>
+	<file>icons/16x16/white_close.png</file>
 	<file>icons/24x24/sort_options.png</file>
 	<file>icons/24x24/listview.png</file>
 	<file>icons/24x24/floatwin.png</file>

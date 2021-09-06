@@ -91,6 +91,8 @@ add_executable(guimain
     ./guimain.cpp
     ./guihelper.cpp
     ./guihelper.h
+    ./globalsearcheditor.cpp
+    ./globalsearcheditor.h
     ./floatingmenubutton.cpp
     ./floatingmenubutton.h
     ./fontitemdelegate.cpp
