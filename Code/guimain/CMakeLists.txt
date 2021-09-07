@@ -144,6 +144,8 @@ add_executable(guimain
     ./noteseditview.h
     ./notetrayicon.cpp
     ./notetrayicon.h
+    ./notecompleter.cpp
+    ./notecompleter.h
     ./normal_editor.cpp
     ./normal_editor.h
     ./pathservice.cpp

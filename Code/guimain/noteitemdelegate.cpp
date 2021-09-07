@@ -89,7 +89,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	// draw the text
 	com_sptr<INote> spNote = index.data(ItemCoreObjRole).value<com_sptr<INote>>();
 	QString title = AppHelper::GetNoteTitle(spNote);
-	QString content = index.data(ItemNoteShowContent).toString();
+	QString content = index.data(ItemNoteContent).toString();
 	QString datetime = index.data(ItemNoteShowDataTime).toString();
 
 	//1. draw title

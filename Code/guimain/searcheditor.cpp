@@ -7,10 +7,14 @@ SearchEditor::SearchEditor(QWidget* parent)
 	: QLineEdit(parent)
 {
 	setPlaceholderText(u8"搜索笔记");
-	setFixedHeight(MyStyle::dpiScaled(25));
 }
 
 SearchEditor::~SearchEditor()
 {
 
+}
+
+void SearchEditor::paintEvent(QPaintEvent* event)
+{
+	QLineEdit::paintEvent(event);
 }

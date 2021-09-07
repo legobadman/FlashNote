@@ -10,7 +10,8 @@ public:
 	SearchEditor(QWidget* parent = nullptr);
 	~SearchEditor();
 
-private:
+protected:
+	void paintEvent(QPaintEvent* event);
 
 };
 

@@ -56,14 +56,15 @@ void BookViewModel::GetShowContent(
 			const QString& time_format,
 			QString& noteid,
 			QString& title,
-			QString& content,
+			QString& htmlContent,
+			QString& full_plain_text,
 			QString& text_abbre,
 			QString& create_time,
 			QString& modify_time)
 {
 	int nContentLimit = 74;
 	title = AppHelper::GetNoteTitle(pNote);
-	content = AppHelper::GetNoteContent(pNote);
+	htmlContent = AppHelper::GetNoteContent(pNote);
 	QString showContent;
 
 	noteid = AppHelper::GetNoteId(pNote);
@@ -71,8 +72,9 @@ void BookViewModel::GetShowContent(
 	modify_time = AppHelper::GetModifyTime(pNote, time_format);
 
 	QTextDocument html;
-	html.setHtml(content);
-	text_abbre = html.toPlainText().replace('\n', ' ');
+	html.setHtml(htmlContent);
+	full_plain_text = html.toPlainText();
+	text_abbre = full_plain_text.replace('\n', ' ');
 	text_abbre = text_abbre.mid(0, nContentLimit);
 }
 
@@ -87,9 +89,10 @@ void BookViewModel::AddBookItems(INoteCollection* pNoteCollection)
 	{
 		com_sptr<INote> spNote;
 		AppHelper::GetNote(pNoteCollection, j, &spNote);
-		QString id, title, content, textabbre, create_time, modify_time;
-		GetShowContent(spNote, "yyyy/MM/dd", id, title, content, textabbre, create_time, modify_time);
+		QString id, title, html, content, textabbre, create_time, modify_time;
+		GetShowContent(spNote, "yyyy/MM/dd", id, title, html, content, textabbre, create_time, modify_time);
 		NoteItem* pItem = new NoteItem(id, title, textabbre);
+		pItem->m_html = html;
 		pItem->m_content = content;
 		pItem->m_spNote = spNote;
 		pItem->m_create_time = create_time;
@@ -199,12 +202,13 @@ HRESULT BookViewModel::onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 		{
 			if (m_vec[i]->m_id == noteid)
 			{
-				QString noteid, title, content, textAbbre, create_time, modify_time;
-				GetShowContent(pNote, "yyyy/MM/dd", noteid, title, content, textAbbre, create_time, modify_time);
+				QString noteid, title, html, content, textAbbre, create_time, modify_time;
+				GetShowContent(pNote, "yyyy/MM/dd", noteid, title, html, content, textAbbre, create_time, modify_time);
 
 				m_vec[i]->m_id = noteid;
 				m_vec[i]->m_title = title;
 				m_vec[i]->m_textAbbre = textAbbre;
+				m_vec[i]->m_html = html;
 				m_vec[i]->m_content = content;
 				m_vec[i]->m_create_time = create_time;
 				m_vec[i]->m_modify_time = modify_time;
@@ -228,9 +232,10 @@ bool BookViewModel::insertRow(INote* pNote)
 {
 	beginInsertRows(QModelIndex(), m_vec.size(), m_vec.size());
 
-	QString noteid, title, textAbbre, content, create_time, modify_time;
-	GetShowContent(pNote, "yyyy/MM/dd", noteid, title, content, textAbbre, create_time, modify_time);
+	QString noteid, title, textAbbre, html, content, create_time, modify_time;
+	GetShowContent(pNote, "yyyy/MM/dd", noteid, title, html, content, textAbbre, create_time, modify_time);
 	NoteItem* pItem = new NoteItem(noteid, title, textAbbre);
+	pItem->m_html = html;
 	pItem->m_content = content;
 	pItem->m_spNote = pNote;
 	pItem->m_create_time = create_time;
@@ -319,7 +324,12 @@ QVariant BookViewModel::data(const QModelIndex& index, int role) const
 		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
 		return QVariant::fromValue<com_sptr<INote>>(pItem->m_spNote);
 	}
-	else if (role == ItemNoteShowContent)
+	else if (role == ItemNoteTitle)
+	{
+        NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+        return QVariant(pItem->m_title);
+	}
+	else if (role == ItemNoteContent)
 	{
 		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
 		return QVariant(pItem->m_textAbbre);
@@ -345,7 +355,6 @@ bool BookViewModel::setData(const QModelIndex& index, const QVariant& value, int
 	}
 	return true;
 }
-
 
 
 AllNotesModel::AllNotesModel(QObject* parent)
@@ -395,4 +404,38 @@ HRESULT AllNotesModel::onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg)
 		}
 	}
 	return S_OK;
+}
+
+
+QuickSearchModel::QuickSearchModel(QObject* parent)
+	: AllNotesModel(parent)
+{
+	initAllNotes();
+}
+
+QuickSearchModel::~QuickSearchModel()
+{
+}
+
+
+QVariant QuickSearchModel::data(const QModelIndex& index, int role) const
+{
+    QVariant var;
+    if (role == Qt::DisplayRole)
+    {
+        NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+        return QVariant(pItem->m_title);
+    }
+    else if (role == Qt::EditRole)
+    {
+        NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+        return QVariant(pItem->m_title);
+    }
+	else if (role == ItemNoteAllContent)
+	{
+        NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+        QString displayText = pItem->m_title + "\n" + pItem->m_content;
+		return QVariant(displayText);
+	}
+	return AllNotesModel::data(index, role);
 }

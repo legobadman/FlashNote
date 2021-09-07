@@ -29,6 +29,7 @@ void BookListView::init()
 	setAutoFillBackground(true);
 	setPalette(palette);
 
+	m_ui->searcheditor->setTextMargins(3, 3, 3, 3);
 	m_ui->sort->setFixedSize(MyStyle::dpiScaledSize(QSize(24, 24)));
 	m_ui->sort->setIcon(QIcon(":/icons/24x24/sort_options.png"));
 	m_ui->sort->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));

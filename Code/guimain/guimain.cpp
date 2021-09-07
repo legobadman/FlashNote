@@ -13,7 +13,7 @@
 #include "globalsearcheditor.h"
 
 
-//#define TEST_SEARCHER
+#define TEST_SEARCHER
 //#define TEST_RICH_EDITOR
 //#define TEST_WIDGET_WINDOW_PARENT
 //#define TEST_SQLITE
@@ -27,8 +27,7 @@
 int main(int argc, char *argv[])
 {
 #ifdef TEST_SEARCHER
-	QApplication app(argc, argv);
-	QApplication::setStyle(new MyStyle);
+	UiApplication app(argc, argv);
 	GlobalSearchEditor editor(NULL);
 	editor.show();
 	return app.exec();

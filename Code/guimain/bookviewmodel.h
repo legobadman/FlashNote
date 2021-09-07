@@ -18,13 +18,14 @@ public:
 
 	QString GetTitle() { return m_title; }
 	QString GetId() { return m_id; }
-	QString GetContent() { return m_content; }
+	QString GetContent() { return m_html; }
 
 public:
 	QString m_id;
 	QString m_title;
 	QString m_textAbbre;
 	QString m_content;
+	QString m_html;
 	QString m_create_time;
 	QString m_modify_time;
 	com_sptr<INote> m_spNote;
@@ -72,7 +73,14 @@ public:
 	long Release(void) { return 1; }
 
 protected:
-	void GetShowContent(INote* pNote, const QString& time_format, QString& noteid, QString& title, QString& content, QString& text_abbr, QString& create_time, QString& modify_time);
+	void GetShowContent(INote* pNote, const QString& time_format,
+		QString& noteid,
+		QString& title,
+		QString& html,
+		QString& full_plain_text,
+		QString& text_abbr,
+		QString& create_time,
+		QString& modify_time);
 	void AddBookItems(INoteCollection* pNoteCollection);
 	virtual HRESULT onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg);
 	virtual HRESULT onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg);
@@ -97,6 +105,16 @@ public:
 
 protected:
 	HRESULT onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg) override;
+};
+
+class QuickSearchModel : public AllNotesModel
+{
+public:
+	QuickSearchModel(QObject* parent = nullptr);
+    ~QuickSearchModel();
+
+protected:
+	virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 };
 
 #endif
