@@ -22,7 +22,9 @@
 #include <QDialog>
 #include "guihelper.h"
 #include "uiapplication.h"
+#ifdef Q_OS_WIN
 #include "notehook.h"
+#endif
 #include "floatingmenubutton.h"
 
 
@@ -375,7 +377,7 @@ void NormalEditor::checkDocument()
 				}
 			}
 
-			//改掉childFrame的格式
+			//锟侥碉拷childFrame锟侥革拷式
 			//reset
 			if (false)
 			{
@@ -578,7 +580,7 @@ bool NormalEditor::eventFilter(QObject* watched, QEvent* event)
 {
 	if (watched == textEdit && event->type() == QEvent::FocusOut)
 	{
-		//先不排除普通焦点移除的可能
+		//锟饺诧拷锟脚筹拷锟斤拷通锟斤拷锟斤拷锟狡筹拷锟侥匡拷锟斤拷
 		emit textChanged(false);
 	}
 	return QWidget::eventFilter(watched, event);

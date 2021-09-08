@@ -11,8 +11,10 @@
 #include "addbookdlg.h"
 #include "noteseditview.h"
 #include "floatingmenubutton.h"
-#include "notehook.h"
 
+#ifdef Q_OS_WIN
+#include "notehook.h"
+#endif
 
 NoteMainWindow::NoteMainWindow(QWidget* parent)
 	: QMainWindow(parent, Qt::Window)
@@ -210,6 +212,7 @@ void NoteMainWindow::closeEvent(QCloseEvent* event)
 
 bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
 {
+#ifdef Q_OS_WIN
 	if (message)
 	{
 		MSG* msg = reinterpret_cast<MSG*>(message);
@@ -234,5 +237,6 @@ bool NoteMainWindow::nativeEvent(const QByteArray& eventType, void* message, lon
 			}
 		}
 	}
+#endif
 	return QWidget::nativeEvent(eventType, message, result);
 }

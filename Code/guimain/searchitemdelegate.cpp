@@ -4,7 +4,7 @@
 #include "globalsearcheditor.h"
 #include "MyStyle.h"
 #include <QAbstractItemView>
-#include <QScrollbar>
+#include <QScrollBar>
 
 
 SearchItemDelegate::SearchItemDelegate(QObject* parent, GlobalSearchEditor* pEditor)

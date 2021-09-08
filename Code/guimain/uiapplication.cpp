@@ -6,7 +6,9 @@
 #include "floatingmenubutton.h"
 #include "screenshot/screenshotwindow.h"
 #include "shortcut/gui/qxtglobalshortcut.h"
+#ifdef Q_OS_WIN
 #include "notehook.h"
+#endif
 #include "globalsearcheditor.h"
 
 
@@ -22,15 +24,19 @@ UiApplication::UiApplication(int& argc, char** argv)
 	CreateApplication(&m_spApp);
 	initCoreFromRPC();
 	initUI();
+#ifdef Q_OS_WIN
 	initFileMapping();
+#endif
 }
 
 UiApplication::~UiApplication()
 {
+#ifdef Q_OS_WIN
 	if (m_hFileMapT != INVALID_HANDLE_VALUE)
 	{
 		CloseHandle(m_hFileMapT);
 	}
+#endif
 }
 
 INoteApplication* UiApplication::coreApplication()
@@ -66,7 +72,6 @@ void UiApplication::initCoreFromRPC()
 #ifdef Q_OS_WIN
 void UiApplication::initFileMapping()
 {
-	//创建内存映射文件。
 	m_hFileMapT = CreateFileMapping(INVALID_HANDLE_VALUE, NULL,
 		PAGE_READWRITE, 0, 4 * 1024, TEXT("FlashMousePosition"));
 	m_hNamedEvent = CreateEventW(NULL, FALSE, FALSE, L"FlashMouseEvnet");
@@ -85,20 +90,25 @@ void UiApplication::screenshot()
 	pShot->showFullScreen();
 }
 
+
 void UiApplication::installGlobalHook()
 {
+#ifdef Q_OS_WIN
 	installHook();
+#endif
 }
 
 void UiApplication::uninstallGlobalHook()
 {
+#ifdef Q_OS_WIN
 	uninstallHook();
 	m_mainWindow->_temp_hide_floatWin();
+#endif
 }
+
 
 void UiApplication::showFloatingSearcher()
 {
-	//读取共享文件上的值
 	if (m_pSearchEditor == NULL)
 		m_pSearchEditor = new GlobalSearchEditor(NULL);
 	m_pSearchEditor->show();
