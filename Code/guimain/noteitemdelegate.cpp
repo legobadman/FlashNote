@@ -93,7 +93,14 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 
 	//1. draw title
 	{
-		QFont fontTitle(QString::fromUtf16((char16_t*)L"微软雅黑", 8));
+		QFont fontTitle("Microsoft YaHei", 10);
+		if (title.length() > 25)
+		{
+			title = title.mid(0, 25);
+			title.append("...");
+		}
+
+		QTextLayout textLayout(title, fontTitle);
 		QFontMetrics fontMetrics(fontTitle);
 
 		int text_xoffset = 9, text_yoffset = 7;
@@ -101,11 +108,17 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		int h = fontMetrics.height();
 		QRect textRect(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset, w, h);
 
-		painter->setPen(QColor(0, 0, 0));
+		textLayout.beginLayout();
+		QTextLine line = textLayout.createLine();
+		int lineWidth = itemRect.width() - text_xoffset * 2;
+		line.setLineWidth(lineWidth);
+		line.setPosition(QPointF(0, 0));
+		textLayout.endLayout();
 
-		painter->setFont(fontTitle);
-		QPointF pp(textRect.topLeft());
-		painter->drawText(textRect, Qt::TextWordWrap, title);
+        QVector<QTextLayout::FormatRange> selections = _getSearchFormatRange(title);
+
+		painter->setPen(QColor(0, 0, 0));
+        textLayout.draw(painter, textRect.topLeft(), selections);
 	}
 
 	//2. draw content
@@ -132,21 +145,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 
 		painter->setPen(QColor(102, 102, 102));
 
-		QVector<QTextLayout::FormatRange> selections;
-		QString searchText = m_pEditor->text();
-		int idx = 0;
-		while (true)
-		{
-			idx = content.indexOf(searchText, idx, Qt::CaseInsensitive);
-			if (idx == -1)
-				break;
-			QTextLayout::FormatRange frg;
-			frg.start = idx;
-			frg.length = searchText.length();
-			frg.format.setForeground(QColor(255, 0, 0));
-			selections.push_back(frg);
-			idx++;
-		}
+		QVector<QTextLayout::FormatRange> selections = _getSearchFormatRange(content);
 		QPointF topLeft(itemRect.x() + text_xoffset, itemRect.y() + text_yoffset);
 		textLayout.draw(painter, topLeft, selections);
 	}
@@ -167,4 +166,24 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	}
 
 	painter->restore();
+}
+
+QVector<QTextLayout::FormatRange> NoteItemDelegate::_getSearchFormatRange(const QString& content) const
+{
+    QVector<QTextLayout::FormatRange> selections;
+    QString searchText = m_pEditor->text();
+    int idx = 0;
+    while (true)
+    {
+        idx = content.indexOf(searchText, idx, Qt::CaseInsensitive);
+        if (idx == -1)
+            break;
+        QTextLayout::FormatRange frg;
+        frg.start = idx;
+        frg.length = searchText.length();
+        frg.format.setForeground(QColor(255, 0, 0));
+        selections.push_back(frg);
+        idx++;
+    }
+	return selections;
 }

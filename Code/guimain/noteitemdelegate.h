@@ -15,6 +15,8 @@ protected:
 	void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
 
 private:
+	QVector<QTextLayout::FormatRange> _getSearchFormatRange(const QString& content) const;
+
 	QAbstractItemView* m_view;
 	QLineEdit* m_pEditor;
 };

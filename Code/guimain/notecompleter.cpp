@@ -23,5 +23,4 @@ QString NoteCompleter::pathFromIndex(const QModelIndex& index) const
         return QString();
     
     return m_pEditor->text();
-    //return sourceModel->data(index, ItemNoteTitle).toString();
 }

@@ -66,7 +66,6 @@ void SearchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
     painter->setPen(QColor(0, 0, 0));
     painter->setFont(font);
 
-    QString searchText = m_pEditor->getSearchText();
     painter->drawText(titleRect, Qt::TextSingleLine, title);
     painter->restore();
 }

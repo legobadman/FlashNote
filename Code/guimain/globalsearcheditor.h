@@ -22,6 +22,7 @@ protected:
 
 private slots:
 	void quit();
+	void onItemActivated(const QModelIndex& index);
 
 private:
 	QPoint m_origin_pos;

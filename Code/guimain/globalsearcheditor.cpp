@@ -8,6 +8,7 @@
 #include "notecompleter.h"
 #include "searchitemdelegate.h"
 #include "noteitemdelegate.h"
+#include "guihelper.h"
 
 
 GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
@@ -59,12 +60,18 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 	m_completer->setPopupPosPolicy(true);
 
 	QAbstractItemView* pPopup = m_completer->popup();
+	//ÆÁ±Îµ¥»÷ÐÅºÅ
+    disconnect(pPopup, SIGNAL(clicked(QModelIndex)), m_completer, SLOT(_q_complete(QModelIndex)));
+
 	pPopup->setItemDelegate(new NoteItemDelegate(pPopup, m_pEditor));
+	pPopup->installEventFilter(this);
 	m_pEditor->setCompleter(m_completer);
 
 	setLayout(pHLayout);
 
 	connect(closeBtn, SIGNAL(clicked()), this, SLOT(quit()));
+	connect(m_completer, SIGNAL(activated(const QModelIndex&)), this, SLOT(onItemActivated(const QModelIndex&)));
+	connect(pPopup, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(onItemActivated(const QModelIndex&)));
 }
 
 GlobalSearchEditor::~GlobalSearchEditor()
@@ -85,4 +92,11 @@ void GlobalSearchEditor::mouseMoveEvent(QMouseEvent* event)
 void GlobalSearchEditor::quit()
 {
 	close();
+}
+
+void GlobalSearchEditor::onItemActivated(const QModelIndex& index)
+{
+	com_sptr<INote> spNote = index.data(ItemCoreObjRole).value<com_sptr<INote>>();
+	AppHelper::openNoteInIsoWindow(AppHelper::GetNoteId(spNote));
+	hide();
 }
