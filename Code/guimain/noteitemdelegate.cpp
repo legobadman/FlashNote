@@ -7,16 +7,17 @@
 #include <QScrollBar>
 
 
-NoteItemDelegate::NoteItemDelegate(NotesListView* parent)
+NoteItemDelegate::NoteItemDelegate(QAbstractItemView* parent, QLineEdit* pEditor)
 	: QStyledItemDelegate(parent)
-	, m_pListView(parent)
+	, m_view(parent)
+	, m_pEditor(pEditor)
 {
 }
 
 QSize NoteItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-	int W = m_pListView->width();
-	int scrollWidth = m_pListView->verticalScrollBar()->width();
+	int W = m_view->width();
+	int scrollWidth = m_view->verticalScrollBar()->width();
 	return MyStyle::dpiScaledSize(QSize(W - scrollWidth, 100));
 }
 
@@ -50,16 +51,14 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	painter->save();
 	painter->setClipRect(opt.rect);
 
-	bool bVisible = m_pListView->verticalScrollBar()->isVisible();
-	int scrollWidth = m_pListView->verticalScrollBar()->width();
+	bool bVisible = m_view->verticalScrollBar()->isVisible();
+	int scrollWidth = m_view->verticalScrollBar()->width();
 
 	QRect itemRect;
 	if (bVisible)
 		itemRect = opt.rect.adjusted(0, 0, -4, 0);
 	else
 		itemRect = opt.rect.adjusted(0, 0, -1, 0);
-
-	const NotesListView* noteslist = qobject_cast<const NotesListView*>(option.widget);
 
 	// draw the background
 	if (opt.backgroundBrush.style() != Qt::NoBrush)
@@ -132,8 +131,24 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		textLayout.endLayout();
 
 		painter->setPen(QColor(102, 102, 102));
+
+		QVector<QTextLayout::FormatRange> selections;
+		QString searchText = m_pEditor->text();
+		int idx = 0;
+		while (true)
+		{
+			idx = content.indexOf(searchText, idx, Qt::CaseInsensitive);
+			if (idx == -1)
+				break;
+			QTextLayout::FormatRange frg;
+			frg.start = idx;
+			frg.length = searchText.length();
+			frg.format.setForeground(QColor(255, 0, 0));
+			selections.push_back(frg);
+			idx++;
+		}
 		QPointF topLeft(itemRect.x() + text_xoffset, itemRect.y() + text_yoffset);
-		textLayout.draw(painter, topLeft);
+		textLayout.draw(painter, topLeft, selections);
 	}
 
 	//3. draw modify_time

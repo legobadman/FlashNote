@@ -8,6 +8,7 @@
 #include <QTableView>
 #include <QtGui/QStandardItemModel>
 #include <QStyledItemDelegate>
+#include <QLineEdit>
 #include <QHeaderView>
 #include <QtGui/QPainter>
 #include <QtGui/QTextLayout>

@@ -13,7 +13,7 @@
 #include "globalsearcheditor.h"
 
 
-#define TEST_SEARCHER
+//#define TEST_SEARCHER
 //#define TEST_RICH_EDITOR
 //#define TEST_WIDGET_WINDOW_PARENT
 //#define TEST_SQLITE

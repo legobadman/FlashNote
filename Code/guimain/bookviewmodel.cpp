@@ -334,6 +334,12 @@ QVariant BookViewModel::data(const QModelIndex& index, int role) const
 		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
 		return QVariant(pItem->m_textAbbre);
 	}
+    else if (role == ItemNoteAllContent)
+    {
+        NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+        QString displayText = pItem->m_title + "\n" + pItem->m_content;
+        return QVariant(displayText);
+    }
 	else if (role == ItemNoteShowDataTime)
 	{
 		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());

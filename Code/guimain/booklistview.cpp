@@ -60,7 +60,7 @@ void BookListView::init()
 	connect(m_ui->searcheditor, SIGNAL(textChanged(const QString&)),
 		this, SLOT(onSearchTextChanged(const QString&)));
 
-	m_ui->listView->setItemDelegate(new NoteItemDelegate(m_ui->listView));
+	m_ui->listView->setItemDelegate(new NoteItemDelegate(m_ui->listView, m_ui->searcheditor));
 }
 
 BookListView::~BookListView()

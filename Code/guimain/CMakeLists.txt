@@ -164,6 +164,8 @@ add_executable(guimain
     ./SeperateLine.h
     ./searcheditor.cpp
     ./searcheditor.h
+    ./searchitemdelegate.cpp
+    ./searchitemdelegate.h
     ./selectnotebookdlg.cpp
     ./selectnotebookdlg.h
     ./selectnotebookdlg.ui

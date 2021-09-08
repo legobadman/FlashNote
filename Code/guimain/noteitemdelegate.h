@@ -7,7 +7,7 @@ class NoteItemDelegate : public QStyledItemDelegate
 {
 	Q_OBJECT
 public:
-	NoteItemDelegate(NotesListView* parent);
+	NoteItemDelegate(QAbstractItemView* parent, QLineEdit* pEditor);
 	void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 	QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
@@ -15,7 +15,8 @@ protected:
 	void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
 
 private:
-	NotesListView* m_pListView;
+	QAbstractItemView* m_view;
+	QLineEdit* m_pEditor;
 };
 
 #endif
