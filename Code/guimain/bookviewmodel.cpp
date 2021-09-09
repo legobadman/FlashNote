@@ -8,6 +8,7 @@ BookViewModel::BookViewModel(QObject* parent /* = nullptr */)
 	: QAbstractItemModel(parent)
 	, m_type(VIEW_NOTEBOOK)
 {
+	m_spNotifier.reset(new BookViewModelNotifier(this));
 }
 
 BookViewModel::~BookViewModel()
@@ -99,9 +100,10 @@ void BookViewModel::AddBookItems(INoteCollection* pNoteCollection)
 		pItem->m_modify_time = modify_time;
 		m_vec.push_back(pItem);
 		m_mapper.insert(id, pItem);
-		spNote->addWatcher(this);
+
+		spNote->addWatcher(m_spNotifier);
 	}
-	pNoteCollection->addWatcher(this);
+	pNoteCollection->addWatcher(m_spNotifier);
 }
 
 HRESULT BookViewModel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
@@ -150,7 +152,7 @@ HRESULT BookViewModel::onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg
 		case NotifyOperator::Add:
 		{
 			insertRow(spNote);
-			spNote->addWatcher(this);
+			spNote->addWatcher(m_spNotifier);
 			break;
 		}
 		case NotifyOperator::Delete:
@@ -379,8 +381,7 @@ void AllNotesModel::initAllNotes()
 
 	com_sptr<INotebooks> spNotebooks;
 	AppHelper::coreApp()->GetNotebooks(&spNotebooks);
-
-	spNotebooks->addWatcher(this);
+	spNotebooks->addWatcher(m_spNotifier);
 
 	int nCount = 0;
 	spNotebooks->GetCount(&nCount);

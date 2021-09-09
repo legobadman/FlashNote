@@ -11,7 +11,7 @@ public:
 	NoteBase();
 	~NoteBase();
 
-	HRESULT addWatcher(ICoreNotify* pNotify);
+	HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify);
 	HRESULT GetId(std::wstring& pbstrId);
 	HRESULT SetId(const std::wstring& bstrId);
 	HRESULT GetBookId(std::wstring& pBookId);
@@ -44,7 +44,7 @@ private:
 	wstring m_bstrContent;
 	wstring m_bstrPlainText;
 
-	std::vector<ICoreNotify*> m_notifies;
+	CORE_NOTIFY_SET m_notifies;
 
 	NOTE_TYPE m_type;
 	long long modify_time;
@@ -88,7 +88,7 @@ public:
 	NotebooksBase();
 	~NotebooksBase();
 
-	HRESULT addWatcher(ICoreNotify* pNotify);
+	HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify);
 	HRESULT GetCount(int* pCount);
 	HRESULT Item(const wstring& index, INotebook** ppNotebook);
 	HRESULT Item(int index, INotebook** ppNotebook);
@@ -105,7 +105,7 @@ private:
 
 private:
 	std::vector<INotebook*> m_vecBooks;
-	std::unordered_set<ICoreNotify*> m_notifies;
+	CORE_NOTIFY_SET m_notifies;
 	int m_ref;
 };
 
@@ -154,7 +154,7 @@ public:
 	NoteApplication();
 	~NoteApplication();
 
-	HRESULT addWatcher(ICoreNotify* pNotify);
+	HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify);
 	HRESULT GetNotebooks(INotebooks** ppNotebooks);
 	HRESULT SetNotebooks(INotebooks* pNotebooks);
 	HRESULT GetUserId(std::wstring& pbstrId);
@@ -171,11 +171,10 @@ public:
 
 private:
 	wstring m_id;
-
 	com_sptr<INotebooks> m_spNotebooks;
 	com_sptr<ITrash> m_spTrash;
 	com_sptr<ISchedules> m_spSchedules;
-	std::unordered_set<ICoreNotify*> m_notifies;
+	CORE_NOTIFY_SET m_notifies;
 	int m_ref;
 };
 

@@ -23,6 +23,8 @@ protected:
 signals:
 	void closeWin();
 	void noteCommited(const QString&);
+	void newnote(const QString& noteid);
+	void noteDeleted(const QString& noteid);
 
 private:
 	Ui::NewNoteWindow* m_ui;

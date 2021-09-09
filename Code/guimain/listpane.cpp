@@ -320,6 +320,8 @@ NavigationPanel::NavigationPanel(QWidget* parent)
 	, m_treeview(NULL)
 	, m_pCustomMenu(NULL)
 {
+	m_spNotifier.reset(new NavigationPanelNotifier(this));
+
 	m_treeview = new NoteItemTreeView(this);
 	m_treeview->setFrameShape(QFrame::NoFrame);
 	m_treeview->setFrameShadow(QFrame::Plain);
@@ -655,7 +657,7 @@ void NavigationPanel::initNotebookItem()
 	com_sptr<INotebooks> spNotebooks;
 	spApp->GetNotebooks(&spNotebooks);
 
-	spNotebooks->addWatcher(this);
+	spNotebooks->addWatcher(m_spNotifier);
 
 	int count = 0;
 	spNotebooks->GetCount(&count);
@@ -700,7 +702,7 @@ void NavigationPanel::initSchedule()
 	com_sptr<ISchedules> spSchedules;
 	spApp->GetSchedules(&spSchedules);
 
-	spSchedules->addWatcher(this);
+	spSchedules->addWatcher(m_spNotifier);
 
 	int count = 0;
 	spSchedules->GetCount(&count);

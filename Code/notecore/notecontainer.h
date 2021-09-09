@@ -1,6 +1,9 @@
 #ifndef __NOTE_CONTAINER_H__
 #define __NOTE_CONTAINER_H__
 
+#include "framework.h"
+#include "notecore2.h"
+
 template <class Interface>
 class NoteCollection : public Interface
 {
@@ -11,7 +14,7 @@ public:
 		Clear();
 	}
 
-	HRESULT addWatcher(ICoreNotify* pNotify)
+	HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify)
 	{
 		m_notifies.insert(pNotify);
 		return S_OK;
@@ -138,12 +141,15 @@ private:
 			NotifyArg arg;
 			arg.ope = ope;
 			arg.pObj = pNote;
-			(*it)->onCoreNotify(this, arg);
+            if (shared_ptr<ICoreNotify> np = (*it).lock())
+            {
+                np->onCoreNotify(this, arg);
+            }
 		}
 	}
 
 protected:
-	std::unordered_set<ICoreNotify*> m_notifies;
+	CORE_NOTIFY_SET m_notifies;
 	std::map<std::wstring, INote*> m_container;
 	int m_ref;
 };

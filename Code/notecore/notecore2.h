@@ -31,14 +31,14 @@ struct NotifyArg
 	INoteCoreObj* pObj;
 };
 
-interface ICoreNotify : public IUnknown
+interface ICoreNotify
 {
-	virtual HRESULT onCoreNotify(INoteCoreObj * pCoreObj, NotifyArg arg) = 0;
+	virtual HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg) = 0;
 };
 
 interface INoteCoreObj : public IUnknown
 {
-	virtual HRESULT addWatcher(ICoreNotify * pNotify) = 0;
+	virtual HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify) = 0;
 };
 
 interface INote: public INoteCoreObj
@@ -119,5 +119,35 @@ public:
 	virtual HRESULT GetUserId(std::wstring& pbstrId) = 0;
 	virtual HRESULT SetUserId(const std::wstring& bstrId) = 0;
 };
+
+struct hash_CoreNotify
+{
+    size_t operator()(const weak_ptr<ICoreNotify> ptr) const
+    {
+        if (shared_ptr<ICoreNotify> sptr = ptr.lock())
+        {
+            return (size_t)sptr.get();
+        }
+        else
+        {
+            return 0;
+        }
+    }
+};
+
+class hashCompare
+{
+public:
+    bool operator()(const weak_ptr<ICoreNotify>& lhs, const weak_ptr<ICoreNotify>& rhs) const
+    {
+        shared_ptr<ICoreNotify> sp1 = lhs.lock();
+        shared_ptr<ICoreNotify> sp2 = rhs.lock();
+        if (sp1 && sp2 && sp1 == sp2)
+            return true;
+        return false;
+    }
+};
+
+typedef std::unordered_set<weak_ptr<ICoreNotify>, hash_CoreNotify, hashCompare> CORE_NOTIFY_SET;
 
 #endif

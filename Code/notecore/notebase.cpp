@@ -160,9 +160,9 @@ long NoteBase::Release(void)
 	return m_ref;
 }
 
-HRESULT NoteBase::addWatcher(ICoreNotify* pNotify)
+HRESULT NoteBase::addWatcher(weak_ptr<ICoreNotify> pNotify)
 {
-	m_notifies.push_back(pNotify);
+	m_notifies.insert(pNotify);
 	return S_OK;
 }
 
@@ -173,7 +173,10 @@ void NoteBase::NotifyThisObj(NotifyOperator ope)
 		NotifyArg arg;
 		arg.ope = ope;
 		arg.pObj = this;
-		(*it)->onCoreNotify(this, arg);
+		if (shared_ptr<ICoreNotify> np = (*it).lock())
+		{
+			np->onCoreNotify(this, arg);
+		}
 	}
 }
 
@@ -306,7 +309,7 @@ NotebooksBase::~NotebooksBase()
 
 }
 
-HRESULT NotebooksBase::addWatcher(ICoreNotify* pNotify)
+HRESULT NotebooksBase::addWatcher(weak_ptr<ICoreNotify> pNotify)
 {
 	m_notifies.insert(pNotify);
 	return S_OK;
@@ -366,7 +369,10 @@ void NotebooksBase::NotifyThisObj(NotifyOperator ope, INotebook* pNotebook)
 		NotifyArg arg;
 		arg.ope = ope;
 		arg.pObj = pNotebook;
-		(*it)->onCoreNotify(this, arg);
+        if (shared_ptr<ICoreNotify> np = (*it).lock())
+        {
+            np->onCoreNotify(this, arg);
+        }
 	}
 }
 
@@ -628,7 +634,7 @@ HRESULT NoteApplication::SetUserId(const std::wstring& bstrId)
 	return S_OK;
 }
 
-HRESULT NoteApplication::addWatcher(ICoreNotify* pNotify)
+HRESULT NoteApplication::addWatcher(weak_ptr<ICoreNotify> pNotify)
 {
 	m_notifies.insert(pNotify);
 	return S_OK;

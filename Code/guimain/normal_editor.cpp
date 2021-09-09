@@ -377,7 +377,6 @@ void NormalEditor::checkDocument()
 				}
 			}
 
-			//�ĵ�childFrame�ĸ�ʽ
 			//reset
 			if (false)
 			{
@@ -580,7 +579,6 @@ bool NormalEditor::eventFilter(QObject* watched, QEvent* event)
 {
 	if (watched == textEdit && event->type() == QEvent::FocusOut)
 	{
-		//�Ȳ��ų���ͨ�����Ƴ��Ŀ���
 		emit textChanged(false);
 	}
 	return QWidget::eventFilter(watched, event);

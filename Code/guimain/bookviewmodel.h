@@ -34,7 +34,6 @@ Q_DECLARE_METATYPE(NoteItem)
 
 
 class BookViewModel : public QAbstractItemModel
-					, public ICoreNotify
 {
 	Q_OBJECT
 
@@ -57,10 +56,7 @@ public:
 	virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 	void clear();
 
-	HRESULT onCoreNotify(
-		INoteCoreObj* pCoreObj,
-		NotifyArg arg);
-
+	HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
 	bool insertRow(INote* pNote);
 
 signals:
@@ -87,10 +83,22 @@ protected:
 	virtual HRESULT onTrashNotify(ITrash* pCoreObj, NotifyArg arg);
 	virtual HRESULT onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
 
-protected:
 	QMap<QString, NoteItem*> m_mapper;
 	QVector<NoteItem*> m_vec;
 	BOOKVIEW_TYPE m_type;
+
+    struct BookViewModelNotifier : public ICoreNotify
+    {
+        BookViewModelNotifier(BookViewModel* pWidget) : m_pWidget(pWidget) {}
+        HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg) {
+            if (m_pWidget)
+                return m_pWidget->onCoreNotify(pCoreObj, arg);
+            else
+                return E_NOTIMPL;
+        }
+        BookViewModel* m_pWidget;
+    };
+	shared_ptr<BookViewModelNotifier> m_spNotifier;
 
 private:
 	com_sptr<INoteCollection> m_spNotebook;

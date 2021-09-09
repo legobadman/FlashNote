@@ -92,13 +92,24 @@ private:
 };
 
 class NavigationPanel : public QWidget
-					  , public ICoreNotify
 {
 	Q_OBJECT
 	enum MENU_ITEM
 	{
 		DELETE_NOTEBOOK = 0,
 		DELETE_SCHEDULE,
+	};
+
+	struct NavigationPanelNotifier : public ICoreNotify
+	{
+		NavigationPanelNotifier(NavigationPanel* pWidget) : m_pWidget(pWidget) {}
+		HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg) {
+			if (m_pWidget)
+				return m_pWidget->onCoreNotify(pCoreObj, arg);
+			else
+				return E_NOTIMPL;
+		}
+		NavigationPanel* m_pWidget;
 	};
 
 public:
@@ -138,6 +149,7 @@ private:
 	NoteItemTreeView* m_treeview;
 	NewNoteItem* m_newnote;
 	QMenu* m_pCustomMenu;
+	shared_ptr<NavigationPanelNotifier> m_spNotifier;
 };
 
 #endif
