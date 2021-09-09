@@ -78,8 +78,8 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 		{
 			m_pAllNotesModel = new AllNotesModel(this);
 			m_pAllNotesModel->initAllNotes();
-			index = m_pAllNotesModel->index(0, 0);
 		}
+		index = m_pAllNotesModel->index(0, 0);
 		m_pCurrFilterModel.reset(new QSortFilterProxyModel(this));
 		m_pCurrFilterModel->setSourceModel(m_pAllNotesModel);
 		m_pListView->resetModel(m_pCurrFilterModel.get(), VIEW_ALLNOTES, NULL);

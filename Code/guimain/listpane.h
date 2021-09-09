@@ -138,9 +138,11 @@ signals:
 	void addnotebook();
 	void addschedule();
 	void clicked(const QModelIndex&);
+	void currentChanged(const QModelIndex&);
 
 private slots:
 	void onObjClick(const QModelIndex&, MOUSE_HINT);
+	void onTreeItemSelected(const QModelIndex& curr, const QModelIndex& prev);
 	void onCustomContextMenu(const QPoint& point);
 	void MenuActionSlot(QAction* action);
 

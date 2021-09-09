@@ -520,7 +520,6 @@ bool DbService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 		com_sptr<INote> spNote;
 		pNotebook->Item(i, &spNote);
 		RemoveNote(pApp, pNotebook, spNote);
-		spNote->SetBookId(NULL);
 	}
 
 	int rowsChanged = m_db.execDML(QString("DELETE FROM NOTEBOOK WHERE ID = '%1';").arg(bookid).toUtf8());

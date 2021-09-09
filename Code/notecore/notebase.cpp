@@ -264,11 +264,9 @@ HRESULT NotebookBase::AddNote(INote* pNote)
 
 HRESULT NotebookBase::RemoveNote(INote* pNote)
 {
-	HRESULT hr = _base::RemoveNote(pNote);
-	if (SUCCEEDED(hr))
-	{
+	if (pNote)
 		pNote->SetBookId(L"");
-	}
+	HRESULT hr = _base::RemoveNote(pNote);
 	return hr;
 }
 

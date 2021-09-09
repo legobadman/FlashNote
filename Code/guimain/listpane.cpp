@@ -341,7 +341,6 @@ NavigationPanel::NavigationPanel(QWidget* parent)
 	setLayout(pLayout);
 
 	connect(m_newnote, SIGNAL(newnote(NOTE_TYPE)), this, SIGNAL(newnote(NOTE_TYPE)));
-	connect(m_treeview, SIGNAL(clicked(const QModelIndex&)), this, SIGNAL(clicked(const QModelIndex&)));
 	connect(m_treeview, SIGNAL(clickObj(const QModelIndex&, MOUSE_HINT)), this,
 		SLOT(onObjClick(const QModelIndex&, MOUSE_HINT)));
 
@@ -447,6 +446,9 @@ void NavigationPanel::initModel()
 
 	m_treeview->setModel(m_model);
 	m_treeview->setItemDelegate(new LeftSideItemDelegate(m_treeview));
+
+    connect(m_treeview->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+        this, SLOT(onTreeItemSelected(const QModelIndex&, const QModelIndex&)));
 }
 
 void NavigationPanel::onCustomContextMenu(const QPoint& point)
@@ -568,7 +570,7 @@ HRESULT NavigationPanel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 					m_model->removeRow(index.row(), booksIdx);
 					QItemSelectionModel* pModel = m_treeview->selectionModel();
 					QModelIndex newIndex = pModel->currentIndex();
-					emit clicked(newIndex);
+					emit currentChanged(newIndex);
 				}
 			}
 		}
@@ -639,6 +641,11 @@ void NavigationPanel::onObjClick(const QModelIndex& index, MOUSE_HINT hint)
 		if (hint == MOUSE_IN_ADD)
 			emit newnote(SCHEDULE);
 	}
+}
+
+void NavigationPanel::onTreeItemSelected(const QModelIndex& curr, const QModelIndex& prev)
+{
+	emit currentChanged(curr);
 }
 
 void NavigationPanel::initNotebookItem()

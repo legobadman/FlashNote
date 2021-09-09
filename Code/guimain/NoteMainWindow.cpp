@@ -39,7 +39,7 @@ void NoteMainWindow::init()
 
 	m_ui->splitter->setStretchFactor(1, 3);
 
-	connect(m_ui->listpane, SIGNAL(clicked(const QModelIndex&)),
+	connect(m_ui->listpane, SIGNAL(currentChanged(const QModelIndex&)),
 		this, SLOT(onLeftTreeClicked(const QModelIndex&)));
 	connect(m_ui->listpane, SIGNAL(newnote(NOTE_TYPE)), this, SLOT(onNewNote(NOTE_TYPE)));
 	connect(m_ui->listpane, SIGNAL(addnotebook()), this, SLOT(onAddNotebook()));
@@ -49,6 +49,8 @@ void NoteMainWindow::init()
 
 void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 {
+	//暂时不做缓存索引。
+	idxNotebook = -1;
 	//索引到笔记本下拉列表的第idxNotebook项，以及笔记本列表的第idxNote项。
 	QModelIndex idx = m_ui->listpane->treeview()->model()->index(1, 0);
 	m_ui->listpane->treeview()->expand(idx);
@@ -56,24 +58,11 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 	idx = m_ui->listpane->treeview()->model()->index(2, 0);
 	m_ui->listpane->treeview()->expand(idx);
 
-	//最左边项的选择。
-	QModelIndex book_idx = idx.child(idxNotebook, 0);
-	m_ui->listpane->treeview()->selectionModel()->select(book_idx, QItemSelectionModel::Select);
+	idx = m_ui->listpane->treeview()->model()->index(0, 0);
+	m_ui->listpane->treeview()->selectionModel()->select(idx, QItemSelectionModel::Select);
 
-	com_sptr<INotebook> spNotebook;
-	AppHelper::GetNotebook(idxNotebook, &spNotebook);
-	if (!spNotebook)
-	{
-		idx = m_ui->listpane->treeview()->model()->index(0, 0);
-		m_ui->listpane->treeview()->selectionModel()->select(idx, QItemSelectionModel::Select);
-
-		m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
-		m_ui->notesview->setNotebook(VIEW_ALLNOTES, NULL);
-	}
-	else
-	{
-		m_ui->notesview->setNotebook(VIEW_NOTEBOOK, spNotebook);
-	}
+	m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
+	m_ui->notesview->setNotebook(VIEW_ALLNOTES, NULL);
 }
 
 void NoteMainWindow::_temp_hide_floatWin()

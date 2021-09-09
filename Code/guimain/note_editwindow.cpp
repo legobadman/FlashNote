@@ -76,6 +76,7 @@ void NoteEditWindow::updateEditContent()
     QString title = AppHelper::GetNoteTitle(m_pNote);
     QString content = AppHelper::GetNoteContent(m_pNote);
 
+	m_ui->editTitle->setEnabled(true);
     m_ui->editTitle->blockSignals(true);
     m_ui->editTitle->setText(title);
     m_ui->editTitle->blockSignals(false);
@@ -83,16 +84,19 @@ void NoteEditWindow::updateEditContent()
 
     if (m_type == NORMAL_NOTE)
     {
+		m_ui->noramlEditor->setEnabled(true);
         m_ui->noramlEditor->initContent(content, !m_bEdittable);
         m_ui->stackedWidget->setCurrentIndex(0);
     }
     else if (m_type == MINDMAP)
     {
+		m_ui->mindmapEditor->setEnabled(true);
         m_ui->mindmapEditor->initContent(content, false);
         m_ui->stackedWidget->setCurrentIndex(1);
     }
     else if (m_type == SCHEDULE)
     {
+		m_ui->mindmapEditor->setEnabled(true);
         m_ui->mindmapEditor->initContent(content, true);
         m_ui->stackedWidget->setCurrentIndex(1);
     }
@@ -143,13 +147,11 @@ HRESULT NoteEditWindow::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 		{
 			if (arg.pObj == m_pNote)
 			{
-				int j;
-				j = 0;
-			}
-			else
-			{
-				int j;
-				j = 0;
+				if (m_type == NORMAL_NOTE)
+				{
+                    m_ui->editTitle->setEnabled(false);
+                    m_ui->noramlEditor->setEnabled(false);
+				}
 			}
 		}
 	}

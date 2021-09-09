@@ -66,6 +66,7 @@ private:
 
 signals:
 	void noteCommited(const QString&);
+	void noteDeleted();
 
 private:
 	Ui::NoteEditWindow* m_ui;
