@@ -128,10 +128,10 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 	onShowNotesView(spNote);
 }
 
-void NotesEditView::onNoteItemSelected(const QModelIndex& index)
+void NotesEditView::onNoteItemSelected(const QModelIndex& current, const QModelIndex& previous)
 {
-	QString noteid = index.data(ItemCoreObjIdRole).toString();
-	com_sptr<INote> spNote = index.data(ItemCoreObjRole).value<com_sptr<INote>>();
+	QString noteid = current.data(ItemCoreObjIdRole).toString();
+	com_sptr<INote> spNote = current.data(ItemCoreObjRole).value<com_sptr<INote>>();
 	onShowNotesView(spNote);
 }
 

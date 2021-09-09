@@ -43,7 +43,7 @@ public:
 	void initFromCollection(INoteCollection* pNoteCollection);
 	QModelIndex findIdOf(const QString& objid);
 	void getNote(const QString& objId, INote** ppNote);
-	void removeRows(const QSet<QString>& objSet);
+	virtual bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
 
 	virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
 	virtual QModelIndex parent(const QModelIndex& child) const override;
@@ -82,7 +82,6 @@ protected:
 	virtual HRESULT onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg);
 	virtual HRESULT onTrashNotify(ITrash* pCoreObj, NotifyArg arg);
 
-	QMap<QString, NoteItem*> m_mapper;
 	QVector<NoteItem*> m_vec;
 	BOOKVIEW_TYPE m_type;
 

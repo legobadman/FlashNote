@@ -99,7 +99,6 @@ void BookViewModel::AddBookItems(INoteCollection* pNoteCollection)
 		pItem->m_create_time = create_time;
 		pItem->m_modify_time = modify_time;
 		m_vec.push_back(pItem);
-		m_mapper.insert(id, pItem);
 
 		spNote->addWatcher(m_spNotifier);
 	}
@@ -157,19 +156,16 @@ HRESULT BookViewModel::onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg
 		}
 		case NotifyOperator::Delete:
 		{
-			m_mapper.remove(noteid);
-			//暂时用遍历的方式去掉
-			int rowsRemoved = -1;
+			int idx = -1;
 			for (int i = 0; i < m_vec.size(); i++)
 			{
 				if (m_vec[i]->m_id == noteid)
 				{
-					rowsRemoved = i;
-					m_vec.removeAt(i);
+					idx = i;
 					break;
 				}
 			}
-			emit rowRemoved(rowsRemoved);
+			removeRows(idx, 1);
 			break;
 		}
 		case NotifyOperator::Update:
@@ -243,7 +239,6 @@ bool BookViewModel::insertRow(INote* pNote)
 	pItem->m_create_time = create_time;
 	pItem->m_modify_time = modify_time;
 	m_vec.push_back(pItem);
-	m_mapper.insert(noteid, pItem);
 	emit rowInserted(m_vec.size() - 1);
 
 	endInsertRows();
@@ -275,24 +270,12 @@ void BookViewModel::getNote(const QString& objId, INote** ppNote)
 	}
 }
 
-void BookViewModel::removeRows(const QSet<QString>& objSet)
+bool BookViewModel::removeRows(int row, int count, const QModelIndex& parent)
 {
-	QVector<NoteItem*> vec;
-	for (int i = 0; i < m_vec.size(); i++)
-	{
-		NoteItem* pItem = m_vec[i];
-		if (objSet.contains(pItem->m_id))
-		{
-			delete pItem;
-			m_vec[i] = NULL;
-		}
-		else
-		{
-			vec.push_back(m_vec[i]);
-		}
-	}
-	m_vec.clear();
-	m_vec = vec;
+	beginRemoveRows(parent, row, row + count - 1);
+	m_vec.erase(m_vec.begin() + row, m_vec.begin() + row + count);
+	endRemoveRows();
+	return true;
 }
 
 QVariant BookViewModel::data(const QModelIndex& index, int role) const

@@ -32,14 +32,11 @@ public:
 	void resetModel(QSortFilterProxyModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection);
 
 signals:
-	void noteitemselected(const QModelIndex&);
 	void searchTriggered(const QString&);
 
 public slots:
 	void onCustomContextMenu(const QPoint& point);
 	void MenuActionSlot(QAction *action);
-	void onRowRemoved(int);
-	void onRowInserted(int);
 	void onSearchTextChanged(const QString&);
 
 private:

@@ -28,7 +28,7 @@ protected:
 	bool eventFilter(QObject* watched, QEvent* event) override;
 
 public slots:
-	void onNoteItemSelected(const QModelIndex& index);
+	void onNoteItemSelected(const QModelIndex& current, const QModelIndex& previous);
 
 private:
 	void onShowNotesView(INote* pNote);

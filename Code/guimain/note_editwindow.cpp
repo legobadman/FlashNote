@@ -130,19 +130,28 @@ void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
 
 HRESULT NoteEditWindow::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 {
-	if (m_bEditting)
-		return S_FALSE;
-
 	if (m_pNote == pCoreObj)
 	{
-		if (arg.ope == NotifyOperator::Update)
+		if (arg.ope == NotifyOperator::Update && !m_bEditting)
 		{
 			updateEditContent();
 		}
 	}
 	else if (m_pNotebook == pCoreObj)
 	{
-
+		if (arg.ope == NotifyOperator::Delete)
+		{
+			if (arg.pObj == m_pNote)
+			{
+				int j;
+				j = 0;
+			}
+			else
+			{
+				int j;
+				j = 0;
+			}
+		}
 	}
 	return S_OK;
 }
