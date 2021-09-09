@@ -39,6 +39,7 @@ interface ICoreNotify
 interface INoteCoreObj : public IUnknown
 {
 	virtual HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify) = 0;
+	virtual HRESULT removeWatcher(weak_ptr<ICoreNotify> pNotify) = 0;
 };
 
 interface INote: public INoteCoreObj

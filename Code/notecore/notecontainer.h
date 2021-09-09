@@ -20,6 +20,12 @@ public:
 		return S_OK;
 	}
 
+    HRESULT removeWatcher(weak_ptr<ICoreNotify> pNotify)
+    {
+        m_notifies.erase(pNotify);
+        return S_OK;
+    }
+
 	HRESULT GetName(std::wstring&)
 	{
 		return E_NOTIMPL;

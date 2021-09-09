@@ -186,7 +186,7 @@ void NormalEditor::initSlots()
 {
 	connect(textEdit, SIGNAL(currentCharFormatChanged(QTextCharFormat)), this, SLOT(slotCurrentCharFormatChanged(QTextCharFormat)));
 	connect(textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(slotCursorPositionChanged()));
-	connect(textEdit, SIGNAL(textChanged()), this, SIGNAL(onEditting()));
+	connect(textEdit, SIGNAL(textChanged()), this, SLOT(onEditting()));
 
 	fontChanged(textEdit->font());
 

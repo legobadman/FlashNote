@@ -166,6 +166,12 @@ HRESULT NoteBase::addWatcher(weak_ptr<ICoreNotify> pNotify)
 	return S_OK;
 }
 
+HRESULT NoteBase::removeWatcher(weak_ptr<ICoreNotify> pNotify)
+{
+	m_notifies.erase(pNotify);
+	return S_OK;
+}
+
 void NoteBase::NotifyThisObj(NotifyOperator ope)
 {
 	for (auto it = m_notifies.begin(); it != m_notifies.end(); it++)
@@ -313,6 +319,12 @@ HRESULT NotebooksBase::addWatcher(weak_ptr<ICoreNotify> pNotify)
 {
 	m_notifies.insert(pNotify);
 	return S_OK;
+}
+
+HRESULT NotebooksBase::removeWatcher(weak_ptr<ICoreNotify> pNotify)
+{
+    m_notifies.erase(pNotify);
+    return S_OK;
 }
 
 HRESULT NotebooksBase::GetCount(/* [out] */ int* pCount)
@@ -638,6 +650,12 @@ HRESULT NoteApplication::addWatcher(weak_ptr<ICoreNotify> pNotify)
 {
 	m_notifies.insert(pNotify);
 	return S_OK;
+}
+
+HRESULT NoteApplication::removeWatcher(weak_ptr<ICoreNotify> pNotify)
+{
+    m_notifies.erase(pNotify);
+    return S_OK;
 }
 
 HRESULT NoteApplication::QueryInterface(

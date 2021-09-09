@@ -37,10 +37,9 @@ void NewNoteWindow::open(QString bookid, QString noteid)
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebookById(bookid, &spNotebook);
 
-	com_sptr<INote> spNote;
-	AppHelper::GetNote(spNotebook, noteid, &spNote);
+	AppHelper::GetNote(spNotebook, noteid, &m_pNote);
 
-	m_ui->editwindow->updateNoteInfo(spNotebook, spNote, true);
+	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
 }
 
 void NewNoteWindow::initSchedule()

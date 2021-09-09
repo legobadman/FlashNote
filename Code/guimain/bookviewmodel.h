@@ -81,11 +81,12 @@ protected:
 	virtual HRESULT onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg);
 	virtual HRESULT onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg);
 	virtual HRESULT onTrashNotify(ITrash* pCoreObj, NotifyArg arg);
-	virtual HRESULT onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
 
 	QMap<QString, NoteItem*> m_mapper;
 	QVector<NoteItem*> m_vec;
 	BOOKVIEW_TYPE m_type;
+
+	HRESULT onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
 
     struct BookViewModelNotifier : public ICoreNotify
     {

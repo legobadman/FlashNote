@@ -30,9 +30,11 @@
 NoteEditWindow::NoteEditWindow(QWidget* parent)
     : QWidget(parent)
 	, m_type(UNKNOWN_TYPE)
+	, m_bEditting(false)
 {
     init();
     initContent();
+	m_spNotifier.reset(new NoteEditWindowNotifier(this));
 }
 
 NoteEditWindow::~NoteEditWindow()
@@ -46,8 +48,17 @@ INote* NoteEditWindow::GetNote()
 
 void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edittable)
 {
+	//要先解除以下内核对象对自己的关联
+	if (m_pNote)
+		m_pNote->removeWatcher(m_spNotifier);
+	if (m_pNotebook)
+		m_pNotebook->removeWatcher(m_spNotifier);
+
 	m_pNotebook = pNotebook;
 	m_pNote = pNote;
+
+	m_pNotebook->addWatcher(m_spNotifier);
+	m_pNote->addWatcher(m_spNotifier);
 
 	m_pNote->GetType(&m_type);
 
@@ -55,35 +66,40 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 
 	updateBookMenu(m_pNotebook);
 
-	QString title = AppHelper::GetNoteTitle(m_pNote);
-	QString content = AppHelper::GetNoteContent(m_pNote);
-
-	m_ui->editTitle->blockSignals(true);
-	m_ui->editTitle->setText(title);
-	m_ui->editTitle->blockSignals(false);
-	m_ui->editTitle->setReadOnly(!m_bEdittable);
-
-	if (m_type == NORMAL_NOTE)
-	{
-		m_ui->noramlEditor->initContent(content, !m_bEdittable);
-		m_ui->stackedWidget->setCurrentIndex(0);
-	}
-	else if (m_type == MINDMAP)
-	{
-		m_ui->mindmapEditor->initContent(content, false);
-		m_ui->stackedWidget->setCurrentIndex(1);
-	}
-	else if (m_type == SCHEDULE)
-	{
-		m_ui->mindmapEditor->initContent(content, true);
-		m_ui->stackedWidget->setCurrentIndex(1);
-	}
-	else
-	{
-		Q_ASSERT(false);
-	}
+	updateEditContent();
 
 	update();
+}
+
+void NoteEditWindow::updateEditContent()
+{
+    QString title = AppHelper::GetNoteTitle(m_pNote);
+    QString content = AppHelper::GetNoteContent(m_pNote);
+
+    m_ui->editTitle->blockSignals(true);
+    m_ui->editTitle->setText(title);
+    m_ui->editTitle->blockSignals(false);
+    m_ui->editTitle->setReadOnly(!m_bEdittable);
+
+    if (m_type == NORMAL_NOTE)
+    {
+        m_ui->noramlEditor->initContent(content, !m_bEdittable);
+        m_ui->stackedWidget->setCurrentIndex(0);
+    }
+    else if (m_type == MINDMAP)
+    {
+        m_ui->mindmapEditor->initContent(content, false);
+        m_ui->stackedWidget->setCurrentIndex(1);
+    }
+    else if (m_type == SCHEDULE)
+    {
+        m_ui->mindmapEditor->initContent(content, true);
+        m_ui->stackedWidget->setCurrentIndex(1);
+    }
+    else
+    {
+        Q_ASSERT(false);
+    }
 }
 
 void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
@@ -110,6 +126,25 @@ void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
 		connect(panel, SIGNAL(notebookMoved(INotebook*)), this, SLOT(onNotebookMoved(INotebook*)));
 		return panel;
 	});
+}
+
+HRESULT NoteEditWindow::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
+{
+	if (m_bEditting)
+		return S_FALSE;
+
+	if (m_pNote == pCoreObj)
+	{
+		if (arg.ope == NotifyOperator::Update)
+		{
+			updateEditContent();
+		}
+	}
+	else if (m_pNotebook == pCoreObj)
+	{
+
+	}
+	return S_OK;
 }
 
 void NoteEditWindow::init()
@@ -169,6 +204,7 @@ void NoteEditWindow::initContent()
 
 void NoteEditWindow::saveNote()
 {
+	RAII_CheckEditting batch(&m_bEditting);
 	Q_ASSERT(m_pNote);
 	QTextDocument* p = m_ui->noramlEditor->document();
 	QString title = m_ui->editTitle->text();
@@ -194,6 +230,8 @@ void NoteEditWindow::saveNote()
 
 void NoteEditWindow::saveMindMap()
 {
+	RAII_CheckEditting batch(&m_bEditting);
+
 	QString title = m_ui->editTitle->text();
 
 	m_pNote->SetTitle(title.toStdWString());
@@ -211,6 +249,8 @@ void NoteEditWindow::saveMindMap()
 
 void NoteEditWindow::saveSchedule()
 {
+	RAII_CheckEditting batch(&m_bEditting);
+
 	QString title = m_ui->editTitle->text();
 
 	m_pNote->SetTitle(title.toStdWString());

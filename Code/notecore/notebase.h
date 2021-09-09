@@ -12,6 +12,7 @@ public:
 	~NoteBase();
 
 	HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify);
+	HRESULT removeWatcher(weak_ptr<ICoreNotify> pNotify);
 	HRESULT GetId(std::wstring& pbstrId);
 	HRESULT SetId(const std::wstring& bstrId);
 	HRESULT GetBookId(std::wstring& pBookId);
@@ -89,6 +90,7 @@ public:
 	~NotebooksBase();
 
 	HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify);
+	HRESULT removeWatcher(weak_ptr<ICoreNotify> pNotify);
 	HRESULT GetCount(int* pCount);
 	HRESULT Item(const wstring& index, INotebook** ppNotebook);
 	HRESULT Item(int index, INotebook** ppNotebook);
@@ -155,6 +157,7 @@ public:
 	~NoteApplication();
 
 	HRESULT addWatcher(weak_ptr<ICoreNotify> pNotify);
+	HRESULT removeWatcher(weak_ptr<ICoreNotify> pNotify);
 	HRESULT GetNotebooks(INotebooks** ppNotebooks);
 	HRESULT SetNotebooks(INotebooks* pNotebooks);
 	HRESULT GetUserId(std::wstring& pbstrId);

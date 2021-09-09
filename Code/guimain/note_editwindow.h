@@ -35,6 +35,34 @@ public slots:
 private:
 	void initSlots();
 	void updateBookMenu(INotebook* pNotebook);
+	void updateEditContent();
+
+    HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
+    struct NoteEditWindowNotifier : public ICoreNotify
+    {
+        NoteEditWindowNotifier(NoteEditWindow* pWidget) : m_pWidget(pWidget) {}
+        HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg) {
+            if (m_pWidget)
+                return m_pWidget->onCoreNotify(pCoreObj, arg);
+            else
+                return E_NOTIMPL;
+        }
+        NoteEditWindow* m_pWidget;
+    };
+    shared_ptr<NoteEditWindowNotifier> m_spNotifier;
+
+	struct RAII_CheckEditting
+	{
+		RAII_CheckEditting(bool* bEditting) : m_bEditting(bEditting) {
+			*m_bEditting = true;
+		}
+		~RAII_CheckEditting() {
+			*m_bEditting = false;
+		}
+
+		bool* m_bEditting;
+	};
+	bool m_bEditting;
 
 signals:
 	void noteCommited(const QString&);
