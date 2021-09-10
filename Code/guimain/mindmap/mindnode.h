@@ -46,6 +46,7 @@ public:
 	int level() const { return m_level; }
 	bool isToRight() const { return m_bToRight; }
 	void setToRight(bool toRight) { m_bToRight = toRight; }
+	void resetAllChildDirection(bool toRight);
 	bool isDragging() const { return m_bDragging; }
 	virtual bool isHolder() const { return false; }
 
@@ -164,6 +165,9 @@ public:
 	QRectF boundingRect() const override;
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 	bool isHolder() const override { return true; }
+
+private:
+	const int m_radius = 5;
 };
 
 #endif

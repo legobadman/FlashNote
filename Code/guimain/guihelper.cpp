@@ -293,3 +293,8 @@ void AppHelper::openNoteInIsoWindow(const QString& noteid)
 	pNewNoteWindow->setWindowTitle(AppHelper::GetNoteTitle(spNote));
 	pNewNoteWindow->show();
 }
+
+QColor AppHelper::colorBlue()
+{
+	return QColor(21, 152, 255);
+}

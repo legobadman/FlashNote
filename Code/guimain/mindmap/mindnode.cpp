@@ -49,7 +49,7 @@ RoundedRectItem::RoundedRectItem(QGraphicsItem* parent)
 QPainterPath RoundedRectItem::shape() const
 {
 	QPainterPath path;
-	path.addRect(boundingRect());
+	path.addRoundedRect(boundingRect(), m_radius, m_radius);
 	return path;
 }
 
@@ -60,9 +60,8 @@ QRectF RoundedRectItem::boundingRect() const
 
 void RoundedRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-	painter->setPen(Qt::NoPen);
-	painter->setBrush(QColor(0, 181, 72));
-	painter->drawRoundedRect(boundingRect(), 2, 2);
+	painter->setPen(QPen(AppHelper::colorBlue(), 5, Qt::DotLine));
+	painter->drawRoundedRect(boundingRect(), m_radius, m_radius);
 }
 
 
@@ -153,28 +152,27 @@ void MindNode::initSignalSlots(MindMapScene* pScene)
 
 void MindNode::initUIColor()
 {
-	// setupÐèÒªÔÚ×îºóÒ»²½×ö£¬²ÅÄÜ»ñÈ¡ÕæÕýµÄlevelÒÔ¼°ÊÇ·ñ°üº¬½ø¶ÈÌõ¡£
 	if (m_level == 0)
 	{
 		m_textColor = QColor(255, 255, 255);
 		m_backgroudColor = QColor(0, 181, 72);
 		m_highlightedBorder = QColor(23, 157, 235);
 		m_selectedBorder = QColor(23, 157, 235);
-		m_borderFocusout = QColor(m_backgroudColor);	//ÓÉÓÚÎÄ±¾¿òµÄ»æÖÆ²ßÂÔ£¬Ö»ÄÜ½«Í¬É«µÄ±ß¿òÊÓÎªÎÞ±ß¿ò¡£
+		m_borderFocusout = QColor(m_backgroudColor);
 	}
 	else if (m_level == 1) {
 		m_textColor = QColor(0, 0, 0);
 		m_highlightedBorder = QColor(136, 203, 242);
 		m_selectedBorder = QColor(23, 157, 235);
 		m_backgroudColor = QColor(242, 242, 242);
-		m_borderFocusout = QColor(m_backgroudColor);	//ÓÉÓÚÎÄ±¾¿òµÄ»æÖÆ²ßÂÔ£¬Ö»ÄÜ½«Í¬É«µÄ±ß¿òÊÓÎªÎÞ±ß¿ò¡£
+		m_borderFocusout = QColor(m_backgroudColor);
 	}
 	else if (m_level >= 2) {
 		m_textColor = QColor(0, 0, 0);
 		m_highlightedBorder = QColor(136, 203, 242);
 		m_selectedBorder = QColor(23, 157, 235);
 		m_backgroudColor = QColor(255, 255, 255);
-		m_borderFocusout = QColor(m_backgroudColor);	//ÓÉÓÚÎÄ±¾¿òµÄ»æÖÆ²ßÂÔ£¬Ö»ÄÜ½«Í¬É«µÄ±ß¿òÊÓÎªÎÞ±ß¿ò¡£
+		m_borderFocusout = QColor(m_backgroudColor);
 	}
 
 	QPalette pal = palette();
@@ -617,6 +615,45 @@ void MindNode::removeChild(MindNode* pNode)
 {
 	m_children.removeAll(pNode);
 	pNode->setParentItem(NULL);
+}
+
+void MindNode::resetAllChildDirection(bool toRight)
+{
+	if (toRight == m_bToRight)
+		return;
+
+	if (toRight)
+	{
+		m_right_expand = m_left_expand;
+		m_left_expand = EXP_NODEFINE;
+		if (!m_children.isEmpty())
+		{
+            m_pRCollaspBtn.reset(new MindNodeButton(this));
+            m_pRCollaspBtn->installSceneEventFilter(this);
+            m_pRCollaspBtn->setVisible(m_right_expand == EXP_COLLAPSE);
+            connect(m_pRCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onRightExpandBtnToggle()));
+		}
+		m_pLCollaspBtn.clear();
+	}
+	else
+	{
+		m_left_expand = m_right_expand;
+		m_right_expand = EXP_NODEFINE;
+		if (!m_children.isEmpty())
+		{
+			m_pLCollaspBtn.reset(new MindNodeButton(this));
+			m_pLCollaspBtn->installSceneEventFilter(this);
+			m_pLCollaspBtn->setVisible(m_left_expand == EXP_COLLAPSE);
+		}
+        connect(m_pLCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onLeftExpandBtnToggle()));
+		m_pRCollaspBtn.clear();
+	}
+	setToRight(toRight);
+
+	for (auto it = m_children.begin(); it != m_children.end(); it++)
+	{
+		(*it)->resetAllChildDirection(toRight);
+	}
 }
 
 void MindNode::insertChild(MindNode* pNode, int idx)

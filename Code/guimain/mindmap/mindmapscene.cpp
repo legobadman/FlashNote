@@ -217,17 +217,19 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 
 void MindMapScene::onNodeDragged(MindNode* pNode)
 {
-	if (m_pHolder && m_pHolder->Parent())
+	if (m_pHolder && m_pHolder->Parent() && pNode)
 	{
 		MindNode* parent = m_pHolder->Parent();
-		//TODO：后续要作非法判断，现在先用来ASSERT流程的正确性。
 		int idx = parent->Children(false).indexOf(m_pHolder);
-		parent->removeChild(m_pHolder);
-		parent->insertChild(pNode, idx);
-		pNode->setToRight(m_pHolder->isToRight());
-		m_pHolder->hide();
-		onRedrawItems();
-		//emit itemContentChanged(false);
+		if (idx != -1)
+		{
+            parent->removeChild(m_pHolder);
+            parent->insertChild(pNode, idx);
+            pNode->resetAllChildDirection(m_pHolder->isToRight());
+            m_pHolder->hide();
+            onRedrawItems();
+			//emit itemContentChanged(false);
+		}
 	}
 }
 
