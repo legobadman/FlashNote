@@ -206,7 +206,7 @@ void MindNode::initExpandBtns()
 			{
 				m_pLCollaspBtn.reset(new MindNodeButton(this));
 				m_pLCollaspBtn->installSceneEventFilter(this);
-				m_pLCollaspBtn->hide();
+				m_pLCollaspBtn->setVisible(m_left_expand == EXP_COLLAPSE);
 				connect(m_pLCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onLeftExpandBtnToggle()));
 			}
 		}
@@ -217,7 +217,7 @@ void MindNode::initExpandBtns()
 			{
 				m_pRCollaspBtn.reset(new MindNodeButton(this));
 				m_pRCollaspBtn->installSceneEventFilter(this);
-				m_pRCollaspBtn->hide();
+				m_pRCollaspBtn->setVisible(m_right_expand == EXP_COLLAPSE);
 				connect(m_pRCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onRightExpandBtnToggle()));
 			}
 		}
@@ -231,7 +231,7 @@ void MindNode::initExpandBtns()
 			{
 				m_pRCollaspBtn.reset(new MindNodeButton(this));
 				m_pRCollaspBtn->installSceneEventFilter(this);
-				m_pRCollaspBtn->hide();
+				m_pRCollaspBtn->setVisible(m_right_expand == EXP_COLLAPSE);
 				connect(m_pRCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onRightExpandBtnToggle()));
 			}
 		}
@@ -245,13 +245,12 @@ void MindNode::initExpandBtns()
 			{
 				m_pLCollaspBtn.reset(new MindNodeButton(this));
 				m_pLCollaspBtn->installSceneEventFilter(this);
-				m_pLCollaspBtn->hide();
+				m_pLCollaspBtn->setVisible(m_left_expand == EXP_COLLAPSE);
 				connect(m_pLCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onLeftExpandBtnToggle()));
 			}
 		}
 	}
 
-	//ÉèÖÃÎ»ÖÃ
 	if (m_pLCollaspBtn)
 	{
 		int x = -MindNodeButton::m_radius * 2 + 3;
@@ -544,20 +543,20 @@ void MindNode::onLeftExpandBtnToggle()
 	if (m_left_expand == EXP_EXPAND)
 	{
 		m_left_expand = EXP_COLLAPSE;
+		m_pLCollaspBtn->show();
 		bVisible = false;
 	}
 	else
 	{
 		m_left_expand = EXP_EXPAND;
+		m_pLCollaspBtn->hide();
 		bVisible = true;
 	}
-	//½«ËùÓÐ×ó½ÚµãÒþ²ØÆðÀ´
 	for (auto it = m_children.begin(); it != m_children.end(); it++)
 	{
 		if (!(*it)->isToRight())
 		{
 			(*it)->setVisible(bVisible);
-			//(*it)->pathItem()->setVisible(bVisible);
 		}
 	}
 	emit expandChanged();
@@ -576,14 +575,15 @@ void MindNode::onRightExpandBtnToggle()
 	if (m_right_expand == EXP_EXPAND)
 	{
 		m_right_expand = EXP_COLLAPSE;
+		m_pRCollaspBtn->show();
 		bVisible = false;
 	}
 	else
 	{
 		m_right_expand = EXP_EXPAND;
+		m_pRCollaspBtn->hide();
 		bVisible = true;
 	}
-	//½«ËùÓÐÓÒ½ÚµãÒþ²ØÆðÀ´
 	for (auto it = m_children.begin(); it != m_children.end(); it++)
 	{
 		if ((*it)->isToRight())
@@ -622,7 +622,7 @@ void MindNode::removeChild(MindNode* pNode)
 void MindNode::insertChild(MindNode* pNode, int idx)
 {
 	m_children.insert(m_children.begin() + idx, pNode);
-	pNode->m_parent = this;	//ºóÐøÖð½¥È¥µôm_parent¡£
+	pNode->m_parent = this;
 	pNode->setParentItem(this);
 }
 
@@ -645,7 +645,6 @@ void MindNode::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 	if (!m_bDragging)
 	{
-		//¼ì²éÊÇ·ñÓÐ×ã¹»µÄÍÏ¶¯¾àÀëÈÏÎªÊÇÍÑÀë
 		qreal dist = _dist(m_initClickScenePos, event->scenePos());
 		if (dist > 3)
 		{
@@ -702,7 +701,6 @@ bool MindNode::sceneEvent(QEvent* event)
 	switch (event->type())
 	{
 	case QEvent::GraphicsSceneHoverEnter:
-		//°´Å¥²¿·ÖÒÑ¾­ÔÚ¾ØÐÎÒÔÍâÁË£¬»¹ÐèÒªÒ»Ð©ÅÐ¶Ï¡£
 		{
 			QGraphicsSceneHoverEvent* e = static_cast<QGraphicsSceneHoverEvent*>(event);
 			if (contains(e->pos()))
@@ -722,9 +720,13 @@ bool MindNode::sceneEvent(QEvent* event)
 			QPointF pos = e->pos();	
 			m_bHovered = false;
 			if (m_pLCollaspBtn)
-				m_pLCollaspBtn->hide();
+			{
+				m_pLCollaspBtn->setVisible(m_left_expand == EXP_COLLAPSE);
+			}
 			if (m_pRCollaspBtn)
-				m_pRCollaspBtn->hide();
+			{
+				m_pRCollaspBtn->setVisible(m_right_expand == EXP_COLLAPSE);
+			}
 			update();
 			break;
 		}

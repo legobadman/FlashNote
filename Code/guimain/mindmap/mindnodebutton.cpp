@@ -30,13 +30,9 @@ bool MindNodeButton::sceneEvent(QEvent* event)
 	switch (event->type())
 	{
 	case QEvent::GraphicsSceneHoverEnter:
-		//按钮部分已经在矩形以外了，还需要一些判断。
-		show();
-		update();
+		//按钮部分已经在矩形以外了，还需要一些判断?
 		break;
 	case QEvent::GraphicsSceneHoverLeave:
-		hide();
-		update();
 		break;
 	case QEvent::GraphicsSceneMouseRelease:
 		emit toggled();
