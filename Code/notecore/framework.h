@@ -6,5 +6,6 @@
 #include <vector>
 #include <map>
 #include <unordered_set>
+#include <memory>
 
 using namespace std;

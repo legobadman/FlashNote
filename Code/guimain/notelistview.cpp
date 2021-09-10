@@ -5,6 +5,7 @@
 NotesListView::NotesListView(QWidget* parent)
 	: QListView(parent)
 {
+	viewport()->setAttribute(Qt::WA_Hover, true);
 }
 
 NotesListView::~NotesListView()
@@ -19,7 +20,6 @@ bool NotesListView::viewportEvent(QEvent* event)
 	case QEvent::HoverMove:
 	case QEvent::HoverEnter:
 		{
-			//TODO: 滚动时hover状态混乱。
 			if (m_hoverIndex.row() > 0)
 			{
 				int lastRow = m_hoverIndex.row() - 1;
@@ -43,7 +43,6 @@ QModelIndex NotesListView::getHoverIndex() const
 
 QVector<QModelIndex> NotesListView::getRenderedIndice(const QRect r)
 {
-	//TODO: 滚动条向下滚动的时候底部的item没有收集到。
 	QVector<QModelIndex> vec;
 	const int itemHeight = 87;
 	int x = (float)r.width() / 2;

@@ -44,6 +44,7 @@ void BookListView::init()
 
 	m_ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_ui->listView->setFrameShape(QFrame::NoFrame);
+	m_ui->listView->viewport()->setAttribute(Qt::WA_Hover, true);
 
 	QPalette pal;
 	pal.setColor(QPalette::Foreground, QColor(161, 161, 161));

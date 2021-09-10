@@ -60,9 +60,8 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 	m_completer->setPopupPosPolicy(true);
 
 	QAbstractItemView* pPopup = m_completer->popup();
-	//ÆÁ±Îµ¥»÷ÐÅºÅ
     disconnect(pPopup, SIGNAL(clicked(QModelIndex)), m_completer, SLOT(_q_complete(QModelIndex)));
-
+	pPopup->viewport()->setAttribute(Qt::WA_Hover, true);
 	pPopup->setItemDelegate(new NoteItemDelegate(pPopup, m_pEditor));
 	pPopup->installEventFilter(this);
 	m_pEditor->setCompleter(m_completer);

@@ -6,6 +6,7 @@
 FramelessLineEdit::FramelessLineEdit(QWidget* parent)
 	: QLineEdit(parent)
 {
+	setAttribute(Qt::WA_Hover, true);
 }
 
 FramelessLineEdit::~FramelessLineEdit()
