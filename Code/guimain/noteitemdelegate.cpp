@@ -68,9 +68,10 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		painter->fillRect(rcBg, opt.backgroundBrush);
 
 		//border
-		if (opt.state & (QStyle::State_Selected | QStyle::State_MouseOver))
+		bool hoverSelected = opt.state & (QStyle::State_Selected | QStyle::State_MouseOver);
+		QColor borderClr;
+		if (hoverSelected)
 		{
-			QColor borderClr;
 			if (opt.state & QStyle::State_Selected)
 			{
 				borderClr = QColor(139, 203, 232);
@@ -80,9 +81,15 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 				borderClr = QColor(195, 229, 245);
 			}
 			painter->setPen(borderClr);
-			rcBg.adjust(0, 0, 0, -1);
 			painter->drawRect(rcBg);
 		}
+		else
+		{
+			borderClr = QColor(235, 235, 235);
+		}
+		
+		painter->setPen(borderClr);
+		painter->drawLine(itemRect.bottomLeft(), itemRect.bottomRight());
 	}
 
 	// draw the text
