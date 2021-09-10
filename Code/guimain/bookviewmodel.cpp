@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "bookviewmodel.h"
 #include "guihelper.h"
 #include "uiapplication.h"
@@ -170,7 +170,7 @@ HRESULT BookViewModel::onNotebookNotify(INoteCollection* pCoreObj, NotifyArg arg
 		}
 		case NotifyOperator::Update:
 		{
-			//TODO: ¸üĞÂbookName
+			//TODO: æ›´æ–°bookName
 			break;
 		}
 	}
@@ -190,7 +190,7 @@ HRESULT BookViewModel::onNoteNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 	case NotifyOperator::Delete:
 	case NotifyOperator::Add:
 	{
-		//notebookÒÑ¾­×öÁË¡£
+		//notebookå·²ç»åšäº†ã€‚
 		break;
 	}
 	case NotifyOperator::Update:
@@ -359,7 +359,7 @@ QVariant BookViewModel::data(const QModelIndex& index, int role) const
 
 bool BookViewModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-	//³¡¾°?
+	//åœºæ™¯?
 	NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
 	if (role == ItemCoreObjIdRole)
 	{
@@ -374,9 +374,9 @@ QVariant BookViewModel::headerData(int section, Qt::Orientation, int role) const
 	{
 		switch (section)
 		{
-		case 0: return QVariant(u8"±êÌâ");
-		case 1: return QVariant(u8"´´½¨Ê±¼ä");
-		case 2: return QVariant(u8"±êÌâÊ±¼ä");
+		case 0: return QVariant(u8"æ ‡é¢˜");
+		case 1: return QVariant(u8"åˆ›å»ºæ—¶é—´");
+		case 2: return QVariant(u8"æ ‡é¢˜æ—¶é—´");
 		}
 	}
     return QVariant();
@@ -394,7 +394,7 @@ AllNotesModel::~AllNotesModel()
 
 void AllNotesModel::initAllNotes()
 {
-	//±éÀúËùÓĞ±Ê¼Ç±¾
+	//éå†æ‰€æœ‰ç¬”è®°æœ¬
 	m_type = VIEW_ALLNOTES;
 
 	com_sptr<INotebooks> spNotebooks;
@@ -418,8 +418,8 @@ HRESULT AllNotesModel::onNotebooksNotify(INotebooks* pNotebooks, NotifyArg arg)
 	{
 		case NotifyOperator::Delete:
 		{
-			//TODO: DeleteNotebookµÄÊ±ºò¾Í·Ö±ğreleaseÁËÃ¿¸önote£¬Ã¿´Îrelease¶¼»ánotify£¬
-			//ÕâÑùÉ¾³ıĞÔÄÜ»áÓĞÎÊÌâ£¬Èç¹ûÔÚÕâÀïÍ³Ò»ÒÆ³ı£¬ĞèÒª¸ÄÄÚºË£¬ÔİÇÒ¸éÖÃ¡£
+			//TODO: DeleteNotebookçš„æ—¶å€™å°±åˆ†åˆ«releaseäº†æ¯ä¸ªnoteï¼Œæ¯æ¬¡releaseéƒ½ä¼šnotifyï¼Œ
+			//è¿™æ ·åˆ é™¤æ€§èƒ½ä¼šæœ‰é—®é¢˜ï¼Œå¦‚æœåœ¨è¿™é‡Œç»Ÿä¸€ç§»é™¤ï¼Œéœ€è¦æ”¹å†…æ ¸ï¼Œæš‚ä¸”æç½®ã€‚
 			break;
 		}
 		case NotifyOperator::Add:

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "LeftSideItemDelegate.h"
 #include "searchitemdelegate.h"
 #include "globalsearcheditor.h"

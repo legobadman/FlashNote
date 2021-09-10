@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "menubutton.h"
 #include "FontColorComboBox.h"
 #include "colorgallery.h"

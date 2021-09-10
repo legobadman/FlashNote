@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "floatingmenubutton.h"
 #include "MyStyle.h"
 #include "guihelper.h"
@@ -45,13 +45,13 @@ void FloatingMenuButton::onBtnClicked()
 {
     hide();
 	com_sptr<INotebook> spNotebook;
-	AppHelper::GetNotebookByName(u8"��ʱ�ʼǱ�", &spNotebook);
+	AppHelper::GetNotebookByName(u8"临时笔记本", &spNotebook);
 	if (spNotebook)
 	{
 		com_sptr<INote> spNote;
 		HRESULT hr = CreateNote(NORMAL_NOTE, &spNote);
 		spNote->SetTitle(m_text.toStdWString());
-		//TODO: ҪתΪhtml��Ϊ���ġ�
+		//TODO: 要转为html作为正文。
 		spNotebook->AddNote(spNote);
 		//bool ret = DbService::GetInstance().SynchronizeNotebook(spNotebook);
 	}

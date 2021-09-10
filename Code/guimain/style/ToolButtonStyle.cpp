@@ -374,7 +374,7 @@ void ToolButtonStyle::getDrawArea(QRect& iconArea, QRect& textArea, QRect& arrow
 			{
 				nSpace_X = textArea.left() + (textArea.width() - arrowSz.width()) / 2;
 			}
-			else//��������ʱ����ͷλ�ڵڶ������ֺ��
+			else//两行文字时，箭头位于第二行文字后边
 			{
 				int w = fm.horizontalAdvance(strList.back());
 				nSpace_X = textArea.left() + (textArea.width() - w - arrowSz.width()) / 2 + w;
@@ -494,7 +494,7 @@ QSize ToolButtonStyle::_getTextDrawSize(Qt::Orientation o) const
 			if (m_bArrowAside)
 				nHeight = l.count() * fontHeight + PNT_TO_PIX(KBUTTON_RN_TEXT_HSPACE);
 
-			else // ������û�������ֶ�Ҫ�������ŵĿռ�, Rainbow��ť��������
+			else // 不管有没有两排字都要留下两排的空间, Rainbow按钮特殊需求。
 				nHeight += fontHeight + PNT_TO_PIX(KBUTTON_TEXT_LINE_SPACE);
 		}
 		sz = QSize(nWidth, nHeight);
@@ -737,7 +737,7 @@ void ToolButtonStyle::drawText(QPainter* painter, QRect& rcText)
 		{
 			int height = m_option->fontMetrics.height();
 			QRect rcTemp = cutRectTop(rc, height);
-			//�����ı���Ҫ����ͷ��ʱ���������ƶ�����ͷ���ȵĿհף����ܱ�֤���ּ��ϼ�ͷ����С�
+			//多行文本需要画箭头的时候，需向左移动出箭头宽度的空白，才能保证文字加上箭头后居中。
 			if (needDrawArrow() && *iter == sl.last())
 			{
 				QSize arrowSize = BUTTON_ARROW_SIZE + BUTTON_ARROWMARGINS;

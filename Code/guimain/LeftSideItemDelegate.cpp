@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "LeftSideItemDelegate.h"
 #include "moc_LeftSideItemDelegate.cpp"
 #include "MyStyle.h"

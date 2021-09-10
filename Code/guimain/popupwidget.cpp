@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "popupwidget.h"
 #include "moc_popupwidget.cpp"
 

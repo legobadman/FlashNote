@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "mindmapwidget.h"
 #include "rapidxml_print.hpp"
 #include <QAction>

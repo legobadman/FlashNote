@@ -1,4 +1,4 @@
-#include "stdafx.h"
+О╩©#include "stdafx.h"
 #include "mindnode.h"
 #include "mindnodebutton.h"
 
@@ -30,7 +30,7 @@ bool MindNodeButton::sceneEvent(QEvent* event)
 	switch (event->type())
 	{
 	case QEvent::GraphicsSceneHoverEnter:
-		//╟╢е╔╡©╥жря╬╜тз╬ьпнртмБакё╛╩╧пХр╙р╩п╘еп╤о║ё
+		//Ф▄┴И▓╝И┐╗Е┬├Е╥╡Г╩▐Е°╗Г÷╘Е╫╒Д╩╔Е╓√Д╨├О╪▄Х©≤И°─Х╕│Д╦─Д╨⌡Е┬╓Ф√╜Ц─┌
 		show();
 		update();
 		break;

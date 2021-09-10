@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "booklistview.h"
 #include "note_editwindow.h"
 #include "noteseditview.h"
@@ -58,7 +58,7 @@ bool NotesEditView::eventFilter(QObject* watched, QEvent* event)
 	return QSplitter::eventFilter(watched, event);
 }
 
-//ÁÙÊ±noteidµÄ»ñÈ¡
+//ä¸´æ—¶noteidçš„è·å–
 QString getCurrentNoteId(INoteCollection* pNoteCollection)
 {
 	com_sptr<INote> spNote;
@@ -71,7 +71,7 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 	m_type = type;
 	
 	QString noteid;
-	QModelIndex index;	//ÔİÊ±Ö»È¡modelµÚÒ»¸öË÷Òı×÷Îªµ±Ç°note¡£
+	QModelIndex index;	//æš‚æ—¶åªå–modelç¬¬ä¸€ä¸ªç´¢å¼•ä½œä¸ºå½“å‰noteã€‚
 	if (VIEW_ALLNOTES == m_type)
 	{
 		if (m_pAllNotesModel == NULL)

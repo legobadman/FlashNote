@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "bookviewmodel.h"
 #include "searcheditor.h"
 #include "toolbutton.h"

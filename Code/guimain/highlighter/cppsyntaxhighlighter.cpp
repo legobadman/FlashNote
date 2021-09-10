@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "cppsyntaxhighlighter.h"
 #include "common_types.h"
 

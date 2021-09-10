@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "MyStyle.h"
 #include "moc_MyStyle.cpp"
 #include "listpane.h"

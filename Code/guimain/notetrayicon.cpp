@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "NoteMainWindow.h"
 #include "notetrayicon.h"
 #include <QtWidgets/QMenu>
@@ -11,7 +11,7 @@ NoteTrayIcon::NoteTrayIcon(QObject* parent /* = nullptr */)
 {
 	setIcon(QIcon(":/icons/bluewhite.png"));
 	QMenu* pContext = new QMenu(NULL);
-	QAction* pQuitAction = pContext->addAction(u8"ÍË³ö");
+	QAction* pQuitAction = pContext->addAction(u8"退出程序");
 	setContextMenu(pContext);
 
 	connect(pQuitAction, SIGNAL(triggered()),

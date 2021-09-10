@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "screenwidget.h"
 #include "MyStyle.h"
 #include <QWindow>
@@ -75,7 +75,7 @@ ScreenGrabRect::ScreenGrabRect(const QPixmap& original, const QRectF& rect, QGra
 
 	for (int i = 0; i < pts.size(); i++)
 	{
-		//·ÀÖ¹Ô½¹ıÈ«ÆÁboundingrect
+		//é˜²æ­¢è¶Šè¿‡å…¨å±boundingrect
 		qreal xp = pts[i].x(), yp = pts[i].y();
 		QPointF scenePt = mapToScene(pts[i]);
 		if (scenePt.x() < 0)
@@ -98,10 +98,10 @@ void ScreenGrabRect::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	if (m_choosingRect)
 	{
-		//TODO£º¸ù¾İÊó±êÎ»ÖÃ¶¨Î»µ½µ±Ç°¿ÉÒÔĞÎ³ÉµÄÒ»¸ö´°¿ÚÇøÓò¡£
-		//Òª¸ù¾İÕâ¸öÇøÓò£¬ÊµÊ±¸üĞÂpixmapÇøÓò¡£
+		//TODOï¼šæ ¹æ®é¼ æ ‡ä½ç½®å®šä½åˆ°å½“å‰å¯ä»¥å½¢æˆçš„ä¸€ä¸ªçª—å£åŒºåŸŸã€‚
+		//è¦æ ¹æ®è¿™ä¸ªåŒºåŸŸï¼Œå®æ—¶æ›´æ–°pixmapåŒºåŸŸã€‚
 
-		//µ±È»ÓÃ»§Ò²ÓĞ¿ÉÄÜÏë¿ªÊ¼ÍÏÑ¡£¬ÓÚÊÇÒ²µÃ¼ÇÏÂ¹Ì¶¨µã¡£
+		//å½“ç„¶ç”¨æˆ·ä¹Ÿæœ‰å¯èƒ½æƒ³å¼€å§‹æ‹–é€‰ï¼Œäºæ˜¯ä¹Ÿå¾—è®°ä¸‹å›ºå®šç‚¹ã€‚
 		m_transform = SCALE_LEFT_TOP;
 		m_movescale_info.fixed_point = event->scenePos();
 		_base::mousePressEvent(event);
@@ -187,7 +187,7 @@ void ScreenGrabRect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 		{
 			px = min(max(0., px), maxW - w);
 			py = min(max(0., py), maxH - h);
-			//ĞŞÕıÎ»ÖÃ¡£
+			//ä¿®æ­£ä½ç½®ã€‚
 			setPos(px, py);
 		}
 		QPixmap slice = m_originalShot.copy(px, py, w, h);
@@ -293,7 +293,7 @@ ScreenGrabRect::MOUSE_TRANSFORM ScreenGrabRect::getMouseEventType(QPointF pressP
 {
 	qreal xp = pressPoint.x(), yp = pressPoint.y();
 	qreal h = boundingRect().height(), w = boundingRect().width();
-	static int offset = 5;		//ÎªÁË¸üÈİÒ×²¶»ñÊó±ê¶øÉèµÄÈİ´íÆ«ÒÆ
+	static int offset = 5;		//ä¸ºäº†æ›´å®¹æ˜“æ•è·é¼ æ ‡è€Œè®¾çš„å®¹é”™åç§»
 	if (xp < -3 - offset)
 	{
 		return OUTSIDE;
@@ -483,7 +483,7 @@ void ScreenShotWidget::onGrabFinish()
 	QPixmap retImage;
 	QRectF rc = getGrabImage(retImage);
 	QSize sz = m_toolbar->sizeHint();
-	//TODO:Èç¹ûÎ»ÓÚ×îÏÂ·½
+	//TODO:å¦‚æœä½äºæœ€ä¸‹æ–¹
 	qreal top = rc.bottom() + sMarginToBar;
 	qreal left = rc.right() - sz.width();
 	m_toolbar->setGeometry(QRect(left, top, sz.width(), sz.height()));

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "newitemdelegate.h"
 #include "listpane.h"
 #include "MyStyle.h"
@@ -69,7 +69,7 @@ void NewItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
 	int iconSize = opt.decorationSize.height();
 	int textMargin = 8;
 	QTextLayout textLayout2(opt.text, opt.font);
-	const int maxLineWidth = 8388607; //≤Œ’’QCommonStylePrivate::viewItemSize
+	const int maxLineWidth = 8388607; //ÂèÇÁÖßQCommonStylePrivate::viewItemSize
 	QSizeF szText = AppHelper::viewItemTextLayout(textLayout2, maxLineWidth);
 
 	int icon_xoffset = icon_center_xoffset - iconSize / 2;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "SeperateLine.h"
 
 SeperateHLine::SeperateHLine(QWidget* parent /* = nullptr */)

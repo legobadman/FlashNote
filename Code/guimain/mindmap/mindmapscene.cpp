@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "mindmapscene.h"
 #include "rapidxml_print.hpp"
 #include "mindnodebutton.h"
@@ -46,7 +46,7 @@ QString MindMapScene::mindmapXML()
 
 void MindMapScene::onNodeCreated(MindNode* pChild)
 {
-	//Ä¿Ç°ÔİÊ±Ö»ĞèÖØ»æ
+	//ç›®å‰æš‚æ—¶åªéœ€é‡ç»˜
 	pChild->setup(this);
 	onRedrawItems();
 	emit itemContentChanged(false);
@@ -61,7 +61,7 @@ void MindMapScene::onNodeDeleted(MindNode* pChild)
 
 void MindMapScene::onNodeContentsChanged()
 {
-	//TODO: Ä¿Ç°¹æÄ£ÏÂ¿´ÆğÀ´Ã»Ì«¶àÎÊÌâ£¬ÒÔºóÔÙÓÅ»¯µ¥¸öµã¼°×Ó½ÚµãµÄ¸üĞÂ
+	//TODO: ç›®å‰è§„æ¨¡ä¸‹çœ‹èµ·æ¥æ²¡å¤ªå¤šé—®é¢˜ï¼Œä»¥åå†ä¼˜åŒ–å•ä¸ªç‚¹åŠå­èŠ‚ç‚¹çš„æ›´æ–°
 	onRedrawItems();
 	emit itemContentChanged(true);
 }
@@ -100,7 +100,7 @@ void MindMapScene::arrangeAllItems(bool bDrawHolder)
 	{
 		MindNode* pRoot = pre.top();
 		
-		//¹Û²ì×Ó½ÚµãµÄ¸ß¶È£¬ÔÚyµÄ»ù´¡ÉÏÎªµ±Ç°½Úµã
+		//è§‚å¯Ÿå­èŠ‚ç‚¹çš„é«˜åº¦ï¼Œåœ¨yçš„åŸºç¡€ä¸Šä¸ºå½“å‰èŠ‚ç‚¹
 		QList<MindNode*> children = pRoot->Children(!bDrawHolder);
 		int W = pRoot->boundingRect().width();
 		int n = children.size();
@@ -130,7 +130,7 @@ void MindMapScene::arrangeAllItems(bool bDrawHolder)
 
 		if (!pRoot->isCollapsed(false) && !leftChildren.empty())
 		{
-			//ÔÙ±éÀúÃ¿Ò»¸ö×Ó¿é
+			//å†éå†æ¯ä¸€ä¸ªå­å—
 			qreal startY = -totalLeftH / 2. + pRoot->boundingRect().height() / 2.;
 			for (int i = 0; i < leftChildren.size(); i++)
 			{
@@ -145,7 +145,7 @@ void MindMapScene::arrangeAllItems(bool bDrawHolder)
 
 		if (!pRoot->isCollapsed(true) && !rightChildren.empty())
 		{
-			//ÔÙ±éÀúÃ¿Ò»¸ö×Ó¿é
+			//å†éå†æ¯ä¸€ä¸ªå­å—
 			qreal startY = -totalRightH / 2. + pRoot->boundingRect().height() / 2.;
 			for (int i = 0; i < rightChildren.size(); i++)
 			{
@@ -198,7 +198,7 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 		}
 	}
 
-	//²»¼ì²éÍ¬Î»ÖÃÊÇ·ñÓĞholderÁË£¬·´Õı¼ÆËãÎ»ÖÃÃ»É¶³É±¾¡£
+	//ä¸æ£€æŸ¥åŒä½ç½®æ˜¯å¦æœ‰holderäº†ï¼Œåæ­£è®¡ç®—ä½ç½®æ²¡å•¥æˆæœ¬ã€‚
 	if (pNewHolderParent == NULL || holderIdx < 0 ||
 		holderIdx > pNewHolderParent->Children().length())
 	{
@@ -220,7 +220,7 @@ void MindMapScene::onNodeDragged(MindNode* pNode)
 	if (m_pHolder && m_pHolder->Parent())
 	{
 		MindNode* parent = m_pHolder->Parent();
-		//TODO£ººóĞøÒª×÷·Ç·¨ÅĞ¶Ï£¬ÏÖÔÚÏÈÓÃÀ´ASSERTÁ÷³ÌµÄÕıÈ·ĞÔ¡£
+		//TODOï¼šåç»­è¦ä½œéæ³•åˆ¤æ–­ï¼Œç°åœ¨å…ˆç”¨æ¥ASSERTæµç¨‹çš„æ­£ç¡®æ€§ã€‚
 		int idx = parent->Children(false).indexOf(m_pHolder);
 		parent->removeChild(m_pHolder);
 		parent->insertChild(pNode, idx);
@@ -272,7 +272,7 @@ XML_NODE* MindMapScene::_export(MindNode* pRoot, xml_document<>& doc)
 		root->append_attribute(attr);
 	}
 
-	//level 1µÄ½ÚµãĞèÒª¼ÇÂ¼·½Ïò¡£
+	//level 1çš„èŠ‚ç‚¹éœ€è¦è®°å½•æ–¹å‘ã€‚
 	if (pRoot->level() == 1)
 	{
 		attr = doc.allocate_attribute("to_right", 
@@ -393,7 +393,7 @@ MindNode* MindMapScene::_parse(MindNode* parent, xml_node<>* root, int level)
 		child = child->next_sibling())
 	{
 		MindNode* pChild = _parse(pRoot, child, level + 1);
-		//Èç¹ûµ±Ç°pChildµÄ·½Ïò±»ÕÛµş£¬ÄÇÃ´pChildÉèÎªÒş²Ø¡£
+		//å¦‚æœå½“å‰pChildçš„æ–¹å‘è¢«æŠ˜å ï¼Œé‚£ä¹ˆpChildè®¾ä¸ºéšè—ã€‚
 		if (pChild->isToRight())
 		{
 			bool bVisible = (pRoot->rightExpandState() == EXP_EXPAND);

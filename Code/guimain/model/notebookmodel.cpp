@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "notebookmodel.h"
 #include "guihelper.h"
 #include "LeftSideItemDelegate.h"

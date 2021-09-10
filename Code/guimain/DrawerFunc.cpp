@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "DrawerFunc.h"
 #include "FramelessLineEdit.h"
 #include "searcheditor.h"

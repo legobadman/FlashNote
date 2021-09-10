@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "selectnotebookdlg.h"
 #include "guihelper.h"
 #include "ui_selectnotebookdlg.h"

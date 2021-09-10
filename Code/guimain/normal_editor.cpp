@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "common_types.h"
 #include "normal_editor.h"
 #include "MyStyle.h"

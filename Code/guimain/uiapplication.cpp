@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "uiapplication.h"
 #include "MyStyle.h"
 #include "dbservice.h"
