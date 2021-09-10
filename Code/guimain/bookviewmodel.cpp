@@ -255,6 +255,11 @@ int BookViewModel::rowCount(const QModelIndex& parent) const
 	return m_vec.size();
 }
 
+int BookViewModel::columnCount(const QModelIndex& parent) const
+{
+	return 3;
+}
+
 void BookViewModel::getNote(const QString& objId, INote** ppNote)
 {
 	if (!ppNote)
@@ -284,6 +289,12 @@ QVariant BookViewModel::data(const QModelIndex& index, int role) const
 	if (role == Qt::DisplayRole)
 	{
 		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+		switch (index.column())
+		{
+		case 0: return QVariant(pItem->m_title);
+		case 1: return QVariant(pItem->m_create_time);
+		case 2: return QVariant(pItem->m_modify_time);
+		}
 		QString displayText = pItem->m_title + "\n" + pItem->m_textAbbre;
 		return QVariant(displayText);
 	}
@@ -355,6 +366,20 @@ bool BookViewModel::setData(const QModelIndex& index, const QVariant& value, int
 	
 	}
 	return true;
+}
+
+QVariant BookViewModel::headerData(int section, Qt::Orientation, int role) const
+{
+	if (role == Qt::DisplayRole)
+	{
+		switch (section)
+		{
+		case 0: return QVariant(u8"标题");
+		case 1: return QVariant(u8"创建时间");
+		case 2: return QVariant(u8"标题时间");
+		}
+	}
+    return QVariant();
 }
 
 

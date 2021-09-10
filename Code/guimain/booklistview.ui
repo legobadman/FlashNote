@@ -263,7 +263,10 @@
       <number>6</number>
      </property>
      <item>
-      <widget class="QListView" name="listView"/>
+      <widget class="QStackedWidget" name="stackedWidget">
+       <widget class="QListView" name="listView"/>
+       <widget class="QTableView" name="tableView"/>
+      </widget>
      </item>
     </layout>
    </item>

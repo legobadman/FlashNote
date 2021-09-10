@@ -15,7 +15,10 @@ BookListView::BookListView(NotesEditView* parent)
 	: QWidget(parent)
 	, m_pCustomMenu(NULL)
 	, m_pNotesView(parent)
+	, m_sortOption(SOP_MODIFY_TIME)
+	, m_bAscent(false)
 	, m_model(NULL)
+	, m_viewType(VIEW_DIGEST)
 {
 	init();
 }
@@ -46,17 +49,28 @@ void BookListView::init()
 	m_ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_ui->listView->setFrameShape(QFrame::NoFrame);
 	m_ui->listView->viewport()->setAttribute(Qt::WA_Hover, true);
+	m_ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
+	m_ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+	m_ui->tableView->setFrameShape(QFrame::NoFrame);
+	m_ui->tableView->verticalHeader()->hide();
+	m_ui->tableView->viewport()->setAttribute(Qt::WA_Hover, true);
 
 	QPalette pal;
 	pal.setColor(QPalette::Foreground, QColor(161, 161, 161));
 	m_ui->lblNumberNotes->setPalette(pal);
 
 	m_ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_ui->tableView->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(m_ui->sort, SIGNAL(clicked()), this, SLOT(onSortBtnClicked()));
+	connect(m_ui->view, SIGNAL(clicked()), this, SLOT(onViewBtnClicked()));
 	connect(m_ui->listView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
+	connect(m_ui->tableView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
 	connect(m_ui->searcheditor, SIGNAL(textChanged(const QString&)), this, SLOT(onSearchTextChanged(const QString&)));
 
 	m_ui->listView->setItemDelegate(new NoteItemDelegate(m_ui->listView, m_ui->searcheditor));
+
+    m_pCustomMenu = new QMenu(this);
+    connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
 }
 
 BookListView::~BookListView()
@@ -65,11 +79,6 @@ BookListView::~BookListView()
 
 void BookListView::onSortBtnClicked()
 {
-    if (m_pCustomMenu == NULL)
-    {
-        m_pCustomMenu = new QMenu(this);
-        connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
-    }
 	m_pCustomMenu->clear();
 
 	QAction* pAction = new QAction(u8"修改时间", m_pCustomMenu);
@@ -103,17 +112,41 @@ void BookListView::onSortBtnClicked()
 
 void BookListView::onViewBtnClicked()
 {
+    m_pCustomMenu->clear();
 
+    QAction* pAction = new QAction(u8"摘要视图", m_pCustomMenu);
+    pAction->setData((int)DIGEST_VIEW);
+    pAction->setCheckable(true);
+    pAction->setChecked(m_viewType == VIEW_DIGEST);
+    m_pCustomMenu->addAction(pAction);
+
+    pAction = new QAction(u8"列表视图", m_pCustomMenu);
+    pAction->setData((int)TABLEVIEW);
+    pAction->setCheckable(true);
+    pAction->setChecked(m_viewType == VIEW_TABLEVIEW);
+    m_pCustomMenu->addAction(pAction);
+
+	m_pCustomMenu->popup(QCursor::pos());
+}
+
+void BookListView::_resizeTableView()
+{
+    bool bVisible = m_ui->tableView->verticalScrollBar()->isVisible();
+    int scrollbar_width = m_ui->tableView->verticalScrollBar()->width();
+    int tableW = bVisible ? (width() - scrollbar_width - 15) : width();
+    m_ui->tableView->setColumnWidth(0, 3 * tableW / 5);
+    m_ui->tableView->setColumnWidth(1, tableW / 5);
+    m_ui->tableView->setColumnWidth(2, tableW / 5);
+}
+
+void BookListView::resizeEvent(QResizeEvent* event)
+{
+	_resizeTableView();
+	QWidget::resizeEvent(event);
 }
 
 void BookListView::onCustomContextMenu(const QPoint& point)
 {
-	if (m_pCustomMenu == NULL)
-	{
-		m_pCustomMenu = new QMenu(this);
-		connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
-	}
-
 	m_pCustomMenu->clear();
 	QModelIndex index = m_ui->listView->indexAt(point);
 
@@ -199,6 +232,16 @@ void BookListView::MenuActionSlot(QAction* action)
 		m_bAscent = !m_bAscent;
 		_sort();
 	}
+	else if (nIndex == DIGEST_VIEW)
+	{
+		m_viewType = VIEW_DIGEST;
+		m_ui->stackedWidget->setCurrentWidget(m_ui->listView);
+	}
+	else if (nIndex == TABLEVIEW)
+	{
+		m_viewType = VIEW_TABLEVIEW;
+		m_ui->stackedWidget->setCurrentWidget(m_ui->tableView);
+	}
 }
 
 void BookListView::_sort()
@@ -228,24 +271,34 @@ void BookListView::onSearchTextChanged(const QString&)
 
 void BookListView::resetModel(QSortFilterProxyModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
 {
-	m_sortOption = SOP_TITLE;
-	m_bAscent = true;
-
 	m_model = pModel;
+
+	if (m_viewType == VIEW_DIGEST)
+		m_ui->stackedWidget->setCurrentWidget(m_ui->listView);
+	else
+		m_ui->stackedWidget->setCurrentWidget(m_ui->tableView);
+
 	m_ui->listView->setModel(pModel);
+
+	m_ui->tableView->setModel(pModel);
 
 	connect(this, SIGNAL(searchTriggered(const QString&)), pModel, SLOT(setFilterWildcard(const QString&)));
 	connect(m_ui->listView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
 		m_pNotesView, SLOT(onNoteItemSelected(const QModelIndex&, const QModelIndex&)));
+    connect(m_ui->tableView->selectionModel(), SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)),
+        m_pNotesView, SLOT(onNoteItemSelected(const QModelIndex&, const QModelIndex&)));
 
 	QModelIndex selectedIndex = pModel->index(0, 0);
 	m_ui->listView->setCurrentIndex(selectedIndex);
+	m_ui->tableView->setCurrentIndex(selectedIndex);
 
 	QString bookName;
 	if (type == VIEW_ALLNOTES)
 		bookName = u8"全部笔记";
 	else if (type == VIEW_NOTEBOOK || type == VIEW_TRASH)
 		bookName = AppHelper::GetNotebookName(pNoteCollection);
+
+    _sort();
 
 	m_ui->lblNotebook->setText(bookName);
 	m_ui->lblNumberNotes->setText(QString(u8"%1条笔记").arg(

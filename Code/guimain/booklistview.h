@@ -26,6 +26,8 @@ class BookListView : public QWidget
 		SORT_CREATE_TIME,
 		SORT_TITLE,
 		SORT_ASCEND,
+		DIGEST_VIEW,
+		TABLEVIEW,
 	};
 
 	enum SORT_OPTION
@@ -33,6 +35,12 @@ class BookListView : public QWidget
 		SOP_MODIFY_TIME,
 		SOP_CREATE_TIME,
 		SOP_TITLE,
+	};
+
+	enum VIEW_TYPE
+	{
+		VIEW_DIGEST,
+		VIEW_TABLEVIEW,
 	};
 
 public:
@@ -52,14 +60,19 @@ public slots:
 	void onSortBtnClicked();
 	void onViewBtnClicked();
 
+protected:
+	void resizeEvent(QResizeEvent* event);
+
 private:
 	void _sort();
+	void _resizeTableView();
 
 	Ui::BookListView* m_ui;
 	QMenu* m_pCustomMenu;
 	NotesEditView* m_pNotesView;
 	QSortFilterProxyModel* m_model;
 	SORT_OPTION m_sortOption;
+	VIEW_TYPE m_viewType;
 	bool m_bAscent;
 };
 
