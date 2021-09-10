@@ -15,6 +15,7 @@ BookListView::BookListView(NotesEditView* parent)
 	: QWidget(parent)
 	, m_pCustomMenu(NULL)
 	, m_pNotesView(parent)
+	, m_model(NULL)
 {
 	init();
 }
@@ -51,6 +52,7 @@ void BookListView::init()
 	m_ui->lblNumberNotes->setPalette(pal);
 
 	m_ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(m_ui->sort, SIGNAL(clicked()), this, SLOT(onSortBtnClicked()));
 	connect(m_ui->listView, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(onCustomContextMenu(const QPoint&)));
 	connect(m_ui->searcheditor, SIGNAL(textChanged(const QString&)), this, SLOT(onSearchTextChanged(const QString&)));
 
@@ -59,6 +61,49 @@ void BookListView::init()
 
 BookListView::~BookListView()
 {
+}
+
+void BookListView::onSortBtnClicked()
+{
+    if (m_pCustomMenu == NULL)
+    {
+        m_pCustomMenu = new QMenu(this);
+        connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
+    }
+	m_pCustomMenu->clear();
+
+	QAction* pAction = new QAction(u8"修改时间", m_pCustomMenu);
+	pAction->setData((int)SORT_MODIFY_TIME);
+	pAction->setCheckable(true);
+	pAction->setChecked(m_sortOption == SOP_MODIFY_TIME);
+	m_pCustomMenu->addAction(pAction);
+
+	pAction = new QAction(u8"创建时间", m_pCustomMenu);
+	pAction->setData((int)SORT_CREATE_TIME);
+    pAction->setCheckable(true);
+    pAction->setChecked(m_sortOption == SOP_CREATE_TIME);
+	m_pCustomMenu->addAction(pAction);
+
+	pAction = new QAction(u8"标题", m_pCustomMenu);
+	pAction->setData((int)SORT_TITLE);
+    pAction->setCheckable(true);
+    pAction->setChecked(m_sortOption == SOP_TITLE);
+	m_pCustomMenu->addAction(pAction);
+
+	m_pCustomMenu->addSeparator();
+
+	pAction = new QAction(u8"倒序排序", m_pCustomMenu);
+	pAction->setData((int)SORT_ASCEND);
+	pAction->setCheckable(true);
+	pAction->setChecked(!m_bAscent);
+	m_pCustomMenu->addAction(pAction);
+
+	m_pCustomMenu->popup(QCursor::pos());
+}
+
+void BookListView::onViewBtnClicked()
+{
+
 }
 
 void BookListView::onCustomContextMenu(const QPoint& point)
@@ -116,36 +161,63 @@ void BookListView::MenuActionSlot(QAction* action)
 		QString bookid = QString::fromStdWString(bookId);
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebookById(bookid, &spNotebook);
-#ifdef USE_RPC
-		bool bRet = RPCService::GetInstance().RemoveNote(AppHelper::coreApp(), spNotebook, spNote);
-#else
 		bool bRet = DbService::GetInstance().RemoveNote(AppHelper::coreApp(), spNotebook, spNote);
-#endif
 	}
 	else if (nIndex == RECOVER_NOTE)
 	{
 		com_sptr<ITrash> pTrash;
 		AppHelper::coreApp()->GetTrash(&pTrash);
-#ifdef USE_RPC
-		bool bRet = RPCService::GetInstance().RecoverNote(AppHelper::coreApp(), pTrash, spNote);
-#else
 		bool bRet = DbService::GetInstance().RecoverNote(AppHelper::coreApp(), pTrash, spNote);
-#endif
 	}
 	else if (nIndex == DELETE_NOTE)
 	{
 		com_sptr<ITrash> pTrash;
 		AppHelper::coreApp()->GetTrash(&pTrash);
-#ifdef USE_RPC
-		bool bRet = RPCService::GetInstance().DeleteNote(pTrash, spNote);
-#else
 		bool bRet = DbService::GetInstance().DeleteNote(pTrash, spNote);
-#endif
 	}
 	else if (nIndex == OPEN_NOTE)
 	{
 		AppHelper::openNoteInIsoWindow(AppHelper::GetNoteId(spNote));
 	}
+	else if (nIndex == SORT_CREATE_TIME)
+	{
+		m_sortOption = SOP_CREATE_TIME;
+		_sort();
+	}
+	else if (nIndex == SORT_MODIFY_TIME)
+	{
+		m_sortOption = SOP_MODIFY_TIME;
+		_sort();
+	}
+	else if (nIndex == SORT_TITLE)
+	{
+		m_sortOption = SOP_TITLE;
+		_sort();
+	}
+	else if (nIndex == SORT_ASCEND)
+	{
+		m_bAscent = !m_bAscent;
+		_sort();
+	}
+}
+
+void BookListView::_sort()
+{
+	int sortRole = 0;
+	if (m_sortOption == SOP_TITLE)
+	{
+		sortRole = ItemNoteTitle;
+	}
+	else if (m_sortOption == SOP_CREATE_TIME)
+	{
+		sortRole = ItemNoteCreateTime;
+	}
+	else if (m_sortOption == SOP_MODIFY_TIME)
+	{
+		sortRole = ItemNoteModifyTime;
+	}
+	m_model->setSortRole(sortRole);
+	m_model->sort(0, m_bAscent ? Qt::AscendingOrder : Qt::DescendingOrder);
 }
 
 void BookListView::onSearchTextChanged(const QString&)
@@ -156,6 +228,10 @@ void BookListView::onSearchTextChanged(const QString&)
 
 void BookListView::resetModel(QSortFilterProxyModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
 {
+	m_sortOption = SOP_TITLE;
+	m_bAscent = true;
+
+	m_model = pModel;
 	m_ui->listView->setModel(pModel);
 
 	connect(this, SIGNAL(searchTriggered(const QString&)), pModel, SLOT(setFilterWildcard(const QString&)));

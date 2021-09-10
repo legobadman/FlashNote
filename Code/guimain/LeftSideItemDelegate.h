@@ -34,6 +34,8 @@ enum LEFT_SIDE_ROLE
 	ItemNoteTitle,
 	ItemNoteContent,
 	ItemNoteShowDataTime,
+	ItemNoteCreateTime,
+	ItemNoteModifyTime,
 	ItemNoteAllContent,
 };
 

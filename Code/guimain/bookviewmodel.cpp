@@ -330,6 +330,16 @@ QVariant BookViewModel::data(const QModelIndex& index, int role) const
 		NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
 		return QVariant(pItem->m_modify_time);
 	}
+	else if (role == ItemNoteCreateTime)
+	{
+        NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+        return QVariant(pItem->m_create_time);
+	}
+	else if (role == ItemNoteModifyTime)
+	{
+        NoteItem* pItem = static_cast<NoteItem*>(index.internalPointer());
+        return QVariant(pItem->m_modify_time);
+	}
 	else
 	{
 		return var;

@@ -22,6 +22,17 @@ class BookListView : public QWidget
 		RECOVER_NOTE,		//»Ö¸´·ÏÖ½Â¨ÖÐµÄ±Ê¼Ç¡£
 		DELETE_NOTE,		//³¹µ×É¾³ý±Ê¼Ç¡£
 		OPEN_NOTE,			//µ¥¶À´ò¿ª±Ê¼Ç¡£
+		SORT_MODIFY_TIME,
+		SORT_CREATE_TIME,
+		SORT_TITLE,
+		SORT_ASCEND,
+	};
+
+	enum SORT_OPTION
+	{
+		SOP_MODIFY_TIME,
+		SOP_CREATE_TIME,
+		SOP_TITLE,
 	};
 
 public:
@@ -38,11 +49,18 @@ public slots:
 	void onCustomContextMenu(const QPoint& point);
 	void MenuActionSlot(QAction *action);
 	void onSearchTextChanged(const QString&);
+	void onSortBtnClicked();
+	void onViewBtnClicked();
 
 private:
+	void _sort();
+
 	Ui::BookListView* m_ui;
 	QMenu* m_pCustomMenu;
 	NotesEditView* m_pNotesView;
+	QSortFilterProxyModel* m_model;
+	SORT_OPTION m_sortOption;
+	bool m_bAscent;
 };
 
 #endif
