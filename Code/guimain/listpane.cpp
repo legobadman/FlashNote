@@ -53,12 +53,13 @@ NewNoteItem::NewNoteItem(QWidget* parent)
 	m_pCustomMenu->setObjectName("newnotemenu");
 
 	QPalette palette(this->palette());
-	palette.setColor(QPalette::Window, QColor(43, 47, 60));
+	palette.setColor(QPalette::Window, QColor(42, 51, 60));
 	palette.setColor(QPalette::Text, QColor(212, 220, 226));
-	palette.setColor(QPalette::Button, QColor(43, 47, 60));
+	palette.setColor(QPalette::Button, QColor(42, 51, 60));
+	palette.setColor(QPalette::Highlight, QColor(42, 51, 60));
 	m_pCustomMenu->setPalette(palette);
 
-	QFont font("Microsoft YaHei", 12);
+	QFont font("Microsoft YaHei", 11);
 
 	QAction* pAction = new QAction(u8"笔记", m_pCustomMenu);
 	pAction->setData((int)MENU_NEWNOTE);
@@ -176,15 +177,13 @@ void NewNoteItem::mouseReleaseEvent(QMouseEvent* e)
 		}
 		else if (menu_hover_start <= x && x <= menu_hover_end)
 		{
-			m_pCustomMenu->popup(QCursor::pos());
-
-			//PopupWidget* popup = new PopupWidget(this);
-			//NewNoteMenu* pNewMenu = new NewNoteMenu;
-			//connect(pNewMenu, SIGNAL(newnote(NOTE_TYPE)), this, SIGNAL(newnote(NOTE_TYPE)));
-			//popup->setContentWidget(pNewMenu);
-			//QPoint pGlobal = mapToGlobal(QPoint(menu_hover_start + 16, 23 + 16));
-			//popup->exec(pGlobal.x(), pGlobal.y(), NEW_NOTE_WIDGET_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 2);
-			//delete popup;
+			PopupWidget* popup = new PopupWidget(this);
+			NewNoteMenu* pNewMenu = new NewNoteMenu;
+			connect(pNewMenu, SIGNAL(newnote(NOTE_TYPE)), this, SIGNAL(newnote(NOTE_TYPE)));
+			popup->setContentWidget(pNewMenu);
+			QPoint pGlobal = mapToGlobal(QPoint(menu_hover_start + 16, 23 + 16));
+			popup->exec(pGlobal.x(), pGlobal.y(), NEW_NOTE_WIDGET_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 2);
+			delete popup;
 		}
 	}
 }
@@ -330,14 +329,21 @@ NewNoteMenu::NewNoteMenu(QWidget* parent)
 
 	QStandardItemModel* pModel = new QStandardItemModel;
 
-	QStandardItem* pNormalNote = new QStandardItem(u8"笔记");
+	QStandardItem* pNormalNote = new QStandardItem(QIcon(":/icons/32x32/menu_newnote.png"), u8"笔记");
 	pModel->appendRow(pNormalNote);
 
-	QStandardItem* pMindMap = new QStandardItem(u8"思维导图");
+	QStandardItem* pMindMap = new QStandardItem(QIcon(":/icons/32x32/menu_mindmap.png"), u8"思维导图");
 	pModel->appendRow(pMindMap);
 
-	QStandardItem* pSchedule = new QStandardItem(u8"进度图");
+	QStandardItem* pSchedule = new QStandardItem(QIcon(":/icons/32x32/menu_mindmap.png"), u8"进度图");
 	pModel->appendRow(pSchedule);
+
+	setLineWidth(1);
+	int style = this->frameStyle();
+	QFrame::Shape shape = this->frameShape();
+
+	setFrameShape(QFrame::Panel);
+	setFrameShadow(QFrame::Sunken);
 
 	setModel(pModel);
 	viewport()->setAttribute(Qt::WA_Hover, true);
@@ -349,6 +355,11 @@ NewNoteMenu::NewNoteMenu(QWidget* parent)
 
 NewNoteMenu::~NewNoteMenu()
 {
+}
+
+void NewNoteMenu::paintEvent(QPaintEvent* e)
+{
+	QListView::paintEvent(e);
 }
 
 void NewNoteMenu::onIndexClicked(const QModelIndex& index)
@@ -515,7 +526,6 @@ void NavigationPanel::onCustomContextMenu(const QPoint& point)
 		connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
 	}
 
-	//ÔÝÊ±Ö»´¦ÀíNotebooks
 	ITEM_CONTENT_TYPE type = index.data(LEFT_SIDE_ROLE::ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
 	if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOKITEM)
 	{

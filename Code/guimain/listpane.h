@@ -74,6 +74,9 @@ public:
 	NewNoteMenu(QWidget* parent = nullptr);
 	~NewNoteMenu();
 
+protected:
+	void paintEvent(QPaintEvent* e) override;
+
 public slots:
 	void onIndexClicked(const QModelIndex& index);
 

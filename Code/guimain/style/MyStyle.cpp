@@ -127,6 +127,84 @@ void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPaint
 	return QProxyStyle::drawPrimitive(pe, opt, p, widget);
 }
 
+void MyStyle::drawNewItemMenu(const QStyleOptionMenuItem* menuitem, QPainter* painter, const QWidget* widget) const
+{
+	QRect rect = menuitem->rect;
+    int x, y, w, h;
+    menuitem->rect.getRect(&x, &y, &w, &h);
+    int tab = menuitem->tabWidth;
+    bool dis = !(menuitem->state & State_Enabled);
+    bool checked = menuitem->checkType != QStyleOptionMenuItem::NotCheckable
+        ? menuitem->checked : false;
+    bool act = menuitem->state & State_Selected;
+	const int gutterWidth = 3;
+	int checkcol = 36;
+
+    static const int windowsItemVMargin = 4; // menu item ver text margin
+    static const int windowsArrowHMargin = 6; // arrow horizontal margin
+    static const int windowsRightBorder = 15; // right border on windows
+
+    QRect vCheckRect = visualRect(menuitem->direction, menuitem->rect, QRect(menuitem->rect.x(),
+        menuitem->rect.y(), checkcol - (gutterWidth + menuitem->rect.x()), menuitem->rect.height()));
+
+    if (act) {
+		//selected color
+		painter->setPen(Qt::NoPen);
+		painter->setBrush(QColor(73, 92, 106));
+		painter->drawRect(menuitem->rect);
+    }
+
+    if (!menuitem->icon.isNull()) {
+        QIcon::Mode mode = dis ? QIcon::Disabled : QIcon::Normal;
+        if (act && !dis)
+            mode = QIcon::Active;
+        QPixmap pixmap;
+        if (checked)
+            pixmap = menuitem->icon.pixmap(proxy()->pixelMetric(PM_SmallIconSize, menuitem, widget), mode, QIcon::On);
+        else
+            pixmap = menuitem->icon.pixmap(proxy()->pixelMetric(PM_SmallIconSize, menuitem, widget), mode);
+        const int pixw = pixmap.width() / pixmap.devicePixelRatio();
+        const int pixh = pixmap.height() / pixmap.devicePixelRatio();
+		static const int icon_xoffset = 7;
+		QPoint topLeft(menuitem->rect.x() + icon_xoffset, menuitem->rect.y() + (menuitem->rect.height() - pixh) / 2);
+        painter->setPen(menuitem->palette.text().color());
+        painter->drawPixmap(topLeft, pixmap);
+    }
+
+    painter->setPen(menuitem->palette.buttonText().color());
+
+    const QColor textColor = menuitem->palette.text().color();
+    if (dis)
+        painter->setPen(textColor);
+
+    int xm = 43;
+    int xpos = menuitem->rect.x() + xm;
+    QRect textRect(xpos, y + windowsItemVMargin, w - xm - windowsRightBorder - tab + 1, h - 2 * windowsItemVMargin);
+    QRect vTextRect = visualRect(menuitem->direction, menuitem->rect, textRect);
+    QString s = menuitem->text;
+    if (!s.isEmpty()) {    // draw text
+        painter->save();
+        int t = s.indexOf(QLatin1Char('\t'));
+        int text_flags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
+        if (!proxy()->styleHint(SH_UnderlineShortcut, menuitem, widget))
+            text_flags |= Qt::TextHideMnemonic;
+        text_flags |= Qt::AlignLeft;
+        if (t >= 0) {
+            QRect vShortcutRect = visualRect(menuitem->direction, menuitem->rect,
+                QRect(textRect.topRight(), QPoint(menuitem->rect.right(), textRect.bottom())));
+            painter->drawText(vShortcutRect, text_flags, s.mid(t + 1));
+            s = s.left(t);
+        }
+        QFont font = menuitem->font;
+        if (menuitem->menuItemType == QStyleOptionMenuItem::DefaultItem)
+            font.setBold(true);
+        painter->setFont(font);
+        painter->setPen(textColor);
+        painter->drawText(vTextRect, text_flags, s.left(t));
+        painter->restore();
+    }
+}
+
 void MyStyle::drawControl(ControlElement element, const QStyleOption* opt, QPainter* p, const QWidget* w) const
 {
 	switch (element)
@@ -139,11 +217,13 @@ void MyStyle::drawControl(ControlElement element, const QStyleOption* opt, QPain
 		{
 			if (w->objectName() == "newnotemenu")
 			{
-				QStyleOption* pOpt = const_cast<QStyleOption*>(opt);
-				QStyleOptionMenuItem* option = static_cast<QStyleOptionMenuItem*>(pOpt);
-				int j;
-				j = 0;
-				p->setBrush(QColor(43, 47, 60));
+				if (const QStyleOptionMenuItem* menuitem = qstyleoption_cast<const QStyleOptionMenuItem*>(opt))
+				{
+					if (menuitem->menuItemType == QStyleOptionMenuItem::Normal)
+					{
+						return drawNewItemMenu(menuitem, p, w);
+					}
+				}
 			}
 		}
 	}
@@ -183,7 +263,7 @@ int MyStyle::pixelMetric(PixelMetric m, const QStyleOption* opt, const QWidget* 
 		case PM_SmallIconSize: return MyStyle::dpiScaled(32);
 		}
 	}
-	return QProxyStyle::pixelMetric(m, opt, widget);
+	return base::pixelMetric(m, opt, widget);
 }
 
 QRect MyStyle::subElementRect(SubElement element, const QStyleOption* option, const QWidget* widget) const

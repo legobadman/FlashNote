@@ -24,7 +24,7 @@ void NewItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModel
 
 	option->palette.setColor(QPalette::All, QPalette::Text, QColor(213, 221, 227));
 	option->backgroundBrush.setStyle(Qt::SolidPattern);
-	option->decorationSize = QSize(32, 32);
+	option->decorationSize = QSize(28, 28);
 	
 	if (option->state & QStyle::State_Selected)
 	{

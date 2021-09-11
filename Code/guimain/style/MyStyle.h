@@ -43,11 +43,13 @@ public:
 		QStyleHintReturn* shret = nullptr) const override;
 	int pixelMetric(PixelMetric m, const QStyleOption* opt = nullptr, const QWidget* widget = nullptr) const override;
 	QRect subElementRect(SubElement element, const QStyleOption* option, const QWidget* widget) const override;
+    QSize sizeFromContents(ContentsType ct, const QStyleOption* opt, const QSize& contentsSize, const QWidget* widget = nullptr) const override;
 
 private:
 	void drawMyLineEdit(PrimitiveElement pe, const QStyleOption* opt, QPainter* p, const QWidget* widget) const;
 	void drawComplexControl_MyToolButton(const StyleOptionToolButton* option, QPainter* painter, const QWidget* widget) const;
 	void drawDropdownArrow(QPainter* painter, QRect downArrowRect) const;
+	void drawNewItemMenu(const QStyleOptionMenuItem* menuitem, QPainter* p, const QWidget* w) const;
 };
 
 #endif
