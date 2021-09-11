@@ -63,7 +63,10 @@ NewNoteItem::NewNoteItem(QWidget* parent)
 
 	QAction* pAction = new QAction(u8"笔记", m_pCustomMenu);
 	pAction->setData((int)MENU_NEWNOTE);
-	pAction->setIcon(QIcon(":/icons/32x32/menu_newnote.png"));
+	QIcon iconNote;
+	iconNote.addFile(":/icons/32x32/menu_newnote.png", QSize(), QIcon::Normal);
+	iconNote.addFile(":/icons/32x32/menu_newnote_on.png", QSize(), QIcon::Active);
+	pAction->setIcon(iconNote);
 	pAction->setFont(font);
 	m_pCustomMenu->addAction(pAction);
 

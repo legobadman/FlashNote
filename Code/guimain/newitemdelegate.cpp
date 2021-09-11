@@ -63,7 +63,7 @@ void NewItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
 	}
 
 	// draw the icon
-	QIcon::State state = opt.state & QStyle::State_Open ? QIcon::On : QIcon::Off;
+	QIcon::State state = QIcon::Off;// opt.state& QStyle::State_Open ? QIcon::On : QIcon::Off;
 
 	const int icon_center_xoffset = 22;
 	int iconSize = opt.decorationSize.height();
@@ -80,7 +80,7 @@ void NewItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
 	QRect iconRect(opt.rect.x() + icon_xoffset, opt.rect.y() + icon_yoffset, iconSize, iconSize);
 	QRect textRect(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset, szText.width(), szText.height());
 
-	opt.icon.paint(painter, iconRect, opt.decorationAlignment, QIcon::Normal, state);
+	opt.icon.paint(painter, iconRect, opt.decorationAlignment, QIcon::Active, state);
 
 	// draw the text
 	if (!opt.text.isEmpty())
