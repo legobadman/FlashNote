@@ -43,7 +43,6 @@ public:
 		QStyleHintReturn* shret = nullptr) const override;
 	int pixelMetric(PixelMetric m, const QStyleOption* opt = nullptr, const QWidget* widget = nullptr) const override;
 	QRect subElementRect(SubElement element, const QStyleOption* option, const QWidget* widget) const override;
-    QSize sizeFromContents(ContentsType ct, const QStyleOption* opt, const QSize& contentsSize, const QWidget* widget = nullptr) const override;
 
 private:
 	void drawMyLineEdit(PrimitiveElement pe, const QStyleOption* opt, QPainter* p, const QWidget* widget) const;
