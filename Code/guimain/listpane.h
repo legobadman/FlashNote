@@ -62,8 +62,6 @@ private:
 	const int menu_hover_end = NEW_NOTE_WIDGET_WIDTH - 20;
 	const int menu_hover_start = menu_hover_end - 16;
 
-	QMenu* m_pCustomMenu;
-
 	bool m_bPressed;
 };
 

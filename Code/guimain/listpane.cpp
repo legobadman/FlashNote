@@ -45,44 +45,9 @@ NewNoteItem::NewNoteItem(QWidget* parent)
 	: QWidget(parent)
 	, m_bPressed(false)
 	, m_hoverObj(MOUSE_IN_OTHER)
-	, m_pCustomMenu(NULL)
 {
 	setMouseTracking(true);
 	setFixedSize(MyStyle::dpiScaledSize(QSize(NEW_NOTE_WIDGET_WIDTH, 60)));
-	m_pCustomMenu = new QMenu(this);
-	m_pCustomMenu->setObjectName("newnotemenu");
-
-	QPalette palette(this->palette());
-	palette.setColor(QPalette::Window, QColor(42, 51, 60));
-	palette.setColor(QPalette::Text, QColor(212, 220, 226));
-	palette.setColor(QPalette::Button, QColor(42, 51, 60));
-	palette.setColor(QPalette::Highlight, QColor(42, 51, 60));
-	m_pCustomMenu->setPalette(palette);
-
-	QFont font("Microsoft YaHei", 11);
-
-	QAction* pAction = new QAction(u8"笔记", m_pCustomMenu);
-	pAction->setData((int)MENU_NEWNOTE);
-	QIcon iconNote;
-	iconNote.addFile(":/icons/32x32/menu_newnote.png", QSize(), QIcon::Normal);
-	iconNote.addFile(":/icons/32x32/menu_newnote_on.png", QSize(), QIcon::Active);
-	pAction->setIcon(iconNote);
-	pAction->setFont(font);
-	m_pCustomMenu->addAction(pAction);
-
-	pAction = new QAction(u8"思维导图", m_pCustomMenu);
-	pAction->setData((int)MENU_MINDMAP);
-	pAction->setIcon(QIcon(":/icons/32x32/menu_mindmap.png"));
-	pAction->setFont(font);
-	m_pCustomMenu->addAction(pAction);
-
-	pAction = new QAction(u8"进度图", m_pCustomMenu);
-	pAction->setData((int)MENU_SCHEDULE);
-	pAction->setIcon(QIcon(":/icons/32x32/menu_mindmap.png"));
-	pAction->setFont(font);
-	m_pCustomMenu->addAction(pAction);
-
-	connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
 }
 
 void NewNoteItem::initStyleOption(QStyleOptionViewItem* option) const
@@ -331,8 +296,11 @@ NewNoteMenu::NewNoteMenu(QWidget* parent)
 	connect(this, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onIndexClicked(const QModelIndex&)));
 
 	QStandardItemModel* pModel = new QStandardItemModel;
-
-	QStandardItem* pNormalNote = new QStandardItem(QIcon(":/icons/32x32/menu_newnote.png"), u8"笔记");
+ 
+    QIcon iconNote;
+    iconNote.addFile(":/icons/32x32/menu_newnote.png", QSize(), QIcon::Normal);
+    iconNote.addFile(":/icons/32x32/menu_newnote_on.png", QSize(), QIcon::Active);
+	QStandardItem* pNormalNote = new QStandardItem(iconNote, u8"笔记");
 	pModel->appendRow(pNormalNote);
 
 	QStandardItem* pMindMap = new QStandardItem(QIcon(":/icons/32x32/menu_mindmap.png"), u8"思维导图");
