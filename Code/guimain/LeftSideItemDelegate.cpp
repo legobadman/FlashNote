@@ -151,6 +151,9 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 
 	ITEM_CONTENT_TYPE type = index.data(ItemContentTypeRole).value<ITEM_CONTENT_TYPE>();
 	ITEM_WIDGET_TYPE widgetType = index.data(ItemWidgetTypeRole).value<ITEM_WIDGET_TYPE>();
+	QString bookId = index.data(ItemCoreObjIdRole).toString();
+	com_sptr<INotebook> spNotebook;
+	AppHelper::GetNotebookById(bookId, &spNotebook);
 
 	NoteItemTreeView* pTreeview = qobject_cast<NoteItemTreeView*>(parent());
 
@@ -255,10 +258,27 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 
 		QPointF paintPosition = textRect2.topLeft();
 
-		QTextLayout textLayout(opt.text, opt.font);
+		QString displayText = opt.text;
+		QVector<QTextLayout::FormatRange> selections;
+		if (spNotebook)
+		{
+			int nCount = AppHelper::GetNoteCounts(spNotebook);
+			QString content = QString("  (%1)").arg(QString::number(nCount));
+
+            QTextLayout::FormatRange frg;
+            frg.start = opt.text.length();
+            frg.length = content.length();
+            frg.format.setForeground(QColor(144, 154, 161));
+			QFont font("Consolas", 7);
+			frg.format.setFont(font);
+			displayText.append(content);
+			selections.push_back(frg);
+		}
+
+		QTextLayout textLayout(displayText, opt.font);
 		textLayout.setTextOption(textOption);
 		AppHelper::viewItemTextLayout(textLayout, textRect.width());
-		textLayout.draw(painter, paintPosition);
+		textLayout.draw(painter, paintPosition, selections);
 	}
 	painter->restore();
 }

@@ -677,10 +677,6 @@ void NavigationPanel::initNotebookItem()
 		QString bookName = AppHelper::GetNotebookName(spNotebook);
 		QString bookId = AppHelper::GetNotebookId(spNotebook);
 
-		int nBookCnt = 0;
-		spNotebook->GetCount(&nBookCnt);
-		if (nBookCnt > 0)
-			bookName.append(QString("  (%1)").arg(QString::number(nBookCnt)));
 		QStandardItem* pItem = new QStandardItem(bookName);
 		pItem->setEditable(false);
 		pItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
