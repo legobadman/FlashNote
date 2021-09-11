@@ -131,10 +131,21 @@ void MyStyle::drawControl(ControlElement element, const QStyleOption* opt, QPain
 {
 	switch (element)
 	{
-	case CE_ComboBoxLabel:
-		break;
-	case CE_ShapedFrame:
-		break;
+		case CE_ComboBoxLabel:
+			break;
+		case CE_ShapedFrame:
+			break;
+		case CE_MenuItem:
+		{
+			if (w->objectName() == "newnotemenu")
+			{
+				QStyleOption* pOpt = const_cast<QStyleOption*>(opt);
+				QStyleOptionMenuItem* option = static_cast<QStyleOptionMenuItem*>(pOpt);
+				int j;
+				j = 0;
+				p->setBrush(QColor(43, 47, 60));
+			}
+		}
 	}
 	return base::drawControl(element, opt, p, w);
 }
@@ -164,6 +175,14 @@ int MyStyle::styleHint(StyleHint sh, const QStyleOption* opt, const QWidget* w, 
 
 int MyStyle::pixelMetric(PixelMetric m, const QStyleOption* opt, const QWidget* widget) const
 {
+	if (widget && widget->objectName() == "newnotemenu")
+	{
+		switch (m)
+		{
+		case PM_MenuPanelWidth: return 0;
+		case PM_SmallIconSize: return MyStyle::dpiScaled(32);
+		}
+	}
 	return QProxyStyle::pixelMetric(m, opt, widget);
 }
 

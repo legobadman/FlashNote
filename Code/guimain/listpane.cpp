@@ -45,9 +45,40 @@ NewNoteItem::NewNoteItem(QWidget* parent)
 	: QWidget(parent)
 	, m_bPressed(false)
 	, m_hoverObj(MOUSE_IN_OTHER)
+	, m_pCustomMenu(NULL)
 {
 	setMouseTracking(true);
 	setFixedSize(MyStyle::dpiScaledSize(QSize(NEW_NOTE_WIDGET_WIDTH, 60)));
+	m_pCustomMenu = new QMenu(this);
+	m_pCustomMenu->setObjectName("newnotemenu");
+
+	QPalette palette(this->palette());
+	palette.setColor(QPalette::Window, QColor(43, 47, 60));
+	palette.setColor(QPalette::Text, QColor(212, 220, 226));
+	palette.setColor(QPalette::Button, QColor(43, 47, 60));
+	m_pCustomMenu->setPalette(palette);
+
+	QFont font("Microsoft YaHei", 12);
+
+	QAction* pAction = new QAction(u8"笔记", m_pCustomMenu);
+	pAction->setData((int)MENU_NEWNOTE);
+	pAction->setIcon(QIcon(":/icons/32x32/menu_newnote.png"));
+	pAction->setFont(font);
+	m_pCustomMenu->addAction(pAction);
+
+	pAction = new QAction(u8"思维导图", m_pCustomMenu);
+	pAction->setData((int)MENU_MINDMAP);
+	pAction->setIcon(QIcon(":/icons/32x32/menu_mindmap.png"));
+	pAction->setFont(font);
+	m_pCustomMenu->addAction(pAction);
+
+	pAction = new QAction(u8"进度图", m_pCustomMenu);
+	pAction->setData((int)MENU_SCHEDULE);
+	pAction->setIcon(QIcon(":/icons/32x32/menu_mindmap.png"));
+	pAction->setFont(font);
+	m_pCustomMenu->addAction(pAction);
+
+	connect(m_pCustomMenu, SIGNAL(triggered(QAction*)), this, SLOT(MenuActionSlot(QAction*)));
 }
 
 void NewNoteItem::initStyleOption(QStyleOptionViewItem* option) const
@@ -145,14 +176,36 @@ void NewNoteItem::mouseReleaseEvent(QMouseEvent* e)
 		}
 		else if (menu_hover_start <= x && x <= menu_hover_end)
 		{
-			PopupWidget* popup = new PopupWidget(this);
-			NewNoteMenu* pNewMenu = new NewNoteMenu;
-			connect(pNewMenu, SIGNAL(newnote(NOTE_TYPE)), this, SIGNAL(newnote(NOTE_TYPE)));
-			popup->setContentWidget(pNewMenu);
-			QPoint pGlobal = mapToGlobal(QPoint(menu_hover_start + 16, 23 + 16));
-			popup->exec(pGlobal.x(), pGlobal.y(), NEW_NOTE_WIDGET_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 2);
-			delete popup;
+			m_pCustomMenu->popup(QCursor::pos());
+
+			//PopupWidget* popup = new PopupWidget(this);
+			//NewNoteMenu* pNewMenu = new NewNoteMenu;
+			//connect(pNewMenu, SIGNAL(newnote(NOTE_TYPE)), this, SIGNAL(newnote(NOTE_TYPE)));
+			//popup->setContentWidget(pNewMenu);
+			//QPoint pGlobal = mapToGlobal(QPoint(menu_hover_start + 16, 23 + 16));
+			//popup->exec(pGlobal.x(), pGlobal.y(), NEW_NOTE_WIDGET_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 2);
+			//delete popup;
 		}
+	}
+}
+
+void NewNoteItem::MenuActionSlot(QAction* action)
+{
+	if (action == NULL)
+		return;
+
+	MENU_ITEM nIndex = (MENU_ITEM)action->data().toInt();
+	if (nIndex == MENU_NEWNOTE)
+	{
+		emit newnote(NORMAL_NOTE);
+	}
+	else if (nIndex == MENU_MINDMAP)
+	{
+		emit newnote(MINDMAP);
+	}
+	else if (nIndex == MENU_SCHEDULE)
+	{
+		emit newnote(SCHEDULE);
 	}
 }
 

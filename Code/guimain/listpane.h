@@ -20,6 +20,14 @@ enum MOUSE_HINT
 class NewNoteItem : public QWidget
 {
 	Q_OBJECT
+
+	enum MENU_ITEM
+	{
+		MENU_NEWNOTE,
+		MENU_MINDMAP,
+		MENU_SCHEDULE,
+	};
+
 public:
 	NewNoteItem(QWidget* parent = nullptr);
 	~NewNoteItem();
@@ -38,6 +46,9 @@ signals:
 	void newnote(NOTE_TYPE);
 	void rightmenu();
 
+private slots:
+	void MenuActionSlot(QAction* action);
+
 private:
 	void setPressed(bool bPressed);
 	bool isDown() const { return m_bPressed; }
@@ -50,6 +61,8 @@ private:
 	const int text_hover_end = 126;
 	const int menu_hover_end = NEW_NOTE_WIDGET_WIDTH - 20;
 	const int menu_hover_start = menu_hover_end - 16;
+
+	QMenu* m_pCustomMenu;
 
 	bool m_bPressed;
 };
