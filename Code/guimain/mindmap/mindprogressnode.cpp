@@ -33,11 +33,13 @@ void MindProgressNode::setup(MindMapScene* pScene)
 	}
 	QGraphicsTextItem::setProgress(m_progress);
 	updateToolTip();
+	updateTipIcon();
 }
 
 void MindProgressNode::initUIColor()
 {
 	m_selectedBorder = QColor(23, 157, 235);
+	m_mainThemeColor = QColor(0, 181, 72);
 	if (m_children.empty())
 	{
 		m_backgroudColor = QColor(255, 255, 255);
@@ -54,9 +56,22 @@ void MindProgressNode::initUIColor()
 void MindProgressNode::updateNodeColor()
 {
 	m_textColor = QColor(0, 0, 0);
-	if (m_children.empty())
+	if (m_children.empty() && !isTopRoot())
 	{
 		QGraphicsTextItem::setProgressColor(QColor(255, 255, 255), QColor(255, 255, 255));
+	}
+	else
+	{
+		QGraphicsTextItem::setProgressColor(QColor(242, 242, 242), QColor(0, 181, 72));
+	}
+}
+
+void MindProgressNode::updateMenuItem()
+{
+	if (m_pMenu)
+	{
+		m_pMenu->clear();
+		initMenu();
 	}
 }
 
@@ -162,7 +177,7 @@ void MindProgressNode::updateTipIcon()
 			m_tipItem->setPixmap(icon.pixmap(16, 16));
 			m_tipItem->show();
 		}
-		else if (m_progress == 1 && m_level >= 2)
+		else if (m_progress == 1 && m_children.empty())
 		{
 			QIcon icon(":/icons/checked.png");
 			m_tipItem->setPixmap(icon.pixmap(16, 16));
@@ -207,6 +222,9 @@ void MindProgressNode::_setWorkhours(float hours)
 
 void MindProgressNode::updateStatus()
 {
+	updateNodeColor();	//新增节点或删除节点需要重新调整颜色。
+	updateMenuItem();
+
 	float totalHours = 0.0;
 	float totalFinished = 0.0;
 	for (auto it = m_children.begin(); it != m_children.end(); it++)

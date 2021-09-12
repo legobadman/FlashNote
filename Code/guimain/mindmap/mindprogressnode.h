@@ -31,6 +31,7 @@ private:
 	void _setWorkhours(float hours);
 	void updateToolTip();
 	void updateNodeColor();
+	void updateMenuItem();
 	void adjustIndicator();
 	void updateTipIcon();
 

@@ -130,6 +130,7 @@ protected:
 	QColor m_highlightedBorder;
 	QColor m_selectedBorder;
 	QColor m_borderFocusout;
+	QColor m_mainThemeColor;
 	int m_level;
 	int m_borderWidth;
 	int m_cornerRadius;

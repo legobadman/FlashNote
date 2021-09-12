@@ -130,8 +130,6 @@ void MindNode::setup(MindMapScene* pScene)
 	if (!isTopRoot())
 	{
 		m_pathItem = new QGraphicsPathItem(this);
-		//m_pathItem = new QGraphicsPathItem;
-		//pScene->addItem(m_pathItem);
 	}
 	initExpandBtns();
 }
@@ -150,10 +148,11 @@ void MindNode::initSignalSlots(MindMapScene* pScene)
 
 void MindNode::initUIColor()
 {
+	m_mainThemeColor = AppHelper::colorBlue();
 	if (m_level == 0)
 	{
 		m_textColor = QColor(255, 255, 255);
-		m_backgroudColor = QColor(0, 181, 72);
+		m_backgroudColor = m_mainThemeColor;
 		m_highlightedBorder = QColor(23, 157, 235);
 		m_selectedBorder = QColor(23, 157, 235);
 		m_borderFocusout = QColor(m_backgroudColor);
@@ -1123,7 +1122,7 @@ void MindNode::setPosition(QPointF pos)
 		QPainterPath path;
 		path.moveTo(rootConnector);
 		path.cubicTo(c1, c2, childConnector);
-		m_pathItem->setPen(QPen(QColor(0, 181, 72), 3));
+		m_pathItem->setPen(QPen(m_mainThemeColor, 3));
 		m_pathItem->setPath(path);
 		m_pathItem->update();
 	}
