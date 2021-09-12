@@ -303,10 +303,16 @@ NewNoteMenu::NewNoteMenu(QWidget* parent)
 	QStandardItem* pNormalNote = new QStandardItem(iconNote, u8"笔记");
 	pModel->appendRow(pNormalNote);
 
-	QStandardItem* pMindMap = new QStandardItem(QIcon(":/icons/32x32/menu_mindmap.png"), u8"思维导图");
+	QIcon iconmap;
+	iconmap.addFile(":/icons/32x32/menu_mindmap.png", QSize(), QIcon::Normal);
+	iconmap.addFile(":/icons/32x32/menu_mindmap_on.png", QSize(), QIcon::Active);
+	QStandardItem* pMindMap = new QStandardItem(iconmap, u8"思维导图");
 	pModel->appendRow(pMindMap);
 
-	QStandardItem* pSchedule = new QStandardItem(QIcon(":/icons/32x32/menu_mindmap.png"), u8"进度图");
+	QIcon iconschedule;
+	iconschedule.addFile(":/icons/32x32/menu_schedule.png", QSize(), QIcon::Normal);
+	iconschedule.addFile(":/icons/32x32/menu_schedule_on2.png", QSize(), QIcon::Active);
+	QStandardItem* pSchedule = new QStandardItem(iconschedule, u8"进度图");
 	pModel->appendRow(pSchedule);
 
 	setLineWidth(1);

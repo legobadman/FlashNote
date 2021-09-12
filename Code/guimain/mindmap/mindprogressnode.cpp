@@ -48,7 +48,7 @@ void MindProgressNode::initUIColor()
 		m_backgroudColor = QColor(242, 242, 242);
 		m_highlightedBorder = QColor(136, 203, 242);
 	}
-	m_borderFocusout = QColor(m_backgroudColor);	//ÓÉÓÚÎÄ±¾¿òµÄ»æÖÆ²ßÂÔ£¬Ö»ÄÜ½«Í¬É«µÄ±ß¿òÊÓÎªÎÞ±ß¿ò¡£
+	m_borderFocusout = QColor(m_backgroudColor);
 }
 
 void MindProgressNode::updateNodeColor()

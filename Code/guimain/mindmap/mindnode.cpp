@@ -119,8 +119,6 @@ QList<MindNode*> MindNode::Children(bool excludeHolder, int direction) const
 
 void MindNode::setup(MindMapScene* pScene)
 {
-	//setupµÄË³ÐòÊÇ£ºÏÈÖ´ÐÐ×Ó½ÚµãµÄsetup£¬ÔÙÖ´ÐÐparent½ÚµãµÄsetup¡£
-	//¶ø×Ó½ÚµãÔÚsetupÇ°£¬ÆäparentµÄ»ù±¾ÊôÐÔÒÑ¶ÁÈ¡¡£
 	ScopeBlockSIG scope(this);
 	initSignalSlots(pScene);
 	initUIColor();
@@ -176,7 +174,6 @@ void MindNode::initUIColor()
 	}
 
 	QPalette pal = palette();
-	//´¦ÀíÑ¡ÖÐÎÄ±¾µÄÇé¿ö¡£
 	pal.setBrush(QPalette::Active, QPalette::Highlight, QColor(0, 129, 218));
 	pal.setBrush(QPalette::Active, QPalette::HighlightedText, QColor(255, 255, 255));
 	pal.setBrush(QPalette::Inactive, QPalette::Highlight, m_backgroudColor);

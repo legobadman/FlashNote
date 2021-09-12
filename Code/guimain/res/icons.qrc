@@ -59,5 +59,9 @@
 	<file>icons/32x32/menu_newnote.png</file>
 	<file>icons/32x32/menu_mindmap.png</file>
 	<file>icons/32x32/menu_newnote_on.png</file>
+    <file>icons/32x32/menu_mindmap_on.png</file>
+    <file>icons/32x32/menu_schedule.png</file>
+    <file>icons/32x32/menu_schedule_on.png</file>
+    <file>icons/32x32/menu_schedule_on2.png</file>
 </qresource>
 </RCC>
