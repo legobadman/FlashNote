@@ -187,6 +187,8 @@ void NoteEditWindow::initSlots()
 
 void NoteEditWindow::initCustomWidget()
 {
+	m_ui->editTitle->setFixedHeight(MyStyle::dpiScaled(27));
+
 	m_ui->bookmenu->setIcon(QIcon(":/icons/16x16/notebookmenu.png"));
 	m_ui->bookmenu->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(50, 22)));

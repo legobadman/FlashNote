@@ -131,7 +131,8 @@ void NoteItemTreeView::mousePressEvent(QMouseEvent* e)
 {
 	QPoint pos = e->pos();
 	const QModelIndex& index = indexAt(pos);
-	if (pos.x() < 30 && this->itemsExpandable())
+	static const int xoffset = 30;
+	if (pos.x() < MyStyle::dpiScaled(xoffset) && this->itemsExpandable())
 	{
 		setExpanded(index, !isExpanded(index));
 	}
@@ -161,8 +162,8 @@ void NoteItemTreeView::updateHoverState(QPoint pos)
 {
 	int width = this->width();
 	const QModelIndex& index = indexAt(pos);
-	static int xrange_expand = 30;
-	static int xrange_addbtn = 35;
+	static int xrange_expand = MyStyle::dpiScaled(30);
+	static int xrange_addbtn = MyStyle::dpiScaled(35);
 
 	if (pos.x() < xrange_expand && model()->hasChildren(index))
 	{

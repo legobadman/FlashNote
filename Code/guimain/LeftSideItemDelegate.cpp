@@ -69,7 +69,11 @@ void LeftSideItemDelegate::drawExpandArrow(QPainter* painter, const QStyleOption
 	bool bExpanded = treeview->isExpanded(index);
 	QPoint basePt = option.rect.topLeft();
 
-	qreal leftmargin = 10, height = 36, bottommargin = 13, leg = 8, base_side = 10;
+	qreal leftmargin = MyStyle::dpiScaled(10),
+		height = MyStyle::dpiScaled(36),
+		bottommargin = MyStyle::dpiScaled(13),
+		leg = MyStyle::dpiScaled(8),
+		base_side = MyStyle::dpiScaled(10);
 
 	QPainterPath path;
 	if (bExpanded)
@@ -83,7 +87,7 @@ void LeftSideItemDelegate::drawExpandArrow(QPainter* painter, const QStyleOption
 						  ↓
 			------------------------------------
 		*/
-		bottommargin = 12;
+		bottommargin = MyStyle::dpiScaled(12);
 
 		QPoint lb, rb, rt;
 		lb.setX(leftmargin);
@@ -129,7 +133,7 @@ void LeftSideItemDelegate::drawExpandArrow(QPainter* painter, const QStyleOption
 
 		qreal yyy = (lb.y() + lt.y());
 		rp.setY(yyy / 2.0);
-		rp.setX(leftmargin + 5.0);	//height
+		rp.setX(leftmargin + MyStyle::dpiScaled(5.0));	//height
 
 		path.moveTo(lb);
 		path.lineTo(rp);
@@ -169,14 +173,14 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 	palette.setColor(QPalette::All, QPalette::HighlightedText, palette.color(QPalette::Active, QPalette::Text));
 	opt.palette = palette;
 
-	int icon_center_xoffset = 32;
+	int icon_center_xoffset = MyStyle::dpiScaled(32);
 	if (ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL == widgetType)
 	{
-		icon_center_xoffset += 5;
+		icon_center_xoffset += MyStyle::dpiScaled(5);
 	}
 
 	int iconSize = opt.decorationSize.height();
-	int textMargin = 5;
+	int textMargin = MyStyle::dpiScaled(5);
 	QTextLayout textLayout2(opt.text, opt.font);
 	const int maxLineWidth = 8388607; //参照QCommonStylePrivate::viewItemSize
 	QSizeF szText = AppHelper::viewItemTextLayout(textLayout2, maxLineWidth);
@@ -222,8 +226,8 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 		else
 			icon.addFile(":/icons/16x16/add_normal.png");
 
-		iconSize = 16;
-		int icon_offset = 10;
+		iconSize = MyStyle::dpiScaled(16);
+		int icon_offset = MyStyle::dpiScaled(10);
 
 		QRect addiconRect(opt.rect.width() - icon_offset - iconSize, 
 			opt.rect.y() + icon_offset, iconSize, iconSize);
@@ -249,7 +253,7 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 			painter->setPen(opt.palette.color(cg, QPalette::Text));
 		}
 
-		const int textMargin = 2;
+		const int textMargin = MyStyle::dpiScaled(2);
 		QRect textRect2 = textRect.adjusted(textMargin, 0, -textMargin, 0); // remove width padding
 		QTextOption textOption;
 		textOption.setWrapMode(QTextOption::ManualWrap);

@@ -98,6 +98,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 	QString content = index.data(ItemNoteContent).toString();
 	QString datetime = index.data(ItemNoteShowDataTime).toString();
 
+	int text_xoffset = MyStyle::dpiScaled(9);
 	//1. draw title
 	{
 		QFont fontTitle("Microsoft YaHei", 10);
@@ -110,7 +111,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		QTextLayout textLayout(title, fontTitle);
 		QFontMetrics fontMetrics(fontTitle);
 
-		int text_xoffset = 9, text_yoffset = 7;
+		int text_yoffset = MyStyle::dpiScaled(7);
 		int w = opt.rect.width() - 2 * text_xoffset;
 		int h = fontMetrics.height();
 		QRect textRect(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset, w, h);
@@ -135,7 +136,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 		QFontMetrics fontMetrics(fontContent);
 		int fontHeight = fontMetrics.height();
 
-		int text_xoffset = 9, text_yoffset = 30;
+		int text_yoffset = MyStyle::dpiScaled(30);
 		int lineWidth = itemRect.width() - text_xoffset * 2;
 
 		textLayout.beginLayout();
@@ -162,8 +163,9 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
         QFont fontDate(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
         QFontMetrics fontMetrics(fontDate);
         int fontHeight = fontMetrics.height();
-
-		int text_xoffset = 9, text_yoffset = fontHeight * 4 + 5;
+		const int numLines = 4;	//title(1 line) + content(2 lines) + one line space
+		const int last_line_spacing = 5;
+		int text_yoffset = fontHeight * numLines + MyStyle::dpiScaled(last_line_spacing);
 		QSize sz = MyStyle::dpiScaledSize(QSize(80, fontHeight));
 		QPoint topLeft(opt.rect.x() + text_xoffset, opt.rect.y() + text_yoffset);
 		QRect dateRect(topLeft, sz);

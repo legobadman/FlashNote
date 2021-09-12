@@ -1,10 +1,13 @@
 ﻿#include "stdafx.h"
 #include "MyStyle.h"
+#include "guihelper.h"
 #include "moc_MyStyle.cpp"
 #include "listpane.h"
 #include "DrawerFunc.h"
 #include "ToolButtonStyle.h"
 #include "toolbuttonstyleoption.h"
+#include "uiapplication.h"
+#include <QScreen>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -24,15 +27,9 @@ qreal MyStyle::dpiScaled(qreal value)
 	static qreal scale = -1;
 	if (scale < 0)
 	{
-		scale = 1.0;
-		{
-#ifdef Q_OS_WIN
-			HDC hdcScreen = GetDC(0);
-			int dpi = GetDeviceCaps(hdcScreen, LOGPIXELSX);
-			ReleaseDC(0, hdcScreen);
-			scale = dpi / 96.0;
-#endif
-		}
+        QScreen* screen = AppHelper::uiApp()->primaryScreen();
+        qreal dpi = screen->logicalDotsPerInch();
+		scale = dpi / 96.0;
 	}
 	return value * scale;
 }

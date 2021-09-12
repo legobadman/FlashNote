@@ -283,11 +283,6 @@
    <extends>QLineEdit</extends>
    <header>searcheditor.h</header>
   </customwidget>
-  <customwidget>
-   <class>NotesListView</class>
-   <extends>QListView</extends>
-   <header>notelistview.h</header>
-  </customwidget>
  </customwidgets>
  <resources/>
  <connections/>

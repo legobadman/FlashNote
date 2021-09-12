@@ -7,7 +7,6 @@
 #define ROW_GALLERY_VIEW 5
 #define COLUMN_GALLERY_VIEW 10
 
-static const int sLeftMargin = MyStyle::dpiScaled(6), sTopMargin = MyStyle::dpiScaled(6), sRightMargin = MyStyle::dpiScaled(6);
 static const int sIconSize = 16;
 static const int sFirstItemH = 24, sFirstItemW = 99;
 static const int sYoffsetFromFirstToTable = 4, sTableItemMargin = 4, sYoffsetFromTableToLast = 4;

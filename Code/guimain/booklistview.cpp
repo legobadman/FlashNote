@@ -33,7 +33,10 @@ void BookListView::init()
 	setAutoFillBackground(true);
 	setPalette(palette);
 
-	m_ui->searcheditor->setTextMargins(3, 3, 3, 3);
+	//TODO: lineEdit里面的字体还是没有scaled
+	int margin = MyStyle::dpiScaled(4);
+	m_ui->searcheditor->setTextMargins(margin, margin, margin, margin);
+	m_ui->searcheditor->setFixedHeight(MyStyle::dpiScaled(25));
 	m_ui->sort->setFixedSize(MyStyle::dpiScaledSize(QSize(24, 24)));
 	m_ui->sort->setIcon(QIcon(":/icons/24x24/sort_options.png"));
 	m_ui->sort->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
