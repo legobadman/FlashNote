@@ -12,216 +12,114 @@
 #include "moc_listpane.cpp"
 
 
-static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight = -1, int* lastVisibleLine = nullptr)
-{
-	if (lastVisibleLine)
-		*lastVisibleLine = -1;
-	qreal height = 0;
-	qreal widthUsed = 0;
-	textLayout.beginLayout();
-	int i = 0;
-	while (true) {
-		QTextLine line = textLayout.createLine();
-		if (!line.isValid())
-			break;
-		line.setLineWidth(lineWidth);
-		line.setPosition(QPointF(0, height));
-		height += line.height();
-		widthUsed = qMax(widthUsed, line.naturalTextWidth());
-		// we assume that the height of the next line is the same as the current one
-		if (maxHeight > 0 && lastVisibleLine && height + line.height() > maxHeight) {
-			const QTextLine nextLine = textLayout.createLine();
-			*lastVisibleLine = nextLine.isValid() ? i : -1;
-			break;
-		}
-		++i;
-	}
-	textLayout.endLayout();
-	return QSizeF(widthUsed, height);
-}
-
-
 NewNoteItem::NewNoteItem(QWidget* parent)
 	: QWidget(parent)
-	, m_bPressed(false)
-	, m_hoverObj(MOUSE_IN_OTHER)
 {
 	setMouseTracking(true);
-	setFixedSize(MyStyle::dpiScaledSize(QSize(NEW_NOTE_WIDGET_WIDTH, 60)));
+	QPalette palette = this->palette();
+	palette.setBrush(QPalette::Window, QColor(42, 51, 60));
+	setPalette(palette);
+
+	static const int left = 16, top = 13, right = 21, bottom = 13;
+
+	QHBoxLayout* pLayout = new QHBoxLayout;
+	pLayout->setContentsMargins(MyStyle::dpiScaled(left), MyStyle::dpiScaled(top),
+		MyStyle::dpiScaled(right), MyStyle::dpiScaled(bottom));
+	pLayout->setSpacing(MyStyle::dpiScaled(9));
+
+	m_pAddBtn = new QLabel;
+	m_pAddBtn->setPixmap(QIcon(":/icons/btn_addnote.png").pixmap(MyStyle::dpiScaledSize(QSize(28, 28))));
+	m_pAddBtn->installEventFilter(this);
+	pLayout->addWidget(m_pAddBtn);
+
+	m_pText = new QLabel(u8"新建笔记");
+	QFont font("Microsoft YaHei", 13);
+	m_pText->setFont(font);
+	palette = m_pText->palette();
+	palette.setBrush(QPalette::WindowText, QColor(213, 221, 227));
+	m_pText->setPalette(palette);
+	m_pText->installEventFilter(this);
+	pLayout->addWidget(m_pText);
+
+	pLayout->addStretch();
+
+	m_pMore = new QLabel;
+	m_pMore->setPixmap(QIcon(":/icons/16x16/newnotemenu.png").pixmap(MyStyle::dpiScaledSize(QSize(28, 28))));
+	m_pMore->installEventFilter(this);
+	pLayout->addWidget(m_pMore);
+
+	setLayout(pLayout);
 }
 
-void NewNoteItem::initStyleOption(QStyleOptionViewItem* option) const
+bool NewNoteItem::eventFilter(QObject* watched, QEvent* event)
 {
-	if (!option)
-		return;
-
-	option->initFrom(this);
-	option->icon = QIcon(":/icons/btn_addnote.png");
-	option->state |= isDown() ? QStyle::State_Sunken : QStyle::State_Raised;
-}
-
-NewNoteItem::~NewNoteItem()
-{
-}
-
-void NewNoteItem::paintEvent(QPaintEvent* event)
-{
-	QPainter painter(this);
-
-	QStyleOptionViewItem option;
-	initStyleOption(&option);
-
-	int button_offset = (m_hoverObj == MOUSE_IN_TEXT && (option.state & QStyle::State_Sunken)) ? 1 : 0;
-	int menubtn_offset = (m_hoverObj == MOUSE_IN_RIGHTMENU && (option.state & QStyle::State_Sunken)) ? 1 : 0;
-
-	QIcon icon(":/icons/btn_addnote.png");
-	painter.drawPixmap(16 + button_offset, 16 + button_offset, option.icon.pixmap(28, 28));
-
-	QPen pen;
-	if (m_hoverObj == MOUSE_IN_TEXT)
+	if (watched == m_pText || watched == m_pAddBtn)
 	{
-		pen.setColor(QColor("#FFFFFF"));
-	}
-	else
-	{
-		pen.setColor(QColor(213, 221, 227));
-	}
-	painter.setPen(pen);
-
-	QFont font;
-	font.setPointSize(13);
-	font.setFamily("Microsoft YaHei");
-
-	QPointF paintPosition(55 + button_offset, 19 + button_offset);
-
-	QTextOption textOption;
-	textOption.setWrapMode(QTextOption::ManualWrap);
-	textOption.setTextDirection(Qt::LeftToRight);
-	textOption.setAlignment(QStyle::visualAlignment(Qt::LeftToRight, Qt::AlignLeft));
-
-	QTextLayout textLayout(u8"新建笔记", font);
-	textLayout.setTextOption(textOption);
-	viewItemTextLayout(textLayout, 100);
-	textLayout.draw(&painter, paintPosition);
-
-	QIcon iconMenu;
-	if (m_hoverObj == MOUSE_IN_RIGHTMENU)
-	{
-		iconMenu.addFile(":/icons/16x16/newnotemenu_hover.png");
-	}
-	else
-	{
-		iconMenu.addFile(":/icons/16x16/newnotemenu.png");
-	}
-	painter.drawPixmap(menu_hover_start + menubtn_offset, 23 + menubtn_offset, iconMenu.pixmap(16, 16));
-}
-
-void NewNoteItem::setPressed(bool bPressed)
-{
-	if (bPressed == m_bPressed)
-		return;
-	m_bPressed = bPressed;
-	update();
-}
-
-void NewNoteItem::mousePressEvent(QMouseEvent* e)
-{
-	if (e->button() == Qt::LeftButton)
-	{
-		emit LButtonPressed();
-		setPressed(true);
-	}
-}
-
-void NewNoteItem::mouseReleaseEvent(QMouseEvent* e)
-{
-	setPressed(false);
-	int x = e->pos().x();
-	if (e->button() == Qt::LeftButton)
-	{
-		if (text_hover_start <= x && x <= text_hover_end)
+		if (event->type() == QEvent::MouseButtonPress)
 		{
+            QRect rc = m_pText->geometry();
+            m_pText->setGeometry(rc.adjusted(1, 1, 1, 1));
+            rc = m_pAddBtn->geometry();
+            m_pAddBtn->setGeometry(rc.adjusted(1, 1, 1, 1));
+		}
+		if (event->type() == QEvent::Enter)
+		{
+			QPalette palette = m_pText->palette();
+			palette.setBrush(QPalette::WindowText, QColor(255, 255, 255));
+			m_pText->setPalette(palette);
+		}
+		if (event->type() == QEvent::Leave)
+		{
+            QPalette palette = m_pText->palette();
+            palette.setBrush(QPalette::WindowText, QColor(213, 221, 227));
+			m_pText->setPalette(palette);
+		}
+		if (event->type() == QEvent::MouseButtonRelease)
+		{
+			QRect rc = m_pText->geometry();
+			m_pText->setGeometry(rc.adjusted(-1, -1, -1, -1));
+			rc = m_pAddBtn->geometry();
+			m_pAddBtn->setGeometry(rc.adjusted(-1, -1, -1, -1));
+
 			emit newnote(NORMAL_NOTE);
 		}
-		else if (menu_hover_start <= x && x <= menu_hover_end)
+	}
+	else if (watched == m_pMore)
+	{
+		if (event->type() == QEvent::MouseButtonPress)
 		{
-			PopupWidget* popup = new PopupWidget(this);
-			NewNoteMenu* pNewMenu = new NewNoteMenu;
-			connect(pNewMenu, SIGNAL(newnote(NOTE_TYPE)), this, SIGNAL(newnote(NOTE_TYPE)));
-			popup->setContentWidget(pNewMenu);
-			QPoint pGlobal = mapToGlobal(QPoint(menu_hover_start + 16, 23 + 16));
-			popup->exec(pGlobal.x(), pGlobal.y(), NEW_NOTE_WIDGET_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 2);
-			delete popup;
+            QRect rc = m_pMore->geometry();
+			m_pMore->setGeometry(rc.adjusted(1, 1, 1, 1));
+		}
+        if (event->type() == QEvent::Enter)
+        {
+            m_pMore->setPixmap(QIcon(":/icons/16x16/newnotemenu_hover.png").pixmap(
+                MyStyle::dpiScaledSize(QSize(28, 28))));
+        }
+        if (event->type() == QEvent::Leave)
+        {
+            m_pMore->setPixmap(QIcon(":/icons/16x16/newnotemenu.png").pixmap(
+                MyStyle::dpiScaledSize(QSize(28, 28))));
+        }
+		if (event->type() == QEvent::MouseButtonRelease)
+		{
+            QRect rc = m_pMore->geometry();
+			m_pMore->setGeometry(rc.adjusted(-1, -1, -1, -1));
+
+            PopupWidget* popup = new PopupWidget(this);
+            NewNoteMenu* pNewMenu = new NewNoteMenu;
+            connect(pNewMenu, SIGNAL(newnote(NOTE_TYPE)), this, SIGNAL(newnote(NOTE_TYPE)));
+            popup->setContentWidget(pNewMenu);
+			QPoint pGlobal = mapToGlobal(rc.bottomRight());
+            popup->exec(pGlobal.x(), pGlobal.y(), NEW_NOTE_WIDGET_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 3);
+            delete popup;
 		}
 	}
-}
-
-void NewNoteItem::MenuActionSlot(QAction* action)
-{
-	if (action == NULL)
-		return;
-
-	MENU_ITEM nIndex = (MENU_ITEM)action->data().toInt();
-	if (nIndex == MENU_NEWNOTE)
-	{
-		emit newnote(NORMAL_NOTE);
-	}
-	else if (nIndex == MENU_MINDMAP)
-	{
-		emit newnote(MINDMAP);
-	}
-	else if (nIndex == MENU_SCHEDULE)
-	{
-		emit newnote(SCHEDULE);
-	}
-}
-
-void NewNoteItem::updateHoverState(QPoint pos)
-{
-	int x = pos.x();
-	if (x >= text_hover_start && x <= text_hover_end)
-	{
-		if (m_hoverObj != MOUSE_IN_TEXT)
-		{
-			m_hoverObj = MOUSE_IN_TEXT;
-			update();
-		}
-	}
-	else if (x >= menu_hover_start && x <= menu_hover_end)
-	{
-		if (m_hoverObj != MOUSE_IN_RIGHTMENU)
-		{
-			m_hoverObj = MOUSE_IN_RIGHTMENU;
-			update();
-		}
-	}
-	else
-	{
-		if (m_hoverObj != MOUSE_IN_OTHER)
-		{
-			m_hoverObj = MOUSE_IN_OTHER;
-			update();
-		}
-	}
-}
-
-void NewNoteItem::mouseMoveEvent(QMouseEvent* e)
-{
-	updateHoverState(e->pos());
-}
-
-void NewNoteItem::enterEvent(QEvent* e)
-{
-	update();
-}
-
-void NewNoteItem::leaveEvent(QEvent* e)
-{
-	m_hoverObj = MOUSE_IN_OTHER;
-	update();
+	return QWidget::eventFilter(watched, event);
 }
 
 
+////////////////////////////////////////////////////////
 NoteItemTreeView::NoteItemTreeView(QWidget* parent)
 	: QTreeView(parent)
 	, m_hoverObj(MOUSE_IN_OTHER)

@@ -20,49 +20,19 @@ enum MOUSE_HINT
 class NewNoteItem : public QWidget
 {
 	Q_OBJECT
-
-	enum MENU_ITEM
-	{
-		MENU_NEWNOTE,
-		MENU_MINDMAP,
-		MENU_SCHEDULE,
-	};
-
 public:
 	NewNoteItem(QWidget* parent = nullptr);
-	~NewNoteItem();
 
 protected:
-	void initStyleOption(QStyleOptionViewItem* option) const;
-	void paintEvent(QPaintEvent* event) override;
-	void enterEvent(QEvent* e) override;
-	void leaveEvent(QEvent* e) override;
-	void mousePressEvent(QMouseEvent* e);
-	void mouseReleaseEvent(QMouseEvent* e);
-	void mouseMoveEvent(QMouseEvent* e);
+	bool eventFilter(QObject* watched, QEvent* event);
 
 signals:
-	void LButtonPressed();
 	void newnote(NOTE_TYPE);
-	void rightmenu();
-
-private slots:
-	void MenuActionSlot(QAction* action);
 
 private:
-	void setPressed(bool bPressed);
-	bool isDown() const { return m_bPressed; }
-	void updateHoverState(QPoint pos);
-
-private:
-	MOUSE_HINT m_hoverObj;
-
-	const int text_hover_start = 15;
-	const int text_hover_end = 126;
-	const int menu_hover_end = NEW_NOTE_WIDGET_WIDTH - 20;
-	const int menu_hover_start = menu_hover_end - 16;
-
-	bool m_bPressed;
+	QLabel* m_pAddBtn;
+	QLabel* m_pText;
+	QLabel* m_pMore;
 };
 
 class NewNoteMenu : public QListView
