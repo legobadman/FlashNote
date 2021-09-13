@@ -27,7 +27,7 @@ void MindProgressNode::setup(MindMapScene* pScene)
 {
 	MindNode::setup(pScene);
 	updateNodeColor();
-	if (m_children.isEmpty() && m_parent)
+	if (hasNoChildren() && Parent())
 	{
 		updateToParent();
 	}
@@ -38,25 +38,28 @@ void MindProgressNode::setup(MindMapScene* pScene)
 
 void MindProgressNode::initUIColor()
 {
-	m_selectedBorder = QColor(23, 157, 235);
-	m_mainThemeColor = QColor(0, 181, 72);
-	if (m_children.empty())
+	QColor selectedBorder = QColor(23, 157, 235);
+	QColor mainThemeColor = QColor(0, 181, 72);
+	QColor backgroundColor;
+	QColor highlightBorder;
+	if (hasNoChildren())
 	{
-		m_backgroudColor = QColor(255, 255, 255);
-		m_highlightedBorder = QColor(23, 157, 235);
+		backgroundColor = QColor(255, 255, 255);
+		highlightBorder = QColor(23, 157, 235);
 	}
 	else
 	{
-		m_backgroudColor = QColor(242, 242, 242);
-		m_highlightedBorder = QColor(136, 203, 242);
+		backgroundColor = QColor(242, 242, 242);
+		highlightBorder = QColor(136, 203, 242);
 	}
-	m_borderFocusout = QColor(m_backgroudColor);
+	QColor borderFocusout = QColor(backgroundColor);
+	setColors(mainThemeColor, backgroundColor, selectedBorder, highlightBorder, borderFocusout);
 }
 
 void MindProgressNode::updateNodeColor()
 {
-	m_textColor = QColor(0, 0, 0);
-	if (m_children.empty() && !isTopRoot())
+	setTextColor(QColor(0, 0, 0));
+	if (hasNoChildren() && !isTopRoot())
 	{
 		QGraphicsTextItem::setProgressColor(QColor(255, 255, 255), QColor(255, 255, 255));
 	}
@@ -68,9 +71,9 @@ void MindProgressNode::updateNodeColor()
 
 void MindProgressNode::updateMenuItem()
 {
-	if (m_pMenu)
+	if (getMenu())
 	{
-		m_pMenu->clear();
+		getMenu()->clear();
 		initMenu();
 	}
 }
@@ -78,11 +81,11 @@ void MindProgressNode::updateMenuItem()
 void MindProgressNode::initMenu()
 {
 	MindNode::initMenu();
-	if (m_children.empty())
+	if (hasNoChildren())
 	{
-		m_pMenu->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
-		m_pMenu->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
-		m_pMenu->addAction(QString(u8"清空进度"), this, SLOT(zeroSchedule()));
+		getMenu()->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
+		getMenu()->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
+		getMenu()->addAction(QString(u8"清空进度"), this, SLOT(zeroSchedule()));
 	}
 }
 
@@ -160,7 +163,7 @@ void MindProgressNode::setPosition(QPointF pos)
 void MindProgressNode::onDeleteNode()
 {
 	MindNode::onDeleteNode();
-	MindProgressNode* progressNode = qobject_cast<MindProgressNode*>(m_parent);
+	MindProgressNode* progressNode = qobject_cast<MindProgressNode*>(Parent());
 	if (progressNode)
 	{
 		progressNode->updateStatus();
@@ -177,7 +180,7 @@ void MindProgressNode::updateTipIcon()
 			m_tipItem->setPixmap(icon.pixmap(16, 16));
 			m_tipItem->show();
 		}
-		else if (m_progress == 1 && m_children.empty())
+		else if (m_progress == 1 && hasNoChildren())
 		{
 			QIcon icon(":/icons/checked.png");
 			m_tipItem->setPixmap(icon.pixmap(16, 16));
@@ -212,7 +215,7 @@ void MindProgressNode::setWorkhours(float hours)
 
 void MindProgressNode::_setWorkhours(float hours)
 {
-	if (m_children.isEmpty())
+	if (hasNoChildren())
 	{
 		_setProgress(0.0);
 	}
@@ -227,7 +230,8 @@ void MindProgressNode::updateStatus()
 
 	float totalHours = 0.0;
 	float totalFinished = 0.0;
-	for (auto it = m_children.begin(); it != m_children.end(); it++)
+	QList<MindNode*> children = Children();
+	for (auto it = children.begin(); it != children.end(); it++)
 	{
 		MindProgressNode* pNode = qobject_cast<MindProgressNode*>((*it));
 		Q_ASSERT(pNode);
@@ -252,9 +256,9 @@ void MindProgressNode::updateStatus()
 
 void MindProgressNode::updateToParent()
 {
-	if (!m_parent)
+	if (!Parent())
 		return;
-	MindProgressNode* parent = qobject_cast<MindProgressNode*>(m_parent);
+	MindProgressNode* parent = qobject_cast<MindProgressNode*>(Parent());
 	Q_ASSERT(parent);
 	parent->updateStatus();
 }

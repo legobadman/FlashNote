@@ -102,6 +102,13 @@ public:
 protected:
 	virtual void initUIColor();
 	void initDirection();
+
+	void setTextColor(const QColor& clr);
+	void setColors(const QColor& mainTheme, const QColor& bgClr, const QColor& selectedBdr, const QColor& highlightBlr, const QColor& focusOutBdr);
+	int childNodeCount();
+	bool hasNoChildren();
+	QPointer<QMenu> getMenu();
+
 	virtual void initMenu();
 	virtual void resetDecoration();
 	bool needShowDecoration() const;
@@ -123,39 +130,41 @@ private:
 	qreal _dist(const QPointF& p1, const QPointF& p2);
 	void _collaspe(bool toRight);
 
-protected:
 	QString m_content;
-	QColor m_textColor;
-	QColor m_backgroudColor;
-	QColor m_highlightedBorder;
-	QColor m_selectedBorder;
-	QColor m_borderFocusout;
-	QColor m_mainThemeColor;
-	int m_level;
-	int m_borderWidth;
-	int m_cornerRadius;
-	int m_counter;	//防止绘制重入。
-	MOUSE_STATE m_mouseState;
-	bool m_bHovered;
-	bool m_bToRight;	//子节点向右扩展，根节点此属性无效。
-	MindNode* m_parent;
+    QColor m_textColor;
+    QColor m_backgroudColor;
+    QColor m_highlightedBorder;
+    QColor m_selectedBorder;
+    QColor m_borderFocusout;
+    QColor m_mainThemeColor;
 
-	QSharedPointer<MindNodeButton> m_pLCollaspBtn;
-	QSharedPointer<MindNodeButton> m_pRCollaspBtn;
-	QGraphicsPathItem* m_pathItem;
-	QPointer<QMenu> m_pMenu;
-	QList<MindNode*> m_children;
+	MOUSE_STATE m_mouseState;
+
+    QSharedPointer<MindNodeButton> m_pLCollaspBtn;
+    QSharedPointer<MindNodeButton> m_pRCollaspBtn;
+    QGraphicsPathItem* m_pathItem;
+    QPointer<QMenu> m_pMenu;
+    QList<MindNode*> m_children;
+
 	QString m_noteid;
 
-	EXPAND_STATE m_left_expand;
-	EXPAND_STATE m_right_expand;
+    QPointF m_initClickScenePos;
+    QPointF m_item_event_offset;
 
-	const int iconSize = 24;
+	MindNode* m_parent;
 
-	QPointF m_initClickScenePos;
-	QPointF m_item_event_offset;
-	QRectF m_hierarchyRect;
-	bool m_bDragging;
+    int m_level;
+    int m_borderWidth;
+    int m_cornerRadius;
+    int m_counter;	//防止绘制重入。
+    const int iconSize = 24;
+
+    EXPAND_STATE m_left_expand;
+    EXPAND_STATE m_right_expand;
+
+    bool m_bDragging;
+    bool m_bHovered;
+    bool m_bToRight;	//子节点向右扩展，根节点此属性无效。
 };
 
 class RoundedRectItem : public MindNode

@@ -273,6 +273,35 @@ void MindNode::initDirection()
 	}
 }
 
+void MindNode::setTextColor(const QColor& clr)
+{
+	m_textColor = clr;
+}
+
+void MindNode::setColors(const QColor& mainTheme, const QColor& bgClr, const QColor& selectedBdr, const QColor& highlightBlr, const QColor& focusOutBdr)
+{
+	m_mainThemeColor = mainTheme;
+	m_backgroudColor = bgClr;
+	m_selectedBorder = selectedBdr;
+	m_highlightedBorder = highlightBlr;
+	m_borderFocusout = focusOutBdr;
+}
+
+int MindNode::childNodeCount()
+{
+	return m_children.size();
+}
+
+bool MindNode::hasNoChildren()
+{
+	return m_children.isEmpty();
+}
+
+QPointer<QMenu> MindNode::getMenu()
+{
+	return m_pMenu;
+}
+
 void MindNode::resetDecoration()
 {
 	if (needShowDecoration())
@@ -870,7 +899,7 @@ void MindNode::udpateBorderFormat(const QStyleOptionGraphicsItem* option)
 	}
 	else
 	{
-		//ÓÉÓÚ±ß¿òÊÇ»­ÔÚ±³¾°±ßÔµ£¬Òò´ËÎªÁËÒþ²Ø±ß¿òÐèÒªÉè³É±³¾°µÄÑÕÉ«¡£
+		//由于边框是画在背景边缘，因此为了隐藏边框需要设成背景的颜色。
 		if (m_mouseState == MS_FOCUSOUT)
 			return;
 		frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
@@ -906,7 +935,7 @@ QRectF MindNode::childrenOrSelfRect(bool isToRight) const
 
 QRectF MindNode::childrenRect(bool bToRight) const
 {
-	//ÕÛµþÒÔºóÊµ¼ÊÉÏÒþ²ØµÄchildrenµÄrectÒÑ¾­Ã»ÓÐÒâÒåÁË£¬ÒòÎªÃ»ÓÐ»æÖÆ»ØÀ´¡£
+	//折叠以后实际上隐藏的children的rect已经没有意义了，因为没有绘制回来。
 	if (m_children.isEmpty() || isCollapsed(bToRight))
 	{
 		return QRectF();
@@ -914,12 +943,11 @@ QRectF MindNode::childrenRect(bool bToRight) const
 	else
 	{
 		QRectF hRect;
-		//·½·¨£ºÕÒµ½×îÎª±ß½çµÄxyÖµ£¨ÒÔthis×ø±êÏµÎª²Î¿¼Ïµ£©
+		//方法：找到最为边界的xy值（以this坐标系为参考系）
 		qreal xLeft = INT_MAX, xRight = INT_MIN, yTop = INT_MAX, yBottom = INT_MIN;
 		for (int i = 0; i < m_children.length(); i++)
 		{
 			MindNode* pChild = m_children[i];
-			//TODO: holderÒ²ÒªÉèÖÃtoRight
 			if (pChild->isToRight() != bToRight)
 				continue;
 
