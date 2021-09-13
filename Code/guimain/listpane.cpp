@@ -316,7 +316,7 @@ void NavigationPanel::initModel()
 
 	QStandardItem* pMaterialItem = new QStandardItem(
 		QIcon(":/icons/material.png"),
-		u8"全部素材"
+		u8"素材集"
 	);
 	pMaterialItem->setEditable(false);
 	pMaterialItem->setData(QVariant::fromValue<ITEM_CONTENT_TYPE>(
@@ -376,8 +376,8 @@ void NavigationPanel::initModel()
 
 	m_model->appendRow(pAllNotesItem);
 	initNotebookItem();
-	/*
 	m_model->appendRow(pMaterialItem);
+	/*
 	m_model->appendRow(pFragmentItem);
 	m_model->appendRow(pDiaryItem);
 	m_model->appendRow(pDraftItem);
