@@ -28,6 +28,13 @@ class MindNode : public QGraphicsTextItem
 		int* pCounter;
 	};
 
+	struct DraggingCache
+	{
+		DraggingCache() : m_pOrginalParent(NULL), m_idx(-1) {}
+		MindNode* m_pOrginalParent;
+		int m_idx;
+	};
+
 public:
 	MindNode(const QString& text, MindNode* parent);
 	virtual ~MindNode();
@@ -58,6 +65,7 @@ public:
 	bool isExpanded(MindNodeButton* pBtn);
 	bool isCollapsed(bool bRight) const;
 	bool hasDraggingInChildRect(QPointF scenePos, int& dir_idx, bool& toRight);
+	void resetPosBeforeDragging();
 	QString noteid() const { return m_noteid; }
 	void setNoteId(const QString& noteid) { m_noteid = noteid; }
 
@@ -103,7 +111,9 @@ protected:
 	virtual void initUIColor();
 	void initDirection();
 
+	void createPathItem(const QColor& clr, Qt::PenStyle style);
 	void setTextColor(const QColor& clr);
+	void setMainThemeColor(const QColor& mainTheme);
 	void setColors(const QColor& mainTheme, const QColor& bgClr, const QColor& selectedBdr, const QColor& highlightBlr, const QColor& focusOutBdr);
 	int childNodeCount();
 	bool hasNoChildren();
@@ -129,6 +139,7 @@ private:
 	void checkRemoveExpandBtns(bool bToRight);
 	qreal _dist(const QPointF& p1, const QPointF& p2);
 	void _collaspe(bool toRight);
+	bool _hasDraggingInSide(QPointF scenePos, bool toRight, int& dir_idx);
 
 	QString m_content;
     QColor m_textColor;
@@ -142,7 +153,9 @@ private:
 
     QSharedPointer<MindNodeButton> m_pLCollaspBtn;
     QSharedPointer<MindNodeButton> m_pRCollaspBtn;
-    QGraphicsPathItem* m_pathItem;
+
+	QGraphicsPathItem* m_pathItem;
+    
     QPointer<QMenu> m_pMenu;
     QList<MindNode*> m_children;
 
@@ -152,6 +165,7 @@ private:
     QPointF m_item_event_offset;
 
 	MindNode* m_parent;
+	DraggingCache m_dragging;
 
     int m_level;
     int m_borderWidth;
@@ -170,7 +184,7 @@ private:
 class RoundedRectItem : public MindNode
 {
 public:
-	RoundedRectItem(QGraphicsItem* parent = nullptr);
+	RoundedRectItem(QGraphicsItem* parent, const QColor& clr, Qt::PenStyle style);
 	QPainterPath shape() const override;
 	QRectF boundingRect() const override;
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
@@ -178,6 +192,7 @@ public:
 
 private:
 	const int m_radius = 5;
+	QColor m_color;
 };
 
 #endif

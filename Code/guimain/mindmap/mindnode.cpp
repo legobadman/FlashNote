@@ -40,10 +40,11 @@ private:
 
 
 //////////////////////////////////////////////////////////////
-RoundedRectItem::RoundedRectItem(QGraphicsItem* parent)
+RoundedRectItem::RoundedRectItem(QGraphicsItem* parent, const QColor& clr, Qt::PenStyle style)
 	: MindNode("", NULL)
 {
-
+	m_color = clr;
+	createPathItem(m_color, style);
 }
 
 QPainterPath RoundedRectItem::shape() const
@@ -60,7 +61,7 @@ QRectF RoundedRectItem::boundingRect() const
 
 void RoundedRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-	painter->setPen(QPen(AppHelper::colorBlue(), 5, Qt::DotLine));
+	painter->setPen(QPen(m_color, 5, Qt::DotLine));
 	painter->drawRoundedRect(boundingRect(), m_radius, m_radius);
 }
 
@@ -129,7 +130,7 @@ void MindNode::setup(MindMapScene* pScene)
 	initMenu();
 	if (!isTopRoot())
 	{
-		m_pathItem = new QGraphicsPathItem(this);
+		createPathItem(m_mainThemeColor, Qt::SolidLine);
 	}
 	initExpandBtns();
 }
@@ -273,9 +274,26 @@ void MindNode::initDirection()
 	}
 }
 
+void MindNode::createPathItem(const QColor& clr, Qt::PenStyle style)
+{
+	if (m_pathItem == NULL)
+	{
+		m_pathItem = new QGraphicsPathItem(this);
+		const int penWidth = 3;
+		QPen pen(clr, penWidth);
+		pen.setStyle(style);
+		m_pathItem->setPen(pen);
+	}
+}
+
 void MindNode::setTextColor(const QColor& clr)
 {
 	m_textColor = clr;
+}
+
+void MindNode::setMainThemeColor(const QColor& mainTheme)
+{
+	m_mainThemeColor = mainTheme;
 }
 
 void MindNode::setColors(const QColor& mainTheme, const QColor& bgClr, const QColor& selectedBdr, const QColor& highlightBlr, const QColor& focusOutBdr)
@@ -711,10 +729,13 @@ void MindNode::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 		if (dist > 3)
 		{
 			m_item_event_offset = event->scenePos() - this->scenePos();
+			m_dragging.m_pOrginalParent = m_parent;
+			m_dragging.m_idx = m_parent->m_children.indexOf(this);
 			m_parent->removeChild(this);
 			m_pathItem->hide();
 			_collaspe(m_bToRight);
 			m_bDragging = true;
+			setZValue(-1);
 		}
 	}
 
@@ -735,6 +756,7 @@ void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	if (m_bDragging)
 	{
 		m_bDragging = false;
+		setZValue(0);
 		if (m_pathItem)
 			m_pathItem->show();
 		emit nodeDragged(this);
@@ -981,109 +1003,111 @@ QRectF MindNode::childrenRect(bool bToRight) const
 	}
 }
 
+void MindNode::resetPosBeforeDragging()
+{
+	if (m_dragging.m_idx != -1 && m_dragging.m_pOrginalParent)
+	{
+		m_parent = m_dragging.m_pOrginalParent;
+		setParentItem(m_parent);
+		m_parent->m_children.insert(m_dragging.m_idx, this);
+	}
+}
+
+bool MindNode::_hasDraggingInSide(QPointF scenePos, bool toRight, int& dir_idx)
+{
+    //只有一个节点或者折叠点的检测区域。
+	QRectF currItemRect = mapRectToScene(boundingRect());
+
+	QList<MindNode*> allChildren = Children();
+	QList<MindNode*> children = Children(true, toRight);
+
+	static const int yOffsetFromRect = MyStyle::dpiScaled(5);
+	static const int xOffsetFromRect = MyStyle::dpiScaled(160);
+	static const int topOffset = MyStyle::dpiScaled(10);
+	static const int rightOffset = MyStyle::dpiScaled(100);
+	static const int leftOffset = MyStyle::dpiScaled(50);
+	static const int xBoundariess = MyStyle::dpiScaled(110);
+
+    QRectF rcSingleCollise;
+	if (toRight)
+	{
+		rcSingleCollise = QRectF(QPointF(currItemRect.right() - rightOffset, currItemRect.top() - yOffsetFromRect),
+			QPointF(currItemRect.right() + xOffsetFromRect, currItemRect.bottom() + yOffsetFromRect));
+
+		if (!children.isEmpty() && m_right_expand == EXP_COLLAPSE && rcSingleCollise.contains(scenePos))
+			onRightExpandBtnToggle();
+	}
+	else
+	{
+        rcSingleCollise = QRectF(QPointF(currItemRect.left() - xOffsetFromRect, currItemRect.top() - yOffsetFromRect),
+            QPointF(currItemRect.left() - leftOffset, currItemRect.bottom() + yOffsetFromRect));
+
+        if (!children.isEmpty() && m_left_expand == EXP_COLLAPSE && rcSingleCollise.contains(scenePos))
+            onLeftExpandBtnToggle();
+	}
+
+    QRectF childrenNodesRect = mapRectToScene(childrenRect(toRight));
+    //为了能匹配最上面子节点的位置，适度往上扩展rightChildrenRect
+    childrenNodesRect.adjust(0, -topOffset, 0, 0);
+
+    if (!children.isEmpty() &&
+        childrenNodesRect.contains(scenePos) &&
+		(
+			(!toRight && childrenNodesRect.right() - scenePos.x() < xBoundariess) ||		//左边
+			(toRight && scenePos.x() - childrenNodesRect.left() < xBoundariess)			//右边
+		))
+    {
+		int holderIdx = 0;
+        //观察在哪个子节点之间(上)(下)
+        foreach(MindNode * pChild, children)
+        {
+            int yTop = pChild->mapRectToScene(pChild->boundingRect()).top();
+            if (yTop < scenePos.y())
+                holderIdx++;
+            else
+                break;
+        }
+        if (holderIdx == 0)
+        {
+            MindNode* behindNode = children[0];
+            dir_idx = allChildren.indexOf(behindNode);
+        }
+        else
+        {
+            MindNode* aboveNode = children[max(0, holderIdx - 1)];
+            //找到aboveNode在所有节点的索引。
+            holderIdx = allChildren.indexOf(aboveNode);
+            dir_idx = holderIdx + 1;
+        }
+        return true;
+    }
+    else if (children.isEmpty() && rcSingleCollise.contains(scenePos))
+    {
+        QString content = GetContent();
+        dir_idx = Children(true, !toRight).length();	//可能另一边有节点
+        return true;
+    }
+	else
+	{
+		return false;
+	}
+}
+
 bool MindNode::hasDraggingInChildRect(QPointF scenePos, int& dir_idx, bool& toRight)
 {
-	bool finded = false;
-	int holderIdx = 0;
-	QRectF currItemRect = mapRectToScene(boundingRect());
-	QList<MindNode*> allChildren = Children();
-	QList<MindNode*> leftChildren = Children(true, 0);
-	QList<MindNode*> rightChildren = Children(true, 1);
-
-	//防止左边节点判断了右边的插入引发混乱
 	if (m_right_expand != EXP_NODEFINE)
 	{
-		QRectF rightChildrenRect = mapRectToScene(childrenRect(true));
-		//为了能匹配最上面子节点的位置，适度往上扩展rightChildrenRect
-		rightChildrenRect.adjust(0, -10, 0, 0);
-
-		if (!rightChildren.isEmpty() &&
-			rightChildrenRect.contains(scenePos) &&
-			scenePos.x() - rightChildrenRect.left() < 110)
+		if (_hasDraggingInSide(scenePos, true, dir_idx))
 		{
-			if (m_content == u8"思维导图笔记")
-			{
-				int j;
-				j = 0;
-			}
-
-			//观察在哪个子节点之间(上)(下)
-			foreach(MindNode * pChild, rightChildren)
-			{
-				int yTop = pChild->mapRectToScene(pChild->boundingRect()).top();
-				if (yTop < scenePos.y())
-					holderIdx++;
-				else
-					break;
-			}
-			if (holderIdx == 0)
-			{
-				MindNode* behindNode = rightChildren[0];
-				dir_idx = allChildren.indexOf(behindNode);
-			}
-			else
-			{
-				MindNode* aboveNode = rightChildren[max(0, holderIdx - 1)];
-				//找到aboveNode在所有节点的索引。
-				holderIdx = allChildren.indexOf(aboveNode);
-				dir_idx = holderIdx + 1;
-			}
-			toRight = true;
-			return true;
-		}
-		else if (rightChildren.isEmpty() &&
-			scenePos.y() > currItemRect.top() - 5 &&
-			scenePos.y() < currItemRect.bottom() + 5 &&
-			scenePos.x() > currItemRect.right() - 50 &&
-			scenePos.x() < currItemRect.right() + 160
-			)
-		{
-			QString content = GetContent();
-			dir_idx = leftChildren.length();	//可能左边有节点
 			toRight = true;
 			return true;
 		}
 	}
-	
+
 	if (m_left_expand != EXP_NODEFINE)
 	{
-		//观察左边
-		QRectF leftChildrenRect = mapRectToScene(childrenRect(false));
-		if (!leftChildren.isEmpty() &&
-			leftChildrenRect.contains(scenePos) &&
-			leftChildrenRect.right() - scenePos.x() < 110)
+		if (_hasDraggingInSide(scenePos, false, dir_idx))
 		{
-
-			if (m_content == u8"思维导图笔记")
-			{
-				int j;
-				j = 0;
-			}
-
-			//观察在哪个子节点之间(上)(下)
-			foreach(MindNode * pChild, leftChildren)
-			{
-				int yTop = pChild->mapRectToScene(pChild->boundingRect()).top();
-				if (yTop < scenePos.y())
-					holderIdx++;
-				else
-					break;
-			}
-			MindNode* aboveNode = leftChildren[max(0, holderIdx - 1)];
-			holderIdx = allChildren.indexOf(aboveNode);
-			dir_idx = holderIdx + 1;
-			toRight = false;
-			return true;
-		}
-		else if (leftChildren.isEmpty() &&
-			scenePos.y() > currItemRect.top() - 5 &&
-			scenePos.y() < currItemRect.bottom() + 5 &&
-			scenePos.x() < currItemRect.left() - 50 &&
-			scenePos.x() > currItemRect.left() - 160
-			)
-		{
-			QString content = GetContent();
-			dir_idx = rightChildren.length();
 			toRight = false;
 			return true;
 		}
@@ -1150,7 +1174,6 @@ void MindNode::setPosition(QPointF pos)
 		QPainterPath path;
 		path.moveTo(rootConnector);
 		path.cubicTo(c1, c2, childConnector);
-		m_pathItem->setPen(QPen(m_mainThemeColor, 3));
 		m_pathItem->setPath(path);
 		m_pathItem->update();
 	}

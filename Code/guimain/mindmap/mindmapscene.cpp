@@ -3,6 +3,7 @@
 #include "rapidxml_print.hpp"
 #include "mindnodebutton.h"
 #include "mindprogressnode.h"
+#include "guihelper.h"
 #include <QDebug>
 
 
@@ -24,7 +25,7 @@ void MindMapScene::initContent(QString content, bool bSchedule)
 {
 	m_bSchedule = bSchedule;
 	clear();
-	m_pHolder = new RoundedRectItem(NULL);
+	m_pHolder = new RoundedRectItem(NULL, m_bSchedule ? QColor(0, 181, 72) : AppHelper::colorBlue(), Qt::DashLine);
 	m_pHolder->hide();
 	addItem(m_pHolder);
 	m_pRoot = parseXML(content.toStdString());
@@ -228,8 +229,16 @@ void MindMapScene::onNodeDragged(MindNode* pNode)
             pNode->resetAllChildDirection(m_pHolder->isToRight());
             m_pHolder->hide();
             onRedrawItems();
-			//emit itemContentChanged(false);
+			emit itemContentChanged(false);
 		}
+		else
+		{
+			pNode->resetPosBeforeDragging();
+		}
+	}
+	else
+	{
+		pNode->resetPosBeforeDragging();
 	}
 }
 
