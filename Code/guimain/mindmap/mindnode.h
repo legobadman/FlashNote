@@ -75,7 +75,9 @@ public:
 	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
 	virtual void setPosition(QPointF pos);
 	void AddChild(MindNode* pChild);
-	virtual void NewChild(bool toRight);	//特指后续的创建而非IO初始化的创建。
+
+	void NewChild(bool toRight);	//特指后续的创建而非IO初始化的创建。
+	MindNode* NewChildImpl(bool toRight);
 
 	QPainterPath shape() const override;
 

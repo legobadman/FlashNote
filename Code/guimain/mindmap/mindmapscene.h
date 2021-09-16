@@ -20,7 +20,9 @@ public:
 	void initContent(QString content, bool bSchedule);
 	QString mindmapXML();
 	MindNode* root() const { return m_pRoot; }
-	TranRepository* transRepository() { return m_repo; }
+	TranRepository* transRepository() { return m_repo.get(); }
+	void undo();
+	void redo();
 
 signals:
 	void itemContentChanged(bool bEditChanged);
@@ -45,7 +47,9 @@ private:
 	MindNode* m_pHolder;
 	QList<QGraphicsPathItem*> m_pathItems;
 	QSet<MindNode*> m_items;
-	TranRepository* m_repo;
+	unique_ptr<TranRepository> m_repo;
+	QShortcut* m_undo;
+	QShortcut* m_redo;
 	bool m_bSchedule;
 };
 

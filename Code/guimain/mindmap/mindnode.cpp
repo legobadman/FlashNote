@@ -494,7 +494,6 @@ void MindNode::onCreateSliblingNode()
 
 void MindNode::onDeleteNode()
 {
-
 	m_parent->m_children.removeAll(this);
 	initMenu();
 	m_parent->checkRemoveExpandBtns(m_bToRight);
@@ -875,30 +874,22 @@ void MindNode::AddChild(MindNode* pChild)
 
 void MindNode::NewChild(bool toRight)
 {
+	MindNode* pChild = NewChildImpl(toRight);
+	if (pChild)
+	{
+        TRANSCATION_PTR trans;
+        MindNodeInfo info;
+        info.childNode = pChild;
+        info.parnetNode = this;
+        trans.reset(new MindTransaction(OP_ADD, info));
+        trans->SetState(SS_START);
+        m_scene->transRepository()->Add(trans);
+		m_scene->transRepository()->Commit(trans->GetId());
+	}
+}
 
- //   function<bool()> newChildCallback = [=]() {
- //       MindNode* pChild = NULL;
- //       if (qobject_cast<MindProgressNode*>(this))
- //       {
- //           pChild = new MindProgressNode(u8"进度节点", this);
- //       }
- //       else
- //       {
- //           pChild = new MindNode(u8"新增节点", this);
- //       }
- //       pChild->setToRight(toRight);
- //       pChild->setLevel(level() + 1);
- //       m_children.append(pChild);
- //       pChild->initMenu();
- //       initExpandBtns();
- //       pChild->setup(m_scene);
-	//	return true;
- //   };
-
-	//function<bool()> removeChildCallback = [=]() {
-
-	//};
-
+MindNode* MindNode::NewChildImpl(bool toRight)
+{
 	MindNode* pChild = NULL;
 	if (qobject_cast<MindProgressNode*>(this))
 	{
@@ -909,25 +900,14 @@ void MindNode::NewChild(bool toRight)
 		pChild = new MindNode(u8"新增节点", this);
 	}
 
-    TRANSCATION_PTR trans;
-	MindNodeInfo info;
-	info.childNode = pChild;
-	info.parnetNode = this;
-
-    trans.reset(new MindTransaction(OP_ADD, info));
-    trans->SetState(SS_START);
-    m_scene->transRepository()->Add(trans);
-
 	pChild->setToRight(toRight);
 	pChild->setLevel(level() + 1);
 	m_children.append(pChild);
 	pChild->initMenu();
 	initExpandBtns();
 	pChild->setup(m_scene);
-
-	m_scene->transRepository()->Commit(trans->GetId());
-
 	emit nodeCreated(pChild);
+	return pChild;
 }
 
 QPainterPath MindNode::shape() const

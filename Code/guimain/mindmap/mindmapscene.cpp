@@ -7,12 +7,14 @@
 #include <QDebug>
 
 
+
 MindMapScene::MindMapScene(QObject* parent)
 	: QGraphicsScene(parent)
 	, m_bSchedule(false)
 	, m_pRoot(NULL)
 	, m_pHolder(NULL)
-	, m_repo(NULL)
+	, m_undo(NULL)
+    , m_redo(NULL)
 {
 }
 
@@ -24,6 +26,7 @@ MindMapScene::~MindMapScene()
 
 void MindMapScene::initContent(QString content, bool bSchedule)
 {
+	m_repo.reset(new TranRepository);
 	m_bSchedule = bSchedule;
 	clear();
 	m_pHolder = new RoundedRectItem(NULL, m_bSchedule ? QColor(0, 181, 72) : AppHelper::colorBlue(), Qt::DashLine);
@@ -44,6 +47,16 @@ QString MindMapScene::mindmapXML()
 	char* end = print(buffer, doc, 0);
 	*end = L'\0';
 	return QString::fromUtf8(buffer);
+}
+
+void MindMapScene::undo()
+{
+	m_repo->Undo();
+}
+
+void MindMapScene::redo()
+{
+	m_repo->Redo();
 }
 
 void MindMapScene::onNodeCreated(MindNode* pChild)

@@ -46,6 +46,7 @@ public:
     void Rollback(int id);
     bool Commit(int id);
     void Add(TRANSCATION_PTR spTrans);      //客户beginTransaction时自行创建trans并插入。
+    void Clear();
 
 private:
     vector<TRANSCATION_PTR> m_transactions;

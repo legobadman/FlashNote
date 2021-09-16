@@ -21,10 +21,16 @@ public:
 signals:
 	void itemContentChanged(bool);
 
+private slots:
+	void redo();
+	void undo();
+
 private:
 	QPointer<MindMapScene> m_scene;
 	QPointer<MindMapView> m_view;
 	MindNode* m_pRoot;
+    QShortcut* m_undo;
+    QShortcut* m_redo;
 };
 
 

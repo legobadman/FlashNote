@@ -14,9 +14,9 @@ bool ITransaction::Commit()
 {
     if (m_state == SS_START)
     {
-        bool ret = Forward();
-        m_state = ret ? SS_COMMITED : SS_UNKNOWN;
-        return ret;
+        /*bool ret = Forward();*/
+        m_state = SS_COMMITED;
+        return true;
     }
     return false;
 }
@@ -92,7 +92,7 @@ void TranRepository::Rollback(int id)
 bool TranRepository::Commit(int id)
 {
     int end_idx = m_transactions.size() - 1;
-    for (int i = end_idx; i >= 0; i--)
+    for (int i = end_idx; i > 0; i--)
     {
         TRANSCATION_PTR spTrans = m_transactions[i];
         if (spTrans->GetId() == id && spTrans->State() == SS_START)
@@ -119,4 +119,10 @@ bool TranRepository::Commit(int id)
 void TranRepository::Add(TRANSCATION_PTR spTrans)
 {
     m_transactions.push_back(spTrans);
+    m_curr_idx++;
+}
+
+void TranRepository::Clear()
+{
+    m_transactions.clear();
 }
