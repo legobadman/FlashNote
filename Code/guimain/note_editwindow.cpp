@@ -319,7 +319,7 @@ void NoteEditWindow::onTitleChanged()
 void NoteEditWindow::onTextChanged(bool delay)
 {
 	if (delay)
-		QTimer::singleShot(2000, this, SLOT(saveNote()));
+		QTimer::singleShot(3000, this, SLOT(saveNote()));
 	else
 		saveNote();
 }

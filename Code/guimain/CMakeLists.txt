@@ -193,6 +193,8 @@ add_executable(guimain
     ./style/ToolButtonStyle.h
     ./style/toolbuttonstyleoption.cpp
     ./style/toolbuttonstyleoption.h
+    ./transaction/transaction.cpp
+    ./transaction/transaction.h
     ./uiapplication.cpp
     ./uiapplication.h
 )
