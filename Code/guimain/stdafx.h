@@ -2,6 +2,7 @@
 #define __GUI_STDAFX_H__
 
 #include <stack>
+#include <functional>
 #include <QApplication>
 #include <QMainWindow>
 #include <QTreeView>

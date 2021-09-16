@@ -123,6 +123,8 @@ add_executable(guimain
     ./mindmap/mindnodebutton.h
     ./mindmap/mindprogressnode.cpp
     ./mindmap/mindprogressnode.h
+    ./mindmap/mindtransaction.cpp
+    ./mindmap/mindtransaction.h
     ./model/notebookmodel.cpp
     ./model/notebookmodel.h
     ./newitemdelegate.cpp

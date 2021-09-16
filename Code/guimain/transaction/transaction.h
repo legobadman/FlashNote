@@ -2,19 +2,14 @@
 #define __TRANSACTION_H__
 
 
-//客户需要在这里登记ID，如果分散出去可能重叠。
-enum TRAN_OPERATOR
-{
-    TOP_ADD,
-    TOP_MOVE,
-    TOP_REMOVE,
-    TOP_EDITTEXT,
-};
+
 
 enum TRAN_STATE
 {
+    SS_UNKNOWN,
     SS_START,
-    SS_COMMITED
+    SS_COMMITED,
+    SS_ROLLBACKED,
 };
 
 class ITransaction
@@ -25,13 +20,19 @@ public:
     bool Rollback();    //只有处在COMMITED状态的记录才能rollback
     bool Undo();
     bool Redo();
-    virtual TRAN_STATE State() = 0;
-    virtual TRAN_OPERATOR GetOp() = 0;
+    TRAN_STATE State() const { return m_state; }
+    void SetState(TRAN_STATE state) { m_state = state; }
+    int GetId() const { return m_id; };
+
+protected:
+    static int nextId;
 
 private:
-    virtual bool CommitImpl() = 0;
-    virtual bool RollbackImpl() = 0;
+    virtual bool Forward() = 0;
+    virtual bool Backward() = 0;
 
+    TRAN_STATE m_state;
+    int m_id;
 };
 
 typedef shared_ptr<ITransaction> TRANSCATION_PTR;
@@ -42,8 +43,8 @@ public:
     TranRepository();
     void Undo();
     void Redo();
-    void Rollback(TRAN_OPERATOR ope);
-    bool Commit(TRAN_OPERATOR ope);
+    void Rollback(int id);
+    bool Commit(int id);
     void Add(TRANSCATION_PTR spTrans);      //客户beginTransaction时自行创建trans并插入。
 
 private:

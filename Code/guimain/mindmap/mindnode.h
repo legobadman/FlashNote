@@ -165,6 +165,7 @@ private:
     QPointF m_item_event_offset;
 
 	MindNode* m_parent;
+	MindMapScene* m_scene;
 	DraggingCache m_dragging;
 
     int m_level;

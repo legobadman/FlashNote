@@ -4,6 +4,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include "mindnode.h"
 #include "mindprogressnode.h"
+#include "../transaction/transaction.h"
 #include "rapidxml.hpp"
 
 using namespace rapidxml;
@@ -19,6 +20,7 @@ public:
 	void initContent(QString content, bool bSchedule);
 	QString mindmapXML();
 	MindNode* root() const { return m_pRoot; }
+	TranRepository* transRepository() { return m_repo; }
 
 signals:
 	void itemContentChanged(bool bEditChanged);
@@ -43,6 +45,7 @@ private:
 	MindNode* m_pHolder;
 	QList<QGraphicsPathItem*> m_pathItems;
 	QSet<MindNode*> m_items;
+	TranRepository* m_repo;
 	bool m_bSchedule;
 };
 

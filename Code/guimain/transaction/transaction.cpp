@@ -2,61 +2,82 @@
 #include "transaction.h"
 
 
+int ITransaction::nextId = 0;
+
 ITransaction::ITransaction()
+    : m_state(SS_UNKNOWN)
+    , m_id(nextId++)
 {
-
 }
-
 
 bool ITransaction::Commit()
 {
-    if (State() == SS_START)
-        return CommitImpl();
+    if (m_state == SS_START)
+    {
+        bool ret = Forward();
+        m_state = ret ? SS_COMMITED : SS_UNKNOWN;
+        return ret;
+    }
     return false;
 }
 
 bool ITransaction::Rollback()
 {
-    if (State() == SS_COMMITED)
-        return RollbackImpl();
+    if (m_state == SS_COMMITED)
+    {
+        bool ret = Backward();
+        m_state = ret ? SS_ROLLBACKED : SS_UNKNOWN;
+        return ret;
+    }
     return false;
 }
 
 bool ITransaction::Undo()
 {
-    return false;
+    return Backward();
 }
 
 bool ITransaction::Redo()
 {
-    return false;
+    return Forward();
 }
 
 
 TranRepository::TranRepository()
     : m_curr_idx(0)
 {
-
+    m_transactions.push_back(NULL); //方便idx指引。
 }
 
 void TranRepository::Undo()
 {
-
+    if (TRANSCATION_PTR sptr = m_transactions[m_curr_idx])
+    {
+        sptr->Undo();
+        m_curr_idx--;
+    }
 }
 
 void TranRepository::Redo()
 {
-
+    if (m_curr_idx < m_transactions.size() - 1)
+    {
+        if (TRANSCATION_PTR sptr = m_transactions[m_curr_idx + 1])
+        {
+            sptr->Redo();
+            m_curr_idx++;
+        }
+    }
 }
 
-void TranRepository::Rollback(TRAN_OPERATOR ope)
+void TranRepository::Rollback(int id)
 {
     //找到ope的start标志的trans
     int end_idx = m_transactions.size() - 1;
     for (int i = end_idx; i >= 0; i--)
     {
         TRANSCATION_PTR spTrans = m_transactions[i];
-        if (spTrans->GetOp() == ope && spTrans->State() == SS_START)
+        if (spTrans->GetId() == id && spTrans->State() == SS_START)
         {
             for (int j = end_idx; j > i; j--)
             {
@@ -68,13 +89,13 @@ void TranRepository::Rollback(TRAN_OPERATOR ope)
     }
 }
 
-bool TranRepository::Commit(TRAN_OPERATOR ope)
+bool TranRepository::Commit(int id)
 {
     int end_idx = m_transactions.size() - 1;
     for (int i = end_idx; i >= 0; i--)
     {
         TRANSCATION_PTR spTrans = m_transactions[i];
-        if (spTrans->GetOp() == ope && spTrans->State() == SS_START)
+        if (spTrans->GetId() == id && spTrans->State() == SS_START)
         {
             bool ret = spTrans->Commit();
             if (!ret)

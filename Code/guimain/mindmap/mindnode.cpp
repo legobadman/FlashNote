@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "mindnode.h"
 #include "mindmapscene.h"
+#include "mindtransaction.h"
 #include "guihelper.h"
 #include "newnotewindow.h"
 #include "selectnotebookdlg.h"
@@ -83,6 +84,7 @@ MindNode::MindNode(const QString& text, MindNode* parent)
 	, m_pMenu(NULL)
 	, m_pathItem(NULL)
 	, m_bDragging(false)
+	, m_scene(NULL)
 {
 	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable | ItemClipsToShape);
 }
@@ -121,6 +123,7 @@ QList<MindNode*> MindNode::Children(bool excludeHolder, int direction) const
 void MindNode::setup(MindMapScene* pScene)
 {
 	ScopeBlockSIG scope(this);
+	m_scene = pScene;
 	initSignalSlots(pScene);
 	initUIColor();
 	initDocFormat(m_content);
@@ -474,7 +477,6 @@ void MindNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 
 void MindNode::onCreateChildNodeRight()
 {
-	//Õ¹¿ª×ÓÏî¡£
 	m_right_expand = EXP_EXPAND;
 	NewChild(true);
 }
@@ -492,6 +494,7 @@ void MindNode::onCreateSliblingNode()
 
 void MindNode::onDeleteNode()
 {
+
 	m_parent->m_children.removeAll(this);
 	initMenu();
 	m_parent->checkRemoveExpandBtns(m_bToRight);
@@ -872,6 +875,30 @@ void MindNode::AddChild(MindNode* pChild)
 
 void MindNode::NewChild(bool toRight)
 {
+
+ //   function<bool()> newChildCallback = [=]() {
+ //       MindNode* pChild = NULL;
+ //       if (qobject_cast<MindProgressNode*>(this))
+ //       {
+ //           pChild = new MindProgressNode(u8"进度节点", this);
+ //       }
+ //       else
+ //       {
+ //           pChild = new MindNode(u8"新增节点", this);
+ //       }
+ //       pChild->setToRight(toRight);
+ //       pChild->setLevel(level() + 1);
+ //       m_children.append(pChild);
+ //       pChild->initMenu();
+ //       initExpandBtns();
+ //       pChild->setup(m_scene);
+	//	return true;
+ //   };
+
+	//function<bool()> removeChildCallback = [=]() {
+
+	//};
+
 	MindNode* pChild = NULL;
 	if (qobject_cast<MindProgressNode*>(this))
 	{
@@ -881,11 +908,25 @@ void MindNode::NewChild(bool toRight)
 	{
 		pChild = new MindNode(u8"新增节点", this);
 	}
+
+    TRANSCATION_PTR trans;
+	MindNodeInfo info;
+	info.childNode = pChild;
+	info.parnetNode = this;
+
+    trans.reset(new MindTransaction(OP_ADD, info));
+    trans->SetState(SS_START);
+    m_scene->transRepository()->Add(trans);
+
 	pChild->setToRight(toRight);
 	pChild->setLevel(level() + 1);
 	m_children.append(pChild);
 	pChild->initMenu();
 	initExpandBtns();
+	pChild->setup(m_scene);
+
+	m_scene->transRepository()->Commit(trans->GetId());
+
 	emit nodeCreated(pChild);
 }
 

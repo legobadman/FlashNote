@@ -12,6 +12,7 @@ MindMapScene::MindMapScene(QObject* parent)
 	, m_bSchedule(false)
 	, m_pRoot(NULL)
 	, m_pHolder(NULL)
+	, m_repo(NULL)
 {
 }
 
@@ -48,7 +49,7 @@ QString MindMapScene::mindmapXML()
 void MindMapScene::onNodeCreated(MindNode* pChild)
 {
 	//目前暂时只需重绘
-	pChild->setup(this);
+	//pChild->setup(this);
 	onRedrawItems();
 	emit itemContentChanged(false);
 }
