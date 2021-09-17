@@ -4,40 +4,148 @@
 #include "../transaction/transaction.h"
 
 class MindNode;
+class MindMapScene;
 
-struct MindNodeInfo
-{
-    MindNode* parnetNode;
-    MindNode* childNode;
-    QString editText;
-    bool bToRight;
-
-    MindNodeInfo() : parnetNode(NULL), childNode(NULL), bToRight(false) {}
-};
-
-//客户需要在这里登记ID，如果分散出去可能重叠。
-enum TRAN_OPERATOR
-{
-    OP_NONE,
-    OP_ADD,
-    OP_MOVE,
-    OP_REMOVE,
-    OP_EDITTEXT,
-};
-
-class MindTransaction : public ITransaction
+class NewChildTransform : public ITransform
 {
 public:
-    MindTransaction(TRAN_OPERATOR ope, const MindNodeInfo& info);
-    ~MindTransaction();
+    NewChildTransform(MindMapScene* pScene, MindNode* parent, bool toRight);
+    bool forward();
+    bool backward();
+    bool prepare() { return true; }
 
 private:
-    virtual bool Forward() override;
-    virtual bool Backward() override;
-
-    TRAN_OPERATOR m_ope;
-    MindNodeInfo m_info;
+    MindNode* m_parent;
+    MindNode* m_child;
+    MindMapScene* m_scene;
+    bool m_toRight;
 };
 
+class RemoveChildTransform : public ITransform
+{
+public:
+    RemoveChildTransform(MindMapScene* pScene, MindNode* parent, MindNode* remove_item);
+    bool forward();
+    bool backward();
+    bool prepare() { return true; }
+
+private:
+    int m_remove_idx;
+    MindNode* m_parent;
+    MindNode* m_child;
+    MindMapScene* m_scene;
+};
+
+class EditContentTransform : public ITransform
+{
+public:
+    EditContentTransform(MindMapScene* pScene, MindNode* pNode, const QString& orignalText, const QString& newText);
+    bool forward();
+    bool backward();
+    bool prepare() { return true; }
+
+private:
+    QString m_orignal;
+    QString m_text;
+    MindNode* m_pNode;
+    MindMapScene* m_scene;
+};
+
+//TODO: 关联笔记
+
+class DragOutTransform : public ITransform
+{
+public:
+    DragOutTransform(MindMapScene* pScene, MindNode* pDragNode, MindNode* parent);
+    bool forward();
+    bool backward();
+    bool prepare() { return true; }
+
+private:
+    MindMapScene* m_scene;
+    MindNode* m_node;
+    MindNode* m_parent;
+    int m_remove_idx;
+};
+
+class DragInTransform : public ITransform
+{
+public:
+    DragInTransform(MindMapScene* pScene, MindNode* pDragNode, MindNode* newParent, int idx, bool toRight);
+    bool forward();
+    bool backward();
+    bool prepare() { return true; }
+
+private:
+    MindMapScene* m_scene;
+    MindNode* m_node;
+    MindNode* m_parent;
+    int m_idx;
+    bool m_isToRight;
+};
+
+
+class MoveTransform : public ITransform
+{
+public:
+    MoveTransform(MindMapScene* pScene, MindNode* pDragNode, MindNode* oldParent);
+    void setNewParent(MindNode* pNewParent);
+    bool forward();
+    bool backward();
+    bool prepare();
+
+private:
+    MindMapScene* m_scene;
+    MindNode* m_pDragNode;
+    MindNode* m_pOldParent;
+    MindNode* m_pNewParent;
+};
+
+
+class DocumentTransform : public ITransform
+{
+public:
+    DocumentTransform(MindMapScene* pScene);
+    void setNewDocument(const QString& newDocument);
+    bool forward();
+    bool backward();
+    bool prepare() { return true; }
+
+private:
+    MindMapScene* m_scene;
+    QString m_oldDocument;
+    QString m_newDocument;
+};
+
+class RAIITransBatch
+{
+public:
+    RAIITransBatch(MindMapScene* scene);
+    ~RAIITransBatch();
+    void setResult(bool success);
+
+private:
+    MindMapScene* m_scene;
+    TRANSCATION_PTR m_spTrans;
+    shared_ptr<DocumentTransform> m_pTransform;
+    int m_id;
+    bool m_success;
+};
+
+class ManualTransBatch
+{
+public:
+    ManualTransBatch(MindMapScene* scene);
+    ~ManualTransBatch();
+    void setResult(bool success);
+    void startBatch();
+    void endBatch();
+
+private:
+    MindMapScene* m_scene;
+    shared_ptr<DocumentTransform> m_pTransform;
+    int m_id;
+    bool m_success;
+};
 
 #endif

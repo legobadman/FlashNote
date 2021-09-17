@@ -11,6 +11,15 @@ using namespace rapidxml;
 
 typedef xml_node<> XML_NODE;
 
+
+class TransEndEvent : public QEvent
+{
+public:
+	static const Type TYPE = static_cast<Type>(QEvent::User + 0x10);
+	explicit TransEndEvent() : QEvent(TYPE) {}
+};
+
+
 class MindMapScene : public QGraphicsScene
 {
 	Q_OBJECT
@@ -23,6 +32,12 @@ public:
 	TranRepository* transRepository() { return m_repo.get(); }
 	void undo();
 	void redo();
+	void reconstruct(const QString& content);
+	void refresh(bool bEditChanged = false);
+	void startMoveTransaction();
+
+protected:
+	bool event(QEvent* event) override;
 
 signals:
 	void itemContentChanged(bool bEditChanged);
@@ -42,7 +57,6 @@ private:
 	XML_NODE* _export(MindNode* root, xml_document<>& doc);
 	MindNode* _parse(MindNode* parent, xml_node<>* root, int level);
 
-private:
 	MindNode* m_pRoot;
 	MindNode* m_pHolder;
 	QList<QGraphicsPathItem*> m_pathItems;
@@ -50,6 +64,8 @@ private:
 	unique_ptr<TranRepository> m_repo;
 	QShortcut* m_undo;
 	QShortcut* m_redo;
+	QString m_content;
+	ManualTransBatch m_moveBatch;
 	bool m_bSchedule;
 };
 

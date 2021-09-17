@@ -2,8 +2,6 @@
 #define __TRANSACTION_H__
 
 
-
-
 enum TRAN_STATE
 {
     SS_UNKNOWN,
@@ -12,10 +10,20 @@ enum TRAN_STATE
     SS_ROLLBACKED,
 };
 
-class ITransaction
+interface ITransform
+{
+    virtual bool prepare() = 0;
+    virtual bool forward() = 0;
+    virtual bool backward() = 0;
+};
+
+typedef shared_ptr<ITransform> TRANSFORM_PTR;
+
+class Transaction
 {
 public:
-    ITransaction();
+    Transaction();
+    void SetTransform(TRANSFORM_PTR sptr) { m_transform = sptr; }
     bool Commit();
     bool Rollback();    //只有处在COMMITED状态的记录才能rollback
     bool Undo();
@@ -28,14 +36,12 @@ protected:
     static int nextId;
 
 private:
-    virtual bool Forward() = 0;
-    virtual bool Backward() = 0;
-
     TRAN_STATE m_state;
+    TRANSFORM_PTR m_transform;
     int m_id;
 };
 
-typedef shared_ptr<ITransaction> TRANSCATION_PTR;
+typedef shared_ptr<Transaction> TRANSCATION_PTR;
 
 class TranRepository
 {
@@ -45,7 +51,10 @@ public:
     void Redo();
     void Rollback(int id);
     bool Commit(int id);
+    bool Cancel(int id);
     void Add(TRANSCATION_PTR spTrans);      //客户beginTransaction时自行创建trans并插入。
+    int AddExecute(TRANSFORM_PTR pTransform);
+    int AddBatch(TRANSFORM_PTR pTransform);
     void Clear();
 
 private:

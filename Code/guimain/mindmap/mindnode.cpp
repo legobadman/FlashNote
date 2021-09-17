@@ -399,7 +399,6 @@ void MindNode::onNewNote(const QString& noteid)
 	initMenu();
 	resetDecoration();
 	emit dataChanged(false);
-	emit textChange();
 }
 
 bool MindNode::needShowDecoration() const
@@ -412,18 +411,10 @@ void MindNode::onEditAssociateNote()
 	AppHelper::openNoteInIsoWindow(m_noteid);
 }
 
-void MindNode::onDocumentContentsChanged(int from, int charsRemoved, int charsAdded)
-{
-	if (m_counter == 0)
-	{
-		m_content = document()->toPlainText();
-		emit textChange();
-	}
-}
-
 void MindNode::initDocFormat(const QString& text)
 {
 	QTextDocument* doc = document();
+	doc->clear();	//防止重入
 
 	QTextCursor cursor = textCursor();
 	cursor.movePosition(QTextCursor::Start);
@@ -459,15 +450,6 @@ void MindNode::initDocFormat(const QString& text)
 	frameFormat.setBorderBrush(QColor(23, 157, 235));
 	frameFormat.setBorder(m_borderWidth);
 	rootFrame->setFrameFormat(frameFormat);
-
-	connect(doc, SIGNAL(contentsChange(int,int,int)), this, SLOT(onDocumentContentsChanged(int, int, int)));
-}
-
-void MindNode::focusOutEvent(QFocusEvent* event)
-{
-	QGraphicsTextItem::focusOutEvent(event);
-	clearSelection();
-	setTextInteractionFlags(Qt::NoTextInteraction);
 }
 
 void MindNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
@@ -494,10 +476,11 @@ void MindNode::onCreateSliblingNode()
 
 void MindNode::onDeleteNode()
 {
-	m_parent->m_children.removeAll(this);
-	initMenu();
-	m_parent->checkRemoveExpandBtns(m_bToRight);
-	emit nodeDeleted(this);
+	RAIITransBatch batch(m_scene);
+    m_parent->m_children.removeAll(this);
+    initMenu();
+    m_parent->checkRemoveExpandBtns(m_bToRight);
+    emit nodeDeleted(this);
 }
 
 void MindNode::checkRemoveExpandBtns(bool bToRight)
@@ -513,7 +496,7 @@ void MindNode::checkRemoveExpandBtns(bool bToRight)
 				break;
 			}
 		}
-		if (bHasRightChildren == false)
+		if (bHasRightChildren == false && m_pRCollaspBtn)
 		{
 			m_pRCollaspBtn->setParentItem(NULL);
 			m_pRCollaspBtn.clear();
@@ -530,7 +513,7 @@ void MindNode::checkRemoveExpandBtns(bool bToRight)
 				break;
 			}
 		}
-		if (bHasLeftChildren == false)
+		if (bHasLeftChildren == false && m_pLCollaspBtn)
 		{
 			m_pLCollaspBtn->setParentItem(NULL);
 			m_pLCollaspBtn.clear();
@@ -582,6 +565,8 @@ bool MindNode::isCollapsed(bool bRight) const
 
 void MindNode::onLeftExpandBtnToggle()
 {
+	RAIITransBatch batch(m_scene);
+
 	bool bVisible = true;
 	if (m_left_expand == EXP_EXPAND)
 	{
@@ -607,6 +592,8 @@ void MindNode::onLeftExpandBtnToggle()
 
 void MindNode::onRightExpandBtnToggle()
 {
+	RAIITransBatch batch(m_scene);
+
 	if (m_content == u8"新增节点4")
 	{
 		QPointF pos = this->scenePos();
@@ -730,6 +717,7 @@ void MindNode::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 		qreal dist = _dist(m_initClickScenePos, event->scenePos());
 		if (dist > 3)
 		{
+			m_scene->startMoveTransaction();
 			m_item_event_offset = event->scenePos() - this->scenePos();
 			m_dragging.m_pOrginalParent = m_parent;
 			m_dragging.m_idx = m_parent->m_children.indexOf(this);
@@ -759,8 +747,6 @@ void MindNode::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	{
 		m_bDragging = false;
 		setZValue(0);
-		if (m_pathItem)
-			m_pathItem->show();
 		emit nodeDragged(this);
 	}
 	if (event->button() == Qt::RightButton)
@@ -860,6 +846,7 @@ bool MindNode::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
 void MindNode::SetContent(const QString& content)
 {
 	m_content = content;
+	initDocFormat(m_content);
 }
 
 QString MindNode::GetContent() const
@@ -870,44 +857,47 @@ QString MindNode::GetContent() const
 void MindNode::AddChild(MindNode* pChild)
 {
 	m_children.append(pChild);
+	pChild->setParentItem(this);
 }
 
 void MindNode::NewChild(bool toRight)
 {
-	MindNode* pChild = NewChildImpl(toRight);
-	if (pChild)
-	{
-        TRANSCATION_PTR trans;
-        MindNodeInfo info;
-        info.childNode = pChild;
-        info.parnetNode = this;
-        trans.reset(new MindTransaction(OP_ADD, info));
-        trans->SetState(SS_START);
-        m_scene->transRepository()->Add(trans);
-		m_scene->transRepository()->Commit(trans->GetId());
-	}
+	RAIITransBatch batch(m_scene);
+    MindNode* pChild = NULL;
+    if (qobject_cast<MindProgressNode*>(this))
+    {
+        pChild = new MindProgressNode(u8"进度节点", this);
+    }
+    else
+    {
+        pChild = new MindNode(u8"新增节点", this);
+    }
+    pChild->setToRight(toRight);
+    pChild->setLevel(level() + 1);
+    m_children.append(pChild);
+    pChild->initMenu();
+    initExpandBtns();
+    emit nodeCreated(pChild);
 }
 
-MindNode* MindNode::NewChildImpl(bool toRight)
+void MindNode::focusInEvent(QFocusEvent* event)
 {
-	MindNode* pChild = NULL;
-	if (qobject_cast<MindProgressNode*>(this))
-	{
-		pChild = new MindProgressNode(u8"进度节点", this);
-	}
-	else
-	{
-		pChild = new MindNode(u8"新增节点", this);
-	}
+    QGraphicsTextItem::focusInEvent(event);
+	//TODO: 换行的要考察
+	m_focusInText = m_content;
+}
 
-	pChild->setToRight(toRight);
-	pChild->setLevel(level() + 1);
-	m_children.append(pChild);
-	pChild->initMenu();
-	initExpandBtns();
-	pChild->setup(m_scene);
-	emit nodeCreated(pChild);
-	return pChild;
+void MindNode::focusOutEvent(QFocusEvent* event)
+{
+    QGraphicsTextItem::focusOutEvent(event);
+    clearSelection();
+    setTextInteractionFlags(Qt::NoTextInteraction);
+	m_content = document()->toPlainText();
+	//风险：如果逃逸了focusOUt的事件，会导致没法提交事务。
+	if (m_focusInText != m_content)
+	{
+		m_scene->transRepository()->AddExecute(TRANSFORM_PTR(new EditContentTransform(m_scene, this, m_focusInText, m_content)));
+	}
 }
 
 QPainterPath MindNode::shape() const
@@ -1140,6 +1130,12 @@ void MindNode::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, 
 {
 	udpateBorderFormat(option);
 	QGraphicsTextItem::paint(painter, option, widget);
+}
+
+void MindNode::setPathItemVisible(bool bVisible)
+{
+	if (m_pathItem)
+		m_pathItem->setVisible(bVisible);
 }
 
 void MindNode::setPosition(QPointF pos)

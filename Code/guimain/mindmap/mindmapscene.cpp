@@ -15,6 +15,7 @@ MindMapScene::MindMapScene(QObject* parent)
 	, m_pHolder(NULL)
 	, m_undo(NULL)
     , m_redo(NULL)
+	, m_moveBatch(this)
 {
 }
 
@@ -28,13 +29,22 @@ void MindMapScene::initContent(QString content, bool bSchedule)
 {
 	m_repo.reset(new TranRepository);
 	m_bSchedule = bSchedule;
-	clear();
-	m_pHolder = new RoundedRectItem(NULL, m_bSchedule ? QColor(0, 181, 72) : AppHelper::colorBlue(), Qt::DashLine);
-	m_pHolder->hide();
-	addItem(m_pHolder);
-	m_pRoot = parseXML(content.toStdString());
-	arrangeAllItems(false);
-	update();
+	m_content = content;
+	reconstruct(m_content);
+}
+
+void MindMapScene::reconstruct(const QString& content)
+{
+	if (!content.isEmpty())
+	{
+        clear();
+        m_pHolder = new RoundedRectItem(NULL, m_bSchedule ? QColor(0, 181, 72) : AppHelper::colorBlue(), Qt::DashLine);
+        m_pHolder->hide();
+        addItem(m_pHolder);
+        m_pRoot = parseXML(content.toStdString());
+        arrangeAllItems(false);
+        update();
+	}
 }
 
 QString MindMapScene::mindmapXML()
@@ -59,10 +69,16 @@ void MindMapScene::redo()
 	m_repo->Redo();
 }
 
+void MindMapScene::refresh(bool bEditChanged)
+{
+    onRedrawItems();
+    emit itemContentChanged(bEditChanged);
+}
+
 void MindMapScene::onNodeCreated(MindNode* pChild)
 {
 	//目前暂时只需重绘
-	//pChild->setup(this);
+	pChild->setup(this);
 	onRedrawItems();
 	emit itemContentChanged(false);
 }
@@ -217,7 +233,6 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 	if (pNewHolderParent == NULL || holderIdx < 0 ||
 		holderIdx > pNewHolderParent->Children().length())
 	{
-		m_pHolder->hide();
 	}
 	else
 	{
@@ -228,6 +243,21 @@ void MindMapScene::onNodeDragging(MindNode* pDraggingNode)
 		pNewHolderParent->insertChild(m_pHolder, holderIdx);
 	}
 	onRedrawItems(true);
+}
+
+void MindMapScene::startMoveTransaction()
+{
+	m_moveBatch.startBatch();
+}
+
+bool MindMapScene::event(QEvent* e)
+{
+	if (e->type() == TransEndEvent::TYPE)
+	{
+		m_moveBatch.endBatch();
+		return true;
+	}
+	return QGraphicsScene::event(e);
 }
 
 void MindMapScene::onNodeDragged(MindNode* pNode)
@@ -241,19 +271,20 @@ void MindMapScene::onNodeDragged(MindNode* pNode)
             parent->removeChild(m_pHolder);
             parent->insertChild(pNode, idx);
             pNode->resetAllChildDirection(m_pHolder->isToRight());
+			pNode->setPathItemVisible(true);
+			m_moveBatch.setResult(true);
+			m_moveBatch.endBatch();
             m_pHolder->hide();
             onRedrawItems();
 			emit itemContentChanged(false);
-		}
-		else
-		{
-			pNode->resetPosBeforeDragging();
+			return;
 		}
 	}
-	else
-	{
-		pNode->resetPosBeforeDragging();
-	}
+
+	m_moveBatch.setResult(false);
+	if (pNode)
+		pNode->setPathItemVisible(false);
+	QApplication::postEvent(this, new TransEndEvent);
 }
 
 MindNode* MindMapScene::parseXML(const std::string& content)

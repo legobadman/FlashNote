@@ -271,6 +271,7 @@ void MindProgressNode::setWorkingHourDlg()
 		QLineEdit::Normal, QString::number(m_workinghours));
 	if (!text.isEmpty())
 	{
+		RAIITransBatch batch(_scene());
 		_setWorkhours(text.toFloat());
 		updateToParent();
 	}
@@ -278,12 +279,14 @@ void MindProgressNode::setWorkingHourDlg()
 
 void MindProgressNode::markFinish()
 {
+	RAIITransBatch batch(_scene());
 	_setProgress(1.0);
 	updateToParent();
 }
 
 void MindProgressNode::zeroSchedule()
 {
+	RAIITransBatch batch(_scene());
 	_setProgress(0.0);
 	updateToParent();
 }

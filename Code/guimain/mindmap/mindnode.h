@@ -5,6 +5,8 @@
 #include <memory>
 #include "mindnodebutton.h"
 #include "common_types.h"
+#include "../transaction/transaction.h"
+#include "mindtransaction.h"
 
 class MindMapScene;
 
@@ -47,6 +49,7 @@ public:
 
 	void removeChild(MindNode* pNode);
 	void insertChild(MindNode* pNode, int idx);
+	void AddChild(MindNode* pChild);
 	MindNode* Parent() const { return m_parent; }
 	bool isTopRoot() const { return m_parent == NULL; }
 	void setLevel(int nLevel) { m_level = nLevel; }
@@ -74,10 +77,9 @@ public:
 	void setHighlightedBorder(QColor color) { m_highlightedBorder = color; }
 	void setSelectedBorder(QColor color) { m_selectedBorder = color; }
 	virtual void setPosition(QPointF pos);
-	void AddChild(MindNode* pChild);
+	void setPathItemVisible(bool bVisible);
 
 	void NewChild(bool toRight);	//特指后续的创建而非IO初始化的创建。
-	MindNode* NewChildImpl(bool toRight);
 
 	QPainterPath shape() const override;
 
@@ -91,12 +93,11 @@ signals:
 	void nodeDragging(MindNode* pNode);
 
 public slots:
-	void onDocumentContentsChanged(int, int, int);
 	virtual void onCreateChildNodeRight();
 	void onCreateChildNodeLeft();
 	void onCreateSliblingNode();
 	virtual void onDeleteNode();
-	void onCreateAssociateNote();
+	void onCreateAssociateNote();	//TODO: 事务
 	void onEditAssociateNote();
 	void onNewNote(const QString&);
 	void onLeftExpandBtnToggle();
@@ -106,7 +107,6 @@ public:
 	void SetContent(const QString& content);
 	QString GetContent() const;
 	QRectF boundingRect() const override;
-	QRectF hierarchyRect(bool bToRight);
 	QRectF childrenRect(bool bToRight) const;
 
 protected:
@@ -126,11 +126,13 @@ protected:
 	bool needShowDecoration() const;
 	bool sceneEvent(QEvent* event) override;
 	virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event);
+	void focusInEvent(QFocusEvent* event) override;
 	void focusOutEvent(QFocusEvent* event) override;
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
 	void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
 	void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+	MindMapScene* _scene() const { return m_scene; }
 
 private:
 	void initSignalSlots(MindMapScene* pScene);
@@ -169,6 +171,11 @@ private:
 	MindNode* m_parent;
 	MindMapScene* m_scene;
 	DraggingCache m_dragging;
+	QString m_focusInText;	//进入编辑时的文本。
+
+	shared_ptr<MoveTransform> m_spMoveTransform;
+	TRANSCATION_PTR m_spMoveTrans;
+	int m_moveTrans_id;
 
     int m_level;
     int m_borderWidth;
