@@ -79,6 +79,16 @@ void TranRepository::Redo()
     }
 }
 
+bool TranRepository::enableUndo()
+{
+    return (m_curr_idx > 0);
+}
+
+bool TranRepository::enableRedo()
+{
+    return (m_curr_idx < m_transactions.size() - 1);
+}
+
 void TranRepository::Rollback(int id)
 {
     //找到ope的start标志的trans

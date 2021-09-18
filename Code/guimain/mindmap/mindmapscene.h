@@ -35,12 +35,14 @@ public:
 	void reconstruct(const QString& content);
 	void refresh(bool bEditChanged = false);
 	void startMoveTransaction();
+	void emitUndoRedoEnable();
 
 protected:
 	bool event(QEvent* event) override;
 
 signals:
 	void itemContentChanged(bool bEditChanged);
+	void undoRedoEnable(bool, bool);
 
 private slots:
 	void onNodeContentsChanged();

@@ -56,6 +56,8 @@ public:
     int AddExecute(TRANSFORM_PTR pTransform);
     int AddBatch(TRANSFORM_PTR pTransform);
     void Clear();
+    bool enableUndo();
+    bool enableRedo();
 
 private:
     vector<TRANSCATION_PTR> m_transactions;

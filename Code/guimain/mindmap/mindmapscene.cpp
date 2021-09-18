@@ -62,11 +62,18 @@ QString MindMapScene::mindmapXML()
 void MindMapScene::undo()
 {
 	m_repo->Undo();
+	emitUndoRedoEnable();
 }
 
 void MindMapScene::redo()
 {
 	m_repo->Redo();
+	emitUndoRedoEnable();
+}
+
+void MindMapScene::emitUndoRedoEnable()
+{
+	emit undoRedoEnable(m_repo->enableUndo(), m_repo->enableRedo());
 }
 
 void MindMapScene::refresh(bool bEditChanged)

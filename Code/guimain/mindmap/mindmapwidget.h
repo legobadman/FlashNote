@@ -9,6 +9,8 @@
 
 using namespace rapidxml;
 
+class NLabelButton;
+
 class MindMapWidget : public QWidget
 {
 	Q_OBJECT
@@ -21,14 +23,20 @@ public:
 signals:
 	void itemContentChanged(bool);
 
+protected:
+    bool eventFilter(QObject* watched, QEvent* event);
+
 private slots:
 	void redo();
 	void undo();
+	void undoRedoEnable(bool, bool);
 
 private:
 	QPointer<MindMapScene> m_scene;
 	QPointer<MindMapView> m_view;
 	MindNode* m_pRoot;
+	NLabelButton* m_undoBtn;
+	NLabelButton* m_redoBtn;
     QShortcut* m_undo;
     QShortcut* m_redo;
 };

@@ -17,6 +17,12 @@
 	<file>icons/trash.png</file>
 	<file>icons/conflict.png</file>
 	<file>icons/warning.png</file>
+    <file>icons/undo.png</file>
+    <file>icons/undo_hover.png</file>
+    <file>icons/redo.png</file>
+    <file>icons/redo_hover.png</file>
+    <file>icons/redo_disable.png</file>
+    <file>icons/undo_disable.png</file>
 	<file>icons/16x16/Bold.png</file>
 	<file>icons/16x16/Italic.png</file>
 	<file>icons/16x16/Underline.png</file>

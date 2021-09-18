@@ -111,6 +111,8 @@ add_executable(guimain
     ./LeftSideItemDelegate.h
     ./listpane.cpp
     ./listpane.h
+    ./labelbutton.cpp
+    ./labelbutton.h
     ./mindmap/mindmapview.cpp
     ./mindmap/mindmapview.h
     ./mindmap/mindmapwidget.cpp

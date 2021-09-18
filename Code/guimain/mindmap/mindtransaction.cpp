@@ -261,6 +261,7 @@ RAIITransBatch::~RAIITransBatch()
 		//TODO: 可能要删除这个事务了。
 		m_scene->transRepository()->Rollback(m_id);
 	}
+	emit m_scene->emitUndoRedoEnable();
 }
 
 
@@ -302,6 +303,7 @@ void ManualTransBatch::endBatch()
             m_scene->transRepository()->Rollback(m_id);
         }
 	}
+	emit m_scene->emitUndoRedoEnable();
 }
 
 void ManualTransBatch::setResult(bool success)
