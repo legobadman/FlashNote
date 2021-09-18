@@ -52,6 +52,45 @@ void BookListView::init()
 	m_ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_ui->listView->setFrameShape(QFrame::NoFrame);
 	m_ui->listView->viewport()->setAttribute(Qt::WA_Hover, true);
+
+	m_ui->listView->verticalScrollBar()->setStyleSheet("\
+		QScrollBar:vertical\
+		{\
+			background-color: #FFFFFF;\
+			width: 15px;\
+			margin: 0px 2px 0px 2px;\
+			border: 1px transparent #2A2929;\
+			border-radius: 0px;\
+		}\
+\
+		QScrollBar::handle:vertical\
+		{\
+			background-color: rgb(215,215,215);\
+			min-height: 5px;\
+			border-radius: 0px;\
+		}\
+\
+        QScrollBar::add-line:vertical {\
+			border: none;	\
+			background: none;	\
+		}\
+\
+		QScrollBar::sub-line:vertical{\
+			border: none;		\
+			background: none;	\
+		}\
+\
+		QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical\
+        {\
+            background: none;\
+        }\
+\
+		QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical\
+		{\
+			background: none;\
+		}\
+		");
+
 	m_ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	m_ui->tableView->setFrameShape(QFrame::NoFrame);

@@ -280,10 +280,18 @@ void NoteEditWindow::onNotebookMoved(INotebook* pNewbook)
 	if (m_pNotebook == pNewbook)
 		return;
 
-	bool ret = DbService::GetInstance().MoveNotebook(m_pNotebook, pNewbook, m_pNote);
-	if (ret)
+	if (AppHelper::GetNoteId(m_pNote).isEmpty())
 	{
-		updateBookMenu(pNewbook);
+		m_pNotebook = pNewbook;
+		updateBookMenu(m_pNotebook);
+	}
+	else
+	{
+        bool ret = DbService::GetInstance().MoveNotebook(m_pNotebook, pNewbook, m_pNote);
+        if (ret)
+        {
+            updateBookMenu(pNewbook);
+        }
 	}
 }
 

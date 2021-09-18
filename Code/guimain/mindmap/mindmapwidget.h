@@ -2,6 +2,7 @@
 #define __MINDMAP_WIDGET_H__
 
 #include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QShortcut>
 #include "mindmapview.h"
 #include "mindnode.h"
 #include "mindmapscene.h"
