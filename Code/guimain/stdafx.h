@@ -29,6 +29,7 @@
 #include <QTimer>
 #include <QLabel>
 #include <QtWidgets/QMdiArea>
+#include <QtWidgets/QShortcut>
 #include <QSystemTrayIcon>
 #include "com_sptr.h"
 #include "notecore2.h"
