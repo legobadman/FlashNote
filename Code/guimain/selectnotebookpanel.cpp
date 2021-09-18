@@ -129,6 +129,7 @@ SelectNotebookPanel::SelectNotebookPanel(QWidget* parent)
 	m_pListView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_pListView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	m_pListView->setContentsMargins(10, 0, 0, 0);
+	m_pListView->viewport()->setAttribute(Qt::WA_Hover, true);
 
 	NotebookModel* model = new NotebookModel;
 	m_pListView->setModel(model);

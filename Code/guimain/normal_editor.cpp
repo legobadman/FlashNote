@@ -58,7 +58,11 @@ void NormalEditor::init()
 	frame2->setMaximumSize(QSize(16777215, 16777215));
 	frame2->setBaseSize(QSize(10, 1));
 	frame2->setFrameShape(QFrame::HLine);
-	frame2->setFrameShadow(QFrame::Sunken);
+	frame2->setFrameShadow(QFrame::Plain);
+    QPalette palette = frame2->palette();
+    palette.setColor(QPalette::WindowText, QColor(204, 204, 204));
+	frame2->setPalette(palette);
+
 	frame2->setLineWidth(1);
 	pMainLayout->addWidget(frame2);
 

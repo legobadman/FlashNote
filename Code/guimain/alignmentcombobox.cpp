@@ -49,6 +49,7 @@ void AlignmentComboBox::popup()
     {
         m_popup = new PopupWidget(this);
         m_pView = new QListView(m_popup);
+        m_pView->viewport()->setAttribute(Qt::WA_Hover, true);
         m_pModel = new QStandardItemModel(m_pView);
 
         QStandardItem* pLeftAlignment = new QStandardItem(QIcon(":/icons/16x16/left_alignment.png"), u8"左对齐");

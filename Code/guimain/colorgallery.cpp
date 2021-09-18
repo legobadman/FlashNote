@@ -5,7 +5,7 @@
 
 
 ColorGallery::ColorGallery(QWidget* parent /* = nullptr */)
-	: QWidget(parent)
+	: _base(parent)
 {
 	init();
 }
@@ -51,17 +51,32 @@ void ColorGallery::init()
 
 	setLayout(pMainLayout);
 
-	setFixedSize(MyStyle::dpiScaledSize(QSize(248, 196)));
+	setFrameShape(QFrame::Panel);
+	setFrameShadow(QFrame::Plain);
+	
+	setLineWidth(1);
+
+	QPalette palette = this->palette();
+	palette.setColor(QPalette::Window, QColor(255, 255, 255));
+	palette.setColor(QPalette::WindowText, QColor(127, 127, 127));
+	setPalette(palette);
 }
 
 void ColorGallery::closeEvent(QCloseEvent* event)
 {
-	QWidget::closeEvent(event);
+	_base::closeEvent(event);
 }
 
 void ColorGallery::hideEvent(QHideEvent* event)
 {
-	QWidget::hideEvent(event);
+	_base::hideEvent(event);
+}
+
+void ColorGallery::paintEvent(QPaintEvent* event)
+{
+    QPainter painter(this);
+    painter.fillRect(this->rect(), QColor(255, 255, 255));
+	_base::paintEvent(event);
 }
 
 QColor ColorGallery::getCurrentColor(const QColor& color)

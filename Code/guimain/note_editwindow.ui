@@ -154,7 +154,7 @@
        </property>
       </widget>
      </item>
-	 <item>
+     <item>
       <spacer name="horizontalSpacer234">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -170,16 +170,16 @@
        </property>
       </spacer>
      </item>
-	 <item>
-	  <widget class="ToolButton" name="alarm" native="true"/>
-	 </item>
-	 <item>
+     <item>
+      <widget class="ToolButton" name="alarm" native="true"/>
+     </item>
+     <item>
       <widget class="ToolButton" name="infoBtn" native="true"/>
      </item>
-	 <item>
+     <item>
       <widget class="ToolButton" name="moreBtn" native="true"/>
      </item>
-	 <item>
+     <item>
       <widget class="ToolButton" name="socialmediashare" native="true"/>
      </item>
     </layout>
@@ -231,11 +231,48 @@
          <height>1</height>
         </size>
        </property>
+       <property name="palette">
+        <palette>
+         <active>
+          <colorrole role="WindowText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>204</red>
+             <green>204</green>
+             <blue>204</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </active>
+         <inactive>
+          <colorrole role="WindowText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>204</red>
+             <green>204</green>
+             <blue>204</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </inactive>
+         <disabled>
+          <colorrole role="WindowText">
+           <brush brushstyle="SolidPattern">
+            <color alpha="255">
+             <red>120</red>
+             <green>120</green>
+             <blue>120</blue>
+            </color>
+           </brush>
+          </colorrole>
+         </disabled>
+        </palette>
+       </property>
        <property name="frameShape">
         <enum>QFrame::HLine</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Sunken</enum>
+        <enum>QFrame::Plain</enum>
        </property>
        <property name="lineWidth">
         <number>1</number>

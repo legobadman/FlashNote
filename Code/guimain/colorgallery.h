@@ -4,9 +4,10 @@
 #include "colortableview.h"
 #include "toolbutton.h"
 
-class ColorGallery : public QWidget
+class ColorGallery : public QFrame
 {
 	Q_OBJECT
+	typedef QFrame _base;
 public:
 	ColorGallery(QWidget* parent = nullptr);
 	~ColorGallery();
@@ -15,6 +16,7 @@ public:
 protected:
 	void closeEvent(QCloseEvent* event) override;
 	void hideEvent(QHideEvent* event) override;
+	void paintEvent(QPaintEvent* event) override;
 	QColor getCurrentColor(const QColor& color);
 
 signals:
