@@ -211,7 +211,12 @@ set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")
 SET(FINAL_BIN_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../bin)
 message(${FINAL_BIN_DIRECTORY})
 
-add_custom_command(TARGET guimain POST_BUILD
- COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ts/lrelease.exe ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${FINAL_BIN_DIRECTORY}/uimain.qm
- WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+if (WIN32)
+	add_custom_command(TARGET guimain POST_BUILD
+		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ts/lrelease.exe ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${FINAL_BIN_DIRECTORY}/uimain.qm
 )
+else()
+	add_custom_command(TARGET guimain POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH="/home/luzh/Qt/build_shared/qtbase/lib" /home/luzh/Qt/build_shared/qttools/bin/lrelease ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${FINAL_BIN_DIRECTORY}/uimain.qm
+)
+endif(WIN32)
