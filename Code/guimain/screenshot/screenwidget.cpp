@@ -540,7 +540,7 @@ void ScreenShotWidget::onSaveShot()
 	QString initialPath = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
 	if (initialPath.isEmpty())
 		initialPath = QDir::currentPath();
-	initialPath += tr("/untitled.") + format;
+	initialPath += "/screenshot." + format;
 
 	QFileDialog fileDialog(this, tr("Save As"), initialPath);
 	fileDialog.setAcceptMode(QFileDialog::AcceptSave);
@@ -557,8 +557,6 @@ void ScreenShotWidget::onSaveShot()
 		return;
 	const QString fileName = fileDialog.selectedFiles().first();
 	if (!retImage.save(fileName)) {
-		QMessageBox::warning(this, tr("Save Error"), tr("The image could not be saved to \"%1\".")
-			.arg(QDir::toNativeSeparators(fileName)));
 	}
 	close();
 }

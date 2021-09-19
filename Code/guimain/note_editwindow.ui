@@ -150,7 +150,7 @@
         </font>
        </property>
        <property name="toolTip">
-        <string>编辑标题</string>
+        <string>edit Title</string>
        </property>
       </widget>
      </item>

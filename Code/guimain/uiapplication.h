@@ -4,6 +4,7 @@
 #include "notetrayicon.h"
 #include "NoteMainWindow.h"
 #include "globalsearcheditor.h"
+#include <QtCore/QTranslator>
 
 class UiApplication : public QApplication
 {

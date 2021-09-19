@@ -157,11 +157,6 @@ add_executable(guimain
     ./popupwidget.cpp
     ./popupwidget.h
     ./res/icons.qrc
-    ./richeditor/mrichtextedit.cpp
-    ./richeditor/mrichtextedit.h
-    ./richeditor/mrichtextedit.ui
-    ./richeditor/mtextedit.cpp
-    ./richeditor/mtextedit.h
     ./richeditor/richtexteditor.cpp
     ./richeditor/richtexteditor.h
     ./SeperateLine.cpp
@@ -177,8 +172,6 @@ add_executable(guimain
     ./selectnotebookpanel.h
     ./screenshot/screenshotwindow.cpp
     ./screenshot/screenshotwindow.h
-    ./screenshot/screenshot.cpp
-    ./screenshot/screenshot.h
     ./screenshot/screenwidget.cpp
     ./screenshot/screenwidget.h
     ./screenshot/screentoolbar.cpp
@@ -213,3 +206,12 @@ else()
 endif(WIN32)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")
+
+
+SET(FINAL_BIN_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/../bin)
+message(${FINAL_BIN_DIRECTORY})
+
+add_custom_command(TARGET guimain POST_BUILD
+ COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ts/lrelease.exe ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${FINAL_BIN_DIRECTORY}/uimain.qm
+ WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)

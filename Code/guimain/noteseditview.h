@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStackedWidget>
+#include <QtCore/QSortFilterProxyModel>
 #include "common_types.h"
 #include "bookviewmodel.h"
 

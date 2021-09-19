@@ -21,6 +21,11 @@ UiApplication::UiApplication(int& argc, char** argv)
 	, m_pSearchEditor(NULL)
 {
 	QApplication::setStyle(new MyStyle);
+    static QTranslator mpQtTr;
+	const QString& appdatapath = this->applicationDirPath();
+    mpQtTr.load(appdatapath + "/" + "uimain");
+    installTranslator(&mpQtTr);
+
 	CreateApplication(&m_spApp);
 	initCoreFromRPC();
 	initUI();

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>新建笔记本</string>
+   <string>New Notebook</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>笔记本名称：</string>
+        <string>Notebook name:</string>
        </property>
       </widget>
      </item>

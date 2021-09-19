@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>我的笔记本</string>
+   <string>FlashNote</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -44,7 +44,7 @@
       <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
-      <widget class="NavigationPanel" name="listpane">
+      <widget class="NavigationPanel" name="listpane" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -71,10 +71,14 @@
        </property>
       </widget>
       <widget class="QStackedWidget" name="stackedWidget2">
-       <widget class="NotesEditView" name="notesview"/>
+       <widget class="NotesEditView" name="notesview">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
        <widget class="QWidget" name="booksview"/>
        <widget class="NoteEditWindow" name="scheduleeditor"/>
-	   <widget class="QWidget" name="schedulesview"/>
+       <widget class="QWidget" name="schedulesview"/>
       </widget>
      </widget>
     </item>
@@ -86,22 +90,46 @@
      <x>0</x>
      <y>0</y>
      <width>628</width>
-     <height>26</height>
+     <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu">
+   <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>文件(F)</string>
+     <string>&amp;File(F)</string>
+    </property>
+    <addaction name="acNewNote"/>
+    <addaction name="acNewBook"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Edit(E)</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menu_2">
+   <widget class="QMenu" name="menuNote_N">
     <property name="title">
-     <string>帮助(H)</string>
+     <string>Note(N)</string>
     </property>
    </widget>
-   <addaction name="menu"/>
-   <addaction name="menu_2"/>
+   <widget class="QMenu" name="menuHelp_H">
+    <property name="title">
+     <string>Help(H)</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuHelp"/>
+   <addaction name="menuNote_N"/>
+   <addaction name="menuHelp_H"/>
   </widget>
+  <action name="acNewNote">
+   <property name="text">
+    <string>&amp;New Note(N)</string>
+   </property>
+  </action>
+  <action name="acNewBook">
+   <property name="text">
+    <string>New Notebook(B)...</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -115,14 +143,10 @@
    <header>note_editwindow.h</header>
   </customwidget>
   <customwidget>
-   <class>BookListView</class>
-   <extends>QWidget</extends>
-   <header>booklistview.h</header>
-  </customwidget>
-  <customwidget>
    <class>NotesEditView</class>
    <extends>QSplitter</extends>
    <header>noteseditview.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

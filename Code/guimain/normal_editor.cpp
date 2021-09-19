@@ -202,7 +202,6 @@ void NormalEditor::initSlots()
 	connect(font_comboBox, SIGNAL(activated(QString)), this, SLOT(onFontChanged(QString)));
 	connect(fontcolor, SIGNAL(colorChanged(const QColor&)), this, SLOT(textFgColor(const QColor&)));
 	connect(highlight, SIGNAL(clicked()), this, SLOT(textBgColor()));
-	connect(attachment, SIGNAL(clicked(bool)), this, SLOT(textLink(bool)));
 
 	connect(bold, SIGNAL(clicked()), this, SLOT(textBold()));
 	connect(italic, SIGNAL(clicked()), this, SLOT(textItalic()));
@@ -421,43 +420,6 @@ void NormalEditor::onFontChanged(const QString& font)
 	mergeFormatOnWordOrSelection(fmt);
 }
 
-void NormalEditor::textLink(bool checked)
-{
-	bool unlink = false;
-	QTextCharFormat fmt;
-	if (checked)
-	{
-		QString url = textEdit->currentCharFormat().anchorHref();
-		bool ok;
-		QString newUrl = QInputDialog::getText(this, tr("Create a link"),
-			tr("Link URL:"), QLineEdit::Normal,
-			url,
-			&ok);
-		if (ok)
-		{
-			fmt.setAnchor(true);
-			fmt.setAnchorHref(newUrl);
-			fmt.setForeground(QApplication::palette().color(QPalette::Link));
-			fmt.setFontUnderline(true);
-		}
-		else
-		{
-			unlink = true;
-		}
-	}
-	else
-	{
-		unlink = true;
-	}
-	if (unlink)
-	{
-		fmt.setAnchor(false);
-		fmt.setForeground(QApplication::palette().color(QPalette::Text));
-		fmt.setFontUnderline(false);
-	}
-	mergeFormatOnWordOrSelection(fmt);
-}
-
 void NormalEditor::textFgColor(const QColor& color)
 {
 	QTextCursor cursor = textEdit->textCursor();
@@ -567,10 +529,10 @@ QTextDocument* NormalEditor::document()
 void NormalEditor::insertImage()
 {
 	QString original = QFileDialog::getOpenFileName(this, tr("Select an image"),
-		".", tr("JPEG (*.jpg *jpeg)\n"
+		".", "JPEG (*.jpg *jpeg)\n"
 			"GIF (*.gif)\n"
 			"PNG (*.png)\n"
-			"Bitmap Files (*.bmp)\n"));
+			"Bitmap Files (*.bmp)\n");
 
 	if (original.isEmpty())
 		return;

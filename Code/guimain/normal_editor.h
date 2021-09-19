@@ -35,7 +35,6 @@ protected slots:
 	void checkDocument();
 	void textSize(const QString& p);
 	void onFontChanged(const QString& font);
-	void textLink(bool checked);
 	void listOrdered();
 	void listBullet();
 	void textBgColor();
