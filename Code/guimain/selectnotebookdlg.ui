@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QListView" name="listView"/>
+    <widget class="SelectNotebookPanel" name="bookpanel"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -64,4 +64,11 @@
    </hints>
   </connection>
  </connections>
+ <customwidgets>
+  <customwidget>
+   <class>SelectNotebookPanel</class>
+   <extends>QWidget</extends>
+   <header>selectnotebookpanel.h</header>
+  </customwidget>
+ </customwidgets>
 </ui>

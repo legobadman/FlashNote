@@ -12,6 +12,7 @@ class SelectNotebookDlg : public QDialog
 public:
 	SelectNotebookDlg(QDialog* parent = NULL);
 	QString getBookId();
+	void setButtonText(const QString& okText, const QString& cancelText);
 
 private:
 	Ui::SelectNotebookDlg* m_ui;

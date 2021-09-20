@@ -147,6 +147,21 @@
         <source>&amp;About(A)...</source>
         <translation>关于(&amp;A)</translation>
     </message>
+    <message>
+        <location filename="../NoteMainWindow.cpp" line="100"/>
+        <source>Move Note</source>
+        <translation>移动笔记</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.cpp" line="101"/>
+        <source>&amp;Move(M)</source>
+        <translation>移动(&amp;M)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.cpp" line="101"/>
+        <source>&amp;Cancel(C)</source>
+        <translation>取消(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>ScreenShotWidget</name>
@@ -161,7 +176,7 @@
     <message>
         <location filename="../selectnotebookdlg.ui" line="14"/>
         <source>Dialog</source>
-        <translation></translation>
+        <translation>选择笔记本</translation>
     </message>
 </context>
 </TS>

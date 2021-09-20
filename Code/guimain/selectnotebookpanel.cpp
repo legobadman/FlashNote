@@ -149,6 +149,12 @@ SelectNotebookPanel::~SelectNotebookPanel()
 {
 }
 
+QString SelectNotebookPanel::currentBookId()
+{
+	QString bookId = m_pListView->currentIndex().data(ItemCoreObjIdRole).toString();
+	return bookId;
+}
+
 void SelectNotebookPanel::onIndexClicked(const QModelIndex& index)
 {
 	QString notebookid = index.data(ItemCoreObjIdRole).toString();

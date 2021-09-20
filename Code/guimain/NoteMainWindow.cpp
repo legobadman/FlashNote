@@ -12,6 +12,7 @@
 #include "noteseditview.h"
 #include "floatingmenubutton.h"
 #include "uiapplication.h"
+#include "selectnotebookdlg.h"
 
 #ifdef Q_OS_WIN
 #include "notehook.h"
@@ -86,6 +87,34 @@ void NoteMainWindow::initMenuSignal()
 		{
             m_ui->scheduleeditor->trashNote();
         }
+	});
+	connect(m_ui->action_MoveNote, &QAction::triggered, [=]() {
+		com_sptr<INote> spNote = GetCurrentActiveNote();
+		if (spNote)
+		{
+			NOTE_TYPE type = UNKNOWN_TYPE;
+			spNote->GetType(&type);
+			if (type != SCHEDULE && type != UNKNOWN_TYPE)
+			{
+				SelectNotebookDlg dlg;
+                dlg.setWindowTitle(tr("Move Note"));
+				dlg.setButtonText(tr("&Move(M)"), tr("&Cancel(C)"));
+				if (QDialog::Accepted == dlg.exec())
+				{
+					QString srcBookId;
+					wstring bookId;
+					spNote->GetBookId(bookId);
+					srcBookId = QString::fromStdWString(bookId);
+					QString destBookId = dlg.getBookId();
+
+					com_sptr<INotebook> spSrcbook, spDestbook;
+					AppHelper::GetNotebookById(srcBookId, &spSrcbook);
+					AppHelper::GetNotebookById(destBookId, &spDestbook);
+
+					DbService::GetInstance().MoveNotebook(spSrcbook, spDestbook, spNote);
+                }
+			}
+		}
 	});
 }
 

@@ -32,6 +32,7 @@ class SelectNotebookPanel : public QWidget
 public:
 	SelectNotebookPanel(QWidget* parent = NULL);
 	~SelectNotebookPanel();
+	QString currentBookId();
 
 signals:
 	void notebookMoved(INotebook* pNotebook);

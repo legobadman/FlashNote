@@ -551,6 +551,8 @@ bool DbService::RemoveNotebook(INoteApplication* pApp, INotebook* pNotebook)
 
 bool DbService::MoveNotebook(INotebook* pSrcbook, INotebook* pDestbook, INote* pNote)
 {
+	if (!pSrcbook || !pDestbook || !pNote)
+		return false;
 	//Remove from srcbook
 	QString srcbook_id = AppHelper::GetNotebookId(pSrcbook);
 	QString destbook_id = AppHelper::GetNotebookId(pDestbook);
