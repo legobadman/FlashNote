@@ -283,8 +283,10 @@ QSizeF AppHelper::viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int
 
 void AppHelper::openNoteInIsoWindow(const QString& noteid)
 {
-	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, NORMAL_NOTE);
+	if (noteid.isEmpty())
+		return;
 
+	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, NORMAL_NOTE);
 	com_sptr<INote> spNote;
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNoteAndBookById(noteid, &spNotebook, &spNote);

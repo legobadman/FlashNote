@@ -70,29 +70,82 @@
         <translation>文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../NoteMainWindow.ui" line="105"/>
-        <source>&amp;Edit(E)</source>
-        <translation>编辑(&amp;E)</translation>
-    </message>
-    <message>
-        <location filename="../NoteMainWindow.ui" line="110"/>
-        <source>Note(N)</source>
-        <translation>笔记(&amp;N)</translation>
-    </message>
-    <message>
-        <location filename="../NoteMainWindow.ui" line="115"/>
-        <source>Help(H)</source>
-        <translation>帮助(&amp;H)</translation>
-    </message>
-    <message>
-        <location filename="../NoteMainWindow.ui" line="125"/>
+        <location filename="../NoteMainWindow.ui" line="102"/>
+        <location filename="../NoteMainWindow.ui" line="147"/>
         <source>&amp;New Note(N)</source>
         <translation>新建笔记(&amp;N)</translation>
     </message>
     <message>
-        <location filename="../NoteMainWindow.ui" line="130"/>
+        <location filename="../NoteMainWindow.ui" line="113"/>
+        <source>&amp;Edit(E)</source>
+        <translation>编辑(&amp;E)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="122"/>
+        <source>Note(N)</source>
+        <translation>笔记(&amp;N)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="131"/>
+        <source>Help(H)</source>
+        <translation>帮助(&amp;H)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="142"/>
         <source>New Notebook(B)...</source>
-        <translation>新建笔记本(B)</translation>
+        <translation>新建笔记本(&amp;B)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="150"/>
+        <source>Ctrl+N</source>
+        <translation>Ctrl+N</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="155"/>
+        <source>New &amp;Mindmap(M)</source>
+        <translation>新建思维导图(&amp;M)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="160"/>
+        <source>New &amp;Schedule(S)</source>
+        <translation>新建进度图(&amp;S)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="165"/>
+        <source>&amp;Undo(U)</source>
+        <translation>撤销(&amp;U)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="170"/>
+        <source>&amp;Redo(R)</source>
+        <translation>重做(&amp;R)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="175"/>
+        <source>&amp;Search(S)</source>
+        <translation>搜索(&amp;S)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="180"/>
+        <source>&amp;Open New Window(O)</source>
+        <translation>在新窗口中打开(&amp;O)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="185"/>
+        <location filename="../NoteMainWindow.ui" line="195"/>
+        <source>&amp;Move Note(M)</source>
+        <translation>移动笔记(&amp;M)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="190"/>
+        <location filename="../NoteMainWindow.ui" line="200"/>
+        <source>&amp;Delete Note(D)</source>
+        <translation>删除笔记(&amp;D)</translation>
+    </message>
+    <message>
+        <location filename="../NoteMainWindow.ui" line="205"/>
+        <source>&amp;About(A)...</source>
+        <translation>关于(&amp;A)</translation>
     </message>
 </context>
 <context>

@@ -24,6 +24,10 @@ public:
 	NotesEditView(QWidget* parent = NULL);
 	~NotesEditView();
 	void setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNotebook);
+	QString currentNoteId();
+	INote* currentNote();
+	INoteCollection* currentNotes();
+	void trashNote();
 
 protected:
 	bool eventFilter(QObject* watched, QEvent* event) override;
@@ -37,14 +41,17 @@ private:
 private:
 	QWidget* m_pNoView;
 
-	NoteEditWindow* m_pEditView;
+	NoteEditWindow* m_pEditWindow;
 	QStackedWidget* m_pStackedEdit;
 
 	QMap<QString, BookViewModel*> m_models;
+	com_sptr<INoteCollection> m_spNotes;
+
 	AllNotesModel* m_pAllNotesModel;
 	BookViewModel* m_pTrashModel;
 	QSharedPointer<QSortFilterProxyModel> m_pCurrFilterModel;
 	BookListView* m_pListView;
+	
 	BOOKVIEW_TYPE m_type;
 };
 

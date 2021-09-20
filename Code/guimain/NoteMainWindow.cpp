@@ -11,6 +11,7 @@
 #include "addbookdlg.h"
 #include "noteseditview.h"
 #include "floatingmenubutton.h"
+#include "uiapplication.h"
 
 #ifdef Q_OS_WIN
 #include "notehook.h"
@@ -21,6 +22,7 @@ NoteMainWindow::NoteMainWindow(QWidget* parent)
 	, m_pMenuButton(NULL)
 {
 	init();
+	initMenuSignal();
 	//TODO: 本地注册表缓存bookindex。
 	int bookidx = 0;
 	initNotesView(bookidx, getActiveNoteInBook(bookidx));
@@ -63,6 +65,28 @@ void NoteMainWindow::initNotesView(int idxNotebook, int idxNote)
 
 	m_ui->stackedWidget2->setCurrentIndex(CONTENT_MAIN_VIEW::NOTES_VIEW);
 	m_ui->notesview->setNotebook(VIEW_ALLNOTES, NULL);
+}
+
+void NoteMainWindow::initMenuSignal()
+{
+	connect(m_ui->action_NewBook, &QAction::triggered, [=]() { onAddNotebook(); });
+	connect(m_ui->action_NewNote, &QAction::triggered, [=]() { onNewNote(NORMAL_NOTE); });
+	connect(m_ui->action_NewMindmap, &QAction::triggered, [=]() { onNewNote(MINDMAP); });
+	connect(m_ui->action_NewSchedule, &QAction::triggered, [=]() { onNewNote(SCHEDULE); });
+	connect(m_ui->action_Search, &QAction::triggered, [=]() { AppHelper::uiApp()->showFloatingSearcher(); });
+	connect(m_ui->action_OpenNewWindow, &QAction::triggered, [=]() { 
+			AppHelper::openNoteInIsoWindow(AppHelper::GetNoteId(GetCurrentActiveNote()));
+		});
+	connect(m_ui->action_DeleteNote, &QAction::triggered, [=]() {
+		if (m_ui->stackedWidget2->currentWidget() == m_ui->notesview)
+		{
+			m_ui->notesview->trashNote();
+		}
+		else if (m_ui->stackedWidget2->currentWidget() == m_ui->scheduleeditor)
+		{
+            m_ui->scheduleeditor->trashNote();
+        }
+	});
 }
 
 void NoteMainWindow::_temp_hide_floatWin()
@@ -118,6 +142,48 @@ int NoteMainWindow::getActiveNoteInBook(int bookidx)
 	return 0;
 }
 
+INote* NoteMainWindow::GetCurrentActiveNote()
+{
+    if (m_ui->stackedWidget2->currentWidget() == m_ui->notesview)
+    {
+        return m_ui->notesview->currentNote();
+    }
+    else if (m_ui->stackedWidget2->currentWidget() == m_ui->scheduleeditor)
+    {
+        return m_ui->scheduleeditor->GetNote();
+    }
+	else
+	{
+		return NULL;
+	}
+}
+
+INoteCollection* NoteMainWindow::GetCurrentNoteCollection()
+{
+    if (m_ui->stackedWidget2->currentWidget() == m_ui->notesview)
+    {
+		if (com_sptr<INote> spNote = m_ui->notesview->currentNote())
+		{
+            std::wstring bookId;
+            spNote->GetBookId(bookId);
+            QString bookid = QString::fromStdWString(bookId);
+            com_sptr<INotebook> spNotebook;
+            AppHelper::GetNotebookById(bookid, &spNotebook);
+            return spNotebook;
+		}
+    }
+    else if (m_ui->stackedWidget2->currentWidget() == m_ui->scheduleeditor)
+    {
+		com_sptr<ISchedules> spNoteColl;
+		AppHelper::coreApp()->GetSchedules(&spNoteColl);
+		return spNoteColl;
+    }
+    else
+    {
+        return NULL;
+    }
+}
+
 void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 {
 	QModelIndex root = index.parent();
@@ -167,7 +233,7 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		com_sptr<INote> spNote;
 		spNotebook->Item(noteid.toStdWString(), &spNote);
 
-		m_ui->scheduleeditor->updateNoteInfo(spNotebook, spNote, true);
+		m_ui->scheduleeditor->updateNoteInfo(spNotebook, spNote, false);
 		m_ui->stackedWidget2->setCurrentWidget(m_ui->scheduleeditor);
 	}
 }

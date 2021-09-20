@@ -30,6 +30,7 @@
 NoteEditWindow::NoteEditWindow(QWidget* parent)
     : QWidget(parent)
 	, m_type(UNKNOWN_TYPE)
+	, m_bTrash(false)
 	, m_bEditting(false)
 {
     init();
@@ -46,7 +47,7 @@ INote* NoteEditWindow::GetNote()
     return m_pNote;
 }
 
-void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edittable)
+void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool bTrash)
 {
 	//要先解除以下内核对象对自己的关联
 	if (m_pNote)
@@ -61,13 +62,10 @@ void NoteEditWindow::updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edi
 	m_pNote->addWatcher(m_spNotifier);
 
 	m_pNote->GetType(&m_type);
-
-	m_bEdittable = edittable;
+	m_bTrash = bTrash;
 
 	updateBookMenu(m_pNotebook);
-
 	updateEditContent();
-
 	update();
 }
 
@@ -75,17 +73,18 @@ void NoteEditWindow::updateEditContent()
 {
     QString title = AppHelper::GetNoteTitle(m_pNote);
     QString content = AppHelper::GetNoteContent(m_pNote);
+	bool edittable = !m_bTrash;
 
 	m_ui->editTitle->setEnabled(true);
     m_ui->editTitle->blockSignals(true);
     m_ui->editTitle->setText(title);
     m_ui->editTitle->blockSignals(false);
-    m_ui->editTitle->setReadOnly(!m_bEdittable);
+    m_ui->editTitle->setReadOnly(!edittable);
 
     if (m_type == NORMAL_NOTE)
     {
 		m_ui->noramlEditor->setEnabled(true);
-        m_ui->noramlEditor->initContent(content, !m_bEdittable);
+        m_ui->noramlEditor->initContent(content, !edittable);
         m_ui->stackedWidget->setCurrentIndex(0);
     }
     else if (m_type == MINDMAP)
@@ -183,6 +182,7 @@ void NoteEditWindow::initSlots()
 	connect(m_ui->editTitle, SIGNAL(textChanged(const QString&)), this, SLOT(onTitleChanged()));
 	connect(m_ui->noramlEditor, SIGNAL(textChanged(bool)), this, SLOT(onTextChanged(bool)));
 	connect(m_ui->mindmapEditor, SIGNAL(itemContentChanged(bool)), this, SLOT(onMindMapChanged(bool)));
+	connect(m_ui->deleteBtn, SIGNAL(clicked()), this, SLOT(trashNote()));
 }
 
 void NoteEditWindow::initCustomWidget()
@@ -201,9 +201,9 @@ void NoteEditWindow::initCustomWidget()
 	m_ui->alarm->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->alarm->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
 
-	m_ui->moreBtn->setIcon(QIcon(":/icons/16x16/more.png"));
-	m_ui->moreBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-	m_ui->moreBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
+	m_ui->deleteBtn->setIcon(QIcon(":/icons/trashnote.png"));
+	m_ui->deleteBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	m_ui->deleteBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
 
 	m_ui->socialmediashare->setIcon(QIcon(":/icons/16x16/socialmediashare.png"));
 	m_ui->socialmediashare->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
@@ -213,6 +213,38 @@ void NoteEditWindow::initCustomWidget()
 void NoteEditWindow::initContent()
 {
     m_ui->editTitle->setPlaceholderText(u8"标题");
+}
+
+void NoteEditWindow::trashNote()
+{
+	if (m_pNote)
+	{
+		NOTE_TYPE type = UNKNOWN_TYPE;
+		m_pNote->GetType(&type);
+
+		DbService& inst = DbService::GetInstance();
+		com_sptr<INoteApplication> spApp = AppHelper::coreApp();
+
+		if (m_bTrash)
+		{
+            com_sptr<ITrash> spTrash;
+			spApp->GetTrash(&spTrash);
+			inst.DeleteNote(spTrash, m_pNote);
+		}
+		else
+		{
+			if (type == SCHEDULE)
+			{
+				inst.RemoveSchedule(spApp, m_pNote);
+			}
+			else
+			{
+                com_sptr<INotebook> spNotebook;
+                AppHelper::GetNotebookByNote(m_pNote, &spNotebook);
+				inst.RemoveNote(spApp, spNotebook, m_pNote);
+			}
+		}
+	}
 }
 
 void NoteEditWindow::saveNote()
@@ -265,7 +297,6 @@ void NoteEditWindow::saveSchedule()
 	RAII_CheckEditting batch(&m_bEditting);
 
 	QString title = m_ui->editTitle->text();
-
 	m_pNote->SetTitle(title.toStdWString());
 
 	QString wtf = m_ui->mindmapEditor->mindmapXML();

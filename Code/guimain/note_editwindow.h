@@ -18,7 +18,7 @@ public:
 	void init();
 	void initCustomWidget();
 	void initContent();
-	void updateNoteInfo(INotebook* pNotebook, INote* pNote, bool edittable);
+	void updateNoteInfo(INotebook* pNotebook, INote* pNote, bool bTrash);
 	INote* GetNote();
 	void setBookName(const QString& name);
 
@@ -26,6 +26,7 @@ public slots:
 	void onTitleChanged();
 	void onTextChanged(bool delay);
 	void onMindMapChanged(bool bEditChange);
+	void trashNote();
 	void saveNote();
 	void saveMindMap();
 	void saveSchedule();
@@ -73,7 +74,7 @@ private:
 	com_sptr<INote> m_pNote;
 	com_sptr<INotebook> m_pNotebook;
 	NOTE_TYPE m_type;
-	bool m_bEdittable;
+	bool m_bTrash;
 };
 
 #endif

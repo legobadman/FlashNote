@@ -22,6 +22,7 @@ public slots:
 	void onNewNote(NOTE_TYPE);
 	void onAddNotebook();
 	void initNotesView(int idxNotebook, int idxNote);
+	void initMenuSignal();
 	void _temp_hide_floatWin();
 
 protected:
@@ -31,6 +32,8 @@ protected:
 private:
 	QString getActiveBookId();
 	int getActiveNoteInBook(int bookidx);
+	INote* GetCurrentActiveNote();
+	INoteCollection* GetCurrentNoteCollection();
 
 private:
 	Ui::NoteMainWindow* m_ui;

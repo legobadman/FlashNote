@@ -446,9 +446,17 @@ bool DbService::TrashNote(INoteApplication* pApp, INoteCollection* pNoteColl, IN
 
 bool DbService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, INote* pNote)
 {
-	com_sptr<INotebook> pNotebook = pNoteColl;
+	if (pNote == NULL)
+		return false;
+
 	QString noteid = AppHelper::GetNoteId(pNote);
+	com_sptr<INotebook> pNotebook = pNoteColl;
 	QString bookid = AppHelper::GetNotebookId(pNotebook);
+	com_sptr<INote> spNote_;
+	if (FAILED(pNotebook->Item(noteid.toStdWString(), &spNote_)))
+	{
+		return false;
+	}
 
 	TrashNote(pApp, pNoteColl, pNote);
 
@@ -474,11 +482,21 @@ bool DbService::RemoveNote(INoteApplication* pApp, INoteCollection* pNoteColl, I
 
 bool DbService::RemoveSchedule(INoteApplication* pApp, INote* pNote)
 {
+	if (pNote == NULL || pApp == NULL)
+		return false;
+
 	com_sptr<ISchedules> spSchedules;
 	pApp->GetSchedules(&spSchedules);
+	QString noteid = AppHelper::GetNoteId(pNote);
+
+	com_sptr<INote> spNote_;
+    if (FAILED(spSchedules->Item(noteid.toStdWString(), &spNote_)))
+    {
+        return false;
+    }
+
 	TrashNote(pApp, spSchedules, pNote);
 
-	QString noteid = AppHelper::GetNoteId(pNote);
 	QString sql = QString("DELETE FROM SCHEDULES WHERE note_id = '%1'").arg(noteid);
 	int ret = m_db.execDML(sql.toUtf8());
 	Q_ASSERT(ret == 1);

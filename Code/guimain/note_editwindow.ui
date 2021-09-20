@@ -177,7 +177,7 @@
       <widget class="ToolButton" name="infoBtn" native="true"/>
      </item>
      <item>
-      <widget class="ToolButton" name="moreBtn" native="true"/>
+      <widget class="ToolButton" name="deleteBtn" native="true"/>
      </item>
      <item>
       <widget class="ToolButton" name="socialmediashare" native="true"/>

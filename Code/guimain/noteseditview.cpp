@@ -4,6 +4,7 @@
 #include "noteseditview.h"
 #include "guihelper.h"
 #include "MyStyle.h"
+#include "dbservice.h"
 #include "LeftSideItemDelegate.h"
 
 
@@ -14,7 +15,7 @@ NotesEditView::NotesEditView(QWidget* parent)
 	, m_pAllNotesModel(NULL)
 	, m_pTrashModel(NULL)
 {
-	m_pEditView = new NoteEditWindow;
+	m_pEditWindow = new NoteEditWindow;
 	m_pNoView = new QWidget;
 
 	m_pListView = new BookListView(this);
@@ -29,7 +30,7 @@ NotesEditView::NotesEditView(QWidget* parent)
 	setPalette(palette);
 
 	m_pStackedEdit = new QStackedWidget(this);
-	m_pStackedEdit->addWidget(m_pEditView);
+	m_pStackedEdit->addWidget(m_pEditWindow);
 	m_pStackedEdit->addWidget(m_pNoView);
 
 	addWidget(m_pListView);
@@ -69,6 +70,7 @@ QString getCurrentNoteId(INoteCollection* pNoteCollection)
 void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollection)
 {
 	m_type = type;
+	m_spNotes = pNoteCollection;
 	
 	QString noteid;
 	QModelIndex index;	//暂时只取model第一个索引作为当前note。
@@ -128,6 +130,36 @@ void NotesEditView::setNotebook(BOOKVIEW_TYPE type, INoteCollection* pNoteCollec
 	onShowNotesView(spNote);
 }
 
+QString NotesEditView::currentNoteId()
+{
+	if (com_sptr<INote> spNote = m_pEditWindow->GetNote())
+	{
+		return AppHelper::GetNoteId(spNote);
+	}
+	return "";
+}
+
+INote* NotesEditView::currentNote()
+{
+	return m_pEditWindow->GetNote();
+}
+
+INoteCollection* NotesEditView::currentNotes()
+{
+	com_sptr<INoteCollection> spNotes;
+	com_sptr<INote> spNote;
+	DbService::GetInstance().RemoveNote(AppHelper::coreApp(), spNotes, spNote);
+	return m_spNotes;
+}
+
+void NotesEditView::trashNote()
+{
+	if (m_pStackedEdit->currentWidget() == m_pEditWindow)
+	{
+		m_pEditWindow->trashNote();
+	}
+}
+
 void NotesEditView::onNoteItemSelected(const QModelIndex& current, const QModelIndex& previous)
 {
 	QString noteid = current.data(ItemCoreObjIdRole).toString();
@@ -155,6 +187,6 @@ void NotesEditView::onShowNotesView(INote* pNote)
 		{
 			AppHelper::GetNotebookByNote(pNote, &spNotebook);
 		}
-		m_pEditView->updateNoteInfo(spNotebook, pNote, VIEW_TRASH != m_type);
+		m_pEditWindow->updateNoteInfo(spNotebook, pNote, m_type == VIEW_TRASH);
 	}
 }

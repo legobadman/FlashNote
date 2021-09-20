@@ -25,7 +25,7 @@ void NewNoteWindow::init(QString bookid)
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNotebookById(bookid, &spNotebook);
 	HRESULT hr = CreateNote(m_type, &m_pNote);
-	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
+	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, false);
 }
 
 void NewNoteWindow::open(QString bookid, QString noteid)
@@ -39,7 +39,7 @@ void NewNoteWindow::open(QString bookid, QString noteid)
 
 	AppHelper::GetNote(spNotebook, noteid, &m_pNote);
 
-	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
+	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, false);
 }
 
 void NewNoteWindow::initSchedule()
@@ -48,7 +48,7 @@ void NewNoteWindow::initSchedule()
 	AppHelper::coreApp()->GetSchedules(&spSchedules);
 	HRESULT hr = CreateNote(m_type, &m_pNote);
 	com_sptr<INotebook> spNotebook(spSchedules);
-	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, true);
+	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, false);
 }
 
 void NewNoteWindow::getNote(INote** ppNote)

@@ -97,37 +97,118 @@
     <property name="title">
      <string>&amp;File(F)</string>
     </property>
-    <addaction name="acNewNote"/>
-    <addaction name="acNewBook"/>
+    <widget class="QMenu" name="menu_New_Note">
+     <property name="title">
+      <string>&amp;New Note(N)</string>
+     </property>
+     <addaction name="action_NewNote"/>
+     <addaction name="action_NewMindmap"/>
+     <addaction name="action_NewSchedule"/>
+    </widget>
+    <addaction name="menu_New_Note"/>
+    <addaction name="action_NewBook"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
+   <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>&amp;Edit(E)</string>
     </property>
+    <addaction name="action_Undo"/>
+    <addaction name="action_Redo"/>
+    <addaction name="separator"/>
+    <addaction name="action_Search"/>
    </widget>
-   <widget class="QMenu" name="menuNote_N">
+   <widget class="QMenu" name="menuNote">
     <property name="title">
      <string>Note(N)</string>
     </property>
+    <addaction name="action_OpenNewWindow"/>
+    <addaction name="separator"/>
+    <addaction name="action_MoveNote"/>
+    <addaction name="action_DeleteNote"/>
    </widget>
-   <widget class="QMenu" name="menuHelp_H">
+   <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help(H)</string>
     </property>
+    <addaction name="action_About"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuNote"/>
    <addaction name="menuHelp"/>
-   <addaction name="menuNote_N"/>
-   <addaction name="menuHelp_H"/>
   </widget>
-  <action name="acNewNote">
+  <action name="action_NewBook">
+   <property name="text">
+    <string>New Notebook(B)...</string>
+   </property>
+  </action>
+  <action name="action_NewNote">
    <property name="text">
     <string>&amp;New Note(N)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
-  <action name="acNewBook">
+  <action name="action_NewMindmap">
    <property name="text">
-    <string>New Notebook(B)...</string>
+    <string>New &amp;Mindmap(M)</string>
+   </property>
+  </action>
+  <action name="action_NewSchedule">
+   <property name="text">
+    <string>New &amp;Schedule(S)</string>
+   </property>
+  </action>
+  <action name="action_Undo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Undo(U)</string>
+   </property>
+  </action>
+  <action name="action_Redo">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Redo(R)</string>
+   </property>
+  </action>
+  <action name="action_Search">
+   <property name="text">
+    <string>&amp;Search(S)</string>
+   </property>
+  </action>
+  <action name="action_OpenNewWindow">
+   <property name="text">
+    <string>&amp;Open New Window(O)</string>
+   </property>
+  </action>
+  <action name="action_Move_Note_M">
+   <property name="text">
+    <string>&amp;Move Note(M)</string>
+   </property>
+  </action>
+  <action name="action_Delete_Note_D">
+   <property name="text">
+    <string>&amp;Delete Note(D)</string>
+   </property>
+  </action>
+  <action name="action_MoveNote">
+   <property name="text">
+    <string>&amp;Move Note(M)</string>
+   </property>
+  </action>
+  <action name="action_DeleteNote">
+   <property name="text">
+    <string>&amp;Delete Note(D)</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>&amp;About(A)...</string>
    </property>
   </action>
  </widget>
