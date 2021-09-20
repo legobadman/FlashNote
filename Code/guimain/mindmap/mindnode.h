@@ -125,7 +125,6 @@ protected:
 	virtual void resetDecoration();
 	bool needShowDecoration() const;
 	bool sceneEvent(QEvent* event) override;
-	virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event);
 	void focusInEvent(QFocusEvent* event) override;
 	void focusOutEvent(QFocusEvent* event) override;
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

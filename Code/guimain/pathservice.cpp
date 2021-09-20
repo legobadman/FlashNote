@@ -18,7 +18,6 @@ PathService::PathService()
 void PathService::_ensurePath()
 {
 	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-	qDebug() << locations;
 	QString appData;
 
 #ifdef Q_OS_WIN

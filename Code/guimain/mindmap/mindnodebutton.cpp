@@ -73,6 +73,4 @@ void MindNodeButton::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 		painter->drawLine(x1, m_radius, x2, m_radius);
 		painter->drawLine(m_radius, y1, m_radius, y2);
 	}
-
-	painter->restore();
 }

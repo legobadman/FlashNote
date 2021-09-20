@@ -203,7 +203,6 @@ void MindNode::initExpandBtns()
 			if (bHasLeftChild)
 			{
 				m_pLCollaspBtn.reset(new MindNodeButton(this));
-				m_pLCollaspBtn->installSceneEventFilter(this);
 				m_pLCollaspBtn->setVisible(m_left_expand == EXP_COLLAPSE);
 				connect(m_pLCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onLeftExpandBtnToggle()));
 			}
@@ -214,7 +213,6 @@ void MindNode::initExpandBtns()
 			if (bHasRightChild)
 			{
 				m_pRCollaspBtn.reset(new MindNodeButton(this));
-				m_pRCollaspBtn->installSceneEventFilter(this);
 				m_pRCollaspBtn->setVisible(m_right_expand == EXP_COLLAPSE);
 				connect(m_pRCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onRightExpandBtnToggle()));
 			}
@@ -228,7 +226,6 @@ void MindNode::initExpandBtns()
 			if (!m_children.empty())
 			{
 				m_pRCollaspBtn.reset(new MindNodeButton(this));
-				m_pRCollaspBtn->installSceneEventFilter(this);
 				m_pRCollaspBtn->setVisible(m_right_expand == EXP_COLLAPSE);
 				connect(m_pRCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onRightExpandBtnToggle()));
 			}
@@ -242,7 +239,6 @@ void MindNode::initExpandBtns()
 			if (!m_children.empty())
 			{
 				m_pLCollaspBtn.reset(new MindNodeButton(this));
-				m_pLCollaspBtn->installSceneEventFilter(this);
 				m_pLCollaspBtn->setVisible(m_left_expand == EXP_COLLAPSE);
 				connect(m_pLCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onLeftExpandBtnToggle()));
 			}
@@ -661,7 +657,6 @@ void MindNode::resetAllChildDirection(bool toRight)
 		if (!m_children.isEmpty())
 		{
             m_pRCollaspBtn.reset(new MindNodeButton(this));
-            m_pRCollaspBtn->installSceneEventFilter(this);
             m_pRCollaspBtn->setVisible(m_right_expand == EXP_COLLAPSE);
             connect(m_pRCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onRightExpandBtnToggle()));
 		}
@@ -674,7 +669,6 @@ void MindNode::resetAllChildDirection(bool toRight)
 		if (!m_children.isEmpty())
 		{
 			m_pLCollaspBtn.reset(new MindNodeButton(this));
-			m_pLCollaspBtn->installSceneEventFilter(this);
 			m_pLCollaspBtn->setVisible(m_left_expand == EXP_COLLAPSE);
 		}
         connect(m_pLCollaspBtn.get(), SIGNAL(toggled()), this, SLOT(onLeftExpandBtnToggle()));
@@ -829,18 +823,6 @@ bool MindNode::sceneEvent(QEvent* event)
 		break;
 	}
 	return QGraphicsTextItem::sceneEvent(event);
-}
-
-bool MindNode::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
-{
-	if (watched == m_pRCollaspBtn.get())
-	{
-		switch (event->type() == QEvent::Paint)
-		{
-			break;
-		}
-	}
-	return QGraphicsTextItem::sceneEventFilter(watched, event);
 }
 
 void MindNode::SetContent(const QString& content)
