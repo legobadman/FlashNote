@@ -28,18 +28,12 @@ void NewNoteWindow::init(QString bookid)
 	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, false);
 }
 
-void NewNoteWindow::open(QString bookid, QString noteid)
+void NewNoteWindow::open(INotebook* pNotebook, INote* pNote)
 {
-	Q_ASSERT(!bookid.isEmpty() && !noteid.isEmpty());
-
+	Q_ASSERT(pNotebook && pNote);
 	setWindowTitle(QString(u8"编辑笔记"));
-
-	com_sptr<INotebook> spNotebook;
-	AppHelper::GetNotebookById(bookid, &spNotebook);
-
-	AppHelper::GetNote(spNotebook, noteid, &m_pNote);
-
-	m_ui->editwindow->updateNoteInfo(spNotebook, m_pNote, false);
+	m_pNote = pNote;
+	m_ui->editwindow->updateNoteInfo(pNotebook, m_pNote, false);
 }
 
 void NewNoteWindow::initSchedule()

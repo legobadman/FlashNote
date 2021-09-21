@@ -213,6 +213,13 @@ INoteCollection* NoteMainWindow::GetCurrentNoteCollection()
     }
 }
 
+void NoteMainWindow::_enableNoteMenu(bool enable)
+{
+    m_ui->action_OpenNewWindow->setEnabled(enable);
+    m_ui->action_MoveNote->setEnabled(enable);
+    m_ui->action_DeleteNote->setEnabled(enable);
+}
+
 void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 {
 	QModelIndex root = index.parent();
@@ -231,10 +238,12 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		{
 			m_ui->notesview->setNotebook(VIEW_NOTEBOOK, spNotebook);
 		}
+		_enableNoteMenu(true);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_NOTEBOOK)
 	{
 		m_ui->stackedWidget2->setCurrentWidget(m_ui->booksview);
+		_enableNoteMenu(false);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_TRASH)
 	{
@@ -242,15 +251,18 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 		com_sptr<ITrash> spTrash;
 		AppHelper::coreApp()->GetTrash(&spTrash);
 		m_ui->notesview->setNotebook(VIEW_TRASH, spTrash);
+		_enableNoteMenu(true);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_ALLNOTE)
 	{
 		m_ui->stackedWidget2->setCurrentWidget(m_ui->notesview);
 		m_ui->notesview->setNotebook(VIEW_ALLNOTES, NULL);
+		_enableNoteMenu(true);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULE)
 	{
 		m_ui->stackedWidget2->setCurrentWidget(m_ui->schedulesview);
+		_enableNoteMenu(false);
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM)
 	{
@@ -264,6 +276,11 @@ void NoteMainWindow::onLeftTreeClicked(const QModelIndex& index)
 
 		m_ui->scheduleeditor->updateNoteInfo(spNotebook, spNote, false);
 		m_ui->stackedWidget2->setCurrentWidget(m_ui->scheduleeditor);
+		_enableNoteMenu(true);
+	}
+	else if (type == ITEM_CONTENT_TYPE::ITEM_MATERIAL)
+	{
+		_enableNoteMenu(false);
 	}
 }
 

@@ -16,6 +16,7 @@
 	<file>icons/draft.png</file>
 	<file>icons/trash.png</file>
 	<file>icons/conflict.png</file>
+    <file>icons/camera.png</file>
 	<file>icons/warning.png</file>
     <file>icons/undo.png</file>
     <file>icons/undo_hover.png</file>

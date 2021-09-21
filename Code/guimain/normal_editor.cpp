@@ -166,19 +166,9 @@ QHBoxLayout* NormalEditor::initToolButtons()
 
 	photo = new ToolButton;
 	photo->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	photo->setIcon(QIcon(":/icons/16x16/screenshot.png"));
+	photo->setIcon(QIcon(":/icons/camera.png"));
 	photo->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	pLayout->addWidget(photo);
-
-	hook = new ToolButton;
-	hook->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	hook->setButtonStyle(ToolButton::ButtonCheckable);
-	pLayout->addWidget(hook);
-
-	floatWin = new ToolButton;
-	floatWin->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	floatWin->setButtonStyle(ToolButton::ButtonCheckable);
-	pLayout->addWidget(floatWin);
 
 	QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	pLayout->addItem(horizontalSpacer);
@@ -212,8 +202,6 @@ void NormalEditor::initSlots()
 	connect(item_symbol, SIGNAL(clicked()), this, SLOT(listBullet()));
 	connect(item_id, SIGNAL(clicked()), this, SLOT(listOrdered()));
 	connect(photo, SIGNAL(clicked()), this, SLOT(screenShot()));
-	connect(hook, SIGNAL(clicked()), this, SLOT(onHookToggled()));
-	connect(floatWin, SIGNAL(clicked()), this, SLOT(onFloatWinToggled()));
 	connect(attachment, SIGNAL(clicked()), this, SLOT(checkDocument()));
 }
 
@@ -463,28 +451,6 @@ void NormalEditor::listOrdered()
 	if (checked)
 		item_symbol->setChecked(false);
 	list(checked, QTextListFormat::ListDecimal);
-}
-
-void NormalEditor::onHookToggled()
-{
-	bool checked = hook->isChecked();
-	if (checked)
-	{
-		AppHelper::uiApp()->installGlobalHook();
-	}
-	else
-	{
-		AppHelper::uiApp()->uninstallGlobalHook();
-	}
-}
-
-void NormalEditor::onFloatWinToggled()
-{
-	bool checked = floatWin->isChecked();
-	if (checked)
-		AppHelper::uiApp()->showFloatingSearcher();
-	else
-		AppHelper::uiApp()->hideFloatingWin();
 }
 
 void NormalEditor::list(bool checked, QTextListFormat::Style style)

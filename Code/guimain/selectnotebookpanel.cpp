@@ -112,7 +112,6 @@ void BookItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt,
 	painter->setPen(QColor(0, 0, 0));
 	painter->setFont(font);
 	painter->drawText(textRect, Qt::AlignVCenter, text);
-	painter->restore();
 }
 
 QSize BookItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const

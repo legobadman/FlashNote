@@ -14,7 +14,7 @@ public:
 	~NewNoteWindow();
 	void init(QString bookid);
 	void initSchedule();
-	void open(QString bookid, QString noteid);
+	void open(INotebook* pNotebook, INote* pNote);
 	void getNote(INote** ppNote);
 
 protected:

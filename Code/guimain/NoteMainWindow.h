@@ -34,6 +34,7 @@ private:
 	int getActiveNoteInBook(int bookidx);
 	INote* GetCurrentActiveNote();
 	INoteCollection* GetCurrentNoteCollection();
+	void _enableNoteMenu(bool enable);
 
 private:
 	Ui::NoteMainWindow* m_ui;

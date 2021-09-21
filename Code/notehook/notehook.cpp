@@ -19,7 +19,7 @@ char* p = NULL;
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
 #define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
-#define FLOAT_WIN_NAME L"我的笔记本"
+#define FLOAT_WIN_NAME L"笔记"	//如果窗口标题改了就要同步这个
 
 DWORD buffSize = 1024;
 TCHAR ProcessName[1024];
@@ -110,6 +110,10 @@ LRESULT CALLBACK MouseMsgProc(int code, WPARAM wParam, LPARAM lParam)
 				HWND hwnd = FindWindowW(FLOAT_WIN_CLASS, FLOAT_WIN_NAME);
 				if (!hwnd)
 					break;
+
+				//chrome会被影响，不知为何
+                //if (p && strcmp(p + 1, "flashnote.exe") == 0)
+                //    break;
 
 				EXTRACT_INFO info;
 				int len = 0;
@@ -255,23 +259,12 @@ LRESULT CALLBACK MouseMsgProc2(int code, WPARAM wParam, LPARAM lParam)
 
 void installHook()
 {
-#ifdef ENABLE_KEYBOARD_HOOK
-	g_KeyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboarMsgProc, g_hInstance, 0);
-#endif
-#ifdef ENABLE_MOUSE_HOOK
 	g_msgHook = SetWindowsHookEx(WH_MOUSE, MouseMsgProc, g_hInstance, 0);
-#endif
 }
 
 void uninstallHook()
 {
-#ifdef ENABLE_KEYBOARD_HOOK
-	UnhookWindowsHookEx(g_KeyboardHook);
-#endif
-#ifdef ENABLE_MOUSE_HOOK
 	UnhookWindowsHookEx(g_msgHook);
-
-#endif
 }
 
 BOOL hook_by_code(LPCSTR szDllName, LPCSTR szFuncName, PROC pfnNew, PBYTE pOrgBytes)
@@ -336,7 +329,11 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 )
 {
 	GetModuleFileName(NULL, ProcessName, buffSize);
-	//p = strrchr(ProcessName, '\\');
+	p = strrchr(ProcessName, '\\');
+
+	//方便调试，但好像后续的程序都没有加载
+	//if (p && strcmp(p + 1, "devenv.exe") == 0)
+		//return FALSE;
 
 	g_hInstance = hModule;
 	switch (ul_reason_for_call)

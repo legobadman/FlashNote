@@ -18,6 +18,7 @@ public:
 
 public slots:
 	void onQuickApp();
+	void onHookChecked(bool bChecked);
 	void onTrigger();
 	void screenshot();
 	void showFloatingSearcher();

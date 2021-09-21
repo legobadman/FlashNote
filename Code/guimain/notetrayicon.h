@@ -15,6 +15,7 @@ signals:
 	void contextActivated();
 	void triggerActivated();
 	void quickTriggerd();
+	void hookTriggered(bool);
 
 public slots:
 	void onActivated(QSystemTrayIcon::ActivationReason reason);

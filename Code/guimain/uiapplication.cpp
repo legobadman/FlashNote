@@ -53,12 +53,10 @@ void UiApplication::initUI()
 {
 	NoteMainWindow* pwtf = new NoteMainWindow(NULL);
 	m_mainWindow = QSharedPointer<NoteMainWindow>(pwtf);
-	connect(m_mainWindow.data(), SIGNAL(newnote(int)),
-		this, SLOT(onNewNote(int)));
-	connect(&m_trayIcon, SIGNAL(triggerActivated()),
-		this, SLOT(onTrigger()));
-	connect(&m_trayIcon, SIGNAL(quickTriggerd()),
-		this, SLOT(onQuickApp()));
+
+	connect(&m_trayIcon, SIGNAL(triggerActivated()), this, SLOT(onTrigger()));
+	connect(&m_trayIcon, SIGNAL(quickTriggerd()), this, SLOT(onQuickApp()));
+	connect(&m_trayIcon, SIGNAL(hookTriggered(bool)), this, SLOT(onHookChecked(bool)));
 
 	QxtGlobalShortcut* shortcut = new QxtGlobalShortcut(this);
 	shortcut->setShortcut(QKeySequence("Alt+Q"));
@@ -95,6 +93,13 @@ void UiApplication::screenshot()
 	pShot->showFullScreen();
 }
 
+void UiApplication::onHookChecked(bool bChecked)
+{
+	if (bChecked)
+		installGlobalHook();
+	else
+		uninstallGlobalHook();
+}
 
 void UiApplication::installGlobalHook()
 {

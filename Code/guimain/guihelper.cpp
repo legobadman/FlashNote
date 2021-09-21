@@ -72,7 +72,20 @@ void AppHelper::GetNoteAndBookById(QString noteid, INotebook** ppNotebook, INote
 		(*ppNotebook)->AddRef();
 		*ppNote = spNote;
 		(*ppNote)->AddRef();
+		return;
 	}
+
+	com_sptr<ISchedules> spSchedules;
+	AppHelper::coreApp()->GetSchedules(&spSchedules);
+	com_sptr<INote> spNote;
+	spSchedules->Item(noteid.toStdWString(), &spNote);
+	if (!spNote)
+		return;
+
+    *ppNotebook = spSchedules;
+    (*ppNotebook)->AddRef();
+    *ppNote = spNote;
+    (*ppNote)->AddRef();
 }
 
 QString AppHelper::GetNotebookName(INoteCollection* pNotebook)
@@ -286,12 +299,18 @@ void AppHelper::openNoteInIsoWindow(const QString& noteid)
 	if (noteid.isEmpty())
 		return;
 
-	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, NORMAL_NOTE);
 	com_sptr<INote> spNote;
 	com_sptr<INotebook> spNotebook;
 	AppHelper::GetNoteAndBookById(noteid, &spNotebook, &spNote);
+	if (!spNote || !spNotebook)
+		return;
+
 	QString bookid = AppHelper::GetNotebookId(spNotebook);
-	pNewNoteWindow->open(bookid, noteid);
+	NOTE_TYPE type = UNKNOWN_TYPE;
+	spNote->GetType(&type);
+
+	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, type);
+	pNewNoteWindow->open(spNotebook, spNote);
 	pNewNoteWindow->setWindowTitle(AppHelper::GetNoteTitle(spNote));
 	pNewNoteWindow->show();
 }
