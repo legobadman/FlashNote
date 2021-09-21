@@ -10,37 +10,16 @@ MindMapView::MindMapView(QWidget* parent)
 
 void MindMapView::mousePressEvent(QMouseEvent* event)
 {
-	if (QApplication::keyboardModifiers() == Qt::ControlModifier && event->button() == Qt::LeftButton)
-	{
-		startPos = event->pos();
-		m_dragMove = true;
-		setCursor(Qt::OpenHandCursor);
-	}
     QGraphicsView::mousePressEvent(event);
 }
 
 void MindMapView::mouseMoveEvent(QMouseEvent* event)
 {
-	if (m_dragMove)
-	{
-		QPointF delta = startPos - event->pos();
-		QTransform transform = this->transform();
-		qreal deltaX = delta.x() / transform.m11();
-		qreal deltaY = delta.y() / transform.m22();
-		setSceneRect(sceneRect().translated(deltaX, deltaY));
-		startPos = event->pos();
-		setCursor(Qt::OpenHandCursor);
-	}
-	else
-	{
-		QGraphicsView::mouseMoveEvent(event);
-	}
+	QGraphicsView::mouseMoveEvent(event);
 }
 
 void MindMapView::mouseReleaseEvent(QMouseEvent* event)
 {
-	m_dragMove = false;
-	setCursor(Qt::ArrowCursor);
 	QGraphicsView::mouseReleaseEvent(event);
 }
 

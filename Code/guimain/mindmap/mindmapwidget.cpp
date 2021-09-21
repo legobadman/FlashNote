@@ -15,13 +15,15 @@ MindMapWidget::MindMapWidget(QWidget* parent)
 	, m_view(new MindMapView)
 	, m_pRoot(NULL)
 	, m_factor(1.)
+	, m_dragMove(false)
 {
-	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	m_view->setScene(m_scene);
-	m_view->setDragMode(QGraphicsView::RubberBandDrag);
+	m_view->setDragMode(QGraphicsView::NoDrag);
 	m_view->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
 	m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
+	m_view->setTransformationAnchor(QGraphicsView::NoAnchor);
 	m_view->setFrameShape(QFrame::HLine);
 	m_view->setFrameShadow(QFrame::Sunken);
 	m_view->viewport()->installEventFilter(this);
@@ -55,7 +57,7 @@ MindMapWidget::MindMapWidget(QWidget* parent)
 	QPalette palette = m_zoom_factor->palette();
 	palette.setColor(QPalette::WindowText, QColor(130, 130, 130));
 	m_zoom_factor->setPalette(palette);
-	m_zoom_factor->setText(QString("%1%").arg((int)(_zoom_factor_base * 100)));
+	m_zoom_factor->setText(QString("%1%").arg(100));
 	pHBoxLayout->addWidget(m_zoom_factor);
 
 	m_zoomin = new NLabelButton;
@@ -160,15 +162,39 @@ void MindMapWidget::initContent(QString content, bool bSchedule)
 
 bool MindMapWidget::eventFilter(QObject* watched, QEvent* event)
 {
-    if (event->type() == QEvent::MouseMove) {
-        QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
+	if (event->type() == QEvent::MouseButtonPress)
+	{
+		QMouseEvent* e = static_cast<QMouseEvent*>(event);
+		m_dragMove = true;
+		m_startPos = e->pos();
+	}
+    else if (event->type() == QEvent::MouseMove)
+	{
+		QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
+		if (m_dragMove)
+		{
+            QPointF delta = m_startPos - mouse_event->pos();
+            QTransform transform = m_view->transform();
+            qreal deltaX = delta.x() / transform.m11();
+            qreal deltaY = delta.y() / transform.m22();
+            m_view->translate(-deltaX, -deltaY);
+            m_startPos = mouse_event->pos();
+		}
+
         QPointF delta = target_viewport_pos - mouse_event->pos();
-        if (qAbs(delta.x()) > 5 || qAbs(delta.y()) > 5) {
+        if (qAbs(delta.x()) > 5 || qAbs(delta.y()) > 5)
+		{
             target_viewport_pos = mouse_event->pos();
             target_scene_pos = m_view->mapToScene(mouse_event->pos());
         }
+		return true;
     }
-    else if (event->type() == QEvent::Wheel) {
+	else if (event->type() == QEvent::MouseButtonRelease)
+	{
+		m_dragMove = false;
+	}
+    else if (event->type() == QEvent::Wheel)
+	{
         QWheelEvent* wheel_event = static_cast<QWheelEvent*>(event);
         if (QApplication::keyboardModifiers() == _modifiers) {
             if (wheel_event->orientation() == Qt::Vertical) {

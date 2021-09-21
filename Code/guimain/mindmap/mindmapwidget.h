@@ -46,7 +46,7 @@ private:
 	qreal _zoom_factor_base;
 	qreal m_factor;
 	const double m_factor_step = 0.2;
-	QPointF target_scene_pos, target_viewport_pos;
+	QPointF target_scene_pos, target_viewport_pos, m_startPos;
 	MindNode* m_pRoot;
 	NLabelButton* m_undoBtn;
 	NLabelButton* m_redoBtn;
@@ -55,6 +55,7 @@ private:
 	QLabel* m_zoom_factor;
     QShortcut* m_undo;
     QShortcut* m_redo;
+	bool m_dragMove;
 };
 
 
