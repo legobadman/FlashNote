@@ -162,7 +162,7 @@ void MindMapWidget::initContent(QString content, bool bSchedule)
 
 bool MindMapWidget::eventFilter(QObject* watched, QEvent* event)
 {
-	if (event->type() == QEvent::MouseButtonPress)
+	if (event->type() == QEvent::MouseButtonPress && QApplication::keyboardModifiers() == Qt::ControlModifier)
 	{
 		QMouseEvent* e = static_cast<QMouseEvent*>(event);
 		m_dragMove = true;
