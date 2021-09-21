@@ -24,7 +24,6 @@ void NLabelButton::enterEvent(QEvent* event)
     if (isEnabled())
     {
         setPixmap(m_iconHover.pixmap(MyStyle::dpiScaledSize(m_iconSize)));
-        //update();
     }
     m_bHovered = true;
 }
@@ -35,7 +34,6 @@ void NLabelButton::leaveEvent(QEvent* event)
     if (isEnabled())
     {
         setPixmap(m_iconEnable.pixmap(MyStyle::dpiScaledSize(m_iconSize)));
-        //update();
     }
     m_bHovered = false;
 }

@@ -18,7 +18,7 @@ FloatingMenuButton::FloatingMenuButton(QWidget* parent)
 	setLayout(pLayout);
 #else
     m_menubutton = new ToolButton(this);
-    m_menubutton->setIcon(QIcon(":/icons/32x32/floatwin32.png"));
+    m_menubutton->setIcon(QIcon(":/icons/floatwin.png"));
     m_menubutton->setIconSize(MyStyle::dpiScaledSize(QSize(32, 32)));
     m_menubutton->setFixedSize(MyStyle::dpiScaledSize(QSize(32, 32)));
     connect(m_menubutton, SIGNAL(clicked()), this, SLOT(onBtnClicked()));

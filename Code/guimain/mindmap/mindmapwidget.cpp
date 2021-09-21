@@ -171,6 +171,12 @@ bool MindMapWidget::eventFilter(QObject* watched, QEvent* event)
     else if (event->type() == QEvent::MouseMove)
 	{
 		QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
+        QPointF delta = target_viewport_pos - mouse_event->pos();
+        if (qAbs(delta.x()) > 5 || qAbs(delta.y()) > 5)
+        {
+            target_viewport_pos = mouse_event->pos();
+            target_scene_pos = m_view->mapToScene(mouse_event->pos());
+        }
 		if (m_dragMove)
 		{
             QPointF delta = m_startPos - mouse_event->pos();
@@ -179,15 +185,8 @@ bool MindMapWidget::eventFilter(QObject* watched, QEvent* event)
             qreal deltaY = delta.y() / transform.m22();
             m_view->translate(-deltaX, -deltaY);
             m_startPos = mouse_event->pos();
+			return true;
 		}
-
-        QPointF delta = target_viewport_pos - mouse_event->pos();
-        if (qAbs(delta.x()) > 5 || qAbs(delta.y()) > 5)
-		{
-            target_viewport_pos = mouse_event->pos();
-            target_scene_pos = m_view->mapToScene(mouse_event->pos());
-        }
-		return true;
     }
 	else if (event->type() == QEvent::MouseButtonRelease)
 	{

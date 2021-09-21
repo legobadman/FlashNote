@@ -118,7 +118,7 @@ void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
 	m_ui->bookmenu->blockSignals(false);
 
 	const int iconSize = 16;
-	m_ui->bookmenu->setIcon(QIcon(":/icons/16x16/notebookmenu.png"));
+	m_ui->bookmenu->setIcon(QIcon(":/icons/notebookmenu.png"));
 	m_ui->bookmenu->setIconSize(MyStyle::dpiScaledSize(QSize(iconSize, iconSize)));
 
 	int w = iconSize + 10 + 4 + width + 20;
@@ -189,15 +189,15 @@ void NoteEditWindow::initCustomWidget()
 {
 	m_ui->editTitle->setFixedHeight(MyStyle::dpiScaled(27));
 
-	m_ui->bookmenu->setIcon(QIcon(":/icons/16x16/notebookmenu.png"));
+	m_ui->bookmenu->setIcon(QIcon(":/icons/notebookmenu.png"));
 	m_ui->bookmenu->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(50, 22)));
 	
-	m_ui->infoBtn->setIcon(QIcon(":/icons/16x16/info.png"));
+	m_ui->infoBtn->setIcon(QIcon(":/icons/info.png"));
 	m_ui->infoBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->infoBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
 
-	m_ui->alarm->setIcon(QIcon(":/icons/16x16/alarm.png"));
+	m_ui->alarm->setIcon(QIcon(":/icons/alarm.png"));
 	m_ui->alarm->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->alarm->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
 
@@ -205,7 +205,7 @@ void NoteEditWindow::initCustomWidget()
 	m_ui->deleteBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->deleteBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
 
-	m_ui->socialmediashare->setIcon(QIcon(":/icons/16x16/socialmediashare.png"));
+	m_ui->socialmediashare->setIcon(QIcon(":/icons/socialmediashare2.png"));
 	m_ui->socialmediashare->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	m_ui->socialmediashare->setFixedSize(MyStyle::dpiScaledSize(QSize(28, 28)));
 }

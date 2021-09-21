@@ -100,14 +100,19 @@ void FontColorComboBox::updateIcon()
 
 	QPainter p(&newIcon);
 
-	QIcon fontClr(":/icons/16x16/fontcolor.png");
-	p.drawPixmap(QPoint(6, 5), QIcon(":/icons/16x16/fontcolor.png").pixmap(MyStyle::dpiScaledSize(QSize(16, 16))));
+	static const int left_offset = MyStyle::dpiScaled(7);
+	static const int right_offset = MyStyle::dpiScaled(23);
+	static const int top_offset = MyStyle::dpiScaled(5);
+	static const int bottom_offset = MyStyle::dpiScaled(21);
+
+	QIcon fontClr(":/icons/fontcolor.png");
+	p.drawPixmap(QPoint(left_offset, top_offset), QIcon(":/icons/fontcolor.png").pixmap(MyStyle::dpiScaledSize(QSize(16, 16))));
 
 	QPen pen;
-	pen.setWidth(3);
+	pen.setWidth(MyStyle::dpiScaled(2));
 	pen.setColor(m_clr);
 	p.setPen(pen);
-	p.drawLine(6, 21, 22, 21);
+	p.drawLine(left_offset, bottom_offset, right_offset, bottom_offset);
 	p.end();
 
 	m_icon = QIcon(newIcon);

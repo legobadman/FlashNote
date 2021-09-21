@@ -93,7 +93,7 @@ void MindProgressNode::resetDecoration()
 {
 	if (needShowDecoration())
 	{
-		setDecoration(2, QIcon(":/icons/16x16/link_note_black.png"));
+		setDecoration(2, QIcon(":/icons/link_note_black.png"));
 	}
 }
 

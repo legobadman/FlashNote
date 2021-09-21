@@ -286,7 +286,7 @@ void MyStyle::drawDropdownArrow(QPainter* painter, QRect downArrowRect) const
 
 	QPointF bottomPoint = QPointF(arrowRect.center().x(), arrowRect.bottom());
 
-	QPixmap px = QIcon(":/icons/16x16/downarrow.png").pixmap(
+	QPixmap px = QIcon(":/icons/downarrow.png").pixmap(
 		MyStyle::dpiScaledSize(QSize(16, 16)));
 
 	painter->drawPixmap(arrowRect.topLeft(), px);

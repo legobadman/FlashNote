@@ -111,6 +111,8 @@ QColor DrawerFunc::getDisabledTextColor()
 void DrawerFunc::drawColorText(QPainter& dc, QColor const& c, QRect const& rc, int flag, QString const& str)
 {
 	dc.save();
+	QFont font("Microsoft YaHei", 9);
+	dc.setFont(font);
 	dc.setPen(c);
 	dc.drawText(rc, flag, str);
 	dc.restore();

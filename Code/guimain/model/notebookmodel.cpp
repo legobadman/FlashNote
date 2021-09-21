@@ -29,7 +29,7 @@ NotebookModel::NotebookModel(QObject* parent)
 		pItem->setData(QVariant::fromValue<ITEM_WIDGET_TYPE>(
 			ITEM_WIDGET_TYPE::ITEM_CHILDLEVEL), ItemWidgetTypeRole);
 		pItem->setData(QVariant(bookId), ItemCoreObjIdRole);
-		pItem->setIcon(QIcon(":/icons/16x16/notebookmenu.png"));
+		pItem->setIcon(QIcon(":/icons/notebookmenu.png"));
 
 		appendRow(pItem);
 	}

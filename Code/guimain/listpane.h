@@ -17,6 +17,8 @@ enum MOUSE_HINT
 #define NEW_NOTE_MENU_ITEM_HEIGHT 40
 #define NEW_NOTE_MENU_ITEM_WIDTH 182
 
+class NLabelButton;
+
 class NewNoteItem : public QWidget
 {
 	Q_OBJECT

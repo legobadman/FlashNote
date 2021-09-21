@@ -62,10 +62,10 @@ BookItemDelegate::BookItemDelegate(QObject* parent)
 
 void BookItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt, const QModelIndex& index) const
 {
-	int iconSize = 16;
-	int icon_xoffset = 11;
-	int icon_yoffset = 5;
-	int icon_to_text = 5;
+	int iconSize = MyStyle::dpiScaled(16);
+	int icon_xoffset = MyStyle::dpiScaled(11);
+	int icon_yoffset = MyStyle::dpiScaled(5);
+	int icon_to_text = MyStyle::dpiScaled(5);
 
 	QColor bgColor, borderColor;
 	if (opt.state & QStyle::State_Selected)
@@ -86,12 +86,12 @@ void BookItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt,
 
 	const QPointF oldBrushOrigin = painter->brushOrigin();
 	painter->setBrushOrigin(opt.rect.topLeft());
-	QRect rc = opt.rect.adjusted(5, 0, -5, 0);
-	QRect rcBackground = rc.adjusted(0, 1, 0, -1);
+	QRect rc = opt.rect.adjusted(MyStyle::dpiScaled(5), 0, MyStyle::dpiScaled(-5), 0);
+	QRect rcBackground = rc.adjusted(0, MyStyle::dpiScaled(1), 0, MyStyle::dpiScaled(-1));
 	painter->fillRect(rcBackground, bgColor);
 	painter->setBrushOrigin(oldBrushOrigin);
 
-	QRect rcBorder = rc.adjusted(0, 0, 0, -1);
+	QRect rcBorder = rc.adjusted(0, 0, 0, MyStyle::dpiScaled(-1));
 	painter->setPen(borderColor);
 	painter->drawRect(rcBorder);
 
@@ -99,8 +99,8 @@ void BookItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt,
 
 	icon_yoffset = (opt.rect.height() - iconSize) / 2;
 
-	QIcon icon(":/icons/16x16/notebookmenu.png");
-	QRect iconRect(opt.rect.x() + icon_xoffset, opt.rect.y() + icon_yoffset, 16, 16);
+	QIcon icon(":/icons/notebookmenu.png");
+	QRect iconRect(opt.rect.x() + icon_xoffset, opt.rect.y() + icon_yoffset, MyStyle::dpiScaled(16), MyStyle::dpiScaled(16));
 	
 	icon.paint(painter, iconRect, opt.decorationAlignment, QIcon::Normal, QIcon::On);
 

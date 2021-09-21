@@ -33,21 +33,23 @@ void BookListView::init()
 	setAutoFillBackground(true);
 	setPalette(palette);
 
+	qreal dpi = MyStyle::dpiScaled(1);
+
 	//TODO: lineEdit里面的字体还是没有scaled
 	int margin = MyStyle::dpiScaled(4);
 	m_ui->searcheditor->setTextMargins(margin, margin, margin, margin);
 	m_ui->searcheditor->setFixedHeight(MyStyle::dpiScaled(25));
 	m_ui->sort->setFixedSize(MyStyle::dpiScaledSize(QSize(24, 24)));
-	m_ui->sort->setIcon(QIcon(":/icons/24x24/sort_options.png"));
-	m_ui->sort->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
+	m_ui->sort->setIcon(dpi < 1.5 ? QIcon(":/icons/24x24/sort_options.png") : QIcon(":/icons/sort_options.png"));
+	m_ui->sort->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 
 	m_ui->view->setFixedSize(MyStyle::dpiScaledSize(QSize(24, 24)));
-	m_ui->view->setIcon(QIcon(":/icons/24x24/listview.png"));
-	m_ui->view->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
+	m_ui->view->setIcon(dpi < 1.5 ? QIcon(":/icons/24x24/listview.png") : QIcon(":/icons/listview.png"));
+	m_ui->view->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 
 	m_ui->more->setFixedSize(MyStyle::dpiScaledSize(QSize(24, 24)));
-	m_ui->more->setIcon(QIcon(":/icons/16x16/more.png"));
-	m_ui->more->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
+	m_ui->more->setIcon(QIcon(":/icons/more.png"));
+	m_ui->more->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 
 	m_ui->listView->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_ui->listView->setFrameShape(QFrame::NoFrame);

@@ -7,11 +7,20 @@
 	<file>icons/bluewhite.png</file>
 	<file>icons/btn_addnote.png</file>
 	<file>icons/checked.png</file>
+    <file>icons/downarrow.png</file>
 	<file>icons/allnotes.png</file>
 	<file>icons/notebooks.png</file>
 	<file>icons/material.png</file>
 	<file>icons/myspace.png</file>
+    <file>icons/menu_mindmap.png</file>
+    <file>icons/menu_mindmap_on.png</file>
+    <file>icons/menu_newnote.png</file>
+    <file>icons/menu_newnote_on.png</file>
+    <file>icons/menu_schedule.png</file>
+    <file>icons/menu_schedule_on.png</file>
 	<file>icons/socialmediashare.png</file>
+    <file>icons/default_color.png</file>
+    <file>icons/morecolor.png</file>
 	<file>icons/schedules.png</file>
 	<file>icons/draft.png</file>
 	<file>icons/trash.png</file>
@@ -31,7 +40,38 @@
     <file>icons/zoomout_hover.png</file>
     <file>icons/zoomin.png</file>
     <file>icons/zoomout.png</file>
-	<file>icons/16x16/Bold.png</file>
+    <file>icons/Bold.png</file>
+    <file>icons/Italic.png</file>
+    <file>icons/Underline.png</file>
+    <file>icons/highlighted.png</file>
+    <file>icons/codeblock.png</file>
+    <file>icons/item_symbol.png</file>
+    <file>icons/item_id.png</file>
+    <file>icons/left_alignment.png</file>
+    <file>icons/center_alignment.png</file>
+    <file>icons/right_alignment.png</file>
+    <file>icons/twoside_alignment.png</file>
+    <file>icons/photo.png</file>
+    <file>icons/fontcolor.png</file>
+    <file>icons/strikeout.png</file>
+    <file>icons/newnotemenu.png</file>
+    <file>icons/newnotemenu_hover.png</file>
+    <file>icons/notebookmenu.png</file>
+    <file>icons/alarm.png</file>
+    <file>icons/info.png</file>
+    <file>icons/more.png</file>
+    <file>icons/socialmediashare2.png</file>
+    <file>icons/download.png</file>
+    <file>icons/finish.png</file>
+    <file>icons/floatwin.png</file>
+    <file>icons/close.png</file>
+    <file>icons/white_close.png</file>
+    <file>icons/add_normal.png</file>
+    <file>icons/add_hover.png</file>
+    <file>icons/sort_options.png</file>
+    <file>icons/listview.png</file>
+
+    <file>icons/16x16/Bold.png</file>
 	<file>icons/16x16/Italic.png</file>
 	<file>icons/16x16/Underline.png</file>
 	<file>icons/16x16/highlighted.png</file>
@@ -61,7 +101,6 @@
 	<file>icons/16x16/info.png</file>
 	<file>icons/16x16/more.png</file>
 	<file>icons/16x16/socialmediashare.png</file>
-	<file>icons/16x16/screenshot.png</file>
 	<file>icons/16x16/download.png</file>
 	<file>icons/16x16/finish.png</file>
 	<file>icons/16x16/close.png</file>

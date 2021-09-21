@@ -324,9 +324,9 @@ void MindNode::resetDecoration()
 	if (needShowDecoration())
 	{
 		if (m_level == 0)
-			setDecoration(2, QIcon(":/icons/16x16/link_note_white.png"));
+			setDecoration(2, QIcon(":/icons/link_note_white.png"));
 		else
-			setDecoration(2, QIcon(":/icons/16x16/link_note_black.png"));
+			setDecoration(2, QIcon(":/icons/link_note_black.png"));
 	}
 }
 

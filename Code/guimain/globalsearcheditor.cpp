@@ -27,7 +27,7 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 
     ToolButton* onlyIcon = new ToolButton;
 	QLabel* labelIcon = new QLabel;
-	QIcon icon(":/icons/32x32/floatwin32.png");
+	QIcon icon(":/icons/floatwin.png");
 	labelIcon->setPixmap(icon.pixmap(MyStyle::dpiScaledSize(QSize(32, 32))));
     pHLayout->addWidget(labelIcon);
 
@@ -42,7 +42,7 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 	QVBoxLayout* pVLayout = new QVBoxLayout;
 	ToolButton* closeBtn = new ToolButton;
 	closeBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-	closeBtn->setIcon(QIcon(":/icons/16x16/white_close.png"));
+	closeBtn->setIcon(QIcon(":/icons/white_close.png"));
 	closeBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	closeBtn->setButtonStyle(ToolButton::ButtonIcon);
 	pVLayout->addWidget(closeBtn);

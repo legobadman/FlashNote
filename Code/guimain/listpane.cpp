@@ -10,6 +10,7 @@
 #include "popupwidget.h"
 #include <QMenu>
 #include "moc_listpane.cpp"
+#include "labelbutton.h"
 
 
 NewNoteItem::NewNoteItem(QWidget* parent)
@@ -43,8 +44,9 @@ NewNoteItem::NewNoteItem(QWidget* parent)
 
 	pLayout->addStretch();
 
+	//采用NLabelButton导致前面两个控件没法偏移！很是诡异
 	m_pMore = new QLabel;
-	m_pMore->setPixmap(QIcon(":/icons/16x16/newnotemenu.png").pixmap(MyStyle::dpiScaledSize(QSize(28, 28))));
+	m_pMore->setPixmap(QIcon(":/icons/newnotemenu.png").pixmap(MyStyle::dpiScaledSize(QSize(16, 16))));
 	m_pMore->installEventFilter(this);
 	pLayout->addWidget(m_pMore);
 
@@ -80,7 +82,6 @@ bool NewNoteItem::eventFilter(QObject* watched, QEvent* event)
 			m_pText->setGeometry(rc.adjusted(-1, -1, -1, -1));
 			rc = m_pAddBtn->geometry();
 			m_pAddBtn->setGeometry(rc.adjusted(-1, -1, -1, -1));
-
 			emit newnote(NORMAL_NOTE);
 		}
 	}
@@ -93,13 +94,13 @@ bool NewNoteItem::eventFilter(QObject* watched, QEvent* event)
 		}
         if (event->type() == QEvent::Enter)
         {
-            m_pMore->setPixmap(QIcon(":/icons/16x16/newnotemenu_hover.png").pixmap(
-                MyStyle::dpiScaledSize(QSize(28, 28))));
+            m_pMore->setPixmap(QIcon(":/icons/newnotemenu_hover.png").pixmap(
+                MyStyle::dpiScaledSize(QSize(16, 16))));
         }
         if (event->type() == QEvent::Leave)
         {
-            m_pMore->setPixmap(QIcon(":/icons/16x16/newnotemenu.png").pixmap(
-                MyStyle::dpiScaledSize(QSize(28, 28))));
+            m_pMore->setPixmap(QIcon(":/icons/newnotemenu.png").pixmap(
+                MyStyle::dpiScaledSize(QSize(16, 16))));
         }
 		if (event->type() == QEvent::MouseButtonRelease)
 		{
@@ -197,20 +198,20 @@ NewNoteMenu::NewNoteMenu(QWidget* parent)
 	QStandardItemModel* pModel = new QStandardItemModel;
  
     QIcon iconNote;
-    iconNote.addFile(":/icons/32x32/menu_newnote.png", QSize(), QIcon::Normal);
-    iconNote.addFile(":/icons/32x32/menu_newnote_on.png", QSize(), QIcon::Active);
+    iconNote.addFile(":/icons/menu_newnote.png", QSize(), QIcon::Normal);
+    iconNote.addFile(":/icons/menu_newnote_on.png", QSize(), QIcon::Active);
 	QStandardItem* pNormalNote = new QStandardItem(iconNote, u8"笔记");
 	pModel->appendRow(pNormalNote);
 
 	QIcon iconmap;
-	iconmap.addFile(":/icons/32x32/menu_mindmap.png", QSize(), QIcon::Normal);
-	iconmap.addFile(":/icons/32x32/menu_mindmap_on.png", QSize(), QIcon::Active);
+	iconmap.addFile(":/icons/menu_mindmap.png", QSize(), QIcon::Normal);
+	iconmap.addFile(":/icons/menu_mindmap_on.png", QSize(), QIcon::Active);
 	QStandardItem* pMindMap = new QStandardItem(iconmap, u8"思维导图");
 	pModel->appendRow(pMindMap);
 
 	QIcon iconschedule;
-	iconschedule.addFile(":/icons/32x32/menu_schedule.png", QSize(), QIcon::Normal);
-	iconschedule.addFile(":/icons/32x32/menu_schedule_on2.png", QSize(), QIcon::Active);
+	iconschedule.addFile(":/icons/menu_schedule.png", QSize(), QIcon::Normal);
+	iconschedule.addFile(":/icons/menu_schedule_on.png", QSize(), QIcon::Active);
 	QStandardItem* pSchedule = new QStandardItem(iconschedule, u8"进度图");
 	pModel->appendRow(pSchedule);
 
@@ -410,7 +411,6 @@ void NavigationPanel::onCustomContextMenu(const QPoint& point)
 		QAction* pDelete = new QAction(u8"删除笔记本", m_pCustomMenu);
 		pDelete->setData((int)NavigationPanel::DELETE_NOTEBOOK);
 		m_pCustomMenu->addAction(pDelete);
-
 		m_pCustomMenu->popup(QCursor::pos());
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM)
@@ -420,7 +420,6 @@ void NavigationPanel::onCustomContextMenu(const QPoint& point)
 		QAction* pDelete = new QAction(u8"删除进度表", m_pCustomMenu);
 		pDelete->setData((int)NavigationPanel::DELETE_SCHEDULE);
 		m_pCustomMenu->addAction(pDelete);
-
 		m_pCustomMenu->popup(QCursor::pos());
 	}
 }

@@ -41,7 +41,7 @@ void LeftSideItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
 	option->backgroundBrush.setStyle(Qt::SolidPattern);
 	option->showDecorationSelected = false;
 
-	option->decorationSize = QSize(16, 16);
+	option->decorationSize = MyStyle::dpiScaledSize(QSize(16, 16));
 
 	if (option->state & QStyle::State_Selected)
 	{
@@ -222,9 +222,9 @@ void LeftSideItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
 		QIcon icon;
 
 		if (pTreeview->GetHoverObj() == MOUSE_IN_ADD)
-			icon.addFile(":/icons/16x16/add_hover.png");
+			icon.addFile(":/icons/add_hover.png");
 		else
-			icon.addFile(":/icons/16x16/add_normal.png");
+			icon.addFile(":/icons/add_normal.png");
 
 		iconSize = MyStyle::dpiScaled(16);
 		int icon_offset = MyStyle::dpiScaled(10);

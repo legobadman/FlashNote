@@ -24,7 +24,7 @@ void NewItemDelegate::initStyleOption(QStyleOptionViewItem* option, const QModel
 
 	option->palette.setColor(QPalette::All, QPalette::Text, QColor(213, 221, 227));
 	option->backgroundBrush.setStyle(Qt::SolidPattern);
-	option->decorationSize = QSize(28, 28);
+	option->decorationSize = MyStyle::dpiScaledSize(QSize(28, 28));
 	
 	if (option->state & QStyle::State_Selected)
 	{
@@ -65,9 +65,9 @@ void NewItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
 	// draw the icon
 	QIcon::State state = opt.state& QStyle::State_Open ? QIcon::On : QIcon::Off;
 
-	const int icon_center_xoffset = 22;
+	const int icon_center_xoffset = MyStyle::dpiScaled(22);
 	int iconSize = opt.decorationSize.height();
-	int textMargin = 8;
+	int textMargin = MyStyle::dpiScaled(8);
 	QTextLayout textLayout2(opt.text, opt.font);
 	const int maxLineWidth = 8388607; //参照QCommonStylePrivate::viewItemSize
 	QSizeF szText = AppHelper::viewItemTextLayout(textLayout2, maxLineWidth);
@@ -100,7 +100,7 @@ void NewItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& optio
 			painter->setPen(opt.palette.color(cg, QPalette::Text));
 		}
 
-		const int textMargin = 2;
+		const int textMargin = MyStyle::dpiScaled(2);
 		QRect textRect2 = textRect.adjusted(textMargin, 0, -textMargin, 0); // remove width padding
 		QTextOption textOption;
 		textOption.setWrapMode(QTextOption::ManualWrap);

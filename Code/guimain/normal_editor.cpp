@@ -77,8 +77,10 @@ void NormalEditor::init()
 QHBoxLayout* NormalEditor::initToolButtons()
 {
 	QHBoxLayout* pLayout = new QHBoxLayout;
-	pLayout->setContentsMargins(8, 0, 8, 0);
+	pLayout->setContentsMargins(MyStyle::dpiScaled(8), 0, MyStyle::dpiScaled(8), 0);
 	pLayout->setSpacing(1);
+
+	qreal dpi = MyStyle::dpiScaled(1);
 	
 	font_comboBox = new FontComboBox;
 	QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -102,55 +104,55 @@ QHBoxLayout* NormalEditor::initToolButtons()
 
 	bold = new ToolButton;
 	bold->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	bold->setIcon(QIcon(":/icons/16x16/Bold.png"));
+	bold->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/Bold.png") : QIcon(":/icons/Bold.png"));
 	bold->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	bold->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(bold);
 
 	italic = new ToolButton;
 	italic->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	italic->setIcon(QIcon(":/icons/16x16/Italic.png"));
+	italic->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/Italic.png") : QIcon(":/icons/Italic.png"));
 	italic->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	italic->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(italic);
 
 	underline = new ToolButton;
 	underline->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	underline->setIcon(QIcon(":/icons/16x16/Underline.png"));
+	underline->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/Underline.png") : QIcon(":/icons/Underline.png"));
 	underline->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	underline->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(underline);
 
 	strikeout = new ToolButton;
 	strikeout->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	strikeout->setIcon(QIcon(":/icons/16x16/strikeout.png"));
+	strikeout->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/strikeout.png") : QIcon(":/icons/strikeout.png"));
 	strikeout->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	strikeout->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(strikeout);
 
 	highlight = new ToolButton;
 	highlight->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	highlight->setIcon(QIcon(":/icons/16x16/highlighted.png"));
+	highlight->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/highlighted.png") : QIcon(":/icons/highlighted.png"));
 	highlight->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	highlight->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(highlight);
 
 	codeblock = new ToolButton;
 	codeblock->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	codeblock->setIcon(QIcon(":/icons/16x16/codeblock.png"));
+	codeblock->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/codeblock.png") : QIcon(":/icons/codeblock.png"));
 	codeblock->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	pLayout->addWidget(codeblock);
 
 	item_symbol = new ToolButton;
 	item_symbol->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	item_symbol->setIcon(QIcon(":/icons/16x16/item_symbol.png"));
+	item_symbol->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/item_symbol.png") : QIcon(":/icons/item_symbol.png"));
 	item_symbol->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	item_symbol->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(item_symbol);
 
 	item_id = new ToolButton;
 	item_id->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	item_id->setIcon(QIcon(":/icons/16x16/item_id.png"));
+	item_id->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/item_id.png") : QIcon(":/icons/item_id.png"));
 	item_id->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	item_id->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(item_id);
