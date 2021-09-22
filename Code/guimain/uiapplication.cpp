@@ -154,4 +154,5 @@ void UiApplication::onQuickApp()
 void UiApplication::onTrigger()
 {
 	m_mainWindow->show();
+	m_mainWindow->activateWindow();
 }
