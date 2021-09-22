@@ -60,11 +60,19 @@ void UiApplication::initUI()
 	connect(&m_trayIcon, SIGNAL(hookTriggered(bool)), this, SLOT(onHookChecked(bool)));
 
 	QxtGlobalShortcut* shortcut = new QxtGlobalShortcut(this);
+#ifdef Q_OS_WIN
 	shortcut->setShortcut(QKeySequence("Alt+Q"));
+#else
+	shortcut->setShortcut(QKeySequence("Ctrl+Alt+Q"));
+#endif
 	connect(shortcut, SIGNAL(activated()), this, SLOT(screenshot()));
 
 	QxtGlobalShortcut* selectTray = new QxtGlobalShortcut(this);
+#ifdef Q_OS_WIN
 	selectTray->setShortcut(QKeySequence("Alt+S"));
+#else
+	selectTray->setShortcut(QKeySequence("Ctrl+Alt+F"));
+#endif
 	connect(selectTray, SIGNAL(activated()), this, SLOT(showFloatingSearcher()));
 }
 
