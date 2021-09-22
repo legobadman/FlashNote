@@ -10,6 +10,7 @@
 #include "notehook.h"
 #endif
 #include "globalsearcheditor.h"
+#include <QtWidgets/QDesktopWidget>
 
 
 UiApplication::UiApplication(int& argc, char** argv)
@@ -121,6 +122,14 @@ void UiApplication::showFloatingSearcher()
 {
 	if (m_pSearchEditor == NULL)
 		m_pSearchEditor = new GlobalSearchEditor(NULL);
+
+    QDesktopWidget* desktop = QApplication::desktop();
+
+	QSize sz = m_pSearchEditor->sizeHint();
+    int screenWidth = desktop->width();
+    int screenHeight = desktop->height();
+
+	m_pSearchEditor->move((screenWidth - sz.width()) / 2, (screenHeight - sz.height()) / 2);
 	m_pSearchEditor->show();
 }
 

@@ -55,9 +55,13 @@ void AlignmentComboBox::popup()
         qreal dpi = MyStyle::dpiScaled(1);
 
         QStandardItem* pLeftAlignment = new QStandardItem(dpi < 1.5 ? QIcon(":/icons/16x16/left_alignment.png") : QIcon(":/icons/left_alignment.png"), u8"左对齐");
+        pLeftAlignment->setEnabled(false);
         QStandardItem* pCenterAlignment = new QStandardItem(dpi < 1.5 ? QIcon(":/icons/16x16/center_alignment.png") : QIcon(":/icons/center_alignment.png"), u8"居中");
+        pCenterAlignment->setEnabled(false);
         QStandardItem* pRightAlignment = new QStandardItem(dpi < 1.5 ? QIcon(":/icons/16x16/right_alignment.png") : QIcon(":/icons/right_alignment.png"), u8"右对齐");
+        pRightAlignment->setEnabled(false);
         QStandardItem* pTwoSideAlignment = new QStandardItem(dpi < 1.5 ? QIcon(":/icons/16x16/twoside_alignment.png") : QIcon(":/icons/twoside_alignment.png"), u8"两端对齐");
+        pTwoSideAlignment->setEnabled(false);
 
         m_pModel->appendRow(pLeftAlignment);
         m_pModel->appendRow(pCenterAlignment);

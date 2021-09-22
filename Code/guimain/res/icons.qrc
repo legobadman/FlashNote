@@ -66,6 +66,7 @@
     <file>icons/floatwin.png</file>
     <file>icons/close.png</file>
     <file>icons/white_close.png</file>
+    <file>icons/white_close_hover.png</file>
     <file>icons/add_normal.png</file>
     <file>icons/add_hover.png</file>
     <file>icons/sort_options.png</file>

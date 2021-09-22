@@ -9,6 +9,7 @@
 #include "searchitemdelegate.h"
 #include "noteitemdelegate.h"
 #include "guihelper.h"
+#include "labelbutton.h"
 
 
 GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
@@ -40,12 +41,15 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
     pHLayout->addWidget(m_pEditor);
 	
 	QVBoxLayout* pVLayout = new QVBoxLayout;
-	ToolButton* closeBtn = new ToolButton;
-	closeBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-	closeBtn->setIcon(QIcon(":/icons/white_close.png"));
-	closeBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-	closeBtn->setButtonStyle(ToolButton::ButtonIcon);
+	NLabelButton* closeBtn = new NLabelButton;
+	closeBtn->setIcons(QSize(16, 16), QIcon(":/icons/white_close.png"), QIcon(":/icons/white_close.png"), QIcon(":/icons/white_close_hover.png"));
+
+	//closeBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	//closeBtn->setIcon(QIcon(":/icons/white_close.png"));
+	//closeBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	//closeBtn->setButtonStyle(ToolButton::ButtonIcon);
 	pVLayout->addWidget(closeBtn);
+
 	pHLayout->addLayout(pVLayout);
 
 	m_model = new QuickSearchModel(this);
