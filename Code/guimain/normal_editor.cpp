@@ -118,7 +118,7 @@ QHBoxLayout* NormalEditor::initToolButtons()
 
 	underline = new ToolButton;
 	underline->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-	underline->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/Underline.png") : QIcon(":/icons/Underline.png"));
+	underline->setIcon(QIcon(":/icons/underline.png"));
 	underline->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	underline->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
 	pLayout->addWidget(underline);
