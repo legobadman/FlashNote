@@ -41,7 +41,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="MenuButton" name="bookmenu" native="true"/>
+      <widget class="BookMenuButton" name="bookmenu" native="true"/>
      </item>
      <item>
       <spacer name="horizontalSpacer233">
@@ -304,6 +304,11 @@
    <class>ToolButton</class>
    <extends>QWidget</extends>
    <header>comctrl/toolbutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>BookMenuButton</class>
+   <extends>MenuButton</extends>
+   <header>bookmenubutton.h</header>
   </customwidget>
   <customwidget>
    <class>NormalEditor</class>
