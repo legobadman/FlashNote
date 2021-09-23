@@ -186,6 +186,7 @@ void BookListView::_resizeTableView()
 void BookListView::resizeEvent(QResizeEvent* event)
 {
 	_resizeTableView();
+	m_ui->listView->doItemsLayout();
 	QWidget::resizeEvent(event);
 }
 
