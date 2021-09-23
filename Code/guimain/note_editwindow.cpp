@@ -112,17 +112,14 @@ void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
 	m_ui->bookmenu->font();
 	QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
 	m_ui->bookmenu->setFont(font);
-	QFontMetrics fm(font);
-	int width = fm.horizontalAdvance(bookName);
-	m_ui->bookmenu->setText(bookName);
+
+	m_ui->bookmenu->setBookName(bookName);
 	m_ui->bookmenu->blockSignals(false);
 
 	const int iconSize = 16;
 	m_ui->bookmenu->setIcon(QIcon(":/icons/notebookmenu.png"));
 	m_ui->bookmenu->setIconSize(MyStyle::dpiScaledSize(QSize(iconSize, iconSize)));
 
-	int w = iconSize + 10 + 4 + width + 20;
-	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(w, 22)));
 	m_ui->bookmenu->setCreateContentCallback([this] {
 		SelectNotebookPanel* panel = new SelectNotebookPanel;
 		connect(panel, SIGNAL(notebookMoved(INotebook*)), m_ui->bookmenu, SIGNAL(popout()));
@@ -191,7 +188,6 @@ void NoteEditWindow::initCustomWidget()
 
 	m_ui->bookmenu->setIcon(QIcon(":/icons/notebookmenu.png"));
 	m_ui->bookmenu->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-	m_ui->bookmenu->setFixedSize(MyStyle::dpiScaledSize(QSize(50, 22)));
 	
 	m_ui->infoBtn->setIcon(QIcon(":/icons/info.png"));
 	m_ui->infoBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));

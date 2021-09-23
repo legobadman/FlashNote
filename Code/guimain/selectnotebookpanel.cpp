@@ -24,37 +24,11 @@ QSize BooksListView::sizeHint() const
 
 	int _nItemsToShow = 15;
 	int nToShow = _nItemsToShow < model()->rowCount() ? _nItemsToShow : model()->rowCount();
-	return QSize(m_cachedWidth, nToShow * sizeHintForRow(0) + 5);
-}
-
-void BooksListView::calcWidthByItems()
-{
-	if (m_cachedWidth > 0)
-		return;
-
-	QAbstractItemModel* pModel = this->model();
-	int maxW = 0;
-	for (int r = 0; r < pModel->rowCount(); r++)
-	{
-		QModelIndex index = pModel->index(r, 0);
-		QString text = index.data().toString();
-		int iconSize = 16;
-		int icon_xoffset = 11;
-		int icon_yoffset = 5;
-		int icon_to_text = 5;
-
-		QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
-		QFontMetricsF fontMetrics(font);
-		int textWidth = fontMetrics.horizontalAdvance(text);
-		int w = icon_xoffset + iconSize + icon_to_text + textWidth;
-		if (w > maxW)
-			maxW = w;
-	}
-	int sw = this->verticalScrollBar()->height();
-	m_cachedWidth = maxW + 16;
+	return QSize(sizeHintForColumn(0), nToShow * sizeHintForRow(0) + 5);
 }
 
 
+/////////////////////////////////////////////////////////////
 BookItemDelegate::BookItemDelegate(QObject* parent)
 	: QAbstractItemDelegate(parent)	
 {
@@ -116,10 +90,23 @@ void BookItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt,
 
 QSize BookItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-	return MyStyle::dpiScaledSize(QSize(200, 23));
+    static const int iconSize = 16;
+	static const int icon_xoffset = 11;
+	static const int icon_yoffset = 5;
+	static const int icon_to_text = 5;
+	static const int text_rightmargin = 20;
+
+	QString text = index.data().toString();
+    QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
+    QFontMetricsF fontMetrics(font);
+    int textWidth = fontMetrics.horizontalAdvance(text);
+	int w = MyStyle::dpiScaled(icon_xoffset + iconSize + icon_to_text + text_rightmargin) + textWidth;
+	int h = MyStyle::dpiScaled(23);
+	return QSize(w, h);
 }
 
 
+////////////////////////////////////////////////////////////////////
 SelectNotebookPanel::SelectNotebookPanel(QWidget* parent)
 	: QWidget(parent)
 	, m_pListView(NULL)
@@ -138,9 +125,7 @@ SelectNotebookPanel::SelectNotebookPanel(QWidget* parent)
 	pLayout->setMargin(0);
 	setLayout(pLayout);
 
-	m_pListView->calcWidthByItems();
 	m_pListView->setItemDelegate(new BookItemDelegate(m_pListView));
-
 	connect(m_pListView, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onIndexClicked(const QModelIndex&)));
 }
 

@@ -9,7 +9,6 @@ public:
 	BooksListView(QWidget* parent = NULL);
 	~BooksListView();
 	QSize sizeHint() const override;
-	void calcWidthByItems();
 
 private:
 	

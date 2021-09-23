@@ -8,9 +8,8 @@ class BookMenuButton : public MenuButton
     Q_OBJECT
 public:
     BookMenuButton(QWidget* parent = NULL);
-    ~BookMenuButton();
     QSize sizeHint() const override;
-    QSize minimumSizeHint() const override;
+    void setBookName(const QString& bookName);
 
 protected:
     void paintEvent(QPaintEvent* event);
