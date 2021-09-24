@@ -18,32 +18,26 @@ PathService::PathService()
 void PathService::_ensurePath()
 {
 	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
-	QString appData;
+	QString dataLocation;
 
 #ifdef Q_OS_WIN
 	locations = locations.filter("ProgramData");
-	if (locations.empty())
-	{
-		//TODO
-	}
-#else
-	if (locations.empty())
-	{
-		//TODO
-	}
 #endif
 
-	appData = locations[0];
+	if (locations.isEmpty())
+		dataLocation = QCoreApplication::applicationDirPath();
+	else
+        dataLocation = locations[0];
 
-	m_appDataPath.setPath(appData);
+	m_appDataPath.setPath(dataLocation);
 	if (!m_appDataPath.exists())
 		m_appDataPath.mkpath(".");
 
-	m_dbPath.setPath(appData + "/" + "database");
+	m_dbPath.setPath(dataLocation + "/" + "database");
 	if (!m_dbPath.exists())
 		m_dbPath.mkpath(".");
 
-	m_assetsPath.setPath(appData + "/" + "assets");
+	m_assetsPath.setPath(dataLocation + "/" + "assets");
 	if (!m_assetsPath.exists())
 		m_assetsPath.mkpath(".");
 }
