@@ -1,19 +1,32 @@
 cmake_minimum_required(VERSION 3.5.1)
 
-if (NOT DEFINED ${CMAKE_BUILD_TYPE})
+if (NOT DEFINED CMAKE_BUILD_TYPE)
 	SET(CMAKE_BUILD_TYPE Debug)
 endif()
 
-SET(BUILD_ROOT ../)
+SET(BUILD_ROOT ${CMAKE_CURRENT_BINARY_DIR})
 
 if (WIN32)
-	list(APPEND CMAKE_PREFIX_PATH "E:/Qt/qtbase/lib/cmake")
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		SET(QT_BASE_PATH "E:/Qt/qtbase")
+	else()
+		SET(QT_BASE_PATH "E:/Qt_release/qtbase")
+	endif()
 else()
-	list(APPEND CMAKE_PREFIX_PATH "/home/luzh/Qt/install_shared/lib/cmake")
-endif(WIN32)
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		SET(QT_BASE_PATH "/home/luzh/Qt/install_shared")
+	else()
+		SET(QT_BASE_PATH "/home/luzh/Qt/install_release_shared")
+	endif()
+endif()
 
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_ROOT}/bin)
+list(APPEND CMAKE_PREFIX_PATH "${QT_BASE_PATH}/lib/cmake")
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${BUILD_ROOT}/bin)
+else()
+	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${BUILD_ROOT}/bin)
+endif()
 
 project(FlashNote)
 

@@ -1,5 +1,6 @@
 /.vs
 /Debug
+/Release
 /GeneratedFiles
 /FlashNote/Debug
 /FlashNote/x64/Debug/FlashNote.log
