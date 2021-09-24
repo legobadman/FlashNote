@@ -19,6 +19,7 @@ cd flashnote
 cp /home/luzh/FlashNote/Release/bin/* .
 #copy desktop icon
 cp /home/luzh/FlashNote/Code/guimain/res/icons/flash.png .
+cp -rf /home/luzh/FlashNote/Code/setup/startup .
 
 linuxdeployqt flashnote -appimage
 
@@ -53,23 +54,18 @@ output=postinst
 echo "#!/bin/sh" | tee $output
 echo "chmod 777 /opt/flashnote/flashnote.desktop" | tee -a $output
 echo "cp /opt/flashnote/flashnote.desktop /usr/share/applications/" | tee -a $output
-echo "cp /opt/flashnote/flashnote.desktop ~/桌面/" | tee -a $output
+echo "cp -rf /opt/flashnote/startup ~/.local/share/flashnote" | tee -a $output
+#echo "cp /opt/flashnote/flashnote.desktop ~/桌面/" | tee -a $output
 chmod 0755 postinst
 
 output=postrm
 
 echo "#!/bin/sh" | tee $output
 echo "rm /usr/share/applications/flashnote.desktop || true" | tee -a $output
-echo "rm ~/桌面/flashnote.desktop || true" | tee -a $output
+#echo "rm -rf ~/.local/share/flashnote" | tee -a $output
+#echo "rm ~/桌面/flashnote.desktop || true" | tee -a $output
 chmod 0755 postrm
 
 #to source dir
 cd ..
 dpkg -b . ../output/flashnote_0.1.0.deb
-
-
-
-
-
-
-
