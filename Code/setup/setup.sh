@@ -54,7 +54,10 @@ output=postinst
 echo "#!/bin/sh" | tee $output
 echo "chmod 777 /opt/flashnote/flashnote.desktop" | tee -a $output
 echo "cp /opt/flashnote/flashnote.desktop /usr/share/applications/" | tee -a $output
-echo "cp -rf /opt/flashnote/startup ~/.local/share/flashnote" | tee -a $output
+echo "rm ~/.local/share/flashnote || true" | tee -a $output
+#need user privilege, otherwise need root privilege to write db
+echo "sudo -u $USER mkdir /p ~/.local/share/flashnote" | tee -a $output
+echo "sudo -u $USER cp -rf /opt/flashnote/startup/* ~/.local/share/flashnote" | tee -a $output
 #echo "cp /opt/flashnote/flashnote.desktop ~/桌面/" | tee -a $output
 chmod 0755 postinst
 
