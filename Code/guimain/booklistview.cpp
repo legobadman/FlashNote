@@ -32,6 +32,7 @@ void BookListView::init()
 	palette.setColor(QPalette::Window, QColor(255, 255, 255));
 	setAutoFillBackground(true);
 	setPalette(palette);
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
 	qreal dpi = MyStyle::dpiScaled(1);
 
@@ -55,11 +56,11 @@ void BookListView::init()
 	m_ui->listView->setFrameShape(QFrame::NoFrame);
 	m_ui->listView->viewport()->setAttribute(Qt::WA_Hover, true);
 
-	m_ui->listView->verticalScrollBar()->setStyleSheet("\
+	m_ui->listView->verticalScrollBar()->setStyleSheet(QString("\
 		QScrollBar:vertical\
 		{\
 			background-color: #FFFFFF;\
-			width: 15px;\
+			width: %1px;\
 			margin: 0px 2px 0px 2px;\
 			border: 1px transparent #2A2929;\
 			border-radius: 0px;\
@@ -91,7 +92,7 @@ void BookListView::init()
 		{\
 			background: none;\
 		}\
-		");
+		").arg(MyStyle::dpiScaled(15)));
 
 	m_ui->tableView->setSelectionMode(QAbstractItemView::SingleSelection);
 	m_ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -348,4 +349,16 @@ void BookListView::resetModel(QSortFilterProxyModel* pModel, BOOKVIEW_TYPE type,
 	m_ui->lblNotebook->setText(bookName);
 	m_ui->lblNumberNotes->setText(QString(u8"%1条笔记").arg(
 		QString::number(pModel->rowCount())));
+}
+
+QSize BookListView::minimumSizeHint() const
+{
+	QSize sz = QWidget::minimumSizeHint();
+	return MyStyle::dpiScaledSize(QSize(256, sz.height()));
+}
+
+QSize BookListView::sizeHint() const
+{
+	QSize sz = QWidget::sizeHint();
+	return MyStyle::dpiScaledSize(QSize(300, sz.height()));
 }

@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QtGui/QImageReader>
 #include <QDir>
+#include "guihelper.h"
 #include "richtexteditor.h"
 #include "pathservice.h"
 #include "moc_richtexteditor.cpp"
@@ -170,7 +171,7 @@ void RichTextEditor::insertFromMimeData(const QMimeData* source)
 	if (source->hasImage())
 	{
 		static int i = 1;
-		QUrl url(QString("dropped_image_%1").arg(i++));
+		QUrl url = AppHelper::GenerateRandomString();
 		dropImage(url, qvariant_cast<QImage>(source->imageData()));
 	}
 	else if (source->hasUrls())

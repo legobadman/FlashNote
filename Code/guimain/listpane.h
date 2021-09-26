@@ -104,11 +104,11 @@ public:
 	QTreeView* treeview() { return m_treeview; }
 
 	HRESULT onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg);
-
-public:
 	HRESULT QueryInterface(QUuid, void **) { return E_NOTIMPL; }
 	long AddRef(void) { return 1; }
 	long Release(void) { return 1; }
+
+	QSize sizeHint() const override;
 
 protected:
 	void paintEvent(QPaintEvent* event) override;

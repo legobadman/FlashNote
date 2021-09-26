@@ -225,7 +225,6 @@ NewNoteMenu::NewNoteMenu(QWidget* parent)
 	setModel(pModel);
 	viewport()->setAttribute(Qt::WA_Hover, true);
 	setItemDelegate(new NewItemDelegate(this));
-	setFixedSize(MyStyle::dpiScaledSize(QSize(NEW_NOTE_MENU_ITEM_WIDTH, NEW_NOTE_MENU_ITEM_HEIGHT * 3)));
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
@@ -292,6 +291,12 @@ NavigationPanel::NavigationPanel(QWidget* parent)
 
 NavigationPanel::~NavigationPanel()
 {
+}
+
+QSize NavigationPanel::sizeHint() const
+{
+	QSize sz = QWidget::sizeHint();
+	return MyStyle::dpiScaledSize(QSize(256, sz.height()));
 }
 
 void NavigationPanel::paintEvent(QPaintEvent* event)

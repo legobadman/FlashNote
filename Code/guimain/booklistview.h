@@ -49,6 +49,8 @@ public:
 
 	void init();
 	void resetModel(QSortFilterProxyModel* pModel, BOOKVIEW_TYPE type, INoteCollection* pNoteCollection);
+	QSize minimumSizeHint() const;
+	QSize sizeHint() const;
 
 signals:
 	void searchTriggered(const QString&);

@@ -36,10 +36,8 @@ NotesEditView::NotesEditView(QWidget* parent)
 	addWidget(m_pListView);
 	addWidget(m_pStackedEdit);
 
-	QList<int> sizes;
-	sizes.append(325);
-	sizes.append(1225);
-	setSizes(sizes);
+	setStretchFactor(1, 3);
+	setChildrenCollapsible(false);
 
 	m_pNoView->installEventFilter(this);
 }

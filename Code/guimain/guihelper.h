@@ -30,6 +30,7 @@ public:
 	static QStringList GetNotes(INoteCollection* pNoteColl);
 
 	static QString GenerateGUID();
+	static QString GenerateRandomString();
 
 	static int GetNoteCounts(INoteCollection* pNotebook);
 	static QSizeF viewItemTextLayout(QTextLayout& textLayout, int lineWidth, int maxHeight = -1, int* lastVisibleLine = nullptr);
