@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "mindmapscene.h"
 #include "mindprogressnode.h"
+#include "MyStyle.h"
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
@@ -93,7 +94,8 @@ void MindProgressNode::resetDecoration()
 {
 	if (needShowDecoration())
 	{
-		setDecoration(2, QIcon(":/icons/link_note_black.png"));
+		static qreal dpi = MyStyle::dpiScaled(1);
+		setDecoration(2, dpi < 1.5 ? QIcon(":/icons/16x16/link_note_black.png") : QIcon(":/icons/link_note_black.png"));
 	}
 }
 

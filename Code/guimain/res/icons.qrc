@@ -71,6 +71,8 @@
     <file>icons/add_hover.png</file>
     <file>icons/sort_options.png</file>
     <file>icons/listview.png</file>
+    <file>icons/link_note_black.png</file>
+    <file>icons/link_note_white.png</file>
 
     <file>icons/16x16/Bold.png</file>
 	<file>icons/16x16/Italic.png</file>

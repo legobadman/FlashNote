@@ -323,10 +323,11 @@ void MindNode::resetDecoration()
 {
 	if (needShowDecoration())
 	{
+		static qreal dpi = MyStyle::dpiScaled(1);
 		if (m_level == 0)
-			setDecoration(2, QIcon(":/icons/link_note_white.png"));
+			setDecoration(2, dpi < 1.5 ? QIcon(":/icons/16x16/link_note_white.png") : QIcon(":/icons/link_note_white.png"));
 		else
-			setDecoration(2, QIcon(":/icons/link_note_black.png"));
+			setDecoration(2, dpi < 1.5 ? QIcon(":/icons/16x16/link_note_black.png") : QIcon(":/icons/link_note_black.png"));
 	}
 }
 
