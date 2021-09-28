@@ -29,6 +29,7 @@ public slots:
 private:
 	void initUI();
 	void initCoreFromRPC();
+	void initFont();
 #ifdef Q_OS_WIN
 	void initFileMapping();
 #endif

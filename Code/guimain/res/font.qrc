@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file>font/consola.ttf</file>
+    <file>font/msyh.ttc</file>
+  </qresource>
+</RCC>

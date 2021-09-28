@@ -159,6 +159,7 @@ add_executable(guimain
     ./popupwidget.cpp
     ./popupwidget.h
     ./res/icons.qrc
+    ./res/font.qrc
     ./richeditor/richtexteditor.cpp
     ./richeditor/richtexteditor.h
     ./SeperateLine.cpp

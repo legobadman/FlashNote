@@ -26,7 +26,7 @@ UiApplication::UiApplication(int& argc, char** argv)
 	const QString& appdatapath = this->applicationDirPath();
     mpQtTr.load(appdatapath + "/" + "uimain");
     installTranslator(&mpQtTr);
-
+	initFont();
 	CreateApplication(&m_spApp);
 	initCoreFromRPC();
 	initUI();
@@ -79,6 +79,14 @@ void UiApplication::initUI()
 void UiApplication::initCoreFromRPC()
 {
 	DbService::GetInstance().InitcoreFromRPC(m_spApp);
+}
+
+void UiApplication::initFont()
+{
+	int fontId = QFontDatabase::addApplicationFont(":/font/msyh.ttc");
+	fontId = QFontDatabase::addApplicationFont(":/font/consola.ttf");
+	QString fontStr = QFontDatabase::applicationFontFamilies(fontId).at(0);
+	QFont font(fontStr);
 }
 
 #ifdef Q_OS_WIN
