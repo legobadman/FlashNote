@@ -36,6 +36,9 @@ NoteEditWindow::NoteEditWindow(QWidget* parent)
     init();
     initContent();
 	m_spNotifier.reset(new NoteEditWindowNotifier(this));
+	m_timer.setSingleShot(true);
+	m_timer.setInterval(3000);
+	connect(&m_timer, SIGNAL(timeout()), this, SLOT(saveNote()));
 }
 
 NoteEditWindow::~NoteEditWindow()
@@ -354,9 +357,14 @@ void NoteEditWindow::onTitleChanged()
 void NoteEditWindow::onTextChanged(bool delay)
 {
 	if (delay)
-		QTimer::singleShot(3000, this, SLOT(saveNote()));
+	{
+		m_timer.stop();
+		m_timer.start();
+	}
 	else
+	{
 		saveNote();
+	}
 }
 
 void NoteEditWindow::onMindMapChanged(bool bEditChange)
@@ -364,15 +372,23 @@ void NoteEditWindow::onMindMapChanged(bool bEditChange)
 	if (AppHelper::GetNoteType(m_pNote) == MINDMAP)
 	{
 		if (bEditChange)
+		{
 			QTimer::singleShot(2000, this, SLOT(saveMindMap()));
+		}
 		else
+		{
 			saveMindMap();
+		}
 	}
 	else if (AppHelper::GetNoteType(m_pNote) == SCHEDULE)
 	{
 		if (bEditChange)
+		{
 			QTimer::singleShot(2000, this, SLOT(saveSchedule()));
+		}
 		else
+		{
 			saveSchedule();
+		}
 	}
 }

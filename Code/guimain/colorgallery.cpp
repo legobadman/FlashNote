@@ -2,6 +2,7 @@
 #include "colorgallery.h"
 #include "moc_colorgallery.cpp"
 #include "MyStyle.h"
+#include <QtWidgets/QColorDialog>
 
 
 ColorGallery::ColorGallery(QWidget* parent /* = nullptr */)
@@ -48,6 +49,7 @@ void ColorGallery::init()
 
 	connect(m_btnDefaultClr, SIGNAL(clicked()), this, SLOT(onDefaultColorClicked()));
 	connect(m_clrTable, SIGNAL(clicked(const QModelIndex&)), this, SLOT(onItemActivated(const QModelIndex&)));
+	connect(m_btnMoreClr, SIGNAL(clicked()), this, SLOT(onMoreClrClicked()));
 
 	setLayout(pMainLayout);
 
@@ -96,4 +98,20 @@ void ColorGallery::onDefaultColorClicked()
 {
 	m_color = QColor(0, 0, 0);
 	emit fontColorChanged(m_color);
+}
+
+void ColorGallery::onMoreClrClicked()
+{
+	QColorDialog dlg(this);
+	dlg.setWindowFlag(Qt::SubWindow);
+	dlg.setWindowTitle(tr("More Color"));
+	if (dlg.exec() == QDialog::Accepted)
+	{
+		QColor clr = dlg.selectedColor();
+        if (clr.isValid())
+        {
+            m_color = clr;
+            emit fontColorChanged(m_color);
+        }
+	}
 }

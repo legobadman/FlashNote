@@ -25,6 +25,7 @@ signals:
 public slots:
 	void onItemActivated(const QModelIndex& index);
 	void onDefaultColorClicked();
+	void onMoreClrClicked();
 
 private:
 	ColorTableView* m_clrTable;

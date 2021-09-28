@@ -73,6 +73,7 @@ private:
 	Ui::NoteEditWindow* m_ui;
 	com_sptr<INote> m_pNote;
 	com_sptr<INotebook> m_pNotebook;
+	QTimer m_timer;
 	NOTE_TYPE m_type;
 	bool m_bTrash;
 };
