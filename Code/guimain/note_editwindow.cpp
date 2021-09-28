@@ -113,7 +113,7 @@ void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
 	QString bookName = AppHelper::GetNotebookName(pNotebook);
 	m_ui->bookmenu->blockSignals(true);
 	m_ui->bookmenu->font();
-	QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
+	QFont font("Microsoft YaHei", 9);
 	m_ui->bookmenu->setFont(font);
 
 	m_ui->bookmenu->setBookName(bookName);

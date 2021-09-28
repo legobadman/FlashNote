@@ -431,7 +431,7 @@ void MindNode::initDocFormat(const QString& text)
 			cursor.setBlockFormat(format);
 
 			QTextCharFormat chrFormat = childBlock.charFormat();
-			chrFormat.setFont(QFont(QString::fromUtf16((char16_t*)L"微软雅黑"), pointSize(m_level)));
+			chrFormat.setFont(QFont("Microsoft YaHei", pointSize(m_level)));
 			chrFormat.setForeground(m_textColor);
 			cursor.setBlockCharFormat(chrFormat);
 		}

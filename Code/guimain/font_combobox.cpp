@@ -17,7 +17,7 @@ FontComboBox::~FontComboBox()
 
 void FontComboBox::init()
 {
-	QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
+	QFont font("Microsoft YaHei", 9);
 	setFont(font);
 	setFixedHeight(MyStyle::dpiScaled(25));
 	setMaxVisibleItems(20);

@@ -160,7 +160,7 @@ void NoteItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
 
 	//3. draw modify_time
 	{
-        QFont fontDate(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
+        QFont fontDate("Microsoft YaHei", 9);
         QFontMetrics fontMetrics(fontDate);
         int fontHeight = fontMetrics.height();
 		const int numLines = 4;	//title(1 line) + content(2 lines) + one line space

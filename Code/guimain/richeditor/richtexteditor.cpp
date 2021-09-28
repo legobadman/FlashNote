@@ -16,7 +16,7 @@ RichTextEditor::RichTextEditor(QWidget* parent)
 	: QTextEdit(parent)
 	, highlighter(NULL)
 {
-	QString fontFamily = QString::fromUtf16((char16_t*)L"微软雅黑");
+	QString fontFamily = "Microsoft YaHei";
 	QFont font(fontFamily, 11);
 	setFont(font);
 

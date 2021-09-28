@@ -78,7 +78,7 @@ void BookItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt,
 	
 	icon.paint(painter, iconRect, opt.decorationAlignment, QIcon::Normal, QIcon::On);
 
-	QFont font(QString::fromUtf16((char16_t*)L"微软雅黑"), 9);
+	QFont font("Microsoft YaHei", 9);
 	QFontMetricsF fontMetrics(font);
 	int w = fontMetrics.horizontalAdvance(text);
 	int h = fontMetrics.height();
