@@ -43,6 +43,7 @@ class NewNoteMenu : public QListView
 public:
 	NewNoteMenu(QWidget* parent = nullptr);
 	~NewNoteMenu();
+	QSize sizeHint() const override;
 
 protected:
 	void paintEvent(QPaintEvent* e) override;

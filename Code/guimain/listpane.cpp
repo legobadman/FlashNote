@@ -233,6 +233,11 @@ NewNoteMenu::~NewNoteMenu()
 {
 }
 
+QSize NewNoteMenu::sizeHint() const
+{
+	return QSize(sizeHintForColumn(0), 3 * sizeHintForRow(0));
+}
+
 void NewNoteMenu::paintEvent(QPaintEvent* e)
 {
 	QListView::paintEvent(e);
