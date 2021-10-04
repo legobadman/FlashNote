@@ -42,6 +42,7 @@ protected:
 
 signals:
 	void itemContentChanged(bool bEditChanged);
+	void zoomInOrOut(qreal);
 	void undoRedoEnable(bool, bool);
 
 private slots:

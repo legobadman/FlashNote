@@ -22,11 +22,10 @@ public:
 	QString mindmapXML();
 	void gentle_zoom(qreal factor);
     void set_modifiers(Qt::KeyboardModifiers modifiers);
-    void set_zoom_factor_base(double value);
 
 signals:
 	void itemContentChanged(bool);
-	void zoomed();
+	void zoomed(qreal);
 
 protected:
     bool eventFilter(QObject* watched, QEvent* event);
@@ -43,9 +42,8 @@ private:
 	QPointer<MindMapScene> m_scene;
 	QPointer<MindMapView> m_view;
 	Qt::KeyboardModifiers _modifiers;
-	qreal _zoom_factor_base;
 	qreal m_factor;
-	const double m_factor_step = 0.2;
+	const double m_factor_step = 0.25;
 	QPointF target_scene_pos, target_viewport_pos, m_startPos;
 	MindNode* m_pRoot;
 	NLabelButton* m_undoBtn;

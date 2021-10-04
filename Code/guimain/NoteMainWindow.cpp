@@ -200,6 +200,7 @@ INoteCollection* NoteMainWindow::GetCurrentNoteCollection()
             AppHelper::GetNotebookById(bookid, &spNotebook);
             return spNotebook;
 		}
+		return NULL;
     }
     else if (m_ui->stackedWidget2->currentWidget() == m_ui->scheduleeditor)
     {

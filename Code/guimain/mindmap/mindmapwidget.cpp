@@ -29,7 +29,6 @@ MindMapWidget::MindMapWidget(QWidget* parent)
 	m_view->viewport()->installEventFilter(this);
 	m_view->setMouseTracking(true);
 	_modifiers = Qt::ControlModifier;
-	_zoom_factor_base = 1.0015;
 
 	QVBoxLayout* pMainLayout = new QVBoxLayout;
 
@@ -93,7 +92,7 @@ MindMapWidget::MindMapWidget(QWidget* parent)
 
 	connect(m_scene, SIGNAL(itemContentChanged(bool)), this, SIGNAL(itemContentChanged(bool)));
 	connect(m_scene, SIGNAL(undoRedoEnable(bool, bool)), this, SLOT(undoRedoEnable(bool, bool)));
-
+	connect(this, SIGNAL(zoomed(qreal)), m_scene, SIGNAL(zoomInOrOut(qreal)));
 	connect(m_undoBtn, SIGNAL(clicked()), this, SLOT(undo()));
 	connect(m_redoBtn, SIGNAL(clicked()), this, SLOT(redo()));
 	connect(m_undo, SIGNAL(activated()), this, SLOT(undo()));
@@ -118,8 +117,7 @@ void MindMapWidget::gentle_zoom(qreal factor)
 
 	qreal factor_i_want = m_view->transform().m11();
 	m_zoom_factor->setText(QString("%1%").arg((int)(factor_i_want * 100 + 0.00001)));
-
-	emit zoomed();
+	emit zoomed(factor_i_want);
 }
 
 void MindMapWidget::zoomIn()
@@ -148,11 +146,6 @@ void MindMapWidget::resetTransform()
 void MindMapWidget::set_modifiers(Qt::KeyboardModifiers modifiers)
 {
 	_modifiers = modifiers;
-}
-
-void MindMapWidget::set_zoom_factor_base(double value)
-{
-	_zoom_factor_base = value;
 }
 
 void MindMapWidget::initContent(QString content, bool bSchedule)

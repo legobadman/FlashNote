@@ -2,15 +2,18 @@
 #define __MIND_NODE_H__
 
 #include <QGraphicsItem>
+#include <QtSvg/QGraphicsSvgItem>
 #include <memory>
 #include "mindnodebutton.h"
 #include "common_types.h"
 #include "../transaction/transaction.h"
 #include "mindtransaction.h"
+#include "linknoteitem.h"
 
 class MindMapScene;
 
 class RoundedRectItem;
+class LinkNoteItem;
 
 class MindNode : public QGraphicsTextItem
 {
@@ -86,6 +89,7 @@ public:
 signals:
 	void textChange();
 	void dataChanged(bool bEditChanged);
+	void nodeLinkAdded();
 	void expandChanged();
 	void nodeCreated(MindNode* pNode);
 	void nodeDeleted(MindNode* pNode);
@@ -102,6 +106,7 @@ public slots:
 	void onNewNote(const QString&);
 	void onLeftExpandBtnToggle();
 	void onRightExpandBtnToggle();
+	void onZoom(qreal factor);
 
 public:
 	void SetContent(const QString& content);
@@ -112,7 +117,7 @@ public:
 protected:
 	virtual void initUIColor();
 	void initDirection();
-
+	void createLinkNoteItem();
 	void createPathItem(const QColor& clr, Qt::PenStyle style);
 	void setTextColor(const QColor& clr);
 	void setMainThemeColor(const QColor& mainTheme);
@@ -122,7 +127,6 @@ protected:
 	QPointer<QMenu> getMenu();
 
 	virtual void initMenu();
-	virtual void resetDecoration();
 	bool needShowDecoration() const;
 	bool sceneEvent(QEvent* event) override;
 	void focusInEvent(QFocusEvent* event) override;
@@ -158,6 +162,7 @@ private:
     QSharedPointer<MindNodeButton> m_pRCollaspBtn;
 
 	QGraphicsPathItem* m_pathItem;
+	LinkNoteItem* m_linkItem;
     
     QPointer<QMenu> m_pMenu;
     QList<MindNode*> m_children;
@@ -171,16 +176,17 @@ private:
 	MindMapScene* m_scene;
 	DraggingCache m_dragging;
 	QString m_focusInText;	//进入编辑时的文本。
+	QIcon m_noteIcon;
 
 	shared_ptr<MoveTransform> m_spMoveTransform;
 	TRANSCATION_PTR m_spMoveTrans;
 	int m_moveTrans_id;
 
     int m_level;
-    int m_borderWidth;
+    qreal m_borderWidth;
     int m_cornerRadius;
     int m_counter;	//防止绘制重入。
-    const int iconSize = 24;
+    const int sIconSize = 32;
 
     EXPAND_STATE m_left_expand;
     EXPAND_STATE m_right_expand;

@@ -62,7 +62,7 @@ void MindNodeButton::paint(QPainter* painter, const QStyleOptionGraphicsItem* op
 
 	if (m_pNode->isExpanded(this))
 	{
-		pen = QPen(QColor(0, 0, 0), 1);
+		pen = QPen(QColor(0, 0, 0), 2);
 		painter->setPen(pen);
 		painter->drawLine(x1, m_radius, x2, m_radius);
 	}

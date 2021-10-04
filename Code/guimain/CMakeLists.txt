@@ -17,7 +17,7 @@ set(CMAKE_AUTORCC ON)
 #endif(NOT CMAKE_PREFIX_PATH AND NOT Qt5Widgets_DIR)
 
 # Add a compiler flag
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 
 # Make this a GUI application on Windows
 if(WIN32)
@@ -49,12 +49,12 @@ link_directories(../3rdparty/boost_1_55_0/stage/lib)
 
 IF (WIN32)
     SET(SHORTCUT_SRCS "./shortcut/gui/qxtwindowsystem.cpp" "./shortcut/gui/qxtwindowsystem.h" "./shortcut/gui/qxtglobalshortcut_win.cpp" "./shortcut/gui/qxtwindowsystem_win.cpp")
-    find_package(Qt5 REQUIRED COMPONENTS Widgets)
+    find_package(Qt5 REQUIRED COMPONENTS Widgets Svg)
 ENDIF (WIN32)
 
 IF (UNIX)
     find_package(X11)
-    find_package(Qt5 REQUIRED COMPONENTS Widgets X11Extras)
+    find_package(Qt5 REQUIRED COMPONENTS Widgets X11Extras Svg)
     IF (APPLE)
         SET(SHORTCUT_SRCS "./shortcut/gui/qxtglobalshortcut_mac.cpp" "./shortcut/gui/qxtwindowsystem_mac.cpp" "./shortcut/gui/qxtwindowsystem_mac.h") 
     ELSE (APPLE)
@@ -129,6 +129,8 @@ add_executable(guimain
     ./mindmap/mindprogressnode.h
     ./mindmap/mindtransaction.cpp
     ./mindmap/mindtransaction.h
+    ./mindmap/linknoteitem.cpp
+    ./mindmap/linknoteitem.h
     ./model/notebookmodel.cpp
     ./model/notebookmodel.h
     ./newitemdelegate.cpp
@@ -203,11 +205,11 @@ target_precompile_headers(guimain PRIVATE ./stdafx.h)
 
 # Add the Qt5 Widgets for linking
 if (WIN32)
-	target_link_libraries(guimain notecore Qt5::Widgets dbservice sqlite Ws2_32 notehook)
+	target_link_libraries(guimain notecore Qt5::Widgets Qt5::Svg dbservice sqlite Ws2_32 notehook)
 	add_custom_command(TARGET guimain POST_BUILD
 		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ts/lrelease.exe ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${BUILD_ROOT}/bin/uimain.qm)
 else()
-	target_link_libraries(guimain notecore Qt5::Widgets Qt5::X11Extras dbservice sqlite Threads::Threads dl X11)
+	target_link_libraries(guimain notecore Qt5::Widgets Qt5::Svg Qt5::X11Extras dbservice sqlite Threads::Threads dl X11)
 	add_custom_command(TARGET guimain POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH="${QT_BASE_PATH}/lib" ${QT_BASE_PATH}/bin/lrelease ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${BUILD_ROOT}/bin/uimain.qm)
 endif(WIN32)

@@ -38,13 +38,12 @@ private:
 protected:
 	void initMenu() override;
 	void initUIColor() override;
-	void resetDecoration() override;
 	bool sceneEvent(QEvent* event) override;
 
 private:
 	float m_progress;
 	float m_workinghours;
-	QGraphicsPixmapItem* m_tipItem;
+	QGraphicsSvgItem* m_tipItem;
 };
 
 

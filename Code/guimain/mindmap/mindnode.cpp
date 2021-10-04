@@ -69,14 +69,14 @@ void RoundedRectItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 
 /////////////////////////////////////////////////////////////
 MindNode::MindNode(const QString& text, MindNode* parent)
-	: QGraphicsTextItem(parent)		//ÏÈ³õÊ¼»¯text»áµ¼ÖÂ¸ñÊ½ÎÊÌâ£¬ÏÈ²»ÕâÃ´´¦Àí¡£
+	: QGraphicsTextItem(parent)
 	, m_level(0)
 	, m_content(text)
 	, m_mouseState(MS_UNKNOWN)
 	, m_bHovered(false)
 	, m_bToRight(true)
-	, m_borderWidth(2)
-	, m_cornerRadius(7)
+	, m_borderWidth(MyStyle::dpiScaled(2))
+	, m_cornerRadius(MyStyle::dpiScaled(7))
 	, m_parent(parent)
 	, m_counter(0)
 	, m_left_expand(EXP_EXPAND)
@@ -85,18 +85,13 @@ MindNode::MindNode(const QString& text, MindNode* parent)
 	, m_pathItem(NULL)
 	, m_bDragging(false)
 	, m_scene(NULL)
+	, m_linkItem(NULL)
 {
 	setFlags(ItemIsMovable | ItemSendsGeometryChanges | ItemIsSelectable | ItemClipsToShape);
 }
 
 MindNode::~MindNode()
 {
-	if (m_pathItem && scene())
-	{
-		//scene()->removeItem(m_pathItem);
-		//m_pathItem = NULL;
-	}
-	//	delete m_pathItem;	//todo: smart pointer
 }
 
 QList<MindNode*> MindNode::Children(bool excludeHolder, int direction) const
@@ -128,7 +123,7 @@ void MindNode::setup(MindMapScene* pScene)
 	initUIColor();
 	initDocFormat(m_content);
 	setCornerRadius(m_cornerRadius);
-	resetDecoration();
+	createLinkNoteItem();
 	initDirection();
 	initMenu();
 	if (!isTopRoot())
@@ -142,12 +137,14 @@ void MindNode::initSignalSlots(MindMapScene* pScene)
 {
 	if (document())
 		connect(document(), SIGNAL(contentsChanged()), pScene, SLOT(onNodeContentsChanged()));
-	connect(this, SIGNAL(dataChanged(bool)), pScene, SIGNAL(itemContentChanged(bool)));
+	connect(this, SIGNAL(dataChanged(bool)), pScene, SIGNAL(onNodeContentsChanged(bool)));
 	connect(this, SIGNAL(nodeCreated(MindNode*)), pScene, SLOT(onNodeCreated(MindNode*)));
 	connect(this, SIGNAL(nodeDeleted(MindNode*)), pScene, SLOT(onNodeDeleted(MindNode*)));
 	connect(this, SIGNAL(expandChanged()), pScene, SLOT(onNodeStateChanged()));
 	connect(this, SIGNAL(nodeDragged(MindNode*)), pScene, SLOT(onNodeDragged(MindNode*)));
 	connect(this, SIGNAL(nodeDragging(MindNode*)), pScene, SLOT(onNodeDragging(MindNode*)));
+	connect(this, SIGNAL(nodeLinkAdded()), pScene, SLOT(onNodeStateChanged()));
+	connect(pScene, SIGNAL(zoomInOrOut(qreal)), this, SLOT(onZoom(qreal)));
 }
 
 void MindNode::initUIColor()
@@ -285,6 +282,39 @@ void MindNode::createPathItem(const QColor& clr, Qt::PenStyle style)
 	}
 }
 
+void MindNode::createLinkNoteItem()
+{
+	if (!m_noteid.isEmpty() && m_linkItem == NULL)
+	{
+		qreal scale = 1.0;
+		static qreal dpi = MyStyle::dpiScaled(1);
+		QString iconFile = ":/icons/16x16/link_note_black.svg";
+		if (dpi == 1.0)
+		{
+			iconFile = ":/icons/16x16/link_note_black.svg";
+		}
+		else if (dpi == 1.25)
+		{
+			iconFile = ":/icons/20x20/link_note_black.svg";
+		}
+		else if (dpi == 1.5)
+		{
+			iconFile = ":/icons/24x24/link_note_black.svg";
+		}
+		else if (dpi == 1.75)
+		{
+			iconFile = ":/icons/28x28/link_note_black.svg";
+		}
+		else if (dpi == 2)
+		{
+			iconFile = ":/icons/32x32/link_note_black.svg";
+		}
+        m_linkItem = new LinkNoteItem(iconFile, this);
+		setDecorationSize(MyStyle::dpiScaled(sIconSize));
+		connect(m_linkItem, SIGNAL(triggered()), this, SLOT(onEditAssociateNote()));
+	}
+}
+
 void MindNode::setTextColor(const QColor& clr)
 {
 	m_textColor = clr;
@@ -319,16 +349,8 @@ QPointer<QMenu> MindNode::getMenu()
 	return m_pMenu;
 }
 
-void MindNode::resetDecoration()
+void MindNode::onZoom(qreal factor)
 {
-	if (needShowDecoration())
-	{
-		static qreal dpi = MyStyle::dpiScaled(1);
-		if (m_level == 0)
-			setDecoration(2, dpi < 1.5 ? QIcon(":/icons/16x16/link_note_white.png") : QIcon(":/icons/link_note_white.png"));
-		else
-			setDecoration(2, dpi < 1.5 ? QIcon(":/icons/16x16/link_note_black.png") : QIcon(":/icons/link_note_black.png"));
-	}
 }
 
 void MindNode::initMenu()
@@ -394,8 +416,8 @@ void MindNode::onNewNote(const QString& noteid)
 	Q_ASSERT(!noteid.isEmpty());
 	m_noteid = noteid;
 	initMenu();
-	resetDecoration();
-	emit dataChanged(false);
+	createLinkNoteItem();
+	emit nodeLinkAdded();
 }
 
 bool MindNode::needShowDecoration() const
@@ -426,8 +448,8 @@ void MindNode::initDocFormat(const QString& text)
 		{
 			QTextBlockFormat format = childBlock.blockFormat();
 			format.setBackground(m_backgroudColor);
-			format.setLeftMargin(10);
-			format.setRightMargin(10);
+			format.setLeftMargin(MyStyle::dpiScaled(10));
+			format.setRightMargin(MyStyle::dpiScaled(10));
 			cursor.setBlockFormat(format);
 
 			QTextCharFormat chrFormat = childBlock.charFormat();
@@ -441,7 +463,7 @@ void MindNode::initDocFormat(const QString& text)
 	QTextFrameFormat frameFormat = rootFrame->frameFormat();
 	frameFormat.setBackground(m_backgroudColor);
 	frameFormat.setMargin(0);
-	frameFormat.setPadding(10);
+	frameFormat.setPadding(MyStyle::dpiScaled(10));
 
 	frameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
 	frameFormat.setBorderBrush(QColor(23, 157, 235));
@@ -707,6 +729,11 @@ void MindNode::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 	if (isTopRoot())
 		return;
 
+	//可能在拖动，此时禁止移动节点
+	bool bCtrl = QApplication::keyboardModifiers() == Qt::ControlModifier;
+	if (bCtrl)
+		return;
+
 	if (!m_bDragging)
 	{
 		qreal dist = _dist(m_initClickScenePos, event->scenePos());
@@ -798,19 +825,6 @@ bool MindNode::sceneEvent(QEvent* event)
 			break;
 		}
 	case QEvent::GraphicsSceneHoverMove:
-		{
-			QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
-			QPointF pos = e->pos();
-			QRectF br = boundingRect();
-			if (!m_noteid.isEmpty() && QRectF(br.width() - 30, br.top() + 16, 16, 16).contains(pos))
-			{
-				setCursor(QCursor(Qt::PointingHandCursor));
-			}
-			else
-			{
-				setCursor(QCursor(Qt::ArrowCursor));
-			}
-		}
 		break;
 	case QEvent::GraphicsSceneMouseDoubleClick:
 		{
@@ -932,7 +946,7 @@ QRectF MindNode::boundingRect() const
 {
 	QRectF br = QGraphicsTextItem::boundingRect();
 	if (needShowDecoration())
-		return br.adjusted(0, 0, iconSize, 0);
+		return br.adjusted(0, 0, MyStyle::dpiScaled(sIconSize * 0.75), 0);
 	else
 		return br;
 }
@@ -1137,6 +1151,16 @@ void MindNode::setPosition(QPointF pos)
 		int y = boundingRect().height() / 2 - 13;
 		m_pRCollaspBtn->setZValue(zValue() + 3);
 		m_pRCollaspBtn->setPos(QPointF(x, y));
+	}
+	if (m_linkItem)
+	{
+		QRectF bbox = boundingRect();
+		QRectF rcLink = m_linkItem->boundingRect();
+		static int xoffset = 4, yoffset = 1;
+        int x = boundingRect().width() - MyStyle::dpiScaled(sIconSize - xoffset);
+        int y = boundingRect().height() / 2 - rcLink.height() / 2 + MyStyle::dpiScaled(yoffset);
+		m_linkItem->setZValue(zValue() + 3);
+		m_linkItem->setPos(QPointF(x, y));
 	}
 	if (m_pathItem)
 	{

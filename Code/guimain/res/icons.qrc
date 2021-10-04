@@ -7,6 +7,7 @@
 	<file>icons/bluewhite.png</file>
 	<file>icons/btn_addnote.png</file>
 	<file>icons/checked.png</file>
+    <file>icons/checked.svg</file>
     <file>icons/downarrow.png</file>
 	<file>icons/allnotes.png</file>
 	<file>icons/notebooks.png</file>
@@ -27,6 +28,7 @@
 	<file>icons/conflict.png</file>
     <file>icons/camera.png</file>
 	<file>icons/warning.png</file>
+    <file>icons/warning.svg</file>
     <file>icons/undo.png</file>
     <file>icons/undo_hover.png</file>
     <file>icons/redo.png</file>
@@ -73,7 +75,7 @@
     <file>icons/listview.png</file>
     <file>icons/link_note_black.png</file>
     <file>icons/link_note_white.png</file>
-
+    <file>icons/link_note_black.svg</file>
     <file>icons/16x16/Bold.png</file>
 	<file>icons/16x16/Italic.png</file>
 	<file>icons/16x16/Underline.png</file>
@@ -98,6 +100,7 @@
 	<file>icons/16x16/newnotemenu.png</file>
 	<file>icons/16x16/newnotemenu_hover.png</file>
 	<file>icons/16x16/notebookmenu.png</file>
+    <file>icons/16x16/link_note_black.svg</file>
 	<file>icons/16x16/link_note_black.png</file>
 	<file>icons/16x16/link_note_white.png</file>
 	<file>icons/16x16/alarm.png</file>
@@ -108,10 +111,16 @@
 	<file>icons/16x16/finish.png</file>
 	<file>icons/16x16/close.png</file>
 	<file>icons/16x16/white_close.png</file>
+    <file>icons/20x20/link_note_black.png</file>
+    <file>icons/20x20/link_note_black.svg</file>
 	<file>icons/24x24/sort_options.png</file>
 	<file>icons/24x24/listview.png</file>
 	<file>icons/24x24/floatwin.png</file>
     <file>icons/24x24/reset.png</file>
+    <file>icons/24x24/link_note_black.png</file>
+    <file>icons/24x24/link_note_black.svg</file>
+    <file>icons/28x28/link_note_black.png</file>
+    <file>icons/28x28/link_note_black.svg</file>
     <file>icons/32x32/floatwin32.png</file>
 	<file>icons/32x32/menu_newnote.png</file>
 	<file>icons/32x32/menu_mindmap.png</file>
@@ -120,5 +129,7 @@
     <file>icons/32x32/menu_schedule.png</file>
     <file>icons/32x32/menu_schedule_on.png</file>
     <file>icons/32x32/menu_schedule_on2.png</file>
+    <file>icons/32x32/link_note_black.png</file>
+    <file>icons/32x32/link_note_black.svg</file>
 </qresource>
 </RCC>

@@ -6,6 +6,7 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QMenu>
+#include <QtSvg/QSvgRenderer>
 #include <QToolTip>
 
 
@@ -15,7 +16,7 @@ MindProgressNode::MindProgressNode(const QString& text, MindNode* parent)
 	, m_workinghours(0.0)
 	, m_tipItem(NULL)
 {
-	m_tipItem = new QGraphicsPixmapItem(this);
+	m_tipItem = new QGraphicsSvgItem(":/icons/checked.svg", this);
 }
 
 MindProgressNode::~MindProgressNode()
@@ -87,15 +88,6 @@ void MindProgressNode::initMenu()
 		getMenu()->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
 		getMenu()->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
 		getMenu()->addAction(QString(u8"清空进度"), this, SLOT(zeroSchedule()));
-	}
-}
-
-void MindProgressNode::resetDecoration()
-{
-	if (needShowDecoration())
-	{
-		static qreal dpi = MyStyle::dpiScaled(1);
-		setDecoration(2, dpi < 1.5 ? QIcon(":/icons/16x16/link_note_black.png") : QIcon(":/icons/link_note_black.png"));
 	}
 }
 
@@ -176,16 +168,17 @@ void MindProgressNode::updateTipIcon()
 {
 	if (m_tipItem)
 	{
+		static qreal dpi = MyStyle::dpiScaled(1);
 		if (m_workinghours == 0)
 		{
-			QIcon icon(":/icons/warning.png");
-			m_tipItem->setPixmap(icon.pixmap(16, 16));
+			m_tipItem->renderer()->load(QString(":/icons/warning.svg"));
+			m_tipItem->setScale(1./2 * dpi);
 			m_tipItem->show();
 		}
 		else if (m_progress == 1 && hasNoChildren())
 		{
-			QIcon icon(":/icons/checked.png");
-			m_tipItem->setPixmap(icon.pixmap(16, 16));
+			m_tipItem->renderer()->load(QString(":/icons/checked.svg"));
+			m_tipItem->setScale(1./2 * dpi);
 			m_tipItem->show();
 		}
 		else

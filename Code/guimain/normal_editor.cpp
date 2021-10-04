@@ -163,14 +163,17 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	vline2 = new SeperateVLine;
 	pLayout->addWidget(vline2);
 
-	attachment = new ToolButton;
-	pLayout->addWidget(attachment);
-
 	photo = new ToolButton;
 	photo->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
 	photo->setIcon(QIcon(":/icons/camera.png"));
 	photo->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	pLayout->addWidget(photo);
+
+    attachment = new ToolButton;
+    attachment->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
+    attachment->setIcon(QIcon(":/icons/16x16/attachment.png"));
+    attachment->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+    pLayout->addWidget(attachment);
 
 	QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	pLayout->addItem(horizontalSpacer);
