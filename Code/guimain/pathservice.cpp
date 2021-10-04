@@ -3,6 +3,7 @@
 #include <QStandardPaths>
 #include <QDebug>
 
+//#define ENABLE_APPDATA_LOCATION
 
 PathService& PathService::instance()
 {
@@ -17,11 +18,14 @@ PathService::PathService()
 
 void PathService::_ensurePath()
 {
-	QStringList locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
 	QString dataLocation;
+	QStringList locations;
 
+#ifdef ENABLE_APPDATA_LOCATION
+	locations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
 #ifdef Q_OS_WIN
 	locations = locations.filter("ProgramData");
+#endif
 #endif
 
 	if (locations.isEmpty())
