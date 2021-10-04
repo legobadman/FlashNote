@@ -43,16 +43,14 @@ void MindProgressNode::initUIColor()
 	QColor selectedBorder = QColor(23, 157, 235);
 	QColor mainThemeColor = QColor(0, 181, 72);
 	QColor backgroundColor;
-	QColor highlightBorder;
+	QColor highlightBorder = QColor(136, 203, 242);
 	if (hasNoChildren())
 	{
 		backgroundColor = QColor(255, 255, 255);
-		highlightBorder = QColor(23, 157, 235);
 	}
 	else
 	{
 		backgroundColor = QColor(242, 242, 242);
-		highlightBorder = QColor(136, 203, 242);
 	}
 	QColor borderFocusout = QColor(backgroundColor);
 	setColors(mainThemeColor, backgroundColor, selectedBorder, highlightBorder, borderFocusout);
