@@ -206,12 +206,16 @@ target_precompile_headers(guimain PRIVATE ./stdafx.h)
 # Add the Qt5 Widgets for linking
 if (WIN32)
 	target_link_libraries(guimain notecore Qt5::Widgets Qt5::Svg dbservice sqlite Ws2_32 notehook)
+    add_custom_command(TARGET guimain POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${BUILD_ROOT}/bin/translations/)
 	add_custom_command(TARGET guimain POST_BUILD
-		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ts/lrelease.exe ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${BUILD_ROOT}/bin/uimain.qm)
+		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/ts/lrelease.exe ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${BUILD_ROOT}/bin/translations/uimain.qm)
 else()
 	target_link_libraries(guimain notecore Qt5::Widgets Qt5::Svg Qt5::X11Extras dbservice sqlite Threads::Threads dl X11)
 	add_custom_command(TARGET guimain POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH="${QT_BASE_PATH}/lib" ${QT_BASE_PATH}/bin/lrelease ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${BUILD_ROOT}/bin/uimain.qm)
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${BUILD_ROOT}/bin/translations/)
+    add_custom_command(TARGET guimain POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH="${QT_BASE_PATH}/lib" ${QT_BASE_PATH}/bin/lrelease ${CMAKE_CURRENT_SOURCE_DIR}/ts/uimain.ts -qm ${BUILD_ROOT}/bin/translations/uimain.qm)
 endif(WIN32)
 
 set_target_properties(guimain PROPERTIES OUTPUT_NAME "flashnote")

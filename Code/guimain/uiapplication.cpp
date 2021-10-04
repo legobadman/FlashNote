@@ -24,7 +24,7 @@ UiApplication::UiApplication(int& argc, char** argv)
 	QApplication::setStyle(new MyStyle);
     static QTranslator mpQtTr;
 	const QString& appdatapath = this->applicationDirPath();
-    mpQtTr.load(appdatapath + "/" + "uimain");
+    mpQtTr.load(appdatapath + "/translations/" + "uimain");
     installTranslator(&mpQtTr);
 	initFont();
 	CreateApplication(&m_spApp);
