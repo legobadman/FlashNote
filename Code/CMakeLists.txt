@@ -16,10 +16,10 @@ if (WIN32)
 else()
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 		SET(QT_BASE_PATH "/home/luzh/Qt/install_shared")
-		SET(QT_SVG_PATH "/home/luzh/Qt/install_shared")	#待确认
+		SET(QT_SVG_PATH "/home/luzh/Qt/install_shared")
 	else()
 		SET(QT_BASE_PATH "/home/luzh/Qt/install_release_shared")
-		SET(QT_SVG_PATH "/home/luzh/Qt/install_release_shared") #待确认
+		SET(QT_SVG_PATH "/home/luzh/Qt/install_release_shared")
 	endif()
 	list(APPEND CMAKE_PREFIX_PATH "${QT_BASE_PATH}/lib/cmake")
 	list(APPEND CMAKE_PREFIX_PATH "${QT_SVG_PATH}/lib/cmake")

@@ -16,10 +16,10 @@ cd opt
 mkdir -p flashnote
 cd flashnote
 
-cp /home/luzh/FlashNote/Release/bin/* .
+cp -rf /home/luzh/FlashNote/Release/bin/* .
 #copy desktop icon
 cp /home/luzh/FlashNote/Code/guimain/res/icons/flash.png .
-cp -rf /home/luzh/FlashNote/Code/setup/startup .
+cp -rf /home/luzh/FlashNote/Code/setup/startup/* .
 
 linuxdeployqt flashnote -appimage
 
@@ -54,19 +54,12 @@ output=postinst
 echo "#!/bin/sh" | tee $output
 echo "chmod 777 /opt/flashnote/flashnote.desktop" | tee -a $output
 echo "cp /opt/flashnote/flashnote.desktop /usr/share/applications/" | tee -a $output
-echo "rm ~/.local/share/flashnote || true" | tee -a $output
-#need user privilege, otherwise need root privilege to write db
-echo "sudo -u $USER mkdir /p ~/.local/share/flashnote" | tee -a $output
-echo "sudo -u $USER cp -rf /opt/flashnote/startup/* ~/.local/share/flashnote" | tee -a $output
-#echo "cp /opt/flashnote/flashnote.desktop ~/桌面/" | tee -a $output
 chmod 0755 postinst
 
 output=postrm
 
 echo "#!/bin/sh" | tee $output
 echo "rm /usr/share/applications/flashnote.desktop || true" | tee -a $output
-#echo "rm -rf ~/.local/share/flashnote" | tee -a $output
-#echo "rm ~/桌面/flashnote.desktop || true" | tee -a $output
 chmod 0755 postrm
 
 #to source dir
