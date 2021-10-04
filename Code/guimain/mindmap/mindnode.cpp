@@ -797,7 +797,12 @@ bool MindNode::sceneEvent(QEvent* event)
 	case QEvent::GraphicsSceneHoverEnter:
 		{
 			QGraphicsSceneHoverEvent* e = static_cast<QGraphicsSceneHoverEvent*>(event);
-			if (contains(e->pos()))
+			QPointF pt = e->pos();
+			QRectF rcBoundRect = boundingRect();
+			qreal offset = MyStyle::dpiScaled(1.5);
+			//需要稍微扩大区域才能容纳部分稍微在外面一点的点。
+			rcBoundRect.adjust(-offset, -offset, offset, offset);
+			if (rcBoundRect.contains(pt))
 			{
 				m_bHovered = true;
 				if (m_pLCollaspBtn)
