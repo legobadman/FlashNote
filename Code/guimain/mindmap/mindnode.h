@@ -88,7 +88,7 @@ public:
 
 signals:
 	void textChange();
-	void dataChanged(bool bEditChanged);
+	void dataChanged();
 	void nodeLinkAdded();
 	void expandChanged();
 	void nodeCreated(MindNode* pNode);

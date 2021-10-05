@@ -143,7 +143,7 @@ void MindProgressNode::_setProgress(float progress)
 	updateNodeColor();
 	update();
 
-	emit dataChanged(false);
+	emit dataChanged();
 }
 
 void MindProgressNode::setPosition(QPointF pos)
@@ -213,7 +213,7 @@ void MindProgressNode::_setWorkhours(float hours)
 		_setProgress(0.0);
 	}
 	setWorkhours(hours);
-	emit dataChanged(false);
+	emit dataChanged();
 }
 
 void MindProgressNode::updateStatus()

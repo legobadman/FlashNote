@@ -137,7 +137,7 @@ void MindNode::initSignalSlots(MindMapScene* pScene)
 {
 	if (document())
 		connect(document(), SIGNAL(contentsChanged()), pScene, SLOT(onNodeContentsChanged()));
-	connect(this, SIGNAL(dataChanged(bool)), pScene, SIGNAL(onNodeContentsChanged(bool)));
+	connect(this, SIGNAL(dataChanged()), pScene, SLOT(onNodeStateChanged()));
 	connect(this, SIGNAL(nodeCreated(MindNode*)), pScene, SLOT(onNodeCreated(MindNode*)));
 	connect(this, SIGNAL(nodeDeleted(MindNode*)), pScene, SLOT(onNodeDeleted(MindNode*)));
 	connect(this, SIGNAL(expandChanged()), pScene, SLOT(onNodeStateChanged()));
