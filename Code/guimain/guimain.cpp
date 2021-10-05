@@ -8,6 +8,8 @@
 #include "guihelper.h"
 #include "uiapplication.h"
 #include <QScreen>
+#include <QtCore/QLockFile>
+#include <QtCore/QProcess>
 #include "globalsearcheditor.h"
 
 
@@ -41,6 +43,14 @@ int main(int argc, char *argv[])
 
 #else
 	UiApplication app(argc, argv);
+
+    QString appDir = QApplication::applicationDirPath();
+    QLockFile* lockFile = new QLockFile(appDir + "/" + "flashnote.app.lock");
+    if (!lockFile->tryLock(0))
+	{
+        return 0;
+    }
+
 	app.showWidget();
 	app.exec();
 	return 0;
