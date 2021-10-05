@@ -13,12 +13,12 @@ HANDLE hFileMapT = INVALID_HANDLE_VALUE;
 HANDLE hEvent = INVALID_HANDLE_VALUE;
 char* p = NULL;
 
-//#define ENABLE_KEYBOARD_HOOK
 #define ENABLE_MOUSE_HOOK
 
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
-#define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
+//#define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
+#define FLOAT_WIN_CLASS L"Qt5150QWindowIcon"
 #define FLOAT_WIN_NAME L"笔记"	//如果窗口标题改了就要同步这个
 
 DWORD buffSize = 1024;
@@ -58,6 +58,17 @@ INPUT* Generate_Ctrl_C()
     input[3].ki.wVk = VK_CONTROL;
     input[3].ki.dwFlags = KEYEVENTF_KEYUP;
 	return input;
+}
+
+char* GetModuleFileNameOnly()
+{
+    TCHAR szFileName[MAX_PATH];
+    GetModuleFileName(NULL, szFileName, MAX_PATH);
+    char* p = strrchr(szFileName, '\\');
+    if (p != 0)
+        return p + 1;
+    else
+        return 0;
 }
 
 HRESULT FindTextPatternElement(IUIAutomation* automation, _In_ IUIAutomationElement* element, _Outptr_result_maybenull_ IUIAutomationElement** textElement)

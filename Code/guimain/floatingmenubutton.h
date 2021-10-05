@@ -3,8 +3,6 @@
 
 #include "menubutton.h"
 
-//#define DEBUG_EXTRACT_TEXT
-
 class FloatingMenuButton : public QWidget
 {
 	Q_OBJECT
@@ -22,11 +20,7 @@ private slots:
 
 private:
 	QString m_text;
-#ifdef DEBUG_EXTRACT_TEXT
-	QPushButton* m_pushbutton;
-#else
 	ToolButton* m_menubutton;
-#endif
 };
 
 

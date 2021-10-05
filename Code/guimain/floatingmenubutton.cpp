@@ -3,6 +3,7 @@
 #include "MyStyle.h"
 #include "guihelper.h"
 #include "dbservice.h"
+#include "labelbutton.h"
 
 
 FloatingMenuButton::FloatingMenuButton(QWidget* parent)
@@ -10,35 +11,29 @@ FloatingMenuButton::FloatingMenuButton(QWidget* parent)
 {
 	setWindowTitle("floating_window");
 	setWindowFlags(Qt::SubWindow | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-#ifdef DEBUG_EXTRACT_TEXT
-	m_pushbutton = new QPushButton(this);
-	m_pushbutton->setText("init");
-	QHBoxLayout* pLayout = new QHBoxLayout;
-	pLayout->addWidget(m_pushbutton);
-	setLayout(pLayout);
-#else
-    m_menubutton = new ToolButton(this);
-    m_menubutton->setIcon(QIcon(":/icons/floatwin.png"));
-    m_menubutton->setIconSize(MyStyle::dpiScaledSize(QSize(32, 32)));
-    m_menubutton->setFixedSize(MyStyle::dpiScaledSize(QSize(32, 32)));
-    connect(m_menubutton, SIGNAL(clicked()), this, SLOT(onBtnClicked()));
-#endif
+	setAttribute(Qt::WA_TranslucentBackground, true);
+
+	QHBoxLayout* pMainLayout = new QHBoxLayout;
+
+	QIcon icon = QIcon(":/icons/flash.png");
+	NLabelButton* pLabel = new NLabelButton;
+	pLabel->setIcons(MyStyle::dpiScaledSize(QSize(32, 32)), icon, icon, icon);
+	connect(pLabel, SIGNAL(clicked()), this, SLOT(onBtnClicked()));
+
+	pMainLayout->addWidget(pLabel);
+	pMainLayout->setMargin(0);
+	pMainLayout->setContentsMargins(0, 0, 0, 0);
+
+	setLayout(pMainLayout);
 }
 
 FloatingMenuButton::~FloatingMenuButton()
 {
-
 }
 
 void FloatingMenuButton::SetExtractText(const QString& text)
 {
 	m_text = text;
-#ifdef DEBUG_EXTRACT_TEXT
-	m_pushbutton->setText(text);
-	update();
-#else
-	m_menubutton->setText(m_text);
-#endif
 }
 
 void FloatingMenuButton::onBtnClicked()
@@ -63,5 +58,4 @@ void FloatingMenuButton::enterEvent(QEvent* event)
 
 void FloatingMenuButton::leaveEvent(QEvent* event)
 {
-
 }
