@@ -15,7 +15,7 @@ FloatingMenuButton::FloatingMenuButton(QWidget* parent)
 
 	QHBoxLayout* pMainLayout = new QHBoxLayout;
 
-	QIcon icon = QIcon(":/icons/flash.png");
+	QIcon icon = QIcon(":/icons/flashnote.png");
 	NLabelButton* pLabel = new NLabelButton;
 	pLabel->setIcons(MyStyle::dpiScaledSize(QSize(32, 32)), icon, icon, icon);
 	connect(pLabel, SIGNAL(clicked()), this, SLOT(onBtnClicked()));

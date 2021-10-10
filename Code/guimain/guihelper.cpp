@@ -332,5 +332,6 @@ void AppHelper::openNoteInIsoWindow(const QString& noteid)
 
 QColor AppHelper::colorBlue()
 {
-	return QColor(21, 152, 255);
+	//return QColor(21, 152, 255);
+	return QColor(21, 111, 209);
 }

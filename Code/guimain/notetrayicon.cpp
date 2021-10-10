@@ -9,7 +9,7 @@ NoteTrayIcon::NoteTrayIcon(QObject* parent /* = nullptr */)
 	, m_pWin(NULL)
 	, m_pApp(NULL)
 {
-	setIcon(QIcon(":/icons/bluewhite.png"));
+	setIcon(QIcon(":/icons/flashnote.png"));
 	QMenu* pContext = new QMenu(NULL);
 
 	QAction* pOpenAction = pContext->addAction(u8"打开笔记");

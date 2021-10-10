@@ -131,5 +131,7 @@
     <file>icons/32x32/menu_schedule_on2.png</file>
     <file>icons/32x32/link_note_black.png</file>
     <file>icons/32x32/link_note_black.svg</file>
+    <file>icons/flashnote.svg</file>
+    <file>icons/flashnote.png</file>
 </qresource>
 </RCC>

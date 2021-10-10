@@ -38,7 +38,7 @@ void NoteMainWindow::init()
 	m_ui = new Ui::NoteMainWindow();
 	m_ui->setupUi(this);
 
-	setWindowIcon(QIcon(":/icons/bluewhite.png"));
+    setWindowIcon(QIcon(":/icons/flashnote.png"));
 
 	m_ui->splitter->setStretchFactor(1, 3);
 

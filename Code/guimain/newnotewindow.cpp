@@ -10,7 +10,7 @@ NewNoteWindow::NewNoteWindow(QWidget* parent, NOTE_TYPE type)
 {
 	m_ui = new Ui::NewNoteWindow();
 	m_ui->setupUi(this);
-	setWindowIcon(QIcon(":/icons/bluewhite.png"));
+	setWindowIcon(QIcon(":/icons/flashnote.png"));
 	connect(m_ui->editwindow, SIGNAL(noteCommited(const QString&)), this, SIGNAL(noteCommited(const QString&)));
 }
 
