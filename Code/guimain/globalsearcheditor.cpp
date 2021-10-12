@@ -23,12 +23,12 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 	pHLayout->setContentsMargins(10, 6, 10, 6);
 
 	QPalette palette;
-	palette.setColor(QPalette::Window, QColor(21, 152, 255));
+	palette.setColor(QPalette::Window, AppHelper::colorBlue());
 	setPalette(palette);
 
     ToolButton* onlyIcon = new ToolButton;
 	QLabel* labelIcon = new QLabel;
-	QIcon icon(":/icons/floatwin.png");
+	QIcon icon(":/icons/flashnote.png");
 	labelIcon->setPixmap(icon.pixmap(MyStyle::dpiScaledSize(QSize(32, 32))));
     pHLayout->addWidget(labelIcon);
 
@@ -43,11 +43,6 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 	QVBoxLayout* pVLayout = new QVBoxLayout;
 	NLabelButton* closeBtn = new NLabelButton;
 	closeBtn->setIcons(QSize(16, 16), QIcon(":/icons/white_close.png"), QIcon(":/icons/white_close.png"), QIcon(":/icons/white_close_hover.png"));
-
-	//closeBtn->setFixedSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-	//closeBtn->setIcon(QIcon(":/icons/white_close.png"));
-	//closeBtn->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-	//closeBtn->setButtonStyle(ToolButton::ButtonIcon);
 	pVLayout->addWidget(closeBtn);
 
 	pHLayout->addLayout(pVLayout);
@@ -61,7 +56,7 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 	m_completer->setFilterMode(Qt::MatchContains);
 	m_completer->setCompletionRole(ItemNoteAllContent);
 	m_completer->setCompletionMode(QCompleter::PopupCompletion);
-	//m_completer->setPopupPosPolicy(true);
+	m_completer->setPopupPosPolicy(true);
 
 	QAbstractItemView* pPopup = m_completer->popup();
     disconnect(pPopup, SIGNAL(clicked(QModelIndex)), m_completer, SLOT(_q_complete(QModelIndex)));

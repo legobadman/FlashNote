@@ -158,19 +158,23 @@ void MindNode::initUIColor()
 		m_selectedBorder = QColor(23, 157, 235);
 		m_borderFocusout = QColor(m_backgroudColor);
 	}
-	else if (m_level == 1) {
-		m_textColor = QColor(0, 0, 0);
-		m_highlightedBorder = QColor(136, 203, 242);
-		m_selectedBorder = QColor(23, 157, 235);
-		m_backgroudColor = QColor(242, 242, 242);
-		m_borderFocusout = QColor(m_backgroudColor);
-	}
-	else if (m_level >= 2) {
-		m_textColor = QColor(0, 0, 0);
-		m_highlightedBorder = QColor(136, 203, 242);
-		m_selectedBorder = QColor(23, 157, 235);
-		m_backgroudColor = QColor(255, 255, 255);
-		m_borderFocusout = QColor(m_backgroudColor);
+	else
+	{
+		if (hasNoChildren()) {
+            m_textColor = QColor(0, 0, 0);
+            m_highlightedBorder = QColor(136, 203, 242);
+            m_selectedBorder = QColor(23, 157, 235);
+            m_backgroudColor = QColor(255, 255, 255);
+            m_borderFocusout = QColor(m_backgroudColor);
+		}
+		else
+		{
+            m_textColor = QColor(0, 0, 0);
+            m_highlightedBorder = QColor(136, 203, 242);
+            m_selectedBorder = QColor(23, 157, 235);
+            m_backgroudColor = QColor(242, 242, 242);
+            m_borderFocusout = QColor(m_backgroudColor);
+		}
 	}
 
 	QPalette pal = palette();

@@ -83,7 +83,7 @@ void MindProgressNode::initMenu()
 	MindNode::initMenu();
 	if (hasNoChildren())
 	{
-		getMenu()->addAction(QString(u8"设置工作时间"), this, SLOT(setWorkingHourDlg()));
+		getMenu()->addAction(QString(u8"设置进度"), this, SLOT(setWorkingHourDlg()));
 		getMenu()->addAction(QString(u8"标记完成"), this, SLOT(markFinish()));
 		getMenu()->addAction(QString(u8"清空进度"), this, SLOT(zeroSchedule()));
 	}
@@ -110,11 +110,11 @@ void MindProgressNode::updateToolTip()
 	QString toolTipText;
 	if (m_workinghours <= 0)
 	{
-		toolTipText = QString(u8"当前进度或者子进度还没设置工时。");
+		toolTipText = QString(u8"当前进度或者子进度还没设置进度（小时）。");
 	}
 	else
 	{
-		toolTipText = QString(u8"总工时为%1个小时，当前进度为%2%。").arg(QString::number(m_workinghours)).arg(QString::number(m_progress * 100));
+		toolTipText = QString(u8"总进度为%1个小时，当前进度为%2%。").arg(QString::number(m_workinghours)).arg(QString::number(m_progress * 100));
 	}
 	setToolTip(toolTipText);
 }
@@ -259,14 +259,26 @@ void MindProgressNode::updateToParent()
 void MindProgressNode::setWorkingHourDlg()
 {
 	QGraphicsView* pView = scene()->views()[0];
-	QString text = QInputDialog::getText(pView,
-		u8"输入该进度的工作时间", u8"设置工作时间（单位：小时）",
-		QLineEdit::Normal, QString::number(m_workinghours));
-	if (!text.isEmpty())
+	QInputDialog dlg(pView);
+	dlg.setWindowTitle(u8"输入进度");
+	dlg.setLabelText(u8"设置进度（单位：小时）");
+	dlg.setTextValue(QString::number(m_workinghours));
+	dlg.setOkButtonText(u8"确认");
+	dlg.setCancelButtonText(u8"取消");
+	dlg.setTextEchoMode(QLineEdit::Normal);
+	dlg.setInputMethodHints(Qt::ImhNone);
+
+	if (dlg.exec() == QDialog::Accepted)
 	{
-		RAIITransBatch batch(_scene());
-		_setWorkhours(text.toFloat());
-		updateToParent();
+        RAIITransBatch batch(_scene());
+		QString text = dlg.textValue();
+		bool toFloat = false;
+		float hours = text.toFloat(&toFloat);
+		if (toFloat)
+		{
+            _setWorkhours(hours);
+            updateToParent();
+		}
 	}
 }
 

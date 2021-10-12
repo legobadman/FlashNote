@@ -387,8 +387,8 @@ void NavigationPanel::initModel()
 
 	m_model->appendRow(pAllNotesItem);
 	initNotebookItem();
-	m_model->appendRow(pMaterialItem);
 	/*
+	m_model->appendRow(pMaterialItem);
 	m_model->appendRow(pFragmentItem);
 	m_model->appendRow(pDiaryItem);
 	m_model->appendRow(pDraftItem);

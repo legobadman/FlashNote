@@ -129,6 +129,8 @@ void NoteEditWindow::updateBookMenu(INotebook* pNotebook)
 		connect(panel, SIGNAL(notebookMoved(INotebook*)), this, SLOT(onNotebookMoved(INotebook*)));
 		return panel;
 	});
+
+	m_ui->bookmenu->setEnabled(m_type != SCHEDULE);
 }
 
 HRESULT NoteEditWindow::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
