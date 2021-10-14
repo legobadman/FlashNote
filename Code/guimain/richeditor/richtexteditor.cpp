@@ -26,6 +26,8 @@ RichTextEditor::RichTextEditor(QWidget* parent)
 	QTextOption opt = document()->defaultTextOption();
 	opt.setTabStopDistance(mtabStopDist);
 	document()->setDefaultTextOption(opt);
+	QUrl baseUrl = QUrl::fromLocalFile(QCoreApplication::applicationDirPath() + "/");
+	document()->setBaseUrl(baseUrl);
 
 	highlighter = new CppSyntaxHighlighter(document());
 }
@@ -122,22 +124,26 @@ void RichTextEditor::dropImage(const QUrl& url, const QImage& image)
 			suffix = "jpg";
 		}
 
-		QString assertPath = PathService::instance().GetAssetsPath();
-		QDir dir(assertPath);
+		QDir root(QCoreApplication::applicationDirPath());
+		QString absDir = PathService::instance().GetAssetsPath();
+		QString relativeDir = root.relativeFilePath(absDir);
+		QDir dir(absDir);
 		//TODO: 暂不检测重复图片。
-		QString fullpath = QString("%1/%2.%3").arg(assertPath).arg(prefix).arg(suffix);
+		QString fullpath = QString("%1/%2.%3").arg(absDir).arg(prefix).arg(suffix);
+		QString relpath = QString("%1/%2.%3").arg(relativeDir).arg(prefix).arg(suffix);
 		int i = 1;
 		while (QFileInfo(fullpath).exists())
 		{
 			prefix += "_" + QString::number(i);
-			fullpath = QString("%1/%2.%3").arg(assertPath).arg(prefix).arg(suffix);
+			fullpath = QString("%1/%2.%3").arg(absDir).arg(prefix).arg(suffix);
+			relpath = QString("%1/%2.%3").arg(relativeDir).arg(prefix).arg(suffix);
 		}
 
 		bool bRet = image.save(fullpath, suffix.toUtf8(), 100);
-		QUrl url_(fullpath);
-		document()->addResource(QTextDocument::ImageResource, url_, image);
+		QUrl url(relpath);
+		document()->addResource(QTextDocument::ImageResource, url, image);
 		QTextImageFormat imageFormat;
-		imageFormat.setName(url_.toString());
+		imageFormat.setName(url.toString());
 		float W = viewport()->width() - 45 * 2;	//算上margin。
 		float ratio = (float)image.width() / image.height();
 		if (image.width() > W)

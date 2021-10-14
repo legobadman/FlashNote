@@ -271,6 +271,8 @@ QString AppHelper::GenerateRandomString()
     const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
     const int randomStringLength = 12; // assuming you want random strings of 12 characters
 
+	qsrand(QDateTime::currentMSecsSinceEpoch() % UINT_MAX);
+
     QString randomString;
     for (int i = 0; i < randomStringLength; ++i)
     {
