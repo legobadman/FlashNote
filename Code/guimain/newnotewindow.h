@@ -13,7 +13,7 @@ public:
 	NewNoteWindow(QWidget* parent, NOTE_TYPE type);
 	~NewNoteWindow();
 	void init(QString bookid);
-	void initSchedule();
+	INote* initSchedule();
 	void open(INotebook* pNotebook, INote* pNote);
 	void getNote(INote** ppNote);
 

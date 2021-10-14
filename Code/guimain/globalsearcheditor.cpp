@@ -26,7 +26,6 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 	palette.setColor(QPalette::Window, AppHelper::colorBlue());
 	setPalette(palette);
 
-    ToolButton* onlyIcon = new ToolButton;
 	QLabel* labelIcon = new QLabel;
 	QIcon icon(":/icons/flashnote.png");
 	labelIcon->setPixmap(icon.pixmap(MyStyle::dpiScaledSize(QSize(32, 32))));

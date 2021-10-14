@@ -304,6 +304,12 @@ QSize NavigationPanel::sizeHint() const
 	return MyStyle::dpiScaledSize(QSize(256, sz.height()));
 }
 
+void NavigationPanel::registerToNote(INote* pNote)
+{
+	if (pNote)
+		pNote->addWatcher(m_spNotifier);
+}
+
 void NavigationPanel::paintEvent(QPaintEvent* event)
 {
 	QPainter painter(this);
@@ -572,6 +578,33 @@ HRESULT NavigationPanel::onCoreNotify(INoteCoreObj* pCoreObj, NotifyArg arg)
 			}
 		}
 	}
+	else if (com_sptr<INote>(pCoreObj))
+	{
+		com_sptr<INote> spNote = pCoreObj;
+		NOTE_TYPE type = NORMAL_NOTE;
+		spNote->GetType(&type);
+		if (type == SCHEDULE)
+		{
+            QString noteid = AppHelper::GetNoteId(spNote);
+            QModelIndexList indexs = m_model->match(
+                m_model->index(0, 0),
+                ItemCoreObjIdRole,
+                QVariant(noteid),
+                1,		//hits
+                Qt::MatchRecursive);
+			
+			if (!indexs.isEmpty())
+			{
+				QModelIndex index = indexs.at(0);
+				QStandardItem* pItem = m_model->itemFromIndex(index);
+				if (pItem)
+				{
+                    QString text = pItem->text();
+                    pItem->setText(AppHelper::GetNoteTitle(spNote));
+				}
+			}
+		}
+	}
 	return E_NOTIMPL;
 }
 
@@ -662,6 +695,8 @@ void NavigationPanel::initSchedule()
 	{
 		com_sptr<INote> spNote;
 		spSchedules->Item(i, &spNote);
+
+		spNote->addWatcher(m_spNotifier);
 
 		QString title = AppHelper::GetNoteTitle(spNote);
 		QString id = AppHelper::GetNoteId(spNote);

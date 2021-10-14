@@ -129,7 +129,8 @@ void NoteMainWindow::onNewNote(NOTE_TYPE noteType)
 	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, noteType);
 	if (noteType == SCHEDULE)
 	{
-		pNewNoteWindow->initSchedule();
+		com_sptr<INote> spNote = pNewNoteWindow->initSchedule();
+		m_ui->listpane->registerToNote(spNote);
 	}
 	else
 	{

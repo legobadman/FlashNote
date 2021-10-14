@@ -109,6 +109,8 @@ public:
 	long AddRef(void) { return 1; }
 	long Release(void) { return 1; }
 
+	void registerToNote(INote* pNote);
+
 	QSize sizeHint() const override;
 
 protected:

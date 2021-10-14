@@ -92,17 +92,19 @@ void MyStyle::drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPaint
 	{
 		if (const QStyleOptionButton* btn = qstyleoption_cast<const QStyleOptionButton*>(opt)) {
 			State flags = opt->state;
+			static const qreal margin_offset = dpiScaled(1.0);
 			if (flags & (State_Sunken | State_On))
 			{
 				p->setPen(QPen(QColor(26, 112, 185), 1));
 				p->setBrush(QColor(202, 224, 243));
-				p->drawRect(opt->rect.adjusted(0, 0, -1, -1));
+				//可能要dpiScaled
+				p->drawRect(opt->rect.adjusted(0, 0, -margin_offset, -margin_offset));
 			}
 			else if (flags & State_MouseOver)
 			{
 				p->setPen(QPen(QColor(26, 112, 185), 1));
 				p->setBrush(QColor(228, 239, 249));
-				p->drawRect(opt->rect.adjusted(0, 0, -1, -1));
+				p->drawRect(opt->rect.adjusted(0, 0, -margin_offset, -margin_offset));
 			}
 		}
 		return;
@@ -252,14 +254,6 @@ int MyStyle::styleHint(StyleHint sh, const QStyleOption* opt, const QWidget* w, 
 
 int MyStyle::pixelMetric(PixelMetric m, const QStyleOption* opt, const QWidget* widget) const
 {
-	if (widget && widget->objectName() == "newnotemenu")
-	{
-		switch (m)
-		{
-		case PM_MenuPanelWidth: return 0;
-		case PM_SmallIconSize: return MyStyle::dpiScaled(32);
-		}
-	}
 	return base::pixelMetric(m, opt, widget);
 }
 
