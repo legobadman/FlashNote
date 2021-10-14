@@ -30,6 +30,22 @@
 
 NormalEditor::NormalEditor(QWidget* parent)
 	: QWidget(parent)
+	, bold(NULL)
+	, italic(NULL)
+    , underline(NULL)
+	, strikeout(NULL)
+	, highlight(NULL)
+	, codeblock(NULL)
+	, vline(NULL)
+	, item_symbol(NULL)
+	, item_id(NULL)
+	, alignment2(NULL)
+	, vline2(NULL)
+	, attachment(NULL)
+	, photo(NULL)
+	, font_comboBox(NULL)
+	, fontsize_comboBox(NULL)
+	, fontcolor(NULL)
 	, textEdit(NULL)
 {
 	init();
@@ -169,11 +185,11 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	photo->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	pLayout->addWidget(photo);
 
-    attachment = new ToolButton;
-    attachment->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-    attachment->setIcon(QIcon(":/icons/16x16/attachment.png"));
-    attachment->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-    pLayout->addWidget(attachment);
+    //attachment = new ToolButton;
+    //attachment->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
+    //attachment->setIcon(QIcon(":/icons/16x16/attachment.png"));
+    //attachment->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+    //pLayout->addWidget(attachment);
 
 	QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	pLayout->addItem(horizontalSpacer);
@@ -207,7 +223,8 @@ void NormalEditor::initSlots()
 	connect(item_symbol, SIGNAL(clicked()), this, SLOT(listBullet()));
 	connect(item_id, SIGNAL(clicked()), this, SLOT(listOrdered()));
 	connect(photo, SIGNAL(clicked()), this, SLOT(screenShot()));
-	connect(attachment, SIGNAL(clicked()), this, SLOT(checkDocument()));
+	if (attachment)
+		connect(attachment, SIGNAL(clicked()), this, SLOT(checkDocument()));
 }
 
 void NormalEditor::slotCurrentCharFormatChanged(const QTextCharFormat& format)
@@ -218,7 +235,8 @@ void NormalEditor::slotCurrentCharFormatChanged(const QTextCharFormat& format)
 	bool bHighlighted = format.background().isOpaque();
 	fontcolor->updateColor(color);
 	highlight->setChecked(bHighlighted);
-	attachment->setChecked(format.isAnchor());
+	if (attachment)
+		attachment->setChecked(format.isAnchor());
 }
 
 void NormalEditor::fontChanged(const QFont& f)
