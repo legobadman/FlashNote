@@ -185,11 +185,11 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	photo->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	pLayout->addWidget(photo);
 
-    //attachment = new ToolButton;
-    //attachment->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
-    //attachment->setIcon(QIcon(":/icons/16x16/attachment.png"));
-    //attachment->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
-    //pLayout->addWidget(attachment);
+    attachment = new ToolButton;
+    attachment->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
+    attachment->setIcon(QIcon(":/icons/16x16/attachment.png"));
+    attachment->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+    pLayout->addWidget(attachment);
 
 	QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 	pLayout->addItem(horizontalSpacer);
