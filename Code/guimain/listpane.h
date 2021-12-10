@@ -85,6 +85,8 @@ class NavigationPanel : public QWidget
 	{
 		DELETE_NOTEBOOK = 0,
 		DELETE_SCHEDULE,
+
+		NEW_NORMALNOTE,
 	};
 
 	struct NavigationPanelNotifier : public ICoreNotify

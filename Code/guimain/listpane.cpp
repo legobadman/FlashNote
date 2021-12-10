@@ -10,6 +10,7 @@
 #include "popupwidget.h"
 #include <QMenu>
 #include "moc_listpane.cpp"
+#include "newnotewindow.h"
 #include "labelbutton.h"
 
 
@@ -427,6 +428,11 @@ void NavigationPanel::onCustomContextMenu(const QPoint& point)
 		QAction* pDelete = new QAction(u8"删除笔记本", m_pCustomMenu);
 		pDelete->setData((int)NavigationPanel::DELETE_NOTEBOOK);
 		m_pCustomMenu->addAction(pDelete);
+	
+		QAction* pNewNote = new QAction(u8"新建笔记", m_pCustomMenu);
+		pNewNote->setData((int)NavigationPanel::NEW_NORMALNOTE);
+		m_pCustomMenu->addAction(pNewNote);
+
 		m_pCustomMenu->popup(QCursor::pos());
 	}
 	else if (type == ITEM_CONTENT_TYPE::ITEM_SCHEDULEITEM)
@@ -446,7 +452,7 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 		return;
 
 	MENU_ITEM nIndex = (MENU_ITEM)action->data().toInt();
-	if (nIndex == DELETE_NOTEBOOK)
+	if (nIndex == DELETE_NOTEBOOK || nIndex == NEW_NORMALNOTE)
 	{
 		QModelIndex index = m_treeview->currentIndex();
 		QString bookid = index.data(ItemCoreObjIdRole).toString();
@@ -454,11 +460,21 @@ void NavigationPanel::MenuActionSlot(QAction* action)
 		com_sptr<INotebook> spNotebook;
 		AppHelper::GetNotebookById(bookid, &spNotebook);
 
+		if(nIndex == DELETE_NOTEBOOK)
+		{
 #ifdef USE_RPC
 		bool bRet = RPCService::GetInstance().RemoveNotebook(AppHelper::coreApp(), spNotebook);
 #else
 		bool bRet = DbService::GetInstance().RemoveNotebook(AppHelper::coreApp(), spNotebook);
-#endif
+#endif	
+		}
+		else
+		{
+			NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, NORMAL_NOTE);
+			if (pNewNoteWindow)
+				pNewNoteWindow->init(bookid);
+			pNewNoteWindow->show();
+		}
 	}
 	else if (nIndex == DELETE_SCHEDULE)
 	{
