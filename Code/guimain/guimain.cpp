@@ -11,6 +11,7 @@
 #include <QtCore/QLockFile>
 #include <QtCore/QProcess>
 #include "globalsearcheditor.h"
+#include "wke.h"
 
 
 //#define TEST_SEARCHER
@@ -40,19 +41,21 @@ int main(int argc, char *argv[])
 
 	DbService& db = DbService::GetInstance();
 	db.reconstruct();
-
 #else
-	UiApplication app(argc, argv);
 
-    QString appDir = QApplication::applicationDirPath();
+	wkeSetWkeDllPath(L"E:\\FlashNote\\Debug\\bin\\node.dll");
+	wkeInitialize();
+
+	UiApplication app(argc, argv);
+	QString appDir = QApplication::applicationDirPath();
     QLockFile* lockFile = new QLockFile(appDir + "/" + "flashnote.app.lock");
     if (!lockFile->tryLock(0))
 	{
         return 0;
     }
-
 	app.showWidget();
 	app.exec();
+	wkeFinalize();
 	return 0;
 #endif
 }

@@ -173,10 +173,10 @@ void DbService::CreateNoteByNOTE(NOTE note, INote** ppNote)
 	spNote->SetTitle(title);
 
 	std::wstring content = note.content.toStdWString();
-	spNote->SetContent(content);
 	spNote->SetCreateTime(note.create_time.toMSecsSinceEpoch());
 	spNote->SetModifyTime(note.modify_time.toMSecsSinceEpoch());
 	spNote->SetId(note.id.toStdWString());
+	spNote->SetContent(content);
 
 	*ppNote = spNote;
 	(*ppNote)->AddRef();

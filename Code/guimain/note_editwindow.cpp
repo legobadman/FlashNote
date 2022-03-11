@@ -86,8 +86,9 @@ void NoteEditWindow::updateEditContent()
 
     if (m_type == NORMAL_NOTE)
     {
+		QString url = AppHelper::GetNoteUrl(m_pNote);
 		m_ui->noramlEditor->setEnabled(true);
-        m_ui->noramlEditor->initContent(content, !edittable);
+        m_ui->noramlEditor->initContent(url, !edittable);
         m_ui->stackedWidget->setCurrentIndex(0);
     }
     else if (m_type == MINDMAP)
@@ -252,10 +253,15 @@ void NoteEditWindow::saveNote()
 {
 	RAII_CheckEditting batch(&m_bEditting);
 	Q_ASSERT(m_pNote);
-	QTextDocument* p = m_ui->noramlEditor->document();
+	
 	QString title = m_ui->editTitle->text();
-	QString html = p->toHtml();
-	QString plainText = p->toPlainText();
+	QTextDocument* p = nullptr;//m_ui->noramlEditor->document();
+	QString html, plainText;
+	if (p)
+	{
+		html = p->toHtml();
+		plainText = p->toPlainText();
+	}
 
 	m_pNote->SetTitle(title.toStdWString());
 	m_pNote->SetContent(html.toStdWString());

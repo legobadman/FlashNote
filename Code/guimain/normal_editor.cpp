@@ -52,12 +52,12 @@ NormalEditor::NormalEditor(QWidget* parent)
 	initSlots();
 }
 
-void NormalEditor::initContent(QString content, bool readOnly)
+void NormalEditor::initContent(QString contentUrl, bool readOnly)
 {
 	textEdit->blockSignals(true);
-	textEdit->setText(content);
-	textEdit->setReadOnly(readOnly);
-	textEdit->updateFrameFormat();
+	textEdit->loadUrl(contentUrl);
+	//textEdit->setReadOnly(readOnly);//donglm_temp_code
+	//textEdit->updateFrameFormat();
 	textEdit->blockSignals(false);
 }
 
@@ -82,7 +82,10 @@ void NormalEditor::init()
 	frame2->setLineWidth(1);
 	pMainLayout->addWidget(frame2);
 
-	textEdit = new RichTextEditor;
+	QSize toolSz = pToolLayout->sizeHint();
+	QSize fram2Sz = frame2->sizeHint();
+	QRectF frameRc = frame2->frameRect();
+	textEdit = new webWidget("https://www.baidu.com", this, QRectF(0, toolSz.height() + fram2Sz.height() +10, frameRc.width(), frameRc.height()));
 	pMainLayout->addWidget(textEdit);
 
 	setLayout(pMainLayout);
@@ -247,7 +250,7 @@ void NormalEditor::fontChanged(const QFont& f)
 	italic->setChecked(f.italic());
 	underline->setChecked(f.underline());
 	strikeout->setChecked(f.strikeOut());
-	if (textEdit->textCursor().currentList()) {
+	/*if (textEdit->textCursor().currentList()) {//donglm_temp_code
 		QTextListFormat lfmt = textEdit->textCursor().currentList()->format();
 		if (lfmt.style() == QTextListFormat::ListDisc) {
 			item_symbol->setChecked(true);
@@ -265,7 +268,7 @@ void NormalEditor::fontChanged(const QFont& f)
 	else {
 		item_symbol->setChecked(false);
 		item_id->setChecked(false);
-	}
+	}*/
 }
 
 void NormalEditor::textBold()
@@ -277,39 +280,46 @@ void NormalEditor::textBold()
 
 void NormalEditor::slotCursorPositionChanged()
 {
-	QTextCursor cursor = textEdit->textCursor();
-	QTextFrame* pFrame = cursor.currentFrame();
+	////QTextCursor cursor = textEdit->textCursor();//donglm_temp_code
+	//QTextFrame* pFrame = cursor.currentFrame();
 
-	QTextList* l = cursor.currentList();
-	if (l)
-	{
-		QTextListFormat lfmt = l->format();
-		if (lfmt.style() == QTextListFormat::ListDisc)
-		{
-			item_symbol->setChecked(true);
-			item_id->setChecked(false);
-		}
-		else if (lfmt.style() == QTextListFormat::ListDecimal)
-		{
-			item_symbol->setChecked(false);
-			item_id->setChecked(true);
-		}
-		else
-		{
-			item_symbol->setChecked(false);
-			item_id->setChecked(false);
-		}
-	}
-	else
-	{
-		item_symbol->setChecked(false);
-		item_id->setChecked(false);
-	}
+	//QTextList* l = cursor.currentList();
+	//if (l)
+	//{
+	//	QTextListFormat lfmt = l->format();
+	//	if (lfmt.style() == QTextListFormat::ListDisc)
+	//	{
+	//		item_symbol->setChecked(true);
+	//		item_id->setChecked(false);
+	//	}
+	//	else if (lfmt.style() == QTextListFormat::ListDecimal)
+	//	{
+	//		item_symbol->setChecked(false);
+	//		item_id->setChecked(true);
+	//	}
+	//	else
+	//	{
+	//		item_symbol->setChecked(false);
+	//		item_id->setChecked(false);
+	//	}
+	//}
+	//else
+	//{
+	//	item_symbol->setChecked(false);
+	//	item_id->setChecked(false);
+	//}*/
 }
 
 void NormalEditor::focusInEvent(QFocusEvent*)
 {
 	textEdit->setFocus(Qt::TabFocusReason);
+}
+
+void NormalEditor::resizeEvent(QResizeEvent* event)
+{
+	QSize sz = event->size();
+	QSize oldSz = event->oldSize();
+	QWidget::resizeEvent(event);
 }
 
 void NormalEditor::textUnderline()
@@ -335,7 +345,7 @@ void NormalEditor::textStrikeout()
 
 void NormalEditor::addCodeBlock()
 {
-	QTextFrameFormat frameFormat;
+	/*QTextFrameFormat frameFormat;//donglm_temp_code
 
 	frameFormat.setBackground(QColor(30, 30, 30));
 	frameFormat.setTopMargin(5);
@@ -354,64 +364,64 @@ void NormalEditor::addCodeBlock()
 	charFormat.setForeground(QColor(213, 221, 227));
 	QFont fontClr("Consolas", 12);
 	charFormat.setFont(fontClr);
-	cursor.setBlockCharFormat(charFormat);
+	cursor.setBlockCharFormat(charFormat);*/
 }
 
 void NormalEditor::checkDocument()
 {
-	QTextDocument* p = textEdit->document();
+	//QTextDocument* p = textEdit->document();//donglm_temp_code
 
-	QTextCursor cursor = textEdit->textCursor();
+	//QTextCursor cursor = textEdit->textCursor();
 
-	QTextFrame::iterator it;
-	QTextFrame* rootFrame = p->rootFrame();
-	for (it = rootFrame->begin(); !(it.atEnd()); ++it)
-	{
-		QTextFrame* childFrame = it.currentFrame();
-		QTextBlock childBlock = it.currentBlock();
-		if (childFrame)
-		{
-			QTextFrame::iterator it2;
-			for (it2 = childFrame->begin(); !(it2.atEnd()); ++it2)
-			{
-				QTextFrame* childFrame2 = it2.currentFrame();
-				QTextBlock block2 = it2.currentBlock();
-				if (childFrame2)
-				{
+	//QTextFrame::iterator it;
+	//QTextFrame* rootFrame = p->rootFrame();
+	//for (it = rootFrame->begin(); !(it.atEnd()); ++it)
+	//{
+	//	QTextFrame* childFrame = it.currentFrame();
+	//	QTextBlock childBlock = it.currentBlock();
+	//	if (childFrame)
+	//	{
+	//		QTextFrame::iterator it2;
+	//		for (it2 = childFrame->begin(); !(it2.atEnd()); ++it2)
+	//		{
+	//			QTextFrame* childFrame2 = it2.currentFrame();
+	//			QTextBlock block2 = it2.currentBlock();
+	//			if (childFrame2)
+	//			{
 
-				}
-				else if (block2.isValid())
-				{
-					QTextBlockFormat format = block2.blockFormat();
-					//format.setLeftMargin(10);
-					//format.setRightMargin(10);
-					//format.setTopMargin(10);
-					//format.setBottomMargin(10);
-					//cursor.setBlockFormat(format);
-				}
-			}
+	//			}
+	//			else if (block2.isValid())
+	//			{
+	//				QTextBlockFormat format = block2.blockFormat();
+	//				//format.setLeftMargin(10);
+	//				//format.setRightMargin(10);
+	//				//format.setTopMargin(10);
+	//				//format.setBottomMargin(10);
+	//				//cursor.setBlockFormat(format);
+	//			}
+	//		}
 
-			//reset
-			if (false)
-			{
-				QTextFrameFormat frameFormat = childFrame->frameFormat();
-				int wtf = frameFormat.padding();
-				frameFormat.setPadding(10);
-				//frameFormat.setMargin(10);
-				childFrame->setFrameFormat(frameFormat);
-			}
-		}
-		else if (childBlock.isValid())
-		{
+	//		//reset
+	//		if (false)
+	//		{
+	//			QTextFrameFormat frameFormat = childFrame->frameFormat();
+	//			int wtf = frameFormat.padding();
+	//			frameFormat.setPadding(10);
+	//			//frameFormat.setMargin(10);
+	//			childFrame->setFrameFormat(frameFormat);
+	//		}
+	//	}
+	//	else if (childBlock.isValid())
+	//	{
 
-		}
-	}
+	//	}
+	//}
 
-	QString html = p->toHtml();
-	QFile f("wtf.html");
-	f.open(QIODevice::WriteOnly);
-	f.write(html.toUtf8());
-	f.close();
+	//QString html = p->toHtml();
+	//QFile f("wtf.html");
+	//f.open(QIODevice::WriteOnly);
+	//f.write(html.toUtf8());
+	//f.close();
 }
 
 void NormalEditor::textSize(const QString& p)
@@ -433,7 +443,7 @@ void NormalEditor::onFontChanged(const QString& font)
 
 void NormalEditor::textFgColor(const QColor& color)
 {
-	QTextCursor cursor = textEdit->textCursor();
+	/*QTextCursor cursor = textEdit->textCursor();//donglm_temp_code
 	QTextCharFormat fmt = cursor.charFormat();
 	if (color.isValid()) {
 		fmt.setForeground(color);
@@ -442,12 +452,12 @@ void NormalEditor::textFgColor(const QColor& color)
 		fmt.clearForeground();
 	}
 	cursor.setCharFormat(fmt);
-	textEdit->setCurrentCharFormat(fmt);
+	textEdit->setCurrentCharFormat(fmt);*/
 }
 
 void NormalEditor::textBgColor()
 {
-	QColor col = highlight->isChecked() ? QColor("#FFFAA5") : QColor("#FFFFFF");
+	/*QColor col = highlight->isChecked() ? QColor("#FFFAA5") : QColor("#FFFFFF");//donglm_temp_code
 	QTextCursor cursor = textEdit->textCursor();
 	QTextCharFormat fmt = cursor.charFormat();
 	if (col.isValid()) {
@@ -457,7 +467,7 @@ void NormalEditor::textBgColor()
 		fmt.clearBackground();
 	}
 	cursor.setCharFormat(fmt);
-	textEdit->setCurrentCharFormat(fmt);
+	textEdit->setCurrentCharFormat(fmt);*/
 }
 
 void NormalEditor::listBullet()
@@ -478,7 +488,7 @@ void NormalEditor::listOrdered()
 
 void NormalEditor::list(bool checked, QTextListFormat::Style style)
 {
-	QTextCursor cursor = textEdit->textCursor();
+	/*QTextCursor cursor = textEdit->textCursor();//donglm_temp_code
 	cursor.beginEditBlock();
 	if (!checked) {
 		QTextBlockFormat obfmt = cursor.blockFormat();
@@ -494,15 +504,15 @@ void NormalEditor::list(bool checked, QTextListFormat::Style style)
 		listFmt.setStyle(style);
 		cursor.createList(listFmt);
 	}
-	cursor.endEditBlock();
+	cursor.endEditBlock();*/
 }
 
 void NormalEditor::mergeFormatOnWordOrSelection(const QTextCharFormat& format)
 {
-	QTextCursor cursor = textEdit->textCursor();
+	/*QTextCursor cursor = textEdit->textCursor();//donglm_temp_code
 	cursor.mergeCharFormat(format);
 	textEdit->mergeCurrentCharFormat(format);
-	textEdit->setFocus(Qt::TabFocusReason);
+	textEdit->setFocus(Qt::TabFocusReason);*/
 }
 
 void NormalEditor::screenShot()
@@ -512,12 +522,13 @@ void NormalEditor::screenShot()
 
 QTextDocument* NormalEditor::document()
 {
-	return textEdit->document();
+	/*return textEdit->document();*///donglm_temp_code
+	return nullptr;
 }
 
 void NormalEditor::insertImage()
 {
-	QString original = QFileDialog::getOpenFileName(this, tr("Select an image"),
+	/*QString original = QFileDialog::getOpenFileName(this, tr("Select an image"),//donglm_temp_code
 		".", "JPEG (*.jpg *jpeg)\n"
 			"GIF (*.gif)\n"
 			"PNG (*.png)\n"
@@ -527,7 +538,7 @@ void NormalEditor::insertImage()
 		return;
 
 	QImage image = QImageReader(original).read();
-	textEdit->dropImage(QUrl(original), image);
+	textEdit->dropImage(QUrl(original), image);*/
 }
 
 bool NormalEditor::eventFilter(QObject* watched, QEvent* event)

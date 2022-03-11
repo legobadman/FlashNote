@@ -38,6 +38,7 @@ include_directories(
 	../3rdparty/boost_1_55_0
     ../3rdparty/rapidxml
     ../3rdparty/sqlite
+    ../3rdparty/miniblink/include
     ../dbservice
     ../notehook
     )
@@ -45,7 +46,10 @@ include_directories(
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-link_directories(../3rdparty/boost_1_55_0/stage/lib)
+link_directories(
+    ../3rdparty/boost_1_55_0/stage/lib
+    ../3rdparty/miniblink/dll
+)
 
 IF (WIN32)
     SET(SHORTCUT_SRCS "./shortcut/gui/qxtwindowsystem.cpp" "./shortcut/gui/qxtwindowsystem.h" "./shortcut/gui/qxtglobalshortcut_win.cpp" "./shortcut/gui/qxtwindowsystem_win.cpp")
@@ -199,6 +203,8 @@ add_executable(guimain
     ./transaction/transaction.h
     ./uiapplication.cpp
     ./uiapplication.h
+    ./webwidget.cpp
+    ./webwidget.h
 )
 
 target_precompile_headers(guimain PRIVATE ./stdafx.h)

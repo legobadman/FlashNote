@@ -53,6 +53,7 @@ interface INote: public INoteCoreObj
 	virtual HRESULT GetType(NOTE_TYPE* pType) = 0;
 	virtual HRESULT SetType(NOTE_TYPE type) = 0;
 	virtual HRESULT GetContent(std::wstring& pbstrContent) = 0;
+	virtual HRESULT GetContentUrl(std::wstring& pbstrContentUrl) = 0;
 	virtual HRESULT SetContent(const std::wstring& content) = 0;
 	virtual HRESULT GetAbbreText(std::wstring& pbstrAbbre) = 0;
 	virtual HRESULT SetPlainText(const std::wstring& content) = 0;

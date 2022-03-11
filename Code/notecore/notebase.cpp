@@ -2,7 +2,9 @@
 #include "notecore2.h"
 #include "notebase.h"
 #include "guidconst.h"
-
+#include <qapplication.h>
+#include <fstream>
+using namespace std;
 
 NoteBase::NoteBase()
 	: m_type(NOTE_TYPE::NORMAL_NOTE)
@@ -72,9 +74,17 @@ HRESULT NoteBase::GetContent(std::wstring& pbstrContent)
 	return S_OK;
 }
 
+HRESULT NoteBase::GetContentUrl(std::wstring& pbstrContentUrl)
+{
+	pbstrContentUrl = m_bstrContentUrl;
+	return S_OK;
+}
+
 HRESULT NoteBase::SetContent(const std::wstring& content)
 {
 	m_bstrContent = content;
+	if (NORMAL_NOTE == m_type && !content.empty())
+		WriteContentHtml(content);
 	NotifyThisObj(NotifyOperator::Update);
 	return S_OK;
 }
@@ -184,6 +194,21 @@ void NoteBase::NotifyThisObj(NotifyOperator ope)
 			np->onCoreNotify(this, arg);
 		}
 	}
+}
+
+void NoteBase::WriteContentHtml(const std::wstring& content)
+{
+	static QString dataDir = "E:\\FlashNote\\Debug\\bin\\userdata\\";
+	QString fileName = QString("FN_%1.html").arg(m_id);
+	QString absFilePath = dataDir + fileName;
+
+	wofstream fout;
+	fout.imbue(std::locale("chs"));
+	fout.open(absFilePath.toStdString());
+	fout << content << endl;
+	fout.close();
+
+	m_bstrContentUrl = absFilePath.toStdWString();
 }
 
 

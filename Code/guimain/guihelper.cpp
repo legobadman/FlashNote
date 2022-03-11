@@ -228,6 +228,18 @@ QString AppHelper::GetNoteContent(INote* pNote)
 	return content;
 }
 
+QString AppHelper::GetNoteUrl(INote* pNote)
+{
+	if (!pNote)
+	{
+		return "";
+	}
+	std::wstring bstrContentUrl;
+	pNote->GetContentUrl(bstrContentUrl);
+	QString url = QString::fromStdWString(bstrContentUrl);
+	return url;
+}
+
 QString AppHelper::GetNoteAbbre(INote* pNote)
 {
 	if (!pNote)

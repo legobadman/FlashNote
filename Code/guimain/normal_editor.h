@@ -9,14 +9,14 @@
 #include "font_combobox.h"
 #include "fontsize_combobox.h"
 #include "font_combobox.h"
-
+#include "webwidget.h"
 
 class NormalEditor : public QWidget
 {
 	Q_OBJECT
 public:
 	NormalEditor(QWidget* parnet = NULL);
-	void initContent(QString content, bool readOnly);
+	void initContent(QString contentUrl, bool readOnly);
 	QTextDocument* document();
 
 Q_SIGNALS:
@@ -46,6 +46,7 @@ protected slots:
 protected:
 	void fontChanged(const QFont& f);
 	void focusInEvent(QFocusEvent*);
+	void resizeEvent(QResizeEvent* event);
 	bool eventFilter(QObject* watched, QEvent* event);
 
 private:
@@ -73,7 +74,7 @@ private:
 	FontComboSizeBox* fontsize_comboBox;
 	FontColorComboBox* fontcolor;
 
-	RichTextEditor* textEdit;
+	webWidget* textEdit;
 };
 
 #endif

@@ -22,6 +22,7 @@ public:
 	HRESULT GetType(NOTE_TYPE* pType);
 	HRESULT SetType(NOTE_TYPE type);
 	HRESULT GetContent(std::wstring& pbstrContent);
+	HRESULT GetContentUrl(std::wstring& pbstrContentUrl);
 	HRESULT SetContent(const std::wstring& content);
 	HRESULT GetAbbreText(std::wstring& pbstrAbbre);
 	HRESULT SetPlainText(const std::wstring& content);
@@ -37,6 +38,7 @@ public:
 
 private:
 	void NotifyThisObj(NotifyOperator ope);
+	void WriteContentHtml(const std::wstring& content);
 
 private:
 	wstring m_id;
@@ -44,6 +46,7 @@ private:
 	wstring m_bstrTitle;
 	wstring m_bstrContent;
 	wstring m_bstrPlainText;
+	wstring m_bstrContentUrl;
 
 	CORE_NOTIFY_SET m_notifies;
 
