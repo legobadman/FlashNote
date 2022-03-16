@@ -52,10 +52,10 @@ NormalEditor::NormalEditor(QWidget* parent)
 	initSlots();
 }
 
-void NormalEditor::initContent(QString contentUrl, bool readOnly)
+void NormalEditor::initContent(QString content, bool readOnly)
 {
 	textEdit->blockSignals(true);
-	textEdit->loadUrl(contentUrl);
+	textEdit->loadHtmlW(content);
 	//textEdit->setReadOnly(readOnly);//donglm_temp_code
 	//textEdit->updateFrameFormat();
 	textEdit->blockSignals(false);

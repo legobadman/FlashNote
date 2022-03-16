@@ -10,6 +10,7 @@ public:
 	~webWidget();
 public:
 	void loadUrl(const QString& url);
+	void loadHtmlW(const QString& html);
 
 protected:
 	void resizeEvent(QResizeEvent* event);

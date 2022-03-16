@@ -16,7 +16,7 @@ class NormalEditor : public QWidget
 	Q_OBJECT
 public:
 	NormalEditor(QWidget* parnet = NULL);
-	void initContent(QString contentUrl, bool readOnly);
+	void initContent(QString content, bool readOnly);
 	QTextDocument* document();
 
 Q_SIGNALS:

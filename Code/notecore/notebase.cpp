@@ -83,8 +83,8 @@ HRESULT NoteBase::GetContentUrl(std::wstring& pbstrContentUrl)
 HRESULT NoteBase::SetContent(const std::wstring& content)
 {
 	m_bstrContent = content;
-	if (NORMAL_NOTE == m_type && !content.empty())
-		WriteContentHtml(content);
+	//if (NORMAL_NOTE == m_type && !content.empty())
+		//WriteContentHtml(content);
 	NotifyThisObj(NotifyOperator::Update);
 	return S_OK;
 }

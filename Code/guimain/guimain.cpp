@@ -44,7 +44,8 @@ int main(int argc, char *argv[])
 #else
 
 	wkeSetWkeDllPath(L"E:\\FlashNote\\Debug\\bin\\node.dll");
-	wkeInitialize();
+	if (!wkeInitialize())
+		Q_ASSERT(FALSE);
 
 	UiApplication app(argc, argv);
 	QString appDir = QApplication::applicationDirPath();

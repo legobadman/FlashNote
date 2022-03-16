@@ -86,9 +86,8 @@ void NoteEditWindow::updateEditContent()
 
     if (m_type == NORMAL_NOTE)
     {
-		QString url = AppHelper::GetNoteUrl(m_pNote);
 		m_ui->noramlEditor->setEnabled(true);
-        m_ui->noramlEditor->initContent(url, !edittable);
+        m_ui->noramlEditor->initContent(content, !edittable);
         m_ui->stackedWidget->setCurrentIndex(0);
     }
     else if (m_type == MINDMAP)

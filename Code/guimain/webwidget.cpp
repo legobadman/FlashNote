@@ -18,6 +18,11 @@ void webWidget::loadUrl(const QString& url)
 	wkeLoadURL(m_webView, url.toLocal8Bit().data());
 }
 
+void webWidget::loadHtmlW(const QString& html)
+{
+	wkeLoadHTMLW(m_webView, html.toStdWString().c_str());
+}
+
 void webWidget::resizeEvent(QResizeEvent* event)
 {
 	QSize sz = event->size();
