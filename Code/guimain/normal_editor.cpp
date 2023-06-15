@@ -85,7 +85,14 @@ void NormalEditor::init()
 	QSize toolSz = pToolLayout->sizeHint();
 	QSize fram2Sz = frame2->sizeHint();
 	QRectF frameRc = frame2->frameRect();
-	textEdit = new webWidget("https://www.baidu.com", this, QRectF(0, toolSz.height() + fram2Sz.height() +10, frameRc.width(), frameRc.height()));
+
+	//QString url = "https://nme.babylonjs.com/";
+	//QString url = "https://butterfly-dag.gitee.io/butterfly-dag/demo/liteGraph";
+	QString url = "https://jerosoler.github.io/Drawflow/";
+	//QString url = "https://codepen.io/Ni55aN/pen/xzgQYq";
+	//QString url = "http://localhost:3000/";
+
+	textEdit = new webWidget(url, this, QRectF(0, toolSz.height() + fram2Sz.height() +10, frameRc.width(), frameRc.height()));
 	pMainLayout->addWidget(textEdit);
 
 	setLayout(pMainLayout);

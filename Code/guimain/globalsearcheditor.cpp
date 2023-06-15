@@ -55,7 +55,9 @@ GlobalSearchEditor::GlobalSearchEditor(QWidget* parent)
 	m_completer->setFilterMode(Qt::MatchContains);
 	m_completer->setCompletionRole(ItemNoteAllContent);
 	m_completer->setCompletionMode(QCompleter::PopupCompletion);
+#ifdef LUZH_CUSTOM_QT
 	m_completer->setPopupPosPolicy(true);
+#endif
 
 	QAbstractItemView* pPopup = m_completer->popup();
     disconnect(pPopup, SIGNAL(clicked(QModelIndex)), m_completer, SLOT(_q_complete(QModelIndex)));

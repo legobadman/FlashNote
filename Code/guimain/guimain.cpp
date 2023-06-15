@@ -12,6 +12,7 @@
 #include <QtCore/QProcess>
 #include "globalsearcheditor.h"
 #include "wke.h"
+#include "webwidget.h"
 
 
 //#define TEST_SEARCHER
@@ -43,9 +44,12 @@ int main(int argc, char *argv[])
 	db.reconstruct();
 #else
 
-	wkeSetWkeDllPath(L"E:\\FlashNote\\Debug\\bin\\node.dll");
+	wkeSetWkeDllPath(L"C:\\FlashNote\\Code\\3rdparty\\miniblink\\dll\\node.dll");
 	if (!wkeInitialize())
 		Q_ASSERT(FALSE);
+
+	//webWidget* textEdit = new webWidget("https://www.baidu.com");
+	//textEdit->showMaximized();
 
 	UiApplication app(argc, argv);
 	QString appDir = QApplication::applicationDirPath();

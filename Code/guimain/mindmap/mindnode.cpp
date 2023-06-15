@@ -122,7 +122,9 @@ void MindNode::setup(MindMapScene* pScene)
 	initSignalSlots(pScene);
 	initUIColor();
 	initDocFormat(m_content);
+#ifdef LUZH_CUSTOM_QT
 	setCornerRadius(m_cornerRadius);
+#endif
 	createLinkNoteItem();
 	initDirection();
 	initMenu();
@@ -177,6 +179,7 @@ void MindNode::initUIColor()
 		}
 	}
 
+#ifdef LUZH_CUSTOM_QT
 	QPalette pal = palette();
 	pal.setBrush(QPalette::Active, QPalette::Highlight, QColor(0, 129, 218));
 	pal.setBrush(QPalette::Active, QPalette::HighlightedText, QColor(255, 255, 255));
@@ -184,6 +187,7 @@ void MindNode::initUIColor()
 	pal.setBrush(QPalette::Inactive, QPalette::HighlightedText, m_textColor);
 
 	setPalette(pal);
+#endif
 }
 
 void MindNode::initExpandBtns()
@@ -314,7 +318,9 @@ void MindNode::createLinkNoteItem()
 			iconFile = ":/icons/32x32/link_note_black.svg";
 		}
         m_linkItem = new LinkNoteItem(iconFile, this);
+#ifdef LUZH_CUSTOM_QT
 		setDecorationSize(MyStyle::dpiScaled(sIconSize));
+#endif
 		connect(m_linkItem, SIGNAL(triggered()), this, SLOT(onEditAssociateNote()));
 	}
 }
@@ -896,7 +902,9 @@ void MindNode::focusInEvent(QFocusEvent* event)
 void MindNode::focusOutEvent(QFocusEvent* event)
 {
     QGraphicsTextItem::focusOutEvent(event);
+#ifdef LUZH_CUSTOM_QT
     clearSelection();
+#endif
     setTextInteractionFlags(Qt::NoTextInteraction);
 	m_content = document()->toPlainText();
 	//风险：如果逃逸了focusOUt的事件，会导致没法提交事务。
