@@ -18,10 +18,6 @@ public:
 	com_sptr(IUnknown* pObj)
 		: m_ptr(NULL)
 	{
-		if (pObj)
-			pObj->AddRef();
-		if (m_ptr)
-			m_ptr->Release();
 		pObj->QueryInterface(__uuid(T), (void**)&m_ptr);
 	}
 

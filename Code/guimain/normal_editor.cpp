@@ -105,17 +105,20 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	sizePolicy.setHeightForWidth(font_comboBox->sizePolicy().hasHeightForWidth());
 	font_comboBox->setSizePolicy(sizePolicy);
 	font_comboBox->setFixedSize(MyStyle::dpiScaledSize(QSize(150, 28)));
+	font_comboBox->setToolTip(u8"字体");
 	pLayout->addWidget(font_comboBox);
 
 	fontsize_comboBox = new FontComboSizeBox;
 	sizePolicy.setHeightForWidth(fontsize_comboBox->sizePolicy().hasHeightForWidth());
 	fontsize_comboBox->setSizePolicy(sizePolicy);
 	fontsize_comboBox->setFixedSize(MyStyle::dpiScaledSize(QSize(50, 28)));
+	fontsize_comboBox->setToolTip(u8"字号");
 	pLayout->addWidget(fontsize_comboBox);
 
 	fontcolor = new FontColorComboBox;
 	fontcolor->setFixedSize(MyStyle::dpiScaledSize(QSize(45, 30)));
 	fontcolor->setIconSize(MyStyle::dpiScaledSize(QSize(24, 24)));
+	fontcolor->setToolTip(u8"字体颜色");
 	pLayout->addWidget(fontcolor);
 
 	bold = new ToolButton;
@@ -123,6 +126,7 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	bold->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/Bold.png") : QIcon(":/icons/Bold.png"));
 	bold->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	bold->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
+	bold->setToolTip(u8"加粗");
 	pLayout->addWidget(bold);
 
 	italic = new ToolButton;
@@ -130,6 +134,7 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	italic->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/Italic.png") : QIcon(":/icons/Italic.png"));
 	italic->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	italic->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
+	italic->setToolTip(u8"倾斜");
 	pLayout->addWidget(italic);
 
 	underline = new ToolButton;
@@ -137,6 +142,7 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	underline->setIcon(QIcon(":/icons/underline.png"));
 	underline->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	underline->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
+	underline->setToolTip(u8"下划线");
 	pLayout->addWidget(underline);
 
 	strikeout = new ToolButton;
@@ -144,6 +150,7 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	strikeout->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/strikeout.png") : QIcon(":/icons/strikeout.png"));
 	strikeout->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	strikeout->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
+	strikeout->setToolTip(u8"删除线");
 	pLayout->addWidget(strikeout);
 
 	highlight = new ToolButton;
@@ -151,12 +158,14 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	highlight->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/highlighted.png") : QIcon(":/icons/highlighted.png"));
 	highlight->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	highlight->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
+	highlight->setToolTip(u8"高亮");
 	pLayout->addWidget(highlight);
 
 	codeblock = new ToolButton;
 	codeblock->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
 	codeblock->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/codeblock.png") : QIcon(":/icons/codeblock.png"));
 	codeblock->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	codeblock->setToolTip(u8"插入代码块");
 	pLayout->addWidget(codeblock);
 
 	item_symbol = new ToolButton;
@@ -164,6 +173,7 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	item_symbol->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/item_symbol.png") : QIcon(":/icons/item_symbol.png"));
 	item_symbol->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	item_symbol->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
+	item_symbol->setToolTip(u8"无序列表");
 	pLayout->addWidget(item_symbol);
 
 	item_id = new ToolButton;
@@ -171,9 +181,11 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	item_id->setIcon(dpi < 1.5 ? QIcon(":/icons/16x16/item_id.png") : QIcon(":/icons/item_id.png"));
 	item_id->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
 	item_id->setButtonStyle(ToolButton::ButtonIcon | ToolButton::ButtonCheckable);
+	item_id->setToolTip(u8"有序列表");
 	pLayout->addWidget(item_id);
 
 	alignment2 = new AlignmentComboBox;
+	alignment2->setToolTip(u8"对齐");
 	pLayout->addWidget(alignment2);
 
 	vline2 = new SeperateVLine;
@@ -183,12 +195,14 @@ QHBoxLayout* NormalEditor::initToolButtons()
 	photo->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
 	photo->setIcon(QIcon(":/icons/camera.png"));
 	photo->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	photo->setToolTip(u8"照相机");
 	pLayout->addWidget(photo);
 
     attachment = new ToolButton;
     attachment->setFixedSize(MyStyle::dpiScaledSize(QSize(30, 30)));
     attachment->setIcon(QIcon(":/icons/16x16/attachment.png"));
     attachment->setIconSize(MyStyle::dpiScaledSize(QSize(16, 16)));
+	attachment->setToolTip(u8"跳转到笔记");
     pLayout->addWidget(attachment);
 
 	QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);

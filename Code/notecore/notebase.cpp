@@ -298,6 +298,7 @@ HRESULT NotebookBase::QueryInterface(
 	{
 		return E_FAIL;
 	}
+	reinterpret_cast<IUnknown*>(*ppvObject)->AddRef();
 	return S_OK;
 }
 
