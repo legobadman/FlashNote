@@ -33,7 +33,9 @@ void MindProgressNode::setup(MindMapScene* pScene)
 	{
 		updateToParent();
 	}
+#ifdef ENABLE_QT_MOCK
 	QGraphicsTextItem::setProgress(m_progress);
+#endif
 	updateToolTip();
 	updateTipIcon();
 }
@@ -61,11 +63,15 @@ void MindProgressNode::updateNodeColor()
 	setTextColor(QColor(0, 0, 0));
 	if (hasNoChildren() && !isTopRoot())
 	{
+#ifdef ENABLE_QT_MOCK
 		QGraphicsTextItem::setProgressColor(QColor(255, 255, 255), QColor(255, 255, 255));
+#endif
 	}
 	else
 	{
+#ifdef ENABLE_QT_MOCK
 		QGraphicsTextItem::setProgressColor(QColor(242, 242, 242), QColor(0, 181, 72));
+#endif
 	}
 }
 
@@ -138,8 +144,9 @@ void MindProgressNode::_setProgress(float progress)
 	}
 
 	setProgress(progress);
-
+#ifdef ENABLE_QT_MOCK
 	QGraphicsTextItem::setProgress(m_progress);
+#endif
 	updateNodeColor();
 	update();
 

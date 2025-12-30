@@ -122,7 +122,9 @@ void MindNode::setup(MindMapScene* pScene)
 	initSignalSlots(pScene);
 	initUIColor();
 	initDocFormat(m_content);
+#ifdef ENABLE_QT_MOCK
 	setCornerRadius(m_cornerRadius);
+#endif
 	createLinkNoteItem();
 	initDirection();
 	initMenu();
@@ -177,13 +179,14 @@ void MindNode::initUIColor()
 		}
 	}
 
+#ifdef ENABLE_QT_MOCK
 	QPalette pal = palette();
 	pal.setBrush(QPalette::Active, QPalette::Highlight, QColor(0, 129, 218));
 	pal.setBrush(QPalette::Active, QPalette::HighlightedText, QColor(255, 255, 255));
 	pal.setBrush(QPalette::Inactive, QPalette::Highlight, m_backgroudColor);
 	pal.setBrush(QPalette::Inactive, QPalette::HighlightedText, m_textColor);
-
 	setPalette(pal);
+#endif
 }
 
 void MindNode::initExpandBtns()
@@ -314,7 +317,9 @@ void MindNode::createLinkNoteItem()
 			iconFile = ":/icons/32x32/link_note_black.svg";
 		}
         m_linkItem = new LinkNoteItem(iconFile, this);
+#ifdef ENABLE_QT_MOCK
 		setDecorationSize(MyStyle::dpiScaled(sIconSize));
+#endif
 		connect(m_linkItem, SIGNAL(triggered()), this, SLOT(onEditAssociateNote()));
 	}
 }
@@ -896,7 +901,9 @@ void MindNode::focusInEvent(QFocusEvent* event)
 void MindNode::focusOutEvent(QFocusEvent* event)
 {
     QGraphicsTextItem::focusOutEvent(event);
+#ifdef ENABLE_QT_MOCK
     clearSelection();
+#endif
     setTextInteractionFlags(Qt::NoTextInteraction);
 	m_content = document()->toPlainText();
 	//风险：如果逃逸了focusOUt的事件，会导致没法提交事务。

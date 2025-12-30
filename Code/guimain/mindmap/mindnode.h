@@ -10,6 +10,9 @@
 #include "mindtransaction.h"
 #include "linknoteitem.h"
 
+
+//#define ENABLE_QT_MOCK
+
 class MindMapScene;
 
 class RoundedRectItem;
