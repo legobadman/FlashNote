@@ -9,7 +9,13 @@
 #include "globalsearcheditor.h"
 #include <QtWidgets/QDesktopWidget>
 
+
+#ifdef Q_OS_WIN
 typedef void (*PFN_HOOK_FUNC)();
+extern HHOOK gLocalHook;
+LRESULT CALLBACK MouseMsgProcLL(int code, WPARAM wParam, LPARAM lParam);
+#endif
+
 
 UiApplication::UiApplication(int& argc, char** argv)
 	: QApplication(argc, argv)
@@ -18,6 +24,7 @@ UiApplication::UiApplication(int& argc, char** argv)
 	, m_hNamedEvent(INVALID_HANDLE_VALUE)
 #endif
 	, m_pSearchEditor(NULL)
+	, m_bLocalHook(true)
 {
 	QApplication::setStyle(new MyStyle);
     static QTranslator mpQtTr;
@@ -116,27 +123,41 @@ void UiApplication::onHookChecked(bool bChecked)
 		uninstallGlobalHook();
 }
 
+void UiApplication::captureText(const QString& text, const QPoint& pos) {
+	m_mainWindow->captureText(text, pos);
+}
+
 void UiApplication::installGlobalHook()
 {
 #ifdef Q_OS_WIN
-	HMODULE hDll = LoadLibrary("notehook.dll");
-	PFN_HOOK_FUNC hookInstall = (PFN_HOOK_FUNC)GetProcAddress(hDll, "installHook");
-	if (hookInstall)
-		hookInstall();
+	if (m_bLocalHook) {
+		gLocalHook = SetWindowsHookEx(WH_MOUSE_LL, MouseMsgProcLL, GetModuleHandle(NULL), 0);
+	}
+	else {
+		HMODULE hDll = LoadLibrary("notehook.dll");
+		PFN_HOOK_FUNC hookInstall = (PFN_HOOK_FUNC)GetProcAddress(hDll, "installHook");
+		if (hookInstall)
+			hookInstall();
+		//FreeLibrary(hDll);
+	}
 #endif
 }
 
 void UiApplication::uninstallGlobalHook()
 {
 #ifdef Q_OS_WIN
-	HMODULE hDll = LoadLibrary("notehook.dll");
-	PFN_HOOK_FUNC hookUninstall = (PFN_HOOK_FUNC)GetProcAddress(hDll, "uninstallHook");
-	if (hookUninstall)
-		hookUninstall();
-	m_mainWindow->_temp_hide_floatWin();
+	if (m_bLocalHook) {
+		UnhookWindowsHookEx(gLocalHook);
+	}
+	else {
+		HMODULE hDll = LoadLibrary("notehook.dll");
+		PFN_HOOK_FUNC hookUninstall = (PFN_HOOK_FUNC)GetProcAddress(hDll, "uninstallHook");
+		if (hookUninstall)
+			hookUninstall();
+		m_mainWindow->_temp_hide_floatWin();
+	}
 #endif
 }
-
 
 void UiApplication::showFloatingSearcher()
 {

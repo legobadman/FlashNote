@@ -15,6 +15,7 @@ public:
 
 	INoteApplication* coreApplication();
 	void showWidget();
+	void captureText(const QString& text, const QPoint& pos);
 
 public slots:
 	void onQuickApp();
@@ -38,13 +39,13 @@ private:
 	NoteTrayIcon m_trayIcon;
 	com_sptr<INoteApplication> m_spApp;
 	QSharedPointer<NoteMainWindow> m_mainWindow;
-	FloatingMenuButton* m_pMenuButton;
 	GlobalSearchEditor* m_pSearchEditor;
 #ifdef Q_OS_WIN
 	HANDLE m_hFileMapT;
 	HANDLE m_hNamedEvent;
 	HANDLE m_hThread;
 #endif
+	bool m_bLocalHook;   //不注入dll，挂钩代码回调到本进程。
 };
 
 #endif

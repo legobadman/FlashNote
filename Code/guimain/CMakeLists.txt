@@ -199,6 +199,7 @@ add_executable(guimain
     ./transaction/transaction.h
     ./uiapplication.cpp
     ./uiapplication.h
+    ./capturehook.cpp
 )
 
 target_precompile_headers(guimain PRIVATE ./stdafx.h)

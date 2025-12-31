@@ -124,6 +124,19 @@ void NoteMainWindow::_temp_hide_floatWin()
 		m_pMenuButton->hide();
 }
 
+void NoteMainWindow::captureText(const QString& text, const QPoint& pos) {
+	if (m_pMenuButton)
+		m_pMenuButton->SetExtractText(text);
+
+	if (text.isEmpty()) {
+		m_pMenuButton->hide();
+	}
+	else {
+		m_pMenuButton->setGeometry(QRect(pos.x() + 20, pos.y() + 20, 32, 32));
+		m_pMenuButton->show();
+	}
+}
+
 void NoteMainWindow::onNewNote(NOTE_TYPE noteType)
 {
 	NewNoteWindow* pNewNoteWindow = new NewNoteWindow(NULL, noteType);

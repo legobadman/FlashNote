@@ -24,6 +24,7 @@ public slots:
 	void initNotesView(int idxNotebook, int idxNote);
 	void initMenuSignal();
 	void _temp_hide_floatWin();
+	void captureText(const QString& text, const QPoint& pos);
 
 protected:
 	void closeEvent(QCloseEvent* event) override;

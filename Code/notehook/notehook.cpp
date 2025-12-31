@@ -11,14 +11,14 @@ HHOOK g_KeyboardHook = NULL;
 HHOOK g_msgHook = NULL;
 HANDLE hFileMapT = INVALID_HANDLE_VALUE;
 HANDLE hEvent = INVALID_HANDLE_VALUE;
-char* p = NULL;
+char* strHostProgram = NULL;
 
 #define ENABLE_MOUSE_HOOK
 
 #define HOST_PROCESS "flashnote.exe"
 #define WHITE_LIST "WeChat.exe"
-//#define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
-#define FLOAT_WIN_CLASS L"Qt5150QWindowIcon"
+#define FLOAT_WIN_CLASS L"Qt5150dQWindowIcon"
+//#define FLOAT_WIN_CLASS L"Qt5150QWindowIcon"
 #define FLOAT_WIN_NAME L"笔记"	//如果窗口标题改了就要同步这个
 
 DWORD buffSize = 1024;
@@ -107,7 +107,8 @@ HRESULT FindTextPatternElement(IUIAutomation* automation, _In_ IUIAutomationElem
 
 LRESULT CALLBACK MouseMsgProc(int code, WPARAM wParam, LPARAM lParam)
 {
-	if (code < 0)
+	bool hostProgName = strHostProgram && strcmp(strHostProgram + 1, "flashnote.exe") == 0;
+	if (code < 0/* || hostProgName*/)
 		return CallNextHookEx(g_msgHook, code, wParam, lParam);
 
 	PMOUSEHOOKSTRUCT pHookStruct = (PMOUSEHOOKSTRUCT)lParam;
@@ -276,8 +277,8 @@ LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 void installHook()
 {
-	//g_msgHook = SetWindowsHookEx(WH_MOUSE, MouseMsgProc, g_hInstance, 0);
-	g_msgHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, g_hInstance, 0);
+	g_msgHook = SetWindowsHookEx(WH_MOUSE, MouseMsgProc, g_hInstance, 0);
+	//g_msgHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, g_hInstance, 0);
 }
 
 void uninstallHook()
@@ -346,12 +347,14 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	LPVOID lpReserved
 )
 {
-	//GetModuleFileName(NULL, ProcessName, buffSize);
-	//p = strrchr(ProcessName, '\\');
+	GetModuleFileName(NULL, ProcessName, buffSize);
+	strHostProgram = strrchr(ProcessName, '\\');
 
 	//方便调试，但好像后续的程序都没有加载
-	//if (p && strcmp(p + 1, "devenv.exe") == 0)
-		//return FALSE;
+	if (strHostProgram && strcmp(strHostProgram + 1, "devenv.exe") == 0)
+		return FALSE;
+
+	//MessageBox(NULL, strHostProgram, NULL, MB_OK);
 
 	g_hInstance = hModule;
 	switch (ul_reason_for_call)
