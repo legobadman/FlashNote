@@ -6,12 +6,10 @@
 #include "floatingmenubutton.h"
 #include "screenshot/screenshotwindow.h"
 #include "shortcut/gui/qxtglobalshortcut.h"
-#ifdef Q_OS_WIN
-#include "notehook.h"
-#endif
 #include "globalsearcheditor.h"
 #include <QtWidgets/QDesktopWidget>
 
+typedef void (*PFN_HOOK_FUNC)();
 
 UiApplication::UiApplication(int& argc, char** argv)
 	: QApplication(argc, argv)
@@ -121,14 +119,20 @@ void UiApplication::onHookChecked(bool bChecked)
 void UiApplication::installGlobalHook()
 {
 #ifdef Q_OS_WIN
-	installHook();
+	HMODULE hDll = LoadLibrary("notehook.dll");
+	PFN_HOOK_FUNC hookInstall = (PFN_HOOK_FUNC)GetProcAddress(hDll, "installHook");
+	if (hookInstall)
+		hookInstall();
 #endif
 }
 
 void UiApplication::uninstallGlobalHook()
 {
 #ifdef Q_OS_WIN
-	uninstallHook();
+	HMODULE hDll = LoadLibrary("notehook.dll");
+	PFN_HOOK_FUNC hookUninstall = (PFN_HOOK_FUNC)GetProcAddress(hDll, "uninstallHook");
+	if (hookUninstall)
+		hookUninstall();
 	m_mainWindow->_temp_hide_floatWin();
 #endif
 }

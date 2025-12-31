@@ -268,9 +268,16 @@ LRESULT CALLBACK MouseMsgProc2(int code, WPARAM wParam, LPARAM lParam)
 	return CallNextHookEx(g_msgHook, code, wParam, lParam);
 }
 
+
+LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+	return CallNextHookEx(g_msgHook, nCode, wParam, lParam);;
+}
+
 void installHook()
 {
-	g_msgHook = SetWindowsHookEx(WH_MOUSE, MouseMsgProc, g_hInstance, 0);
+	//g_msgHook = SetWindowsHookEx(WH_MOUSE, MouseMsgProc, g_hInstance, 0);
+	g_msgHook = SetWindowsHookEx(WH_KEYBOARD, KeyboardProc, g_hInstance, 0);
 }
 
 void uninstallHook()
@@ -339,8 +346,8 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	LPVOID lpReserved
 )
 {
-	GetModuleFileName(NULL, ProcessName, buffSize);
-	p = strrchr(ProcessName, '\\');
+	//GetModuleFileName(NULL, ProcessName, buffSize);
+	//p = strrchr(ProcessName, '\\');
 
 	//方便调试，但好像后续的程序都没有加载
 	//if (p && strcmp(p + 1, "devenv.exe") == 0)

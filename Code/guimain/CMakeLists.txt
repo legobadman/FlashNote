@@ -208,7 +208,7 @@ get_filename_component(_qt_bin_dir "${_qt_bin_dir}" DIRECTORY)
 
 # Add the Qt5 Widgets for linking
 if (WIN32)
-	target_link_libraries(guimain notecore Qt5::Widgets Qt5::Svg dbservice sqlite Ws2_32 notehook)
+	target_link_libraries(guimain notecore Qt5::Widgets Qt5::Svg dbservice sqlite Ws2_32)
     add_custom_command(TARGET guimain POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${BUILD_ROOT}/bin/translations/)
 	add_custom_command(TARGET guimain POST_BUILD
